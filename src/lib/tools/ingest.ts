@@ -79,9 +79,9 @@ const extensions = process.argv[3];
 collectDocuments(directory, extensions, (filePath) => {
 	console.log(`Function executed on document: ${filePath}`);
 })
-.then((documents) => {
-    console.log(documents);
-})
-.catch((error) => {
-    console.error(error);
-});
+	.then((documents) => {
+		console.log(documents);
+	})
+	.catch((error) => {
+		console.error(error);
+	});
