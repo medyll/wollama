@@ -10,7 +10,7 @@ import path from 'path';
  * @returns A promise that resolves to an array of collected document paths.
  * @throws {Error} If the directory parameter is missing.
  */
-export async function collectDocuments(
+export async function ingest(
 	directory: string | string[],
 	extensions?: string | string[],
 	fn?: (filePath: string) => void
@@ -73,15 +73,4 @@ export async function collectDocuments(
 	return documents;
 }
 
-const directory = process.argv[2];
-const extensions = process.argv[3];
 
-collectDocuments(directory, extensions, (filePath) => {
-	console.log(`Function executed on document: ${filePath}`);
-})
-	.then((documents) => {
-		console.log(documents);
-	})
-	.catch((error) => {
-		console.error(error);
-	});
