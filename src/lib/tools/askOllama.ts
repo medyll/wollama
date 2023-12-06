@@ -1,10 +1,11 @@
-import { Ollama } from 'ollama-node';
+//import { Ollama } from 'ollama-node';
 import type { MessageType } from '../stores/messages';
+import { OllamaFetch } from './ollamaFetch';
 
 const systemprompt = '';
 
 export async function askOllama(prompt: string, model: string) {
-	try {
+	/* try {
 		const ollama = new Ollama();
 		await ollama.setModel('llama2-uncensored');
 
@@ -14,20 +15,19 @@ export async function askOllama(prompt: string, model: string) {
 		return output.output;
 	} catch (error) {
 		console.error(error);
-	}
+	} */
 }
 
 export async function guessChatTitle(message: MessageType): Promise<{
 	output: any;
 	stats: any;
 }> {
-	const prompt = `You must generate a short title, around 3 to 5 words, for this following message, excluding the term 'title.' 
-	Then, please reply with only the title. here is the message : \n ${message?.content}`;
-console.log( {prompt});
-	const ollama = new Ollama();
-	await ollama.setModel('llama2-uncensored');
-	await ollama.setSystemPrompt('systemprompt');
-	return await ollama.generate(prompt);
+	const prompt = `You must generate a short title, maximum 4 words long,  for this following message, excluding the term 'title.' 
+	Then, please reply with only the title and never more than 5 words. here is the message :  ${message?.content}`;
+
+	const ollama_fetch = new OllamaFetch();
+	return await ollama_fetch.generate(prompt);
+ 
 }
 
 export const createMessage = (message: MessageType) => {

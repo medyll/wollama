@@ -21,14 +21,17 @@
 
 	$: if (
 		$activeChatId &&
-		$chatList[$activeChatId]?.title === 'New Chat' &&
+		chatList.getChat($activeChatId)?.title === 'New Chat' &&
 		Object.entries($chatList[$activeChatId]?.messages).length === 2
-	) { 
-		// concat the 2 first messages
+	) {
+		console.log('listen');
+		//
 		const content = Object.values(chatList.getChatMessages($activeChatId))[0];
-		/* guessChatTitle(content).then((res)=>{
-			console.log(res)
-		}); */
+		guessChatTitle(content).then((res) => {
+			console.log(res);
+			if (res?.response === '') return;
+			chatList.updateChat($activeChatId, { title: res?.response });
+		});
 	}
 
 	function sendRequest(content: string) {
@@ -51,7 +54,7 @@
 		chatList.createChatMessage($activeChatId, messageAssistant);
 
 		//
-		chatList.getChatMessage($activeChatId,message.id); 
+		chatList.getChatMessage($activeChatId, message.id);
 		// send prompt
 		sendPrompt(content, (content, done) => {
 			if (done) {

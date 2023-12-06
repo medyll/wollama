@@ -1,4 +1,4 @@
-import { Ollama } from 'ollama-node';
+import type { ReaderData } from './tools/ollamaFetch';
 
 const models = ['llama2-uncensored'];
 
@@ -19,19 +19,7 @@ export const readerConst = {
 const askOllama = async (model: any, prompt: any, hook: (content: string | undefined, end?: boolean) => void) => {
 	readerConst.stop = false;
 
-	type ReaderData = {
-		model: string;
-		create_at: string;
-		done: boolean;
-		response: string;
-		context: any;
-		total_duration: number;
-		load_duration: number;
-		prompt_eval_count: number;
-		prompt_eval_duration: number;
-		eval_count: number;
-		eval_duration: number;
-	};
+ 
 
 	const query = await sendQuery(prompt, lastContext, model);
 

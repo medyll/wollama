@@ -32,11 +32,11 @@ function chatListStore() {
 	function storeData() {
 		clearTimeout(dataStoreTimer);
 		dataStoreTimer = setTimeout(() => {
-			localStorage.storable = JSON.stringify(currentStore);
+			localStorage.chatList = JSON.stringify(currentStore);
 		}, 500);
 	}
 
-	isBrowser && localStorage.storable && set(JSON.parse(localStorage.storable));
+	isBrowser && localStorage.chatList && set(JSON.parse(localStorage.chatList));
 
 	return {
 		subscribe,
