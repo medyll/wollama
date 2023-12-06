@@ -8,6 +8,7 @@ export interface Settings {
 	API_BASE_URL?: string;
 	modelList?: string[];
 	chatModelKeys?: string[];
+	defaultModel?: string;
 	llamaOptions?: {
 		seed?: string;
 		temperature?: number;
@@ -18,4 +19,4 @@ export interface Settings {
 	};
 }
 
-export const settings = writable<Settings>({});
+export const settings = writable<Settings>({defaultModel:'llama2-uncensored'});

@@ -6,6 +6,7 @@
 	import { createChat, createMessage, guessChatTitle } from '$lib/tools/askOllama';
 	import { messageList } from '../stores/messages';
 	import { activeChatId, chatList } from '$lib/stores/chatList';
+	import { settings } from '$lib/stores/settings';
 
 	let submitPrompt: Function;
 
@@ -37,7 +38,7 @@
 		let chatId = $activeChatId ?? undefined;
 		// if no active chatId, create new chat
 		if (!$activeChatId) {
-			const newChat = createChat();
+			const newChat = createChat({models:[$settings.defaultModel]});
 			chatId = newChat.id;
 			// set ActiveId
 			activeChatId.set(newChat.id);

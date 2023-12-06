@@ -42,11 +42,12 @@ export const createMessage = (message: MessageType) => {
 	};
 };
 
-export const createChat = () => {
+export const createChat = (chatData:any= {}  ) => {
 	return {
 		id: crypto.randomUUID(),
 		title: 'New Chat',
 		models: [],
-		messages: {}
+		messages: {},
+		...chatData
 	};
 };
