@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { chatList } from './../stores/chatList.js';
+	import { activeChatId, chatList } from './../stores/chatList.js';
 	import { goto } from '$app/navigation';
 	import { settings } from '$lib/stores/settings';
 	import { userProfile } from '../stores/users';
@@ -7,6 +7,7 @@
 
 	let showDropDown: boolean = false;
 	const loadChat = async (id: string) => {
+		activeChatId.set(id)
 		goto(`/chat/${id}`);
 	};
 </script>

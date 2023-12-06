@@ -1,8 +1,7 @@
 <script lang="ts">
 	import InputZone from '$lib/components/Speech.svelte';
 	import MessageList from '$lib/components/MessageList.svelte';
-	import Model from '$lib/components/Model.svelte';
-	import Navbar from '$lib/components/Navbar.svelte';
+	import Model from '$lib/components/Model.svelte'; 
 	import { sendPrompt } from '$lib/promptSender';
 	import { createChat, createMessage, guessChatTitle } from '$lib/tools/askOllama';
 	import { messageList } from '../stores/messages';
