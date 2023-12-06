@@ -9,9 +9,8 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"module": "ESNext",
-		"types": ["vite/client", "svelte", "@sveltejs/kit"],
-		"moduleResolution": "bundler"
+		"module": "ESNext"
+		// "types": ["vite/client", "svelte", "@sveltejs/kit"],
 	},
 	"include": ["src/**/*"],
 	"exclude": ["**/*.spec.ts"]

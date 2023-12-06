@@ -1,0 +1,38 @@
+@font-face {
+	font-family : 'Arimo';
+	src         : url('../assets/fonts/Arimo-Variable.ttf');
+	font-display: swap;
+}
+
+@font-face {
+	font-family : 'Mona Sans';
+	src         : url('../assets/fonts/Mona-Sans.woff2');
+	font-display: swap;
+}
+
+html {
+	word-break: break-word;
+	height:100%;
+	min-height:100%
+}
+
+body{
+	height:100%;
+	min-height:100%;
+	word-break: break-word;
+}
+
+.spin {
+  animation-name: spin;
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+@keyframes spin {
+  from {
+    transform:rotate(0deg);
+  }
+  to {
+    transform:rotate(360deg);
+  }
+}
