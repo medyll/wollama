@@ -17,6 +17,16 @@ export async function askOllama(prompt: string, model: string) {
 	}
 }
 
+export async function guessChatTitle(message: MessageType) {
+	const prompt = `Generate a brief title, around 3 to 5 words, for this question, excluding the term 'title.' 
+	Then, please reply with only the title. here is the ${message.content}`;
+
+	const ollama = new Ollama();
+	await ollama.setModel('llama2-uncensored');
+	return await ollama.generate(prompt);
+
+}
+
 export const createMessage = (message: MessageType) => {
 	return {
 		id: crypto.randomUUID(),
@@ -26,5 +36,14 @@ export const createMessage = (message: MessageType) => {
 		childrenIds: [],
 		content: message.content,
 		role: message.role
+	};
+};
+
+export const createChat = () => {
+	return {
+		id: crypto.randomUUID(),
+		title: 'New Chat',
+		models: [],
+		messages: {}
 	};
 };

@@ -12,7 +12,7 @@
 </script>
 
 <input placeholder="Search" bind:value={search} />
-{#each Object.values($chatList ?? [1, 2]) as chat}
+{#each Object.values($chatList ?? []) as chat}
 	<button
 		class=" flex rounded-md p-3.5 w-full"
 		on:click={() => {

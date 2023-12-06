@@ -4,7 +4,7 @@ const models = ['llama2-uncensored'];
 
 let lastContext: number[] = [];
 
-export const sendPrompt = async (prompt: any, hook: (content: any) => void) => {
+export const sendPrompt = async (prompt: any, hook: (content: any, end?: boolean) => void) => {
 	await Promise.all(
 		models.map(async (model) => {
 			await askOllama(model, prompt, hook);
@@ -16,7 +16,7 @@ export const readerConst = {
 	stop: false
 };
 
-const askOllama = async (model: any, prompt: any, hook: (content: any) => void) => {
+const askOllama = async (model: any, prompt: any, hook: (content: string | undefined, end?: boolean) => void) => {
 	readerConst.stop = false;
 
 	type ReaderData = {
@@ -42,7 +42,10 @@ const askOllama = async (model: any, prompt: any, hook: (content: any) => void) 
 
 	while (true) {
 		const { value, done } = await streamReader.read();
-		if (done ?? readerConst.stop) break;
+		if (done ?? readerConst.stop) {
+			if (hook) hook(undefined,true);
+			break;
+		}
 
 		try {
 			const lines = value.split('\n');
@@ -51,7 +54,6 @@ const askOllama = async (model: any, prompt: any, hook: (content: any) => void) 
 					const data: ReaderData = JSON.parse(line);
 					if (data.response !== '\n') {
 						if (hook) hook(data.response);
-						//lastCon.streamingGenerateontext;
 					}
 				}
 			}

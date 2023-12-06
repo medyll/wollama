@@ -35,7 +35,8 @@
 		<div class="flex-1 font-bold p-2">{message.role}</div>
 	</div>
 	<div class="flex-1 px-2 whitespace-pre-line">
-		{#if message?.content  === ''}
+	{@html message?.content ? marked(message?.content) : ''}
+		<!-- {#if message?.content  === ''}
 			<pre class="animate-pulse"> 
 				<div class="h-2 bg-gray-200 dark:bg-gray-600 rounded col-span-2" />
 				<div class="h-2 bg-gray-200 dark:bg-gray-600 rounded col-span-2" />
@@ -44,6 +45,6 @@
 			</pre>
 		{:else}
 			{@html message?.content ? marked(message?.content) : ''}
-		{/if}
+		{/if} -->
 	</div>
 </div>

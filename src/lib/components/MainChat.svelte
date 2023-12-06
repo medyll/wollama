@@ -4,8 +4,9 @@
 	import Model from '$lib/components/Model.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { sendPrompt } from '$lib/promptSender';
-	import { createMessage } from '$lib/tools/askOllama';
+	import { createChat, createMessage } from '$lib/tools/askOllama';
 	import { messageList } from '../stores/messages';
+	import { activeChatId, chatList } from '$lib/stores/chatList';
 
 	let submitPrompt: Function;
 
@@ -14,30 +15,54 @@
 	let prompt: string = '';
 	let streamResponseText: string = '';
 
-	/* if (Object.values($messageList.length).length > 1) {
-		// window.history.replaceState(history.state, '', `/c/activeChat/activeChat`); 
-	} */
+	$: if ($activeChatId && Object.values($messageList ?? {}).length > 1) {
+		window.history.replaceState(history.state, '', `/chat/${$activeChatId}`);
+	}
+
+	$: if (
+		$activeChatId &&
+		$chatList[$activeChatId]?.title === 'New Chat' &&
+		Object.entries($chatList[$activeChatId]?.messages).length === 2
+	) {
+		console.log(Object.entries($chatList[$activeChatId]?.messages));
+		// concat the 2 first messages
+		// guessChatTitle();
+	}
 
 	function sendRequest(content: string) {
-		// build message
+		let chatId = $activeChatId ?? undefined;
+		// if no active chatId, create new chat
+		if (!$activeChatId) {
+			const newChat = createChat();
+			chatId = newChat.id;
+			// set ActiveId
+			activeChatId.set(newChat.id);
+			// add chat to store
+			chatList.setChat(newChat);
+		}
+		//
 		const message = createMessage({ role: 'user', content });
 		const messageAssistant = createMessage({ role: 'assistant', parentId: message.id });
 
 		// add message to list
-		messageList.update((n) => ({
-			...n,
-			[message.id]: message,
-			[messageAssistant.id]: messageAssistant
-		}));
+		chatList.createChatMessage($activeChatId, message);
+		chatList.createChatMessage($activeChatId, messageAssistant);
 
+		//
+		chatList.getChatMessage($activeChatId,message.id); 
 		// send prompt
-		sendPrompt(content, (content) => {
-			streamResponseText += content;
-			const newcont = $messageList[messageAssistant.id];
-			messageList.update((n) => ({
-				...n,
-				[messageAssistant.id]: { ...newcont, content: streamResponseText }
-			}));
+		sendPrompt(content, (content, done) => {
+			if (done) {
+				streamResponseText = '';
+				return;
+			}
+
+			streamResponseText += content ?? '';
+
+			chatList.updateChatMessage($activeChatId, {
+				id: messageAssistant.id,
+				content: streamResponseText
+			});
 		});
 	}
 </script>
@@ -45,34 +70,36 @@
 <div class="flex flex-col h-full w-full overflow-auto relative">
 	<Model />
 	<div class="flex-1 mb-32">
-		<MessageList />
+		<MessageList chatId={$activeChatId} />
 	</div>
-	<div class="w-full y-b fixed  margb-0 max-w-3xl bottom-0">
+	<div class="w-full y-b fixed margb-0 max-w-3xl bottom-0">
 		<form
 			id="prompt-form"
 			on:submit|preventDefault={() => {
 				submitPrompt(prompt);
 			}}
 		/>
-		<div class="flex place-items-center rounded-xl dark:bg-gray-800 dark:border-gray-100 dark:text-gray-100">
+		<div
+			class="flex place-items-center rounded-xl dark:bg-gray-800 dark:border-gray-100 dark:text-gray-100"
+		>
 			<textarea
 				class="flex-1 border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-gray-100 outline-none py-3 px-2 resize-none"
 				placeholder={voiceListening ? 'Listening...' : 'Write a message'}
 				disabled={voiceListening}
 				bind:value={prompt}
 				on:keypress={(e) => {
-					if (e.key === 'Enter'  && !e.shiftKey ) {
-						e.preventDefault()
+					if (e.key === 'Enter' && !e.shiftKey) {
+						e.preventDefault();
 						sendRequest(prompt);
 					}
 				}}
 				rows="1"
 				form="prompt-form"
 			/>
-			<div  >
+			<div>
 				<InputZone onEnd={sendRequest} bind:prompt bind:voiceListening />
 			</div>
 		</div>
-		<div class="text-xs  text-center">Caution message</div>
+		<div class="text-xs text-center">Caution message</div>
 	</div>
 </div>

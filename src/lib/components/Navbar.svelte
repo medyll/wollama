@@ -6,7 +6,7 @@
 <div class="flex justify-middle">
 	<button
 		on:click={async () => {
-			goto('/chat/123456');
+			goto('/');
 		}}
 		class="flex"
 	>
