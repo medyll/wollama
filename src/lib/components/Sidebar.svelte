@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { chatList } from './../stores/chatList.js';
 	import { goto } from '$app/navigation';
+	import { settings } from '$lib/stores/settings';
 	import { userProfile } from '../stores/users';
 	let search: any = '';
 
@@ -10,6 +12,16 @@
 </script>
 
 <input placeholder="Search" bind:value={search} />
+{#each Object.values($chatList ?? [1, 2]) as chat}
+	<button
+		class=" flex rounded-md p-3.5 w-full"
+		on:click={() => {
+			loadChat(chat.id);
+		}}
+	>
+		<div>{chat.title}</div>
+	</button>
+{/each}
 <button
 	on:click={() => {
 		goto('/admin');
@@ -28,7 +40,7 @@
 			}, 150);
 		}}
 	>
-		<div>User profile</div> 
+		<div>User profile</div>
 	</button>
 
 	<button

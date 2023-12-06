@@ -2,7 +2,7 @@
 	import { messageList } from '../stores/messages';
 	import Message from '$lib/components/Message.svelte';
 
-	console.log($messageList)
+	 
 </script>
 
 <div class="flex-v w-full h-full overflow-x-auto">

@@ -59,6 +59,7 @@
 		"marked": "^11.0.0",
 		"ollama-node": "^0.1.27",
 		"svelte-french-toast": "^1.2.0",
+		"svelte-loading-skeleton": "^1.0.1",
 		"ts-node": "^10.9.1"
 	}
 }

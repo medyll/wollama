@@ -3,10 +3,11 @@ import { writable } from 'svelte/store';
 export interface Settings {
 	speechAutoSend?: boolean;
 	speechRecognition?: SpeechRecognition;
-	system: string;
+	system?: string;
 	requestFormat?: string;
 	API_BASE_URL?: string;
 	modelList?: string[];
+	chatModelKeys?: string[];
 	llamaOptions?: {
 		seed?: string;
 		temperature?: number;

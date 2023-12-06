@@ -44,10 +44,10 @@
 
 <div class="flex flex-col h-full w-full overflow-auto relative">
 	<Model />
-	<div class="flex-1">
+	<div class="flex-1 mb-32">
 		<MessageList />
 	</div>
-	<div class="w-full y-b fixed max-w-3xl bottom-0">
+	<div class="w-full y-b fixed  margb-0 max-w-3xl bottom-0">
 		<form
 			id="prompt-form"
 			on:submit|preventDefault={() => {
@@ -56,16 +56,17 @@
 		/>
 		<div class="flex place-items-center rounded-xl dark:bg-gray-800 dark:border-gray-100 dark:text-gray-100">
 			<textarea
-				class="flex-1 border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-gray-100 outline-none py-3 px-2"
-				placeholder={voiceListening ? 'Listening...' : 'Send a message'}
+				class="flex-1 border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-gray-100 outline-none py-3 px-2 resize-none"
+				placeholder={voiceListening ? 'Listening...' : 'Write a message'}
 				disabled={voiceListening}
 				bind:value={prompt}
 				on:keypress={(e) => {
-					if (e.key === 'Enter') {
+					if (e.key === 'Enter'  && !e.shiftKey ) {
+						e.preventDefault()
 						sendRequest(prompt);
 					}
 				}}
-				rows="2"
+				rows="1"
 				form="prompt-form"
 			/>
 			<div  >
