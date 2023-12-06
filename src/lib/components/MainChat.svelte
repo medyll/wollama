@@ -4,7 +4,7 @@
 	import Model from '$lib/components/Model.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { sendPrompt } from '$lib/promptSender';
-	import { createChat, createMessage } from '$lib/tools/askOllama';
+	import { createChat, createMessage, guessChatTitle } from '$lib/tools/askOllama';
 	import { messageList } from '../stores/messages';
 	import { activeChatId, chatList } from '$lib/stores/chatList';
 
@@ -23,10 +23,12 @@
 		$activeChatId &&
 		$chatList[$activeChatId]?.title === 'New Chat' &&
 		Object.entries($chatList[$activeChatId]?.messages).length === 2
-	) {
-		console.log(Object.entries($chatList[$activeChatId]?.messages));
+	) { 
 		// concat the 2 first messages
-		// guessChatTitle();
+		const content = Object.values(chatList.getChatMessages($activeChatId))[0];
+		/* guessChatTitle(content).then((res)=>{
+			console.log(res)
+		}); */
 	}
 
 	function sendRequest(content: string) {

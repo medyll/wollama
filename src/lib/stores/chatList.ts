@@ -18,18 +18,33 @@ export const activeChatId = writable<string | undefined>();
  * @returns An object with methods to subscribe, set, and update the chat list.
  */
 function chatListStore() {
-    
+	const isBrowser = typeof window !== 'undefined';
 	const { subscribe, set, update } = writable<ChatListType>({});
 
 	let currentStore = {} as ChatListType;
+	let dataStoreTimer: NodeJS.Timeout;
 
-	subscribe((o) => currentStore = o);
+	subscribe((o) => {
+		currentStore = o;
+		storeData();
+	});
+
+	function storeData() {
+		clearTimeout(dataStoreTimer);
+		dataStoreTimer = setTimeout(() => {
+			localStorage.storable = JSON.stringify(currentStore);
+		}, 500);
+	}
+
+	isBrowser && localStorage.storable && set(JSON.parse(localStorage.storable));
 
 	return {
 		subscribe,
 		set,
 		update,
+		getChat: (chatId: string) => currentStore?.[chatId],
 		setChat: (newChat: ChatType) => update((n) => ({ ...n, [newChat.id]: newChat })),
+		getChatMessages: (chatId: string) => currentStore?.[chatId]?.messages ?? {},
 		updateChat: (chatId: string, chatData: ChatType) => {
 			update((n) => {
 				const currentChat = n[chatId];
@@ -46,7 +61,6 @@ function chatListStore() {
 				return { ...n, [chatId]: newChat };
 			}),
 		getChatMessage: (chatId: string, messageId: string) => {
-			console.log({ currentStore });
 			return currentStore?.[chatId]?.messages?.[messageId];
 		},
 		updateChatMessage: (chatId: string, message: MessageType) =>
