@@ -38,6 +38,9 @@ export const createChat = (chatData:any= {}  ) => {
 		title: 'New Chat',
 		models: [],
 		messages: {},
+		resume: '',
+		dateCreation: new Date(),
+		dateLastMessage: new Date(),
 		...chatData
 	};
 };
