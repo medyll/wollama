@@ -6,11 +6,16 @@
 
 	const chat = chatList.getChat(chatId);
 	const confirmDelete: boolean = false;
+	let editChat: boolean = false;
 
 	$: active = Boolean($activeChatId == chatId);
 
-	function deleteChat() {
+	function deleteCha1tHandler() {
 		// chatList.deleteChat(chatId);
+	}
+
+	function editChatTitleHandler() {
+		editChat = true;
 	}
 </script>
 
@@ -19,9 +24,16 @@
 		{#if active}
 			<Icon icon="mdi:delete" />
 		{/if}
-		<span class="whitespace-nowrap overflow-hidden">
-			{chat.title}
-		</span>
+		{#if editChat}
+			<input type="text" bind:value={chat.title} />
+			<button on:click={editChatTitleHandler}>
+				<Icon icon="mdi:check" />
+			</button>
+		{:else}
+			<span class="whitespace-nowrap overflow-hidden">
+				{chat.title}
+			</span>
+		{/if}
 	</button>
 	<!-- <div class="absolute flex right top">
 		<button class="self-center">

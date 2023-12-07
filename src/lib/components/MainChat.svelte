@@ -1,12 +1,14 @@
 <script lang="ts">
 	import InputZone from '$lib/components/Speech.svelte';
 	import MessageList from '$lib/components/MessageList.svelte';
-	import Model from '$lib/components/Model.svelte'; 
+	import Model from '$lib/components/Model.svelte';
 	import { sendPrompt } from '$lib/promptSender';
 	import { createChat, createMessage, guessChatTitle } from '$lib/tools/askOllama';
 	import { messageList } from '../stores/messages';
 	import { activeChatId, chatList } from '$lib/stores/chatList';
 	import { settings } from '$lib/stores/settings';
+	import { aiResponseState, chatEditListener } from '$lib/stores/chatEditListener';
+	import Icon from '@iconify/svelte';
 
 	let submitPrompt: Function;
 
@@ -38,7 +40,7 @@
 		let chatId = $activeChatId ?? undefined;
 		// if no active chatId, create new chat
 		if (!$activeChatId) {
-			const newChat = createChat({models:[$settings.defaultModel]});
+			const newChat = createChat({ models: [$settings.defaultModel] });
 			chatId = newChat.id;
 			// set ActiveId
 			activeChatId.set(newChat.id);
@@ -56,9 +58,11 @@
 		//
 		chatList.getChatMessage($activeChatId, message.id);
 		// send prompt
+		$aiResponseState = 'running';
 		sendPrompt(content, (content, done) => {
 			if (done) {
 				streamResponseText = '';
+				$aiResponseState = 'done';
 				return;
 			}
 
@@ -69,6 +73,11 @@
 				content: streamResponseText
 			});
 		});
+	}
+
+	function preSend(content: string) {
+		sendRequest(content);
+		prompt = '';
 	}
 </script>
 
@@ -89,20 +98,25 @@
 		>
 			<textarea
 				class="flex-1 border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-gray-100 outline-none py-3 px-2 resize-none"
-				placeholder={voiceListening ? 'Listening...' : 'Write a message'}
-				disabled={voiceListening}
+				placeholder={voiceListening ? 'Listening...' : 'Message to ai'}
 				bind:value={prompt}
+				on:change={() => {}}
 				on:keypress={(e) => {
+					chatEditListener.setEvent();
 					if (e.key === 'Enter' && !e.shiftKey) {
 						e.preventDefault();
-						sendRequest(prompt);
+						preSend(prompt);
 					}
 				}}
 				rows="1"
 				form="prompt-form"
 			/>
 			<div>
-				<InputZone onEnd={sendRequest} bind:prompt bind:voiceListening />
+				<InputZone onEnd={preSend} bind:prompt bind:voiceListening />
+				<button 
+					disabled={$chatEditListener.isTyping}>
+					<Icon icon="mdi:send" />
+				</button>
 			</div>
 		</div>
 		<div class="text-xs text-center">Caution message</div>

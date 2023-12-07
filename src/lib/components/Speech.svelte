@@ -7,10 +7,10 @@
 	export let voiceListening = false;
 	export let transcript: string = '';
 	export let bribe: string = '';
-	export let onEnd:(transcript:string) => void = () => null;
+	export let onEnd: (transcript: string) => void = () => null;
 
 	export let prompt: string = '';
-
+	export let disabled: boolean = false;
 
 	const stopResponse = () => {
 		readerConst.stop = true;
@@ -25,7 +25,7 @@
 				prompt = bribe;
 				break;
 			case 'onend':
-                onEnd(args.transcript || '') 
+				onEnd(args.transcript || '');
 				transcript = args.transcript || '';
 				voiceListening = false;
 				break;
@@ -47,21 +47,12 @@
 				stopResponse();
 				voiceListening = true;
 				voiceRecognition.listen();
+			}else{
+				stopResponse();
 			}
 		}}
 	>
-		{#if voiceListening}
-			listening
-		{:else}
-			<Icon icon="mdi:microphone" />
-		{/if}
-	</button>
-	<button
-		disabled={!voiceListening}
-		on:click={() => {
-			stopResponse();
-		}}>stop</button
-	>
+		<Icon icon={ voiceListening? 'mdi:spin':'mdi:microphone'}
+		style="font-size:1.8em" />
+	</button>  
 </div>
-
-
