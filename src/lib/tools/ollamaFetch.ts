@@ -41,4 +41,23 @@ export class OllamaFetch {
 				throw error;
 			});
 	}
+
+	async listModels() {
+		return fetch(`http://127.0.0.1:11434/api/tags`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then(async (res) => {
+				if (!res.ok) throw await res.json();
+				return await res.json();
+			})
+			.then(async (res) => { 
+				return  res?.models 
+			})
+			.catch((error) => {
+				throw error;
+			});
+	}
 }

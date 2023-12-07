@@ -11,7 +11,6 @@ export interface ChatListType {
 	[key: string]: ChatType;
 }
 
- 
 export const activeChatId = writable<string | undefined>();
 
 /**
@@ -46,10 +45,18 @@ function chatListStore() {
 		getChat: (chatId: string) => currentStore?.[chatId],
 		setChat: (newChat: ChatType) => update((n) => ({ ...n, [newChat.id]: newChat })),
 		getChatMessages: (chatId: string) => currentStore?.[chatId]?.messages ?? {},
-		updateChat: (chatId: string, chatData: ChatType) => {
+		updateChat: (chatId: string, chatData: Partial<ChatType>) => {
 			update((n) => {
 				const currentChat = n[chatId];
 				const newChat = { ...currentChat, ...chatData };
+				return { ...n, [chatId]: newChat };
+			});
+		},
+		addChatModel: (chatId: string, model: string) => {
+			update((n) => {
+				const currentChat = n[chatId];
+				const currentModels = n[chatId].models;
+				const newChat = { ...currentChat, models: [...currentModels, model] };
 				return { ...n, [chatId]: newChat };
 			});
 		},

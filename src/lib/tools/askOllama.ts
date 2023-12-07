@@ -5,17 +5,7 @@ import { OllamaFetch } from './ollamaFetch';
 const systemprompt = '';
 
 export async function askOllama(prompt: string, model: string) {
-	/* try {
-		const ollama = new Ollama();
-		await ollama.setModel('llama2-uncensored');
 
-		await ollama.setSystemPrompt(systemprompt);
-
-		const output = await ollama.generate(prompt);
-		return output.output;
-	} catch (error) {
-		console.error(error);
-	} */
 }
 
 export async function guessChatTitle(message: MessageType): Promise<{
