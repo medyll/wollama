@@ -115,7 +115,7 @@ function groupChatMessages(
 		};
 	}
 }
-
+// derived from chatList
 export const messageByGroupDate = derived(chatList, ($chatList) => {
 	return groupChatMessages(sortList($chatList));
 });
