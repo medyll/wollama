@@ -3,26 +3,32 @@
 	import { goto } from '$app/navigation';
 	import { settings } from '$lib/stores/settings';
 	import { userProfile } from '../stores/users';
+	import { messageByGroupDate } from '$lib/tools/utils.js';
 	let search: any = '';
 
 	let showDropDown: boolean = false;
+
 	const loadChat = async (id: string) => {
-		activeChatId.set(id)
+		activeChatId.set(id);
 		goto(`/chat/${id}`);
 	};
+
+	$: console.log($chatList,$messageByGroupDate);
 </script>
 
 <input placeholder="Search" bind:value={search} />
-{#each Object.values($chatList ?? []) as chat}
-	<button
-		class=" flex rounded-md p-3.5 w-full"
-		on:click={() => {
-			loadChat(chat.id);
-		}}
-	>
-		<div>{chat.title}</div>
-	</button>
-{/each}
+<div>
+	{#each $messageByGroupDate as erd}
+	<div>
+		<div>{erd.name}</div>
+		<div>
+			{#each erd.items as chat}
+			<div><button class="text-ellipsis" >{chat.title}</button></div>
+			{/each}
+		</div>
+	</div>
+	{/each}
+</div>
 <button
 	on:click={() => {
 		goto('/admin');

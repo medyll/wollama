@@ -1,14 +1,19 @@
 import { writable } from 'svelte/store';
 import type { MessageList as MessageListType, MessageType } from './messages';
 
-export type ChatType = {
+// Chat element
+export type ChatDataType = {
 	id: string;
 	title: string;
 	models: string[];
 	messages: MessageListType;
+	dateCreation: Date;
+	dateLastMessage: Date;
 };
+
+// Object list of chat elements
 export interface ChatListType {
-	[key: string]: ChatType;
+	[key: string]: ChatDataType;
 }
 
 export const activeChatId = writable<string | undefined>();
@@ -43,9 +48,9 @@ function chatListStore() {
 		set,
 		update,
 		getChat: (chatId: string) => currentStore?.[chatId],
-		setChat: (newChat: ChatType) => update((n) => ({ ...n, [newChat.id]: newChat })),
+		setChat: (newChat: ChatDataType) => update((n) => ({ ...n, [newChat.id]: newChat })),
 		getChatMessages: (chatId: string) => currentStore?.[chatId]?.messages ?? {},
-		updateChat: (chatId: string, chatData: Partial<ChatType>) => {
+		updateChat: (chatId: string, chatData: Partial<ChatDataType>) => {
 			update((n) => {
 				const currentChat = n[chatId];
 				const newChat = { ...currentChat, ...chatData };
