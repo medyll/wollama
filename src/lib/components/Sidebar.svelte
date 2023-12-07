@@ -5,6 +5,7 @@
 	import { userProfile } from '../stores/users';
 	import { messageByGroupDate } from '$lib/tools/utils.js';
 	import ChatButton from './ChatButton.svelte';
+	import Icon from '@iconify/svelte';
 	let search: any = '';
 
 	let showDropDown: boolean = false;
@@ -13,11 +14,19 @@
 		activeChatId.set(id);
 		goto(`/chat/${id}`);
 	};
-
-	$: console.log($chatList, $messageByGroupDate);
+ 
 </script>
 
-<div class="flex flex-col h-full w-[260px] border">
+<div class="flex flex-col h-full w-[260px] gap-3">
+	<button
+		on:click={async () => {
+			$activeChatId = undefined;
+			goto('/');
+		}}
+		class="flex"
+	>
+		<Icon icon="mdi:chat-plus" /> Nouveau chat
+	</button>
 	<div class="p-3">
 		<input placeholder="Search" bind:value={search} />
 	</div>
@@ -42,7 +51,6 @@
 			</div>
 		{/each}
 	</div>
-
 	<div>
 		<button
 			on:click={() => {

@@ -17,6 +17,8 @@
 	let prompt: string = '';
 	let streamResponseText: string = '';
 
+	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
+
 	$: if ($activeChatId && Object.values($messageList ?? {}).length > 1) {
 		window.history.replaceState(history.state, '', `/chat/${$activeChatId}`);
 	}
@@ -90,17 +92,16 @@
 		<form
 			id="prompt-form"
 			on:submit|preventDefault={() => {
-				submitPrompt(prompt);
+				preSend(prompt);
 			}}
 		/>
 		<div
-			class="flex place-items-center rounded-xl dark:bg-gray-800 dark:border-gray-100 dark:text-gray-100"
+			class="border flex place-items-center rounded-xl dark:bg-gray-800 dark:border-gray-100 dark:text-gray-100"
 		>
 			<textarea
-				class="flex-1 border dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-gray-100 outline-none py-3 px-2 resize-none"
-				placeholder={voiceListening ? 'Listening...' : 'Message to ai'}
+				class="flex-1 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-gray-100 outline-none py-3 px-2 resize-none"
+				{placeholder} 
 				bind:value={prompt}
-				on:change={() => {}}
 				on:keypress={(e) => {
 					chatEditListener.setEvent();
 					if (e.key === 'Enter' && !e.shiftKey) {
@@ -111,11 +112,10 @@
 				rows="1"
 				form="prompt-form"
 			/>
-			<div>
+			<div class="flex">
 				<InputZone onEnd={preSend} bind:prompt bind:voiceListening />
-				<button 
-					disabled={$chatEditListener.isTyping}>
-					<Icon icon="mdi:send" />
+				<button type="submit" form="prompt-form" disabled={$chatEditListener.isTyping}>
+					<Icon icon="mdi:send" style="font-size:1.8em" />
 				</button>
 			</div>
 		</div>

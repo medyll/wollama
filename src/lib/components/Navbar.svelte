@@ -5,15 +5,7 @@
 </script>
 
 <div class="flex justify-middle">
-	<button
-		on:click={async () => {
-			$activeChatId = undefined;
-			goto('/');
-		}}
-		class="flex"
-	>
-		<Icon icon="mdi:chat-plus" /> Créer un nouveau chat
-	</button>
+	
 
 	AIUI
 </div>

@@ -52,7 +52,7 @@
 			}
 		}}
 	>
-		<Icon icon={ voiceListening? 'mdi:spin':'mdi:microphone'}
+		<Icon mode="bg"  icon={ voiceListening? 'ooui:ellipsis':'mdi:microphone'}
 		style="font-size:1.8em" />
 	</button>  
 </div>
