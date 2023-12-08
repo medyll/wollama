@@ -101,8 +101,10 @@
 <div class="flex flex-col h-full w-full overflow-auto relative">
 	<Model />
 	<div class="flex-1 mb-32">
-		<DashBoard />
+		<DashBoard >
+		
 		<MessageList chatId={$activeChatId} />
+		</DashBoard>
 	</div>
 	<div>
 		{#each userFiles as file, fileIdx}
