@@ -11,7 +11,7 @@
 	let element: HTMLElement;
 
 	onMount(() => {
-		// hljs.highlightAll(); 
+		// hljs.highlightAll();
 		element.scrollIntoView({
 			block: 'end',
 			behavior: 'smooth'
@@ -23,18 +23,17 @@
 			behavior: 'smooth'
 		});
 	}
+
+	$: icon = message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one';
 </script>
 
-<div
-	bind:this={element}
-	class="w-full flex grid gap-4x border dark:border-gray-600 mb-5 rounded-md"
->
-	<div class="flex mr-4 content-center">
-		<div class="p-2"><Icon icon="mdi:user" /></div>
-		<div class="flex-1 font-bold p-2">{message.role}</div>
+<div bind:this={element} class="w-full flex flex-col gap-1 mb-4">
+	<div class="flex items-center">
+		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
+		<div class="flex-1 font-bold capitalize">{message.role}</div>
 	</div>
-	<div class="flex-1 px-2 whitespace-pre-line">
-	{@html message?.content ? marked(message?.content) : ''}
+	<div class="flex-1 whitespace-pre-line ml-12">
+		{@html message?.content ? marked(message?.content) : ''} 
 		<!-- {#if message?.content  === ''}
 			<pre class="animate-pulse"> 
 				<div class="h-2 bg-gray-200 dark:bg-gray-600 rounded col-span-2" />

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import DashBoard from './DashBoard.svelte';
-	import InputZone from '$lib/components/Speech.svelte';
+	import Speech from '$lib/components/Speech.svelte';
 	import MessageList from '$lib/components/chat/MessageList.svelte';
 	import Model from '$lib/components/chat/Model.svelte';
 	import { sendPrompt } from '$lib/promptSender';
@@ -116,10 +116,10 @@
 				{placeholder}
 				form="prompt-form"
 			/>
-			<div class="flex">
-				<InputZone onEnd={preSendMessage} bind:prompt bind:voiceListening />
+			<div class="flex items-center">
+				<Speech onEnd={preSendMessage} bind:prompt bind:voiceListening />
 				<button type="submit" form="prompt-form" disabled={$chatEditListener.isTyping}>
-					<Icon icon="mdi:send" style="font-size:1.8em" />
+					<Icon icon="mdi:send" style="font-size:1.6em" />
 				</button>
 			</div>
 		</div>
@@ -129,6 +129,6 @@
 
 <style lang="postcss">
 	.textarea {
-		@apply border flex place-items-center rounded-xl dark:bg-gray-800 dark:border-gray-100 dark:text-gray-100
+		@apply border overflow-hidden flex items-center rounded-xl dark:bg-gray-800 border-gray-400 dark:border-gray-100 dark:text-gray-100
 	}
 </style>

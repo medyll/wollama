@@ -10,11 +10,18 @@
 	font-display: swap;
 }
 
+@font-face {
+	font-family : 'Roboto';
+	src         : url('../assets/fonts/Roboto.ttf');
+	font-display: swap;
+}
+
 html {
-	word-break: break-word;
-	height    : 100%;
-	min-height: 100%;
+	word-break : break-word;
+	height     : 100%;
+	min-height : 100%;
 	font-family: 'Segoe UI';
+	font-size  : 0.9em;
 }
 
 body {
@@ -48,6 +55,10 @@ pre {
 	white-space: pre-wrap;
 }
 
- .iconify{
+.iconify {
 	display: inline-block;
- }
+}
+
+html {
+	font-family: Roboto, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}

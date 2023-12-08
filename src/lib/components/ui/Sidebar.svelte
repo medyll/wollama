@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { activeChatId } from '../../stores/chatter.js';
 	import { goto } from '$app/navigation';
-	import { settings } from '$lib/stores/settings';
-	import { userProfile } from '../../stores/users.js';
 	import { messageByGroupDate } from '$lib/tools/utils.js';
 	import ChatButton from '../chat/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
@@ -16,18 +14,18 @@
 	};
 </script>
 
-<div class="flex flex-col h-full w-[260px] gap-3">
+<div class="flex flex-col h-full w-[260px] gap-3 border-r-4">
 	<button
 		on:click={async () => {
 			$activeChatId = undefined;
 			goto('/');
 		}}
-		class="flex"
+		class="flex items-center gap-2"
 	>
-		<Icon icon="mdi:chat-plus" /> Nouveau chat
+		<Icon icon="mdi:chat-plus-outline" style="font-size:1.8em" /> <span>Nouveau chat</span>
 	</button>
 	<div class="p-3">
-		<input placeholder="Search" bind:value={search} />
+		<input placeholder="Search chats" bind:value={search} />
 	</div>
 	<div class="flex-1 p-2">
 		{#each $messageByGroupDate as erd}
