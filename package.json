@@ -55,6 +55,7 @@
 		"date-fns": "^2.30.0",
 		"fs-extra": "^11.2.0",
 		"highlight": "^0.2.4",
+		"i18n": "^0.15.1",
 		"langchain": "^0.0.200",
 		"marked": "^11.0.0",
 		"ollama-node": "^0.1.27",
