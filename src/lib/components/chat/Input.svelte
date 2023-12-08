@@ -4,16 +4,17 @@
 	export let form: string = '';
 </script>
 
-<textarea
-	{form}
-	{placeholder}
-	bind:value={prompt}
-	on:keypress
-	rows="1"
-/>
+<div class="relative flex items-center">
+	<div class="sides px-2"><slot name="start" /></div>
+	<textarea {form} {placeholder} bind:value={prompt} on:keypress rows="1" />
+	<div class="sides absolute h-full right-0"><slot name="end" /></div>
+</div>
 
 <style lang="postcss">
 	textarea {
-		@apply flex-1  outline-none py-3 px-2 resize-none;
+		@apply w-full flex-1 block outline-none py-3 px-2 resize-none;
+	}
+	.sides {
+		@apply flex flex-row ;
 	}
 </style>

@@ -109,19 +109,18 @@
 				preSendMessage(prompt);
 			}}
 		/>
-		<div class="textarea" >
-			<Input
-				on:keypress={keyPressHandler}
-				bind:prompt
-				{placeholder}
-				form="prompt-form"
-			/>
-			<div class="flex items-center">
-				<Speech onEnd={preSendMessage} bind:prompt bind:voiceListening />
-				<button type="submit" form="prompt-form" disabled={$chatEditListener.isTyping}>
-					<Icon icon="mdi:send" style="font-size:1.6em" />
+		<div class="textarea">
+			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
+				<button slot="start" type="button" form="prompt-form" disabled={$chatEditListener.isTyping}>
+					<Icon icon="heroicons:paper-clip-solid" style="font-size:1.6em" />
 				</button>
-			</div>
+				<div slot="end" class="flex items-center">
+					<Speech onEnd={preSendMessage} bind:prompt bind:voiceListening />
+					<button class="px-2" type="submit" form="prompt-form" disabled={$chatEditListener.isTyping}>
+						<Icon icon="mdi:send" style="font-size:1.6em" />
+					</button>
+				</div>
+			</Input>
 		</div>
 		<div class="text-xs text-center">Caution message</div>
 	</div>
@@ -129,6 +128,6 @@
 
 <style lang="postcss">
 	.textarea {
-		@apply border overflow-hidden flex items-center rounded-xl dark:bg-gray-800 border-gray-400 dark:border-gray-100 dark:text-gray-100
+		@apply border overflow-hidden rounded-xl dark:bg-gray-800 border-gray-400 dark:border-gray-100 dark:text-gray-100;
 	}
 </style>
