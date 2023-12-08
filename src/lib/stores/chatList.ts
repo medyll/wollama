@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { MessageList as MessageListType, MessageType } from './messages';
+import type { MessageListType as MessageListType, MessageType } from './messages';
 
 // Chat element
 export type ChatDataType = {
@@ -48,7 +48,7 @@ function chatListStore() {
 		set,
 		update,
 		getChat: (chatId: string) => currentStore?.[chatId],
-		setChat: (newChat: ChatDataType) => update((n) => ({ ...n, [newChat.id]: newChat })),
+		insertChat: (newChat: ChatDataType) => update((n) => ({ ...n, [newChat.id]: newChat })),
 		getChatMessages: (chatId: string) => currentStore?.[chatId]?.messages ?? {},
 		updateChat: (chatId: string, chatData: Partial<ChatDataType>) => {
 			update((n) => {
@@ -65,7 +65,7 @@ function chatListStore() {
 				return { ...n, [chatId]: newChat };
 			});
 		},
-		createChatMessage: (chatId: string, message: MessageType) =>
+		insertMessage: (chatId: string, message: Partial<MessageType>) =>
 			update((n) => {
 				const newChat = {
 					...n[chatId],
@@ -85,7 +85,14 @@ function chatListStore() {
 					messages: { ...n[chatId]?.messages, [message.id]: newMessage }
 				};
 				return { ...n, [chatId]: newChat };
-			})
+			}),
+		getLastMessageContext: (chatId: string) => {
+			const messages = currentStore?.[chatId]?.messages;
+			const lastMessage = Object.values(messages)
+				.filter((x) => x.role === 'assistant')
+				.pop();
+			return lastMessage?.context;
+		}
 	};
 }
 export const chatList = chatListStore();

@@ -1,10 +1,10 @@
-import type { ReaderData } from './tools/ollamaFetch';
+import type { OllamaStream, OllamaStreamLine } from './tools/ollamaFetch';
 
 const models = ['llama2-uncensored'];
 
 let lastContext: number[] = [];
 
-export const sendPrompt = async (prompt: any, hook: (content: any, end?: boolean) => void) => {
+export const sendPrompt = async (prompt: any, hook: (data: OllamaStreamLine) => void) => {
 	await Promise.all(
 		models.map(async (model) => {
 			await askOllama(model, prompt, hook);
@@ -16,10 +16,8 @@ export const readerConst = {
 	stop: false
 };
 
-const askOllama = async (model: any, prompt: any, hook: (content: string | undefined, end?: boolean) => void) => {
+const askOllama = async (model: any, prompt: any, hook: (data: OllamaStreamLine) => void) => {
 	readerConst.stop = false;
-
- 
 
 	const query = await sendQuery(prompt, lastContext, model);
 
@@ -29,49 +27,24 @@ const askOllama = async (model: any, prompt: any, hook: (content: string | undef
 		.getReader();
 
 	while (true) {
-		const { value, done } = await streamReader.read();
+		const stream = await streamReader.read();
+		const { value, done } = stream;
+		// console.log({ stream });
 		if (done ?? readerConst.stop) {
-			if (hook) hook(undefined,true);
 			break;
 		}
+		if (value) {
+			const data: OllamaStreamLine = JSON.parse(value);
 
-		try {
-			const lines = value.split('\n');
-			for (const line of lines) {
-				if (line !== '') {
-					const data: ReaderData = JSON.parse(line);
-					if (data.response !== '\n') {
-						if (hook) hook(data.response);
-					}
-				}
+			if (data.response !== '\n') {
+				if (hook) hook(data);
 			}
-		} catch (error) {
-			break;
 		}
 	}
 };
 
 async function sendQuery(userPrompt: string, context: any, model: string) {
 	const settings = {} as any;
-
-	/* const ollama = new Ollama();
-	await ollama.setModel(model);
-	await ollama.setContext(context);
-	await ollama.streamingGenerate(
-		userPrompt,
-		(content: any) => {
-			console.log(content);
-		},
-		(context: any) => {
-			console.log(context);
-		},
-		(fullResponse: any) => {
-			console.log(fullResponse);
-		},
-		(stats: any) => {
-			console.log(stats);
-		}
-	); */
 
 	return await fetch(`http://127.0.0.1:11434/api/generate`, {
 		method: 'POST',

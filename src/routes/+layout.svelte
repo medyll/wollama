@@ -2,7 +2,10 @@
 	import MainChat from '$lib/components/MainChat.svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import Sidebar from '$lib/components/Sidebar.svelte';
+	import { activeChatId, chatList } from '$lib/stores/chatList';
+	import type { MessageListType, MessageType } from '$lib/stores/messages';
 	import { settings } from '$lib/stores/settings';
+	import { guessChatTitle } from '$lib/tools/askOllama';
 	import { OllamaFetch } from '$lib/tools/ollamaFetch';
 	import '../styles/app.css';
 	import '../styles/tailwind.css';
@@ -20,6 +23,35 @@
 			['models']: [...models]
 		}));
 	}
+
+	async function checkTitle(chatId: string) {
+		const chat = chatList.getChat(chatId);
+		if (chat?.title === 'New Chat') {
+			const chat = chatList.getChat(chatId);
+			const messages: MessageListType = chat.messages;
+
+			if (chat.title == 'New Chat' && Object.values(messages).length > 1) {
+				const resume = Object.values(messages)
+					.slice(0, 2)
+					.map((message: MessageType) => message.content)
+					.join('\n');
+				
+			const res = await guessChatTitle(resume);
+			
+			// 
+			if (res?.response !== '') chatList.updateChat(chatId, { title: res.response });
+
+			}
+		}
+	}
+
+	chatList.subscribe((n) => {
+		if ($activeChatId) checkTitle($activeChatId);
+	});
+
+	activeChatId.subscribe((n) => {
+		if (n) checkTitle(n);
+	});
 
 	modelS();
 </script>
@@ -42,7 +74,7 @@ overflow-hidden"
 			<div class="relative"><Navbar /></div>
 			<div class="flex-1 w-full relative">
 				<div class="h-full relative overflow-hidden mx-auto max-w-3xl">
-					<MainChat />
+					<slot><MainChat /></slot>
 				</div>
 			</div>
 		</div>

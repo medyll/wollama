@@ -1,21 +1,30 @@
-export type ReaderData = {
+export type OllamaStream = {
+	done: boolean;
+	value: string;
+};
+
+export type OllamaStreamLine = {
 	model: string;
 	create_at: string;
-	done: boolean;
 	response: string;
-	context: any;
-	total_duration: number;
+	done: boolean;
+	context: string[];
+	created_at: string;
+	eval_count: number;
+	eval_duration: number;
 	load_duration: number;
 	prompt_eval_count: number;
 	prompt_eval_duration: number;
-	eval_count: number;
-	eval_duration: number;
+	total_duration: number;
 };
+export interface OllamaStreamLineLast {
+}
 
 export class OllamaFetch {
 	private options = {
 		model: 'llama2-uncensored'
 	};
+ 
 
 	constructor(options?: {}) {
 		this.options = { ...this.options, ...options };
@@ -53,8 +62,8 @@ export class OllamaFetch {
 				if (!res.ok) throw await res.json();
 				return await res.json();
 			})
-			.then(async (res) => { 
-				return  res?.models 
+			.then(async (res) => {
+				return res?.models;
 			})
 			.catch((error) => {
 				throw error;

@@ -2,15 +2,16 @@ import { writable } from 'svelte/store';
 
 export type MessageType = {
 	id: string;
+	chatId: string;
 	edit: boolean;
 	editedContent: string;
 	parentId: string;
-	childrenIds: string[];
 	content: string;
 	role: 'user' | 'assistant';
+	context: number[];
 };
 
-export type MessageList = {
+export type MessageListType = {
 	[key: string]: MessageType;
 };
-export const messageList = writable<MessageList>({}); 
+export const messageList = writable<MessageListType>({}); 

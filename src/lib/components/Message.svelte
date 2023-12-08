@@ -11,8 +11,7 @@
 	let element: HTMLElement;
 
 	onMount(() => {
-		// hljs.highlightAll();
-		console.log(element);
+		// hljs.highlightAll(); 
 		element.scrollIntoView({
 			block: 'end',
 			behavior: 'smooth'
