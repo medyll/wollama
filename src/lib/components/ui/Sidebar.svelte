@@ -14,7 +14,6 @@
 		activeChatId.set(id);
 		goto(`/chat/${id}`);
 	};
- 
 </script>
 
 <div class="flex flex-col h-full w-[260px] gap-3">
@@ -38,14 +37,12 @@
 				</div>
 				<div>
 					{#each erd.items as chat}
-						<div>
-							<ChatButton
-								chatId={chat.id}
-								on:click={() => {
-									loadChat(chat.id);
-								}}
-							/>
-						</div>
+						<ChatButton
+							chatId={chat.id}
+							on:click={() => {
+								loadChat(chat.id);
+							}}
+						/>
 					{/each}
 				</div>
 			</div>
