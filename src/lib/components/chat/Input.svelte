@@ -2,11 +2,12 @@
 	export let prompt: string = '';
 	export let placeholder: string = '';
 	export let form: string = '';
+	export let disabled: boolean = false;
 </script>
 
 <div class="relative flex items-center">
 	<div class="sides px-2"><slot name="start" /></div>
-	<textarea {form} {placeholder} bind:value={prompt} on:keypress rows="1" />
+	<textarea {disabled} {form} {placeholder} bind:value={prompt} on:keypress rows="1" />
 	<div class="sides absolute h-full right-0"><slot name="end" /></div>
 </div>
 

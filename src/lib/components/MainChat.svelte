@@ -14,8 +14,6 @@
 	import Input from './chat/Input.svelte';
 	import Attachment from './chat/Attachment.svelte';
 
-	let submitPrompt: Function;
-
 	let voiceListening = false;
 
 	let prompt: string = '';
@@ -23,6 +21,8 @@
 	let userFiles: any[] = [];
 
 	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
+
+	$: disableSubmit = prompt.trim() =='' || $chatEditListener.isTyping;
 
 	function getChat() {
 		let chatId = $activeChatId ?? undefined;
@@ -105,9 +105,9 @@
 		<MessageList chatId={$activeChatId} />
 	</div>
 	<div>
-	{#each userFiles as file, fileIdx}
-	<img src={file.dataUri} alt="input" class="  " />
-	{/each}
+		{#each userFiles as file, fileIdx}
+			<img src={file.dataUri} alt="input" class="  " />
+		{/each}
 	</div>
 	<div class="w-full y-b fixed margb-0 max-w-3xl bottom-0">
 		<form
@@ -117,22 +117,27 @@
 			}}
 		/>
 		<div class="textarea">
-			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
-				<Attachment slot="start" form="prompt-form" bind:userFiles disabled={$chatEditListener.isTyping} />
+			<Input on:keypress={keyPressHandler} bind:prompt {placeholder}   form="prompt-form"> 
+				<Attachment
+					slot="start"
+					form="prompt-form"
+					bind:userFiles
+					disabled={$chatEditListener.isTyping}
+				/>
 				<div slot="end" class="flex items-center">
 					<Speech onEnd={preSendMessage} bind:prompt bind:voiceListening />
 					<button
 						class="px-2"
 						type="submit"
 						form="prompt-form"
-						disabled={$chatEditListener.isTyping}
+						disabled={disableSubmit}
 					>
 						<Icon icon="mdi:send" style="font-size:1.6em" />
 					</button>
 				</div>
 			</Input>
 		</div>
-		<div class="text-xs text-center">Caution message</div>
+		<div class="text-xs text-center py-2">Caution message</div>
 	</div>
 </div>
 
