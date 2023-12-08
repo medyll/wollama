@@ -12,6 +12,7 @@
 	import Icon from '@iconify/svelte';
 	import type { OllamaStreamLine } from '$lib/tools/ollamaFetch';
 	import Input from './chat/Input.svelte';
+	import Attachment from './chat/Attachment.svelte';
 
 	let submitPrompt: Function;
 
@@ -19,6 +20,7 @@
 
 	let prompt: string = '';
 	let streamResponseText: string = '';
+	let userFiles: any[] = [];
 
 	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
 
@@ -53,6 +55,7 @@
 			postSendMessage($activeChatId, messageAssistant.id, messageUser.id, data);
 		});
 	}
+
 	async function postSendMessage(
 		chatId: string,
 		assistantMessageId: number,
@@ -60,7 +63,6 @@
 		data: OllamaStreamLine
 	) {
 		if (data.done) {
-			console.log(data);
 			streamResponseText = '';
 			$aiResponseState = 'done';
 			const content = Object.values(chatter.getChatMessages(chatId))[0];
@@ -102,6 +104,11 @@
 		<DashBoard />
 		<MessageList chatId={$activeChatId} />
 	</div>
+	<div>
+	{#each userFiles as file, fileIdx}
+	<img src={file.dataUri} alt="input" class="  " />
+	{/each}
+	</div>
 	<div class="w-full y-b fixed margb-0 max-w-3xl bottom-0">
 		<form
 			id="prompt-form"
@@ -111,12 +118,15 @@
 		/>
 		<div class="textarea">
 			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
-				<button slot="start" type="button" form="prompt-form" disabled={$chatEditListener.isTyping}>
-					<Icon icon="heroicons:paper-clip-solid" style="font-size:1.6em" />
-				</button>
+				<Attachment slot="start" form="prompt-form" bind:userFiles disabled={$chatEditListener.isTyping} />
 				<div slot="end" class="flex items-center">
 					<Speech onEnd={preSendMessage} bind:prompt bind:voiceListening />
-					<button class="px-2" type="submit" form="prompt-form" disabled={$chatEditListener.isTyping}>
+					<button
+						class="px-2"
+						type="submit"
+						form="prompt-form"
+						disabled={$chatEditListener.isTyping}
+					>
 						<Icon icon="mdi:send" style="font-size:1.6em" />
 					</button>
 				</div>
