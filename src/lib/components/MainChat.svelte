@@ -22,7 +22,7 @@
 
 	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
 
-	$: disableSubmit = prompt.trim() =='' || $chatEditListener.isTyping;
+	$: disableSubmit = prompt.trim() == '' || $chatEditListener.isTyping;
 
 	function getChat() {
 		let chatId = $activeChatId ?? undefined;
@@ -101,9 +101,8 @@
 <div class="flex flex-col h-full w-full overflow-auto relative">
 	<Model />
 	<div class="flex-1 mb-32">
-		<DashBoard >
-		
-		<MessageList chatId={$activeChatId} />
+		<DashBoard>
+			<MessageList chatId={$activeChatId} />
 		</DashBoard>
 	</div>
 	<div>
@@ -119,7 +118,7 @@
 			}}
 		/>
 		<div class="textarea">
-			<Input on:keypress={keyPressHandler} bind:prompt {placeholder}   form="prompt-form"> 
+			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
 				<Attachment
 					slot="start"
 					form="prompt-form"
@@ -128,12 +127,7 @@
 				/>
 				<div slot="end" class="flex items-center">
 					<Speech onEnd={preSendMessage} bind:prompt bind:voiceListening />
-					<button
-						class="px-2"
-						type="submit"
-						form="prompt-form"
-						disabled={disableSubmit}
-					>
+					<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
 						<Icon icon="mdi:send" style="font-size:1.6em" />
 					</button>
 				</div>

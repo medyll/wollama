@@ -6,7 +6,7 @@
 </script>
 
 {#if Object.values(messages).length == 0}
-	<slot />
-{:else}
 	<Icon icon="fluent-emoji-high-contrast:llama" style="font-size:10em" />
+{:else}
+	<slot />
 {/if}
