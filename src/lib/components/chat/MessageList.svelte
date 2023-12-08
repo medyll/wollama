@@ -1,10 +1,10 @@
 <script lang="ts"> 
-	import Message from '$lib/components/Message.svelte'; 
-	import { chatList } from '$lib/stores/chatList';
+	import Message from '$lib/components/chat/Message.svelte'; 
+	import { chatter } from '$lib/stores/chatter';
 
 	export let chatId: string; 
 
-	$: messages = $chatList?.[chatId]?.messages ?? {}
+	$: messages = $chatter?.[chatId]?.messages ?? {}
 </script>
 
 <div class="flex-v w-full h-full overflow-x-auto">

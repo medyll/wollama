@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { activeChatId, chatList } from '$lib/stores/chatList';
+	import { activeChatId, chatter } from '$lib/stores/chatter';
 	import Icon from '@iconify/svelte';
 
 	export let chatId: string = '';
 
-	const chat = chatList.getChat(chatId);
+	const chat = chatter.getChat(chatId);
 	const confirmDelete: boolean = false;
 	let editChat: boolean = false;
 
 	$: active = Boolean($activeChatId == chatId);
 
 	function deleteCha1tHandler() {
-		// chatList.deleteChat(chatId);
+		// chatter.deleteChat(chatId);
 	}
 
 	function editChatTitleHandler() {

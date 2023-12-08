@@ -1,4 +1,4 @@
-import { chatList, type ChatDataType, type ChatListType } from '$lib/stores/chatList';
+import { chatter, type ChatDataType, type ChatListType } from '$lib/stores/chatter';
 import { derived } from 'svelte/store';
 import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
@@ -116,6 +116,6 @@ function groupChatMessages(
 	}
 }
 // derived from chatList
-export const messageByGroupDate = derived(chatList, ($chatList) => {
-	return groupChatMessages(sortList($chatList));
+export const messageByGroupDate = derived(chatter, ($chatter) => {
+	return groupChatMessages(sortList($chatter));
 });

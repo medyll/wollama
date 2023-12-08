@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { activeChatId, chatList } from './../stores/chatList.js';
+	import { activeChatId } from '../../stores/chatter.js';
 	import { goto } from '$app/navigation';
 	import { settings } from '$lib/stores/settings';
-	import { userProfile } from '../stores/users';
+	import { userProfile } from '../../stores/users.js';
 	import { messageByGroupDate } from '$lib/tools/utils.js';
-	import ChatButton from './ChatButton.svelte';
+	import ChatButton from '../chat/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
 	let search: any = '';
 

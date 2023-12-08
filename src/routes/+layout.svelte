@@ -1,8 +1,8 @@
 <script lang="ts">
 	import MainChat from '$lib/components/MainChat.svelte';
-	import Navbar from '$lib/components/Navbar.svelte';
-	import Sidebar from '$lib/components/Sidebar.svelte';
-	import { activeChatId, chatList } from '$lib/stores/chatList';
+	import Navbar from '$lib/components/ui/Navbar.svelte';
+	import Sidebar from '$lib/components/ui/Sidebar.svelte';
+	import { activeChatId, chatter } from '$lib/stores/chatter';
 	import type { MessageListType, MessageType } from '$lib/stores/messages';
 	import { settings } from '$lib/stores/settings';
 	import { guessChatTitle } from '$lib/tools/askOllama';
@@ -25,9 +25,9 @@
 	}
 
 	async function checkTitle(chatId: string) {
-		const chat = chatList.getChat(chatId);
+		const chat = chatter.getChat(chatId);
 		if (chat?.title === 'New Chat') {
-			const chat = chatList.getChat(chatId);
+			const chat = chatter.getChat(chatId);
 			const messages: MessageListType = chat.messages;
 
 			if (chat.title == 'New Chat' && Object.values(messages).length > 1) {
@@ -39,13 +39,13 @@
 			const res = await guessChatTitle(resume);
 			
 			// 
-			if (res?.response !== '') chatList.updateChat(chatId, { title: res.response });
+			if (res?.response !== '') chatter.updateChat(chatId, { title: res.response });
 
 			}
 		}
 	}
 
-	chatList.subscribe((n) => {
+	chatter.subscribe((n) => {
 		if ($activeChatId) checkTitle($activeChatId);
 	});
 

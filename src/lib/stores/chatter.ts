@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { MessageListType as MessageListType, MessageType } from './messages';
+import type { MessageListType, MessageType } from './messages';
 
 // Chat element
 export type ChatDataType = {
@@ -17,7 +17,7 @@ export interface ChatListType {
 }
 
 export const activeChatId = writable<string | undefined>();
-
+export const chatter = chatListStore();
 /**
  * Creates a chat list store.
  * @returns An object with methods to subscribe, set, and update the chat list.
@@ -95,4 +95,3 @@ function chatListStore() {
 		}
 	};
 }
-export const chatList = chatListStore();

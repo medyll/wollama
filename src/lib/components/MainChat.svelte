@@ -1,19 +1,17 @@
 <script lang="ts">
 	import DashBoard from './DashBoard.svelte';
 	import InputZone from '$lib/components/Speech.svelte';
-	import MessageList from '$lib/components/MessageList.svelte';
-	import Model from '$lib/components/Model.svelte';
+	import MessageList from '$lib/components/chat/MessageList.svelte';
+	import Model from '$lib/components/chat/Model.svelte';
 	import { sendPrompt } from '$lib/promptSender';
-	import {
-		createChat,
-		createMessage as createMessageData, 
-	} from '$lib/tools/askOllama';
+	import { chatDataObject } from '$lib/tools/askOllama';
 	import { messageList } from '../stores/messages';
-	import { activeChatId, chatList } from '$lib/stores/chatList';
+	import { activeChatId, chatter } from '$lib/stores/chatter';
 	import { settings } from '$lib/stores/settings';
 	import { aiResponseState, chatEditListener } from '$lib/stores/chatEditListener';
 	import Icon from '@iconify/svelte';
 	import type { OllamaStreamLine } from '$lib/tools/ollamaFetch';
+	import Input from './chat/Input.svelte';
 
 	let submitPrompt: Function;
 
@@ -24,32 +22,30 @@
 
 	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
 
-	 
-
 	function getChat() {
 		let chatId = $activeChatId ?? undefined;
 		if (!$activeChatId) {
-			const newChat = createChat({ models: [$settings.defaultModel] });
+			const newChat = chatDataObject.createChatData({ models: [$settings.defaultModel] });
 			chatId = newChat.id;
 			// set ActiveId
 			activeChatId.set(newChat.id);
 			// add chat to store
-			chatList.insertChat(newChat);
+			chatter.insertChat(newChat);
 		}
 		return chatId;
 	}
 
 	function sendMessage(chatId: string, content: string) {
 		//
-		const messageUser = createMessageData({ role: 'user', content, chatId });
-		const messageAssistant = createMessageData({ role: 'assistant' });
+		const messageUser = chatDataObject.createMessageData({ role: 'user', content, chatId });
+		const messageAssistant = chatDataObject.createMessageData({ role: 'assistant' });
 
 		// add messages to store
-		chatList.insertMessage($activeChatId, messageUser);
-		chatList.insertMessage($activeChatId, messageAssistant);
+		chatter.insertMessage($activeChatId, messageUser);
+		chatter.insertMessage($activeChatId, messageAssistant);
 
 		//
-		chatList.getChatMessage($activeChatId, messageUser.id);
+		chatter.getChatMessage($activeChatId, messageUser.id);
 
 		// send prompt
 		$aiResponseState = 'running';
@@ -67,19 +63,17 @@
 			console.log(data);
 			streamResponseText = '';
 			$aiResponseState = 'done';
-			const content = Object.values(chatList.getChatMessages(chatId))[0];
-
-			
+			const content = Object.values(chatter.getChatMessages(chatId))[0];
 
 			// update current user message with kpi and context
-			chatList.updateChatMessage(chatId, {
+			chatter.updateChatMessage(chatId, {
 				id: assistantMessageId,
 				context: data.context
 			});
 		} else {
 			streamResponseText += data.response ?? '';
 
-			chatList.updateChatMessage(chatId, {
+			chatter.updateChatMessage(chatId, {
 				id: assistantMessageId,
 				content: streamResponseText
 			});
@@ -91,6 +85,14 @@
 		sendMessage(id, content);
 		window.history.replaceState(history.state, '', `/chat/${id}`);
 		prompt = '';
+	}
+
+	function keyPressHandler(e: KeyboardEvent) {
+		chatEditListener.setEvent();
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			preSendMessage(prompt);
+		}
 	}
 </script>
 
@@ -107,21 +109,11 @@
 				preSendMessage(prompt);
 			}}
 		/>
-		<div
-			class="border flex place-items-center rounded-xl dark:bg-gray-800 dark:border-gray-100 dark:text-gray-100"
-		>
-			<textarea
-				class="flex-1 dark:border-gray-600 bg-white dark:bg-gray-800 dark:text-gray-100 outline-none py-3 px-2 resize-none"
+		<div class="textarea" >
+			<Input
+				on:keypress={keyPressHandler}
+				bind:prompt
 				{placeholder}
-				bind:value={prompt}
-				on:keypress={(e) => {
-					chatEditListener.setEvent();
-					if (e.key === 'Enter' && !e.shiftKey) {
-						e.preventDefault();
-						preSendMessage(prompt);
-					}
-				}}
-				rows="1"
 				form="prompt-form"
 			/>
 			<div class="flex">
@@ -134,3 +126,9 @@
 		<div class="text-xs text-center">Caution message</div>
 	</div>
 </div>
+
+<style lang="postcss">
+	.textarea {
+		@apply border flex place-items-center rounded-xl dark:bg-gray-800 dark:border-gray-100 dark:text-gray-100
+	}
+</style>

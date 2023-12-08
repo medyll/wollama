@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import type { MessageType } from '../stores/messages';
+	import type { MessageType } from '../../stores/messages';
 	/* import hljs from 'highlight.js';
 	import 'highlight.js/styles/github-dark.min.css';  */
 
