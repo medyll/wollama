@@ -4,10 +4,18 @@ const models = ['llama2-uncensored'];
 
 let lastContext: number[] = [];
 
-export const sendPrompt = async (prompt: any, hook: (data: OllamaStreamLine) => void) => {
+export type PromptSenderType = {
+	prompt: string;
+	context?: number[];
+};
+
+export const sendPrompt = async (
+	sender: PromptSenderType,
+	hook: (data: OllamaStreamLine) => void
+) => {
 	await Promise.all(
 		models.map(async (model) => {
-			await askOllama(model, prompt, hook);
+			await askOllama(model, sender, hook);
 		})
 	);
 };
@@ -16,10 +24,14 @@ export const readerConst = {
 	stop: false
 };
 
-const askOllama = async (model: any, prompt: any, hook: (data: OllamaStreamLine) => void) => {
+const askOllama = async (
+	model: any,
+	sender: PromptSenderType,
+	hook: (data: OllamaStreamLine) => void
+) => {
 	readerConst.stop = false;
-
-	const query = await sendQuery(prompt, lastContext, model);
+	const { prompt, context } = sender;
+	const query = await sendQuery(prompt, context, model);
 
 	const streamReader = query.body
 		.pipeThrough(new TextDecoderStream())
@@ -27,7 +39,7 @@ const askOllama = async (model: any, prompt: any, hook: (data: OllamaStreamLine)
 		.getReader();
 
 	while (true) {
-		const { value, done } = await streamReader.read(); 
+		const { value, done } = await streamReader.read();
 
 		if (done ?? readerConst.stop) {
 			break;
@@ -44,7 +56,7 @@ const askOllama = async (model: any, prompt: any, hook: (data: OllamaStreamLine)
 
 async function sendQuery(userPrompt: string, context: any, model: string) {
 	const settings = {} as any;
-
+	console.log('sendQuery', userPrompt, context, model);
 	return await fetch(`http://127.0.0.1:11434/api/generate`, {
 		method: 'POST',
 		headers: {

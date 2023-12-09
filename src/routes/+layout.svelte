@@ -45,13 +45,13 @@
 		}
 	}
 
-	chatter.subscribe((n) => {
+	/* chatter.subscribe((n) => {
 		if ($activeChatId) checkTitle($activeChatId);
 	});
 
 	activeChatId.subscribe((n) => {
 		if (n) checkTitle(n);
-	});
+	}); */
 
 	modelS();
 </script>

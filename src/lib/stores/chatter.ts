@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import type { MessageListType, MessageType } from './messages';
+import type { OllamaStreamLineLast } from '$lib/tools/ollamaFetch';
 
 // Chat element
 export type ChatDataType = {
@@ -9,6 +10,7 @@ export type ChatDataType = {
 	messages: MessageListType;
 	dateCreation: Date;
 	dateLastMessage: Date;
+	context: number[];
 };
 
 // Object list of chat elements
@@ -76,7 +78,7 @@ function chatListStore() {
 		getChatMessage: (chatId: string, messageId: string) => {
 			return currentStore?.[chatId]?.messages?.[messageId];
 		},
-		updateChatMessage: (chatId: string, message: MessageType) =>
+		updateChatMessage: (chatId: string, message: Partial<MessageType>) =>
 			update((n) => {
 				const currentMessage = n[chatId]?.messages[message.id];
 				const newMessage = { ...currentMessage, ...message };
@@ -86,6 +88,23 @@ function chatListStore() {
 				};
 				return { ...n, [chatId]: newChat };
 			}),
+		updateChatMessageData: (chatId: string, messageId: number, data: Partial<OllamaStreamLineLast>) => {
+			update((n) => {
+				const currentData = n[chatId]?.messages?.[messageId]?.data;
+				const newChat = {
+					...n[chatId],
+					messages: {
+						...n[chatId]?.messages,
+						[messageId]: {
+							...n[chatId]?.messages?.[messageId],
+							data: {...currentData, data}
+						}
+					}
+				};
+				return { ...n, [chatId]: newChat };
+			});
+		},
+
 		getLastMessageContext: (chatId: string) => {
 			const messages = currentStore?.[chatId]?.messages;
 			const lastMessage = Object.values(messages)

@@ -1,4 +1,5 @@
 //import { Ollama } from 'ollama-node';
+import type { ChatDataType } from '$lib/stores/chatter';
 import type { MessageType } from '../stores/messages';
 import { OllamaFetch, type OllamaStreamLine } from './ollamaFetch';
 
@@ -22,7 +23,7 @@ export const chatDataObject = {
 		role: message.role,
 		data:[]
 	}),
-	createChatData: (chatData: any = {}) => ({
+	createChatData: (chatData: Partial<ChatDataType> = {}) => ({
 		id: crypto.randomUUID(),
 		title: 'New Chat',
 		models: [],
@@ -30,6 +31,7 @@ export const chatDataObject = {
 		resume: '',
 		dateCreation: new Date(),
 		dateLastMessage: new Date(),
+		context: [],
 		...chatData
 	})
 };

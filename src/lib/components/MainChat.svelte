@@ -37,21 +37,20 @@
 	}
 
 	function sendMessage(chatId: string, content: string) {
+		const chat = chatter.getChat(chatId);
 		//
 		const messageUser = chatDataObject.createMessageData({ role: 'user', content, chatId });
 		const messageAssistant = chatDataObject.createMessageData({ role: 'assistant' });
 
-		console.log({ messageUser, messageAssistant });
 		// add messages to store
-		chatter.insertMessage($activeChatId, messageUser);
-		chatter.insertMessage($activeChatId, messageAssistant);
-
-		//
-		// chatter.getChatMessage($activeChatId, messageUser.id);
+		chatter.insertMessage(chatId, messageUser);
+		chatter.insertMessage(chatId, messageAssistant);
 
 		// send prompt
 		$aiResponseState = 'running';
-		sendPrompt(content, async (data) => postSendMessage($activeChatId, messageAssistant.id, messageUser.id, data));
+		sendPrompt({ prompt: content, context: chat.context ?? [] }, async (data) =>
+			postSendMessage(chatId, messageAssistant.id, messageUser.id, data)
+		);
 	}
 
 	async function postSendMessage(
@@ -63,13 +62,12 @@
 		if (data.done) {
 			streamResponseText = '';
 			$aiResponseState = 'done';
-			const content = Object.values(chatter.getChatMessages(chatId))[0];
 
-			// update current user message with kpi and context
-			chatter.updateChatMessage(chatId, {
-				id: assistantMessageId,
-				context: data.context
-			});
+			console.log(data.context);
+			// register chat context
+			chatter.updateChat(chatId, { context: data.context });
+			// update chat assistant message data
+			chatter.updateChatMessageData(chatId, assistantMessageId, data);
 		} else {
 			streamResponseText += data.response ?? '';
 
