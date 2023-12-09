@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import MainChat from '$lib/components/MainChat.svelte';
+	import Settings from '$lib/components/settings/Settings.svelte';
+	import Modal from '$lib/components/ui/Modal.svelte';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
 	import Sidebar from '$lib/components/ui/Sidebar.svelte';
 	import { activeChatId, chatter } from '$lib/stores/chatter';
 	import type { MessageListType, MessageType } from '$lib/stores/messages';
-	import { settings } from '$lib/stores/settings';
+	import { settings, showSettings } from '$lib/stores/settings';
 	import { guessChatTitle } from '$lib/tools/askOllama';
 	import { OllamaFetch } from '$lib/tools/ollamaFetch';
 	import '../styles/app.css';
@@ -25,10 +27,9 @@
 		}));
 	}
 
-	modelS(); 
+	modelS();
 
-	if($page.params.id) activeChatId.set($page.params.id);
-	
+	if ($page.params.id) activeChatId.set($page.params.id);
 </script>
 
 <svelte:head>
@@ -55,3 +56,6 @@ overflow-hidden"
 		</div>
 	</div>
 </div>
+<Modal show={$showSettings}>
+	<Settings />
+</Modal>

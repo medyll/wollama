@@ -99,7 +99,6 @@
 
 <div class="flex flex-col h-full w-full overflow-auto relative">
 	<Model />
-	$aiResponseState {$aiResponseState}
 	<div class="flex-1 mb-32">
 		<DashBoard>
 			<MessageList chatId={$activeChatId} />

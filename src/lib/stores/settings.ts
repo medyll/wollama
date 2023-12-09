@@ -20,3 +20,4 @@ export interface Settings {
 }
 
 export const settings = writable<Settings>({defaultModel:'llama2-uncensored'});
+export const showSettings = writable<boolean>(false);

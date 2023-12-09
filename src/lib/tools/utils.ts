@@ -41,6 +41,7 @@ function getStartAndEndOfWeek(date: Date, firstDayOfWeek: any = 1): { start: Dat
 
 export async function checkTitle(chatId: string) {
 	const chat = chatter.getChat(chatId);
+	console.log('checkTitle', chatId, chat?.title);
 	if (chat?.title === 'New Chat') {
 		const chat = chatter.getChat(chatId);
 		const messages: MessageListType = chat.messages;
@@ -52,7 +53,7 @@ export async function checkTitle(chatId: string) {
 				.join('\n');
 
 			const res = await guessChatTitle(resume);
-
+			console.log('checkTitle', res);
 			//
 			if (res?.response !== '') chatter.updateChat(chatId, { title: res.response });
 		}
