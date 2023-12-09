@@ -1,22 +1,18 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
 	import Icon from '@iconify/svelte';
+	import InfoLine from '../ui/InfoLine.svelte';
 </script>
 
-<div class="flex">
-	<div class="flex-1">{$t('settings.theme')}</div>
-	<div>Theme</div>
-</div>
+<InfoLine title={$t('settings.theme')}>Theme</InfoLine>
 <hr />
-<div>
-	<div>Ollama {$t('settings.server_url')}</div>
+<InfoLine title={'Ollama ' + $t('settings.server_url')} vertical>
 	<div class="flex">
-		<input class="flex-1" type="text" value={"http"} />
+		<input class="flex-1" type="text" value={'http'} />
 		<button title={$t('settings.test_connection')}><Icon icon="mdi:reload" /> </button>
 	</div>
-</div>
+</InfoLine>
 <hr />
-<div>
-	<div>{$t('settings.system_prompt')}</div>
-    <div><textarea></textarea></div>
-</div>
+<InfoLine title={$t('settings.system_prompt')} vertical>
+	<textarea class="w-full">prompt</textarea>
+</InfoLine>
