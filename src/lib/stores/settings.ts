@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { defaultOllamaSettings } from '../../configuration/llamaOptions';
 
 export interface Settings {
 	speechAutoSend?: boolean;
@@ -19,5 +20,5 @@ export interface Settings {
 	};
 }
 
-export const settings = writable<Settings>({defaultModel:'llama2-uncensored'});
+export const settings = writable<Settings>({defaultModel:'llama2-uncensored',llamaOptions: defaultOllamaSettings});
 export const showSettings = writable<boolean>(false);
