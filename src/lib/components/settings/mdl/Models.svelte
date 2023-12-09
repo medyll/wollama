@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
-	import { chatter } from '$lib/stores/chatter';
 	import { settings } from '$lib/stores/settings';
 	import Icon from '@iconify/svelte';
-	import InfoLine from '../ui/InfoLine.svelte';
+	import InfoLine from '$lib/components/ui/InfoLine.svelte';
 </script>
 
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
 	import Icon from '@iconify/svelte';
-	import InfoLine from '../ui/InfoLine.svelte';
+	import InfoLine from '$lib/components/ui/InfoLine.svelte';
 </script>
 
 <InfoLine title={$t('settings.theme')}>Theme</InfoLine>
@@ -12,6 +12,8 @@
 		<button title={$t('settings.test_connection')}><Icon icon="mdi:reload" /> </button>
 	</div>
 </InfoLine>
+<hr />
+<InfoLine title={$t('settings.auth')}>On</InfoLine>
 <hr />
 <InfoLine title={$t('settings.system_prompt')} vertical>
 	<textarea class="w-full">prompt</textarea>
