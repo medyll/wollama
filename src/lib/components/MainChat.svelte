@@ -49,7 +49,7 @@
 
 		// send prompt
 		$aiResponseState = 'running';
-		sendPrompt({ prompt: content, context: chat.context ?? [] }, async (data) =>
+		sendPrompt({ prompt: content, context: chat?.context ?? [] }, async (data) =>
 			postSendMessage(chatId, messageAssistant.id, messageUser.id, data)
 		);
 	}

@@ -1,9 +1,8 @@
 
 
-
 export const defaultOptions  = {
 	defaultModel: 'llama2-uncensored',
-    ollama_server: process.env.PUBLIC_OLLAMA_SERVER_API,
+    ollama_server: 'http://127.0.0.1:11434',
     auth: false,
     system_prompt: '',
 	sender: {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import MainChat from '$lib/components/MainChat.svelte';
 	import Settings from '$lib/components/settings/Settings.svelte';
@@ -29,7 +30,14 @@
 
 	modelS();
 
-	if ($page.params.id) activeChatId.set($page.params.id);
+	if ($page.params.id) {
+		if (!chatter.getChat($page.params.id)) {
+			$activeChatId = undefined;
+			goto('/');
+		} else {
+			activeChatId.set($page.params.id);
+		}
+	}
 </script>
 
 <svelte:head>
