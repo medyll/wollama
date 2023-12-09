@@ -18,9 +18,9 @@ export const chatDataObject = {
 		id: crypto.randomUUID(),
 		edit: false,
 		editedContent: '',
-		parentId: message?.parentId ?? null,
 		content: message.content,
-		role: message.role
+		role: message.role,
+		data:[]
 	}),
 	createChatData: (chatData: any = {}) => ({
 		id: crypto.randomUUID(),

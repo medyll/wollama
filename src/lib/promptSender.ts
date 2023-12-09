@@ -27,9 +27,8 @@ const askOllama = async (model: any, prompt: any, hook: (data: OllamaStreamLine)
 		.getReader();
 
 	while (true) {
-		const stream = await streamReader.read();
-		const { value, done } = stream;
-		// console.log({ stream });
+		const { value, done } = await streamReader.read(); 
+
 		if (done ?? readerConst.stop) {
 			break;
 		}

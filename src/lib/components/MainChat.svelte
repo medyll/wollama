@@ -5,7 +5,6 @@
 	import Model from '$lib/components/chat/Model.svelte';
 	import { sendPrompt } from '$lib/promptSender';
 	import { chatDataObject } from '$lib/tools/askOllama';
-	import { messageList } from '../stores/messages';
 	import { activeChatId, chatter } from '$lib/stores/chatter';
 	import { settings } from '$lib/stores/settings';
 	import { aiResponseState, chatEditListener } from '$lib/stores/chatEditListener';
@@ -42,18 +41,17 @@
 		const messageUser = chatDataObject.createMessageData({ role: 'user', content, chatId });
 		const messageAssistant = chatDataObject.createMessageData({ role: 'assistant' });
 
+		console.log({ messageUser, messageAssistant });
 		// add messages to store
 		chatter.insertMessage($activeChatId, messageUser);
 		chatter.insertMessage($activeChatId, messageAssistant);
 
 		//
-		chatter.getChatMessage($activeChatId, messageUser.id);
+		// chatter.getChatMessage($activeChatId, messageUser.id);
 
 		// send prompt
 		$aiResponseState = 'running';
-		sendPrompt(content, async (data) => {
-			postSendMessage($activeChatId, messageAssistant.id, messageUser.id, data);
-		});
+		sendPrompt(content, async (data) => postSendMessage($activeChatId, messageAssistant.id, messageUser.id, data));
 	}
 
 	async function postSendMessage(
@@ -100,6 +98,7 @@
 
 <div class="flex flex-col h-full w-full overflow-auto relative">
 	<Model />
+	$aiResponseState {$aiResponseState}
 	<div class="flex-1 mb-32">
 		<DashBoard>
 			<MessageList chatId={$activeChatId} />
