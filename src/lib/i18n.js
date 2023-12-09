@@ -21,7 +21,7 @@ function translate(locale, key, vars) {
     text = text.replace(regex, vars[k]);
   });
 
-  return text;
+  return text ?? key;
 }
 
 export const t = derived(locale, ($locale) => (key, vars = {}) =>
