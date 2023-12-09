@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import MainChat from '$lib/components/MainChat.svelte';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
 	import Sidebar from '$lib/components/ui/Sidebar.svelte';
@@ -24,36 +25,10 @@
 		}));
 	}
 
-	async function checkTitle(chatId: string) {
-		const chat = chatter.getChat(chatId);
-		if (chat?.title === 'New Chat') {
-			const chat = chatter.getChat(chatId);
-			const messages: MessageListType = chat.messages;
+	modelS(); 
 
-			if (chat.title == 'New Chat' && Object.values(messages).length > 1) {
-				const resume = Object.values(messages)
-					.slice(0, 2)
-					.map((message: MessageType) => message.content)
-					.join('\n');
-				
-			const res = await guessChatTitle(resume);
-			
-			// 
-			if (res?.response !== '') chatter.updateChat(chatId, { title: res.response });
-
-			}
-		}
-	}
-
-	/* chatter.subscribe((n) => {
-		if ($activeChatId) checkTitle($activeChatId);
-	});
-
-	activeChatId.subscribe((n) => {
-		if (n) checkTitle(n);
-	}); */
-
-	modelS();
+	if($page.params.id) activeChatId.set($page.params.id);
+	
 </script>
 
 <svelte:head>

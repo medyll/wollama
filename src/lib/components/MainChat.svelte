@@ -12,6 +12,7 @@
 	import type { OllamaStreamLine } from '$lib/tools/ollamaFetch';
 	import Input from './chat/Input.svelte';
 	import Attachment from './chat/Attachment.svelte';
+	import { checkTitle } from '$lib/tools/utils';
 
 	let voiceListening = false;
 
@@ -63,11 +64,13 @@
 			streamResponseText = '';
 			$aiResponseState = 'done';
 
-			console.log(data.context);
+			 
 			// register chat context
 			chatter.updateChat(chatId, { context: data.context });
 			// update chat assistant message data
 			chatter.updateChatMessageData(chatId, assistantMessageId, data);
+			//
+			checkTitle(chatId)
 		} else {
 			streamResponseText += data.response ?? '';
 
