@@ -33,7 +33,13 @@
 			<button class="text-left my-1" on:click={()=>{activeSetting = setting;}}>{setting}</button>
 		{/each}
 	</div>
-	<div class="flex-1 px-4">
+	<div class="flex-1 px-4 settings">
 		<svelte:component this={settingList[activeSetting]} />
 	</div>
 </div>
+
+<style lang="postcss">
+.settings {
+	height: 350px;;
+}
+</style>

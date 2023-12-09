@@ -8,7 +8,12 @@
 <hr />
 
 {#each Object.keys($settings.llamaOptions) as setting}
+	{@const settingValue = $settings.llamaOptions[setting]}
 	<InfoLine title={$t('settings.' + setting)}>
-		{$settings.llamaOptions[setting]}
+		{#if setting == 'temperature'}
+			<input type="range"  min="0" max="1" step="0.1"  value={settingValue} />
+		{:else if setting == ''}{:else}
+			<input type="text" value={settingValue} />
+		{/if}
 	</InfoLine>
 {/each}

@@ -1,19 +1,17 @@
 <script lang="ts">
 
-export let title: string= ''; 
+export let title: string | undefined= undefined; 
 export let vertical: boolean = false;
 
-
-$$slots.input
 </script>
 
-{#if $$slots.input && title!=''}
-    <div class="w-full font-semibold py-2">		
+{#if $$slots.input && !title }
+    <div class="w-full font-semibold py-2 text-sm">		
         {title}
     </div>
 {/if}
 <div class="flex {vertical? 'flex-col': 'place-items-center'} gap-2 ">
-	<div class="flex-1 font-semibold py-2">		
+	<div class="flex-1 font-semibold py-2 text-sm">		
         <slot name="input">{title}</slot>
 	</div>
 	<div class="{vertical? 'px-2':''}">

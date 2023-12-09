@@ -2,19 +2,43 @@
 	import { t } from '$lib/i18n';
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$lib/components/ui/InfoLine.svelte';
+	import { settings } from '$lib/stores/settings.js';
+
+	let ollama_server = $settings.ollama_server;
+
+	function changeThemeHandler() {
+		$settings.theme = $settings.theme == 'light' ? 'dark' : 'light';
+	}
+
+	function settingsUrl(url: string) {
+		$settings.ollama_server = url;
+	}
+
+	function settingAuth() {
+		$settings.auth = $settings.auth == true ? false : true;
+	}
 </script>
 
-<InfoLine title={$t('settings.theme')}>Theme</InfoLine>
-<hr />
-<InfoLine title={'Ollama ' + $t('settings.server_url')} vertical>
-	<div class="flex">
-		<input class="flex-1" type="text" value={'http'} />
-		<button title={$t('settings.test_connection')}><Icon icon="mdi:reload" /> </button>
-	</div>
+<InfoLine title={$t('settings.theme')}>
+	<button on:click={() => changeThemeHandler()}>
+		{$settings.theme}
+		<Icon icon="mdi:theme-light-dark" />
+	</button>
 </InfoLine>
 <hr />
-<InfoLine title={$t('settings.auth')}>On</InfoLine>
+<InfoLine title={'Ollama ' + $t('settings.server_url')} vertical>
+	<form on:submit|preventDefault={(e)=>{$settings.ollama_server= ollama_server}} class="flex">
+		<input bind:value={ollama_server} class="flex-1" type="text"  />
+		<button on:click={()=> settingsUrl(ollama_server)} title={$t('settings.test_connection')}><Icon icon="mdi:upload" /> </button>
+	</form>
+</InfoLine>
+<hr />
+<InfoLine title={$t('settings.auth')}>
+	<button on:click={settingAuth}>
+		{$settings.auth}
+	</button>
+</InfoLine>
 <hr />
 <InfoLine title={$t('settings.system_prompt')} vertical>
-	<textarea class="w-full">prompt</textarea>
+	<textarea cols="4" class="w-full">{$settings.system_prompt}</textarea>
 </InfoLine>

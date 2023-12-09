@@ -1,15 +1,20 @@
 import { writable } from 'svelte/store';
-import { defaultOllamaSettings } from '../../configuration/llamaOptions';
+import { defaultOllamaSettings, defaultOptions } from '../../configuration/configuration';
 
 export interface Settings {
-	speechAutoSend?: boolean;
-	speechRecognition?: SpeechRecognition;
-	system?: string;
+	theme?: string;
 	requestFormat?: string;
-	API_BASE_URL?: string;
+	ollama_server?: string;
 	modelList?: string[];
 	chatModelKeys?: string[];
 	defaultModel?: string;
+	auth: string;
+	system_prompt?: string;
+	sender: {
+		speechAutoSend?: boolean;
+		speechRecognition?: SpeechRecognition;
+		system?: string;
+	};
 	llamaOptions?: {
 		seed?: string;
 		temperature?: number;
@@ -20,5 +25,38 @@ export interface Settings {
 	};
 }
 
-export const settings = writable<Settings>({defaultModel:'llama2-uncensored',llamaOptions: defaultOllamaSettings});
+const settingStore = () => {
+	const isBrowser = typeof window !== 'undefined';
+	const { subscribe, set, update } = writable<Settings>({
+		...defaultOptions,
+		llamaOptions: defaultOllamaSettings
+	});
+
+	let currentStore = {} as Settings;
+	let dataStoreTimer: NodeJS.Timeout;
+
+	subscribe((o) => {
+		currentStore = o;
+		storeData();
+	});
+
+	function storeData() {
+		clearTimeout(dataStoreTimer);
+		dataStoreTimer = setTimeout(() => {
+			localStorage.settings = JSON.stringify(currentStore);
+		}, 500);
+	}
+
+	isBrowser && localStorage.settings && set(JSON.parse(localStorage.settings));
+
+	return {
+		subscribe,
+		set,
+		update,
+		reset: () => set({ ...defaultOptions, llamaOptions: defaultOllamaSettings })
+	};
+};
+
+export const settings = settingStore();
+
 export const showSettings = writable<boolean>(false);
