@@ -1,6 +1,8 @@
 export default {
   en: {
+    'ui.settings': "settings"
   },
-  fr: { 
+  fr: {
+    'ui.settings': "paramètres"
   },
 };

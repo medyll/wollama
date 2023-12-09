@@ -4,6 +4,7 @@
 	import { messageByGroupDate } from '$lib/tools/utils.js';
 	import ChatButton from '../chat/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
+	import { showSettings } from '$lib/stores/settings.js';
 	let search: any = '';
 
 	let showDropDown: boolean = false;
@@ -49,8 +50,8 @@
 	<div>
 		<button
 			on:click={() => {
-				goto('/admin');
-			}}>admin</button
+				showSettings.set(true);
+			}}>settings</button
 		>
 		<button
 			class=" flex rounded-md p-3.5 w-full"
