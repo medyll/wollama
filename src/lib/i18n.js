@@ -13,7 +13,7 @@ function translate(locale, key, vars) {
   // Grab the translation from the translations object.
   let text = translations[locale][key];
 
-  if (!text) throw new Error(`no translation found for ${locale}.${key}`);
+  // if (!text) throw new Error(`no translation found for ${locale}.${key}`);
 
   // Replace any passed in variables in the translation string.
   Object.keys(vars).map((k) => {

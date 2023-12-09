@@ -33,10 +33,10 @@
 <div class="flex w-full">
 	<div class="flex flex-col">
 		{#each Object.keys(settingList) as setting}
-			<button on:click={()=>{activeSetting = setting;}}>{setting}</button>
+			<button class="text-left" on:click={()=>{activeSetting = setting;}}>{setting}</button>
 		{/each}
 	</div>
-	<div class="flex-1">
+	<div class="flex-1 px-4">
 		<svelte:component this={settingList[activeSetting]} />
 	</div>
 </div>
