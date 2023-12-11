@@ -1,5 +1,6 @@
 import { derived, writable } from "svelte/store";
-import translations from "../locales/translations.js"
+import translations from "../locales/translations.js" 
+import { Utils } from "./tools/utils.js";
 
 export const locale = writable("en");
 export const locales = Object.keys(translations);
@@ -11,7 +12,7 @@ function translate(locale, key, vars) {
   if (!locale) throw new Error(`no translation for key "${key}"`);
 
   // Grab the translation from the translations object.
-  let text = translations[locale][key];
+  let text = translations[locale][key]   ?? Utils.resolveDotPath(translations[locale],key);
 
   // if (!text) throw new Error(`no translation found for ${locale}.${key}`);
 

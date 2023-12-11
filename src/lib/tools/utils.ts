@@ -4,6 +4,16 @@ import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date
 import type { MessageListType, MessageType } from '$lib/stores/messages';
 import { guessChatTitle } from './askOllama';
 
+export class Utils {
+	static resolveDotPath(
+		object: Record<string, any>,
+		path: string,
+		defaultValue?: any
+	): any | undefined {
+		return path.split('.').reduce((r, s) => (r ? r[s] : defaultValue), object) ?? undefined;
+	}
+}
+
 type GroupItem = {
 	code: string;
 	name: string;
@@ -61,32 +71,32 @@ export async function checkTitle(chatId: string) {
 }
 
 export function getTimeTitle(inputText: string) {
-  const match = inputText.match(/(weeks|months)(\d+)/);
-  
-  if (match) {
-    const timeUnit = match[1];
-    const timeValue = parseInt(match[2]);
+	const match = inputText.match(/(weeks|months)(\d+)/);
 
-    if (timeUnit === 'weeks') {
-      if (timeValue === 0) {
-        return "ui:thisweek";
-      } else if (timeValue === 1) {
-        return "ui:lastweek";
-      } else {
-        return `il y a ${timeValue} semaines`;
-      }
-    } else if (timeUnit === 'months') {
-      if (timeValue === 0) {
-        return "ce mois-ci";
-      } else if (timeValue === 1) {
-        return "mois dernier";
-      } else {
-        return `il y a ${timeValue} mois`;
-      }
-    }
-  }
-  
-  return "Format invalide";
+	if (match) {
+		const timeUnit = match[1];
+		const timeValue = parseInt(match[2]);
+
+		if (timeUnit === 'weeks') {
+			if (timeValue === 0) {
+				return 'ui:thisweek';
+			} else if (timeValue === 1) {
+				return 'ui:lastweek';
+			} else {
+				return `il y a ${timeValue} semaines`;
+			}
+		} else if (timeUnit === 'months') {
+			if (timeValue === 0) {
+				return 'ce mois-ci';
+			} else if (timeValue === 1) {
+				return 'mois dernier';
+			} else {
+				return `il y a ${timeValue} mois`;
+			}
+		}
+	}
+
+	return 'Format invalide';
 }
 
 function groupChatMessages(
