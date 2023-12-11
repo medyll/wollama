@@ -11,6 +11,7 @@ export default {
       searchChats: "search chats",
       thisWeek: "this week",
       lastWeek: "last week",
+      retryInSeconds: 'retry in {{seconds}} seconds'
     },
     settings: {
       auth: "authentication",

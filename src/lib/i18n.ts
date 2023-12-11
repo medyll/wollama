@@ -9,7 +9,7 @@ type DeepKeyString<T, Prefix extends string = ''> = {
 	[K in keyof T]: T[K] extends object ? DeepKeyString<T[K], `${Prefix}${K}.`> : `${Prefix}${K}`;
 }[keyof T];
 
-type MyObjectKeys = DeepKeyString<typeof translations>;
+type MyObjectKeys = {[locale:string]: DeepKeyString<typeof translations>}
 
 function doTranslate(locale, key, vars) {
 	// Let's throw some errors if we're trying to use keys/locales that don't exist.

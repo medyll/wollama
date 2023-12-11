@@ -1,8 +1,10 @@
+import { connectionChecker } from '$lib/stores/connection';
 import { settings } from '$lib/stores/settings';
 import { ui } from '$lib/stores/ui';
 import { OllamaFetch } from './ollamaFetch';
 
-let ollamaCheckTimer: NodeJS.Timeout;
+let ollamaCheckRetries = 0;
+let raminingTimer = 0;
 export class engine {
 	public static setTheme(theme: string) {
 		settings.setParameterValue('theme', theme);
@@ -13,23 +15,36 @@ export class engine {
 		}
 	}
 
-	public static async checkOllamaEndPoints(fn: () => any) {
-		const ollama_fetch = new OllamaFetch(); 
+	public static async checkOllamaEndPoints(fn: () => any = () => {}) {
+		const ollama_fetch = new OllamaFetch();
 
-        ui.setConnectionStatus('connecting');
-		await fetchModels();
-        setTimeout(this.checkOllamaEndPoints,10000)
+		connectionChecker.setConnectionStatus('connecting');
 
-		async function fetchModels() {
-			return ollama_fetch
-				.listModels()
-				.then((res) => {
-					ui.setConnectionStatus('connected');
-				})
-				.catch((error) => {
-					console.log('erreor,', error);
-					ui.setConnectionStatus('error');
-				});
+		await ollama_fetch
+			.listModels()
+			.then(() => {
+				connectionChecker.setConnectionStatus('connected');
+				connectionChecker.setKey('connectionRetryCount', 0);
+			})
+			.catch((error) => {
+				connectionChecker.incrementConnectionRetryCount();
+				connectionChecker.setConnectionStatus('error');
+			})
+			.finally(() => {
+				if (
+					connectionChecker.get('connectionStatus') != 'connected' &&
+					connectionChecker.get('connectionRetryTimeout') != 0
+				) {
+					ollamaCheckRetries = setTimeout(
+						() => this.checkOllamaEndPoints(fn),
+						connectionChecker.get('connectionRetryTimeout')
+					);
+				}
+			});
+
+		function getRetryTimeOut(retryCount: number, maxRetries?: number = 50) {
+			let retryInterval = retryCount * 1.5;
+			return retryCount > maxRetries ? 240000 : retryInterval * 1000;
 		}
 	}
 }

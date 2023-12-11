@@ -31,7 +31,7 @@
 		}));
 	}
 
-	engine.checkOllamaEndPoints(ui.setConnectionStatus('error'));
+	engine.checkOllamaEndPoints();
 
 	modelS();
 

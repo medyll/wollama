@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { t } from '$lib/i18n';
-	import { activeChatId } from '$lib/stores/chatter';
 	import { showSettings } from '$lib/stores/settings';
 	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
+	import StatusBar from './StatusBar.svelte';
+
+	new Date().getSeconds()
 </script>
 
-<div class="flex justify-middle p-2 gap-8">
+<div class="flex-align-middle p-2 gap-8">
 	<div class="flex-1">AIUI</div>
-	<div>{$ui.connectionStatus}</div>
+	<StatusBar />
 	<button
 		on:click={() => {
 			goto('/signing');
