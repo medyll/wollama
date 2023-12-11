@@ -3,11 +3,13 @@
 	import { t } from '$lib/i18n';
 	import { activeChatId } from '$lib/stores/chatter';
 	import { showSettings } from '$lib/stores/settings';
+	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
 </script>
 
 <div class="flex justify-middle p-2 gap-8">
 	<div class="flex-1">AIUI</div>
+	<div>{$ui.connectionStatus}</div>
 	<button
 		on:click={() => {
 			goto('/signing');

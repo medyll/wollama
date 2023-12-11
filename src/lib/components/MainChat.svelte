@@ -15,6 +15,7 @@
 	import { checkTitle } from '$lib/tools/utils';
 	import ChatInfo from './chat/ChatInfo.svelte'; 
 	import { t } from '$lib/i18n';
+	import { ui } from '$lib/stores/ui';
 
 	let voiceListening = false;
 
@@ -83,7 +84,7 @@
 	}
 
 	function preSendMessage(content: string) {
-		const id = getChat();
+		const id = getChat(); 
 		sendMessage(id, content);
 		window.history.replaceState(history.state, '', `/chat/${id}`);
 		prompt = '';

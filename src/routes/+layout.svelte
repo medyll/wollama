@@ -14,6 +14,8 @@
 	import '../styles/app.css';
 	import '../styles/tailwind.css';
 	import '../styles/snippets.css';
+	import { engine } from '$lib/tools/engine';
+	import { ui } from '$lib/stores/ui';
 
 	function setSettings() {
 		// set default model
@@ -28,6 +30,8 @@
 			['models']: [...models]
 		}));
 	}
+
+	engine.checkOllamaEndPoints(ui.setConnectionStatus('error'));
 
 	modelS();
 

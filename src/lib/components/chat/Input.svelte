@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { ui } from "$lib/stores/ui";
+
 	export let prompt: string = '';
 	export let placeholder: string = '';
 	export let form: string = '';
-	export let disabled: boolean = false;
+	export let disabled: boolean = $ui.connectionStatus == 'error';
 </script>
 
 <div class="relative flex-align-middle">

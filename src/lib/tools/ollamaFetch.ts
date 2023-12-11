@@ -58,7 +58,7 @@ export class OllamaFetch {
 				'Content-Type': 'application/json'
 			}
 		})
-			.then(async (res) => {
+			.then(async (res) => { 
 				if (!res.ok) throw await res.json();
 				return await res.json();
 			})
@@ -66,7 +66,9 @@ export class OllamaFetch {
 				return res?.models;
 			})
 			.catch((error) => {
-				throw error;
+				throw error
 			});
 	}
+
+	 
 }
