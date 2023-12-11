@@ -1,13 +1,39 @@
 
 
-.application {
-    @apply  text-gray-700 bg-gray-50 ;
-    @apply  dark:bg-gray-800 dark:text-gray-100
-}
-
 .flex-align-middle {
     @apply flex items-center;
 }
-.flex-v {
+
+.flex-v { 
     @apply flex flex-col;
+}
+
+.application {
+    @apply text-gray-700 bg-gray-50;
+    @apply dark:bg-gray-800 dark:text-gray-100
+}
+
+.inputSearch {
+    @apply w-full p-1 rounded-md border border-gray-700;
+    @apply text-gray-700 bg-gray-200;
+    @apply dark:bg-gray-900 dark:text-gray-100
+}
+.appButton {
+    @apply text-left px-2 py-1 rounded-md border border-gray-700;
+    @apply text-gray-700 bg-gray-200;
+    @apply dark:bg-gray-900 dark:text-gray-100
+}
+
+.borderButton {
+    @apply text-left px-1 py-1 rounded-md border ;
+    @apply text-gray-700 bg-gray-50 border-gray-300;
+    @apply dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700
+}
+
+.mainInputArea {
+     @apply border overflow-hidden rounded-md  ;
+     @apply dark:bg-gray-50 dark:text-gray-700;
+    @apply text-gray-700 bg-gray-200;
+    /*@apply text-gray-700 bg-opacity-30 border-gray-400; */
+    /* @apply  dark:text-gray-800 dark:border-gray-300 */
 }

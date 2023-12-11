@@ -118,7 +118,7 @@
 				preSendMessage(prompt);
 			}}
 		/>
-		<div class="textarea">
+		<div class="mainInputArea">
 			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
 				<Attachment
 					slot="start"
@@ -138,8 +138,3 @@
 	</div>
 </div>
 
-<style lang="postcss">
-	.textarea {
-		@apply border overflow-hidden rounded-xl dark:bg-gray-800 border-gray-400 dark:border-gray-100 dark:text-gray-100;
-	}
-</style>

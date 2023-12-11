@@ -24,6 +24,7 @@
 </script>
 
 <button
+	class="borderButton"
 	on:click={() => {
 		fileinput.click();
 	}}

@@ -6,7 +6,7 @@
 </script>
 
 <div class="relative flex-align-middle">
-	<div class="sides px-2"><slot name="start" /></div>
+	<div class="sides"><slot name="start" /></div>
 	<textarea {disabled} {form} {placeholder} bind:value={prompt} on:keypress rows="1" />
 	<div class="sides absolute h-full right-0"><slot name="end" /></div>
 </div>
