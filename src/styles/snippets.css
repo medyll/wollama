@@ -1,0 +1,13 @@
+
+
+.application {
+    @apply  text-gray-700 bg-gray-50 ;
+    @apply  dark:bg-gray-800 dark:text-gray-100
+}
+
+.flex-align-middle {
+    @apply flex items-center;
+}
+.flex-v {
+    @apply flex flex-col;
+}

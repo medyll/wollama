@@ -18,7 +18,7 @@
 	let activeSetting = 'general';
 </script>
 
-<div class=" flex items-center justify-between dark:text-gray-300 px-5 py-4">
+<div class="flex-align-middle justify-between dark:text-gray-300 px-5 py-4">
 	<div class=" text-lg font-medium self-center">{$t('ui.settings')}</div>
 	<button 
 		on:click={() => showSettings.set(false)}
@@ -28,7 +28,7 @@
 </div>
 <hr class=" dark:border-gray-800" />
 <div class="flex w-full">
-	<div class="flex flex-col w-24 px-2 ">
+	<div class="flex-v w-24 px-2 ">
 		{#each Object.keys(settingList) as setting}
 			<button class="text-left my-1" on:click={()=>{activeSetting = setting;}}>{setting}</button>
 		{/each}

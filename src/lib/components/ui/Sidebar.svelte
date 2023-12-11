@@ -15,13 +15,13 @@
 	};
 </script>
 
-<div class="flex flex-col h-full w-[260px] gap-3 border-r-4">
+<div class="flex-v h-full w-[260px] gap-3 border-r-4">
 	<button
 		on:click={async () => {
 			$activeChatId = undefined;
 			goto('/');
 		}}
-		class="flex items-center gap-2"
+		class="flex-align-middle gap-2"
 	>
 		<Icon icon="mdi:chat-plus-outline" style="font-size:1.8em" /> <span>Nouveau chat</span>
 	</button>

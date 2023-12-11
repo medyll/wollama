@@ -97,7 +97,7 @@
 	}
 </script>
 
-<div class="flex flex-col h-full w-full overflow-auto relative">
+<div class="flex-v h-full w-full overflow-auto relative">
 	<Model />
 	<div class="flex-1 mb-32">
 		<DashBoard>
@@ -124,7 +124,7 @@
 					bind:userFiles
 					disabled={$chatEditListener.isTyping}
 				/>
-				<div slot="end" class="flex items-center">
+				<div slot="end" class="flex-align-middle">
 					<Speech onEnd={preSendMessage} bind:prompt bind:voiceListening />
 					<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
 						<Icon icon="mdi:send" style="font-size:1.6em" />

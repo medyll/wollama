@@ -27,8 +27,8 @@
 	$: icon = message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one';
 </script>
 
-<div bind:this={element} class="w-full flex flex-col gap-1 mb-4">
-	<div class="flex items-center">
+<div bind:this={element} class="flex-v w-full gap-1 mb-4">
+	<div class="flex-align-middle">
 		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
 		<div class="flex-1 font-bold capitalize">{message.role}</div>
 	</div>

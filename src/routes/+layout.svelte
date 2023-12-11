@@ -13,6 +13,7 @@
 	import { OllamaFetch } from '$lib/tools/ollamaFetch';
 	import '../styles/app.css';
 	import '../styles/tailwind.css';
+	import '../styles/snippets.css';
 
 	function setSettings() {
 		// set default model
@@ -44,17 +45,12 @@
 	<title>AIUI</title>
 </svelte:head>
 
-<div
-	class="flex w-full h-full text-gray-700
-bg-white
-dark:bg-gray-800 dark:text-gray-100
-overflow-hidden"
->
+<div class="flex w-full h-full overflow-hidden application">
 	<div class="h-full overflow-hidden">
 		<Sidebar />
 	</div>
 	<div class="flex-1 relative overflow-auto">
-		<div class="flex flex-col flex-1 h-full">
+		<div class="flex-v flex-1 h-full">
 			<div class="relative"><Navbar /></div>
 			<div class="flex-1 w-full relative">
 				<div class="h-full relative overflow-hidden mx-auto max-w-3xl">

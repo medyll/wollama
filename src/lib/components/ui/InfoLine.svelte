@@ -10,7 +10,7 @@ export let vertical: boolean = false;
         {title}
     </div>
 {/if}
-<div class="flex {vertical? 'flex-col': 'place-items-center'} gap-2 ">
+<div class="{vertical? 'flex-v': 'flex-align-middle'} gap-2 ">
 	<div class="flex-1 font-semibold py-2 text-sm">		
         <slot name="input">{title}</slot>
 	</div>
