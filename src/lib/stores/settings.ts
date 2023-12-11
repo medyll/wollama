@@ -49,11 +49,18 @@ const settingStore = () => {
 
 	isBrowser && localStorage.settings && set(JSON.parse(localStorage.settings));
 
+	function setParameterValue(key: string, value: any) {
+		update((n) => {
+			const newSettings = { ...n, [key]: value };
+			return newSettings;
+		});
+	}
+
 	return {
 		subscribe,
 		set,
 		update,
-		reset: () => set({ ...defaultOptions, llamaOptions: defaultOllamaSettings })
+		setParameterValue
 	};
 };
 

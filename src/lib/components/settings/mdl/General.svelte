@@ -3,11 +3,13 @@
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$lib/components/ui/InfoLine.svelte';
 	import { settings } from '$lib/stores/settings.js';
+	import { engine } from '$lib/tools/engine';
 
 	let ollama_server = $settings.ollama_server;
 
 	function changeThemeHandler() {
-		$settings.theme = $settings.theme == 'light' ? 'dark' : 'light';
+		engine.setTheme($settings.theme == 'light' ? 'dark' : 'light')
+		// $settings.theme = $settings.theme == 'light' ? 'dark' : 'light';
 	}
 
 	function settingsUrl(url: string) {
@@ -16,7 +18,7 @@
 
 	function settingAuth() {
 		$settings.auth = $settings.auth == true ? false : true;
-	}
+	} 
 </script>
 
 <InfoLine title={$t('settings.theme')}>
