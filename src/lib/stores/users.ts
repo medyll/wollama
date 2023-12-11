@@ -1,7 +1,15 @@
-import { writable } from "svelte/store";
+import { writable } from 'svelte/store';
 
-export type userProfileType = {
+export type userProfileType = {};
 
-}
+const userProfileStore = () => {
+	const { subscribe, set, update } = writable<userProfileType>({});
 
-export const userProfile = writable<userProfileType>({});
+	return {
+		subscribe,
+		set,
+		update
+	};
+};
+
+export const userProfile = userProfileStore();
