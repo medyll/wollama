@@ -60,6 +60,35 @@ export async function checkTitle(chatId: string) {
 	}
 }
 
+export function getTimeTitle(inputText: string) {
+  const match = inputText.match(/(weeks|months)(\d+)/);
+  
+  if (match) {
+    const timeUnit = match[1];
+    const timeValue = parseInt(match[2]);
+
+    if (timeUnit === 'weeks') {
+      if (timeValue === 0) {
+        return "ui:thisweek";
+      } else if (timeValue === 1) {
+        return "ui:lastweek";
+      } else {
+        return `il y a ${timeValue} semaines`;
+      }
+    } else if (timeUnit === 'months') {
+      if (timeValue === 0) {
+        return "ce mois-ci";
+      } else if (timeValue === 1) {
+        return "mois dernier";
+      } else {
+        return `il y a ${timeValue} mois`;
+      }
+    }
+  }
+  
+  return "Format invalide";
+}
+
 function groupChatMessages(
 	sortedList: ChatDataType[],
 	args = { weekGroupSize: 3, monthGroupSize: 5 }

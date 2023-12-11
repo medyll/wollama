@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { activeChatId } from '../../stores/chatter.js';
 	import { goto } from '$app/navigation';
-	import { messageByGroupDate } from '$lib/tools/utils.js';
+	import { getTimeTitle, messageByGroupDate } from '$lib/tools/utils.js';
 	import ChatButton from '../chat/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
 	import { showSettings } from '$lib/stores/settings.js';
@@ -32,7 +32,7 @@
 		{#each $messageByGroupDate as erd}
 			<div>
 				<div class="font-bold whitespace-nowrap text-ellipsis">
-					{erd.name}
+				{getTimeTitle(erd.code)}
 				</div>
 				<div>
 					{#each erd.items as chat}
