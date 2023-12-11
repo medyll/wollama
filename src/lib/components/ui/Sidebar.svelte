@@ -7,7 +7,7 @@
 	import { showSettings } from '$lib/stores/settings.js';
 	import { t } from '$lib/i18n.js';
 	let search: any = '';
-	import { format } from 'date-fns'; 
+	import { format } from 'date-fns';
 
 	const loadChat = async (id: string) => {
 		activeChatId.set(id);
@@ -17,16 +17,18 @@
 
 <div class="flex-v h-full w-[260px] gap-2 border-r-4 px-2 pt-2">
 	<div class="text-right">{format(new Date(), 'EEEE, dd MMMM')}</div>
-	<button
-		on:click={async () => {
-			$activeChatId = undefined;
-			goto('/');
-		}}
-		class="appButton w-full"
-	>
-		<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
+	<div class="flex-align-middle gap-2 justify-end">
 		<span>{$t('ui.newChat')}</span>
-	</button>
+		<button
+			on:click={async () => {
+				$activeChatId = undefined;
+				goto('/');
+			}}
+			class="appButton iconButton"
+		>
+			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
+		</button>
+	</div>
 	<input class="inputSearch" placeholder={$t('ui.searchChats')} bind:value={search} />
 	<div class="text-right">{$t('ui.myChats')}</div>
 	<div class="flex-1">
@@ -48,5 +50,4 @@
 			</div>
 		{/each}
 	</div>
-	
 </div>

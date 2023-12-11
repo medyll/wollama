@@ -3,6 +3,7 @@ export default {
     ui: {
       settings: "settings",
       newChat: "new chat",
+      myChats: "my chats",
       userProfile: "user profile",
       signOut: "sign out",
       aiCautionMessage: "the llama can have some hallucinations",

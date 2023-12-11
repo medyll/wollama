@@ -7,6 +7,7 @@
 	import { marked } from 'marked';
 	import { onMount } from 'svelte';
 	import { t } from '$lib/i18n';
+	import Skeleton from '../ui/Skeleton.svelte';
 	export let message: MessageType;
 
 	let element: HTMLElement;
@@ -33,17 +34,17 @@
 		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
 		<div class="flex-1 font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
 	</div>
-	<div class="flex-1 whitespace-pre-line ml-12">
-		{@html message?.content ? marked(message?.content) : ''} 
-		<!-- {#if message?.content  === ''}
-			<pre class="animate-pulse"> 
-				<div class="h-2 bg-gray-200 dark:bg-gray-600 rounded col-span-2" />
-				<div class="h-2 bg-gray-200 dark:bg-gray-600 rounded col-span-2" />
-				<div class="h-2 bg-gray-200 dark:bg-gray-600 rounded col-span-2" />
-				<div class="h-2 bg-gray-200 dark:bg-gray-600 rounded col-span-2" />
-			</pre>
+	<div class="flex-1 whitespace-pre-line ml-12 relative">
+		{#if [undefined, ''].includes(message?.content)}
+			<Skeleton class="h-full" />
 		{:else}
 			{@html message?.content ? marked(message?.content) : ''}
-		{/if} -->
+		{/if}
 	</div>
 </div>
+
+<style lang="postcss">
+	.skeletonLine {
+		@apply h-2 bg-gray-200 dark:bg-gray-600 rounded-md col-span-2 mb-1 animate-pulse;
+	}
+</style>

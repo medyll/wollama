@@ -56,7 +56,7 @@ const askOllama = async (
 
 async function sendQuery(userPrompt: string, context: any, model: string) {
 	const settings = {} as any;
-	console.log('sendQuery', userPrompt, context, model);
+	
 	return await fetch(`http://127.0.0.1:11434/api/generate`, {
 		method: 'POST',
 		headers: {
