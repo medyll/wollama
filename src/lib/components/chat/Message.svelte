@@ -6,6 +6,7 @@
 
 	import { marked } from 'marked';
 	import { onMount } from 'svelte';
+	import { t } from '$lib/i18n';
 	export let message: MessageType;
 
 	let element: HTMLElement;
@@ -30,7 +31,7 @@
 <div bind:this={element} class="flex-v w-full gap-1 mb-4">
 	<div class="flex-align-middle">
 		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
-		<div class="flex-1 font-bold capitalize">{message.role}</div>
+		<div class="flex-1 font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
 	</div>
 	<div class="flex-1 whitespace-pre-line ml-12">
 		{@html message?.content ? marked(message?.content) : ''} 

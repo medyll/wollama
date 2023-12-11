@@ -4,7 +4,8 @@
 	import { getTimeTitle, messageByGroupDate } from '$lib/tools/utils.js';
 	import ChatButton from '../chat/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
-	import { showSettings } from '$lib/stores/settings.js';
+	import { showSettings } from '$lib/stores/settings.js'; 
+	import { t } from '$lib/i18n.js';
 	let search: any = '';
 
 	let showDropDown: boolean = false;
@@ -23,16 +24,16 @@
 		}}
 		class="flex-align-middle gap-2"
 	>
-		<Icon icon="mdi:chat-plus-outline" style="font-size:1.8em" /> <span>Nouveau chat</span>
+		<Icon icon="mdi:chat-plus-outline" style="font-size:1.8em" /> <span>{$t('ui.newChat')}</span>
 	</button>
 	<div class="p-3">
-		<input placeholder="Search chats" bind:value={search} />
+		<input placeholder="{$t('ui.searchChats')}" bind:value={search} />
 	</div>
 	<div class="flex-1 p-2">
 		{#each $messageByGroupDate as erd}
 			<div>
 				<div class="font-bold whitespace-nowrap text-ellipsis">
-				{getTimeTitle(erd.code)}
+				 {$t(getTimeTitle(erd.code))}
 				</div>
 				<div>
 					{#each erd.items as chat}
@@ -51,10 +52,9 @@
 		<button
 			on:click={() => {
 				showSettings.set(true);
-			}}>settings</button
+			}}>{$t('ui.settings')}</button
 		>
-		<button
-			class=" flex rounded-md p-3.5 w-full"
+		<button 
 			on:click={() => {
 				showDropDown = !showDropDown;
 			}}
@@ -64,7 +64,7 @@
 				}, 150);
 			}}
 		>
-			<div>User profile</div>
+			<div>{$t('ui.userProfile')}</div>
 		</button>
 
 		<button
@@ -72,7 +72,7 @@
 				goto('/signing');
 			}}
 		>
-			Sign Out
+			{$t('ui.signOut')}
 		</button>
 	</div>
 </div>

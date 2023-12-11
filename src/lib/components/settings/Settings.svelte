@@ -30,7 +30,7 @@
 <div class="flex w-full">
 	<div class="flex-v w-24 px-2 ">
 		{#each Object.keys(settingList) as setting}
-			<button class="text-left my-1" on:click={()=>{activeSetting = setting;}}>{setting}</button>
+			<button class="text-left my-1" on:click={()=>{activeSetting = setting;}}>{$t(`settings.modules.${setting}`)}</button>
 		{/each}
 	</div>
 	<div class="flex-1 px-4 settings">

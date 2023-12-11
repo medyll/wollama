@@ -13,7 +13,8 @@
 	import Input from './chat/Input.svelte';
 	import Attachment from './chat/Attachment.svelte';
 	import { checkTitle } from '$lib/tools/utils';
-	import ChatInfo from './chat/ChatInfo.svelte';
+	import ChatInfo from './chat/ChatInfo.svelte'; 
+	import { t } from '$lib/i18n';
 
 	let voiceListening = false;
 
@@ -133,7 +134,7 @@
 				</div>
 			</Input>
 		</div>
-		<div class="text-xs text-center py-2">Caution message</div>
+		<div class="text-xs text-center py-2">{$t('ui.aiCautionMessage')}</div>
 	</div>
 </div>
 

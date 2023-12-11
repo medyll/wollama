@@ -10,5 +10,5 @@
 	<button>on</button>
 </InfoLine>
 <InfoLine title={$t('ui.avatar')} vertical>
-	<input type="text" class="w-full" placeholder={$t('ui.set_avatar_email')}  />
+	<input type="text" class="w-full" placeholder={$t('settings.avatar_email')}  />
 </InfoLine>

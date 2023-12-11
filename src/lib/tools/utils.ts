@@ -79,9 +79,9 @@ export function getTimeTitle(inputText: string) {
 
 		if (timeUnit === 'weeks') {
 			if (timeValue === 0) {
-				return 'ui:thisweek';
+				return 'ui.thisWeek';
 			} else if (timeValue === 1) {
-				return 'ui:lastweek';
+				return 'ui.lastWeek';
 			} else {
 				return `il y a ${timeValue} semaines`;
 			}
