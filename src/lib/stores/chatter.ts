@@ -49,7 +49,7 @@ function chatListStore() {
 		subscribe,
 		set,
 		update,
-		getChat: (chatId: string) => currentStore?.[chatId],
+		getChat: (chatId?: string) => chatId ? currentStore?.[chatId] : undefined,
 		insertChat: (newChat: ChatDataType) => update((n) => ({ ...n, [newChat.id]: newChat })),
 		getChatMessages: (chatId: string) => currentStore?.[chatId]?.messages ?? {},
 		updateChat: (chatId: string, chatData: Partial<ChatDataType>) => {

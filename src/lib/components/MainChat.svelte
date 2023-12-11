@@ -13,6 +13,7 @@
 	import Input from './chat/Input.svelte';
 	import Attachment from './chat/Attachment.svelte';
 	import { checkTitle } from '$lib/tools/utils';
+	import ChatInfo from './chat/ChatInfo.svelte';
 
 	let voiceListening = false;
 
@@ -64,13 +65,12 @@
 			streamResponseText = '';
 			$aiResponseState = 'done';
 
-			 
 			// register chat context
 			chatter.updateChat(chatId, { context: data.context });
 			// update chat assistant message data
 			chatter.updateChatMessageData(chatId, assistantMessageId, data);
 			//
-			checkTitle(chatId)
+			checkTitle(chatId);
 		} else {
 			streamResponseText += data.response ?? '';
 
@@ -98,9 +98,10 @@
 </script>
 
 <div class="flex-v h-full w-full overflow-auto relative">
-	<Model />
 	<div class="flex-1 mb-32">
 		<DashBoard>
+		<ChatInfo />
+			<Model />
 			<MessageList chatId={$activeChatId} />
 		</DashBoard>
 	</div>
