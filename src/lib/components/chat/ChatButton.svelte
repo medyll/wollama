@@ -4,7 +4,7 @@
 
 	export let chatId: string = '';
 
-	const chat = chatter.getChat(chatId);
+	$: chat = chatter.getChat(chatId);
 	const confirmDelete: boolean = false;
 	let editChat: boolean = false;
 
