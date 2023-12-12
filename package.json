@@ -75,6 +75,8 @@
 		"date-fns": "^2.30.0",
 		"fs-extra": "^11.2.0",
 		"highlight": "^0.2.4",
+		"highlight.js": "^11.9.0",
+		"hljs": "^6.2.3",
 		"i18n": "^0.15.1",
 		"langchain": "^0.0.200",
 		"marked": "^11.0.0",

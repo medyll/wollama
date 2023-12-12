@@ -51,14 +51,18 @@ body {
 	@apply rounded-lg;
 }
 
-pre {
-	white-space: pre-wrap;
-}
-
 .iconify {
 	display: inline-block;
 }
 
 html {
 	font-family: Roboto, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+code.hljs {
+	display   : block !important;
+	overflow-x: auto;
+	padding   : 1em;
+	border    : px solid red;
+	white-space: pre-line
 }

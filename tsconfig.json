@@ -9,7 +9,8 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"module": "ESNext"
+		"module": "ESNext",
+		"moduleResolution": "node",
 		// "types": ["vite/client", "svelte", "@sveltejs/kit"],
 	},
 	"include": ["src/**/*"],
