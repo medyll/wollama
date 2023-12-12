@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.3](https://github.com/medyll/aiui/compare/v0.0.2...v0.0.3) (2023-12-12)
+
+
+### Bug Fixes
+
+* empty dashboard ([0fa6323](https://github.com/medyll/aiui/commit/0fa63236d8d3817df45d025e4bc72e08126c9b25))
+
 ### 0.0.2 (2023-12-12)
 
 
