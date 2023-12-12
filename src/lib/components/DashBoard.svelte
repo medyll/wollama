@@ -2,7 +2,7 @@
 	import { activeChatId, chatter } from '$lib/stores/chatter';
 	import Icon from '@iconify/svelte';
 
-	$: messages = chatter.getChatMessages($activeChatId);
+	$: messages = chatter.getChatMessages($activeChatId); // get messages for active chat
 </script>
 
 {#if Object.values(messages).length == 0}
