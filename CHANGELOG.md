@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.4](https://github.com/medyll/aiui/compare/v0.0.3...v0.0.4) (2023-12-12)
+
+
+### Features
+
+* code snipet display style is now active ([1186645](https://github.com/medyll/aiui/commit/1186645a469f5107e225f6eee684d7646f44a96e))
+* messages now stick to bottom ([b10072a](https://github.com/medyll/aiui/commit/b10072a91b8bdc91d613649dd8dcac64279d8810))
+
+
+### Bug Fixes
+
+* added indentaion in code tags ([b19a746](https://github.com/medyll/aiui/commit/b19a746433bc6d0638f068c073e50a766b588b63))
+* models used on request ([ed36269](https://github.com/medyll/aiui/commit/ed3626969ce5b257d87b8e93270a6d59b1a9c10f))
+
 ### [0.0.3](https://github.com/medyll/aiui/compare/v0.0.2...v0.0.3) (2023-12-12)
 
 
