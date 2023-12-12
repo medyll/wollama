@@ -3,7 +3,7 @@
 	"version": "0.0.4",
 	"author": "Medyll",
 	"description": "AIUI",
-	"private": true,
+	"private": false,
 	"config": {
 		"commitizen": {
 			"path": "./node_modules/cz-customizable"
