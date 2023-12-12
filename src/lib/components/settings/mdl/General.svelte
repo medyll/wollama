@@ -17,7 +17,7 @@
 	}
 
 	function settingAuth() {
-		$settings.auth = $settings.auth == true ? false : true;
+		$settings.authHeader = $settings.authHeader == true ? false : true;
 	} 
 </script>
 
@@ -37,7 +37,7 @@
 <hr />
 <InfoLine title={$t('settings.auth')}>
 	<button on:click={settingAuth}>
-		{$settings.auth}
+		{$settings.authHeader}
 	</button>
 </InfoLine>
 <hr />

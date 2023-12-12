@@ -9,11 +9,12 @@ export interface Settings {
 	defaultModels?: string[];
 	chatModelKeys?: string[];
 	defaultModel?: string;
-	auth: string;
+	authHeader: boolean;
 	system_prompt?: string;
+	locale:string;
 	sender: {
 		speechAutoSend?: boolean;
-		speechRecognition?: SpeechRecognition;
+		speechRecognition?: boolean;
 		system?: string;
 	};
 	llamaOptions?: {
@@ -28,12 +29,12 @@ export interface Settings {
 
 const settingStore = () => {
 	const isBrowser = typeof window !== 'undefined';
-	const { subscribe, set, update } = writable<Settings>({
+	const { subscribe, set, update } = writable<Partial<Settings>>({
 		...defaultOptions,
 		llamaOptions: defaultOllamaSettings
 	});
 
-	let currentStore = {} as Settings;
+	let currentStore = {} as Partial<Settings>;
 	let dataStoreTimer: NodeJS.Timeout;
 
 	subscribe((o) => {

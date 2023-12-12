@@ -3,11 +3,11 @@
 export const defaultOptions  = {
 	defaultModel: 'llama2-uncensored',
     ollama_server: 'http://127.0.0.1:11434',
-    auth: false,
+    authHeader: false,
     system_prompt: '',
 	sender: {
 		speechAutoSend: false,
-		speechRecognition: 'en-US'
+		speechRecognition: true
 	}, 
 };
 
