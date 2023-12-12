@@ -4,6 +4,17 @@
 	"author": "Medyll",
 	"description": "AIUI",
 	"private": true,
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-customizable"
+		}
+	},
+	"husky": {
+		"hooks": {
+			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+			"prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+		}
+	},
 	"scripts": {
 		"dev": "vite dev --port 5214",
 		"build": "vite build && npx cap copy",
@@ -16,10 +27,12 @@
 		"lint": "prettier --check --write . && eslint --fix  .",
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
-		"test:unit": "vitest"
+		"test:unit": "vitest",
+		"changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
 	},
 	"devDependencies": {
 		"@capacitor/cli": "^5.5.1",
+		"@commitlint/config-conventional": "^18.4.3",
 		"@iconify/svelte": "^3.1.4",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^2.0.0",
@@ -29,10 +42,14 @@
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"autoprefixer": "^10.4.16",
+		"commitizen": "^4.3.0",
+		"conventional-changelog-cli": "^4.1.0",
+		"cz-customizable": "^7.0.0",
 		"electron-builder": "^24.9.1",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^9.0.0",
 		"eslint-plugin-svelte": "^2.30.0",
+		"husky": "^8.0.3",
 		"nodemon": "^3.0.2",
 		"postcss": "^8.4.32",
 		"prettier": "^3.0.0",
