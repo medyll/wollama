@@ -46,17 +46,15 @@ const askOllama = async (
 		}
 		if (value) {
 			const data: OllamaStreamLine = JSON.parse(value);
-
-			if (data.response !== '\n') {
-				if (hook) hook(data);
-			}
+			
+			if (hook) hook(data);
 		}
 	}
 };
 
 async function sendQuery(userPrompt: string, context: any, model: string) {
 	const settings = {} as any;
-	
+
 	return await fetch(`http://127.0.0.1:11434/api/generate`, {
 		method: 'POST',
 		headers: {

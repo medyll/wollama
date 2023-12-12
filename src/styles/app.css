@@ -64,5 +64,7 @@ code.hljs {
 	overflow-x: auto;
 	padding   : 1em;
 	border    : px solid red;
-	white-space: pre-line
+	white-space: pre-wrap;
+	padding-top:1em;
+	margin: 1em 0;
 }
