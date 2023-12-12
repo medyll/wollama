@@ -34,8 +34,6 @@
      @apply border overflow-hidden rounded-md  ;
      @apply dark:bg-gray-50 dark:text-gray-700;
     @apply text-gray-700 bg-gray-200;
-    /*@apply text-gray-700 bg-opacity-30 border-gray-400; */
-    /* @apply  dark:text-gray-800 dark:border-gray-300 */
 }
 .iconButton{
     aspect-ratio: 1/1;

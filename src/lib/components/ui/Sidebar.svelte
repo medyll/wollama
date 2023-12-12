@@ -17,6 +17,7 @@
 
 <div class="flex-v h-full w-[260px] gap-2 border-r-4 px-2 pt-2">
 	<div class="text-right">{format(new Date(), 'EEEE, dd MMMM')}</div>
+	<hr />
 	<div class="flex-align-middle gap-2 justify-end">
 		<span>{$t('ui.newChat')}</span>
 		<button
@@ -29,7 +30,9 @@
 			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
 		</button>
 	</div>
+	<hr />
 	<input class="inputSearch" placeholder={$t('ui.searchChats')} bind:value={search} />
+	<hr />
 	<div class="text-right">{$t('ui.myChats')}</div>
 	<div class="flex-1">
 		{#each $messageByGroupDate as erd}
