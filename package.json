@@ -1,6 +1,6 @@
 {
 	"name": "aiui",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"author": "Medyll",
 	"description": "AIUI",
 	"private": true,
@@ -28,10 +28,12 @@
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
-		"changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+		"changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
+		"release": "standard-version"
 	},
 	"devDependencies": {
 		"@capacitor/cli": "^5.5.1",
+		"@commitlint/cli": "^18.4.3",
 		"@commitlint/config-conventional": "^18.4.3",
 		"@iconify/svelte": "^3.1.4",
 		"@playwright/test": "^1.28.1",
@@ -54,6 +56,7 @@
 		"postcss": "^8.4.32",
 		"prettier": "^3.0.0",
 		"prettier-plugin-svelte": "^3.0.0",
+		"standard-version": "^9.5.0",
 		"svelte": "^4.2.7",
 		"svelte-check": "^3.6.0",
 		"tailwindcss": "^3.3.6",
