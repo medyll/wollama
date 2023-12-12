@@ -30,7 +30,7 @@
 	function getChat() {
 		let chatId = $activeChatId ?? undefined;
 		if (!$activeChatId) {
-			const newChat = chatDataObject.createChatData({ models: [$settings.defaultModel] });
+			const newChat = chatDataObject.createChatData({ models: [$settings.defaultModels] });
 			chatId = newChat.id;
 			// set ActiveId
 			activeChatId.set(newChat.id);

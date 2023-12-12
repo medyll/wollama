@@ -5,7 +5,8 @@ export interface Settings {
 	theme?: string;
 	requestFormat?: string;
 	ollama_server?: string;
-	modelList?: string[];
+	models?: string[];
+	defaultModels?: string[];
 	chatModelKeys?: string[];
 	defaultModel?: string;
 	auth: string;

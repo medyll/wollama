@@ -5,11 +5,15 @@ import { Utils } from './tools/utils.js';
 export const locale = writable('en');
 export const locales = Object.keys(translations);
 
-type DeepKeyString<T, Prefix extends string = ''> = {
-	[K in keyof T]: T[K] extends object ? DeepKeyString<T[K], `${Prefix}${K}.`> : `${Prefix}${K}`;
-}[keyof T];
+type DeepKeys<T> = T extends object
+  ? {
+      [K in keyof T]: T[K] extends null | undefined
+        ? K & string
+        : `${K & string}${'' extends DeepKeys<T[K]> ? '' : '.'}${DeepKeys<T[K]>}`;
+    }[keyof T]
+  : '';
 
-type MyObjectKeys = {[locale:string]: DeepKeyString<typeof translations>}
+type MyObjectKeys = DeepKeys<typeof translations.en>;
 
 function doTranslate(locale, key, vars) {
 	// Let's throw some errors if we're trying to use keys/locales that don't exist.

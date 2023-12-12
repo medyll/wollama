@@ -18,7 +18,7 @@
 	import { ui } from '$lib/stores/ui';
 
 	function setSettings() {
-		// set default model
+		
 	}
 	// auto-load models
 	async function modelS() {
