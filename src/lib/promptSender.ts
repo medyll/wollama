@@ -1,20 +1,21 @@
 import type { OllamaStream, OllamaStreamLine } from './tools/ollamaFetch';
 
-const models = ['llama2-uncensored'];
+const defaultModels = ['mistral'];
 
 let lastContext: number[] = [];
 
 export type PromptSenderType = {
 	prompt: string;
 	context?: number[];
+	models?: string[];
 };
 
 export const sendPrompt = async (
 	sender: PromptSenderType,
-	hook: (data: OllamaStreamLine) => void
+	hook: (data: OllamaStreamLine) => void,
 ) => {
 	await Promise.all(
-		models.map(async (model) => {
+		(sender?.models ?? defaultModels).map(async (model) => {
 			await askOllama(model, sender, hook);
 		})
 	);

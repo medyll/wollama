@@ -97,7 +97,7 @@ function chatListStore() {
 						...n[chatId]?.messages,
 						[messageId]: {
 							...n[chatId]?.messages?.[messageId],
-							data: {...currentData, data}
+							data: {...currentData, ...data}
 						}
 					}
 				};

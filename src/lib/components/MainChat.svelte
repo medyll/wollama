@@ -13,9 +13,8 @@
 	import Input from './chat/Input.svelte';
 	import Attachment from './chat/Attachment.svelte';
 	import { checkTitle } from '$lib/tools/utils';
-	import ChatInfo from './chat/ChatInfo.svelte'; 
+	import ChatInfo from './chat/ChatInfo.svelte';
 	import { t } from '$lib/i18n';
-	import { ui } from '$lib/stores/ui';
 
 	let voiceListening = false;
 
@@ -30,7 +29,7 @@
 	function getChat() {
 		let chatId = $activeChatId ?? undefined;
 		if (!$activeChatId) {
-			const newChat = chatDataObject.createChatData({ models: [$settings.defaultModels] });
+			const newChat = chatDataObject.createChatData({ models: $settings.defaultModels });
 			chatId = newChat.id;
 			// set ActiveId
 			activeChatId.set(newChat.id);
@@ -50,10 +49,14 @@
 		chatter.insertMessage(chatId, messageUser);
 		chatter.insertMessage(chatId, messageAssistant);
 
-		// send prompt
 		$aiResponseState = 'running';
-		sendPrompt({ prompt: content, context: chat?.context ?? [] }, async (data) =>
-			postSendMessage(chatId, messageAssistant.id, messageUser.id, data)
+		let models = $chatter[chatId]?.models; 
+		let args = { prompt: content, context: chat?.context ?? [], models: [...models] }
+		console.log(args) // args is ok
+		// use args as a parameter
+		sendPrompt(
+			args,
+			async (data) => postSendMessage(chatId, messageAssistant.id, messageUser.id, data)
 		);
 	}
 
@@ -84,7 +87,7 @@
 	}
 
 	function preSendMessage(content: string) {
-		const id = getChat(); 
+		const id = getChat();
 		sendMessage(id, content);
 		window.history.replaceState(history.state, '', `/chat/${id}`);
 		prompt = '';
@@ -102,7 +105,7 @@
 <div class="flex-v h-full w-full overflow-auto relative">
 	<div class="flex-1 mb-32">
 		<DashBoard>
-		<ChatInfo />
+			<ChatInfo />
 			<Model />
 			<MessageList chatId={$activeChatId} />
 		</DashBoard>
@@ -138,4 +141,3 @@
 		<div class="text-xs text-center py-2">{$t('ui.aiCautionMessage')}</div>
 	</div>
 </div>
-
