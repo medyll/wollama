@@ -20,13 +20,13 @@
 </script>
 
 <div class="flex-align-middle justify-between  px-5 py-4 gap-4">
-	<div class=" "><Icon icon="mdi:settings" style="font-size:1.8em" /> </div>
+	<div class=" "><Icon icon="mdi:settings"  class="lg" /> </div>
 	<div class="flex-1 text-3xl font-medium self-center capitalize">{$t('ui.settings')}</div>
-	<button on:click={() => showSettings.set(false)}>
+	<button on:click={() => showSettings.set(false)} type="button" aria-label="close" >
 		<Icon icon="mdi:close" style="font-size:1.6em" />
 	</button>
 </div> 
-<div class="flex w-full settings p-2">
+<div class="flex w-full settings p-4 px-8">
 	<div class=" w-full">
 		{#each Object.keys(settingList) as setting}
 			<Cartouche title={$t(`settings.modules.${setting}`)}> 
