@@ -78,7 +78,7 @@
 	<div class="flex-align-middle">
 		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
 		<div class="flex-1 font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
-		<div>{message?.data?.model ?? ''}</div>
+		<div class="soft-title">{message?.data?.model ?? ''}</div>
 	</div>
 
 	<div class="flex-1 ml-12 relative overflow-hidden">

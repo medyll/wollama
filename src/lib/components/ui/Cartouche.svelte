@@ -33,7 +33,7 @@
 		@apply border  border-indigo-500/30 dark:border-white/20;
 	}
 	.cartoucheTitle {
-		@apply w-full rounded-t-md cursor-pointer flex  p-2 text-left gap-4;
+		@apply w-full rounded-t-md cursor-pointer flex  p-2 text-left gap-4 h-14;
 		@apply bg-white dark:bg-neutral-200/10;
 		@apply hover:bg-neutral-200 hover:dark:bg-gray-200/30;
 	}

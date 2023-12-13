@@ -2,7 +2,7 @@ export default {
   en: {
     ui: {
       settings: "settings",
-      newChat: "new chat",
+      newChat: "create new chat",
       myChats: "my chats",
       userProfile: "user profile",
       signOut: "sign out",

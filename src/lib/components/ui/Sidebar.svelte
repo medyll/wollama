@@ -15,42 +15,51 @@
 	};
 </script>
 
-<div class="flex-v h-full w-[260px] gap-2 border-r-4 px-2 pt-2">
-	<div class="text-right">{format(new Date(), 'EEEE, dd MMMM')}</div>
-	<hr />
-	<div class="flex-align-middle gap-2 justify-end">
+<div class="flex-v h-full w-[360px] gap-3 px-8 pt-2">
+	<div class="flex-align-middle gap-2 ">
+	    <div class="flex-1 font-semibold text-xl">wOollama</div>
 		<span>{$t('ui.newChat')}</span>
 		<button
 			on:click={async () => {
 				$activeChatId = undefined;
 				goto('/');
 			}}
-			class="appButton iconButton"
+			class="borderButton iconButton"
 		>
 			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
 		</button>
 	</div>
-	<hr />
-	<input class="inputSearch" placeholder={$t('ui.searchChats')} bind:value={search} />
-	<hr />
-	<div class="text-right">{$t('ui.myChats')}</div>
-	<div class="flex-1">
-		{#each $messageByGroupDate as erd}
-			<div>
-				<div class="font-bold whitespace-nowrap text-ellipsis">
-					{$t(getTimeTitle(erd.code))}
-				</div>
+	<input type="text" placeholder={$t('ui.searchChats')} bind:value={search} />
+	<hr class="ml-auto w-24   " />
+	<div class="text-right soft-title">{$t('ui.myChats')}</div>
+	<div class="chatZone">
+		<div class="flex-1">
+			{#each $messageByGroupDate as erd}
 				<div>
-					{#each erd.items as chat}
-						<ChatButton
-							chatId={chat.id}
-							on:click={() => {
-								loadChat(chat.id);
-							}}
-						/>
-					{/each}
+					<div class="font-bold whitespace-nowrap text-ellipsis py-2">
+						{$t(getTimeTitle(erd.code))}
+					</div>
+					<div>
+						{#each erd.items as chat}
+							<ChatButton
+								chatId={chat.id}
+								on:click={() => {
+									loadChat(chat.id);
+								}}
+							/>
+						{/each}
+					</div>
 				</div>
-			</div>
-		{/each}
+			{/each}
+		</div>
 	</div>
 </div>
+
+<style lang="postcss">
+	.chatZone {
+		@apply flex flex-col gap-4;
+		@apply border rounded-lg p-2 py-4;
+		@apply border-neutral-600/30;
+		@apply bg-zinc-200/50 dark:bg-slate-400/30;
+	}
+</style>

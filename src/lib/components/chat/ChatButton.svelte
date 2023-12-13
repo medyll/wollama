@@ -19,12 +19,12 @@
 	}
 </script>
 
-<div class="flex relative p-0.5 w-full">
+<div class="flex relative w-full">
 	<button on:click class="button {active ? 'active' : ''}">
-		{#if active}
-		<div class="w-6">		
-			<Icon icon="mdi:chat" />
+		<div class="w-6 text-left">		
+			<Icon icon="{active ? 'carbon:chat-operational' : 'carbon:chat'}" class="md {active ? 'active' : 'opacity-50'} "  />
 		</div>
+		{#if active}
 		{/if}
 		{#if editChat}
 			<input type="text" bind:value={chat.title} />
@@ -49,9 +49,9 @@
 
 <style lang="postcss">
 	.button {
-		@apply w-full text-left flex justify-between items-center rounded-md px-1 py-0.5 transition whitespace-nowrap text-ellipsis hover:bg-gray-200 dark:hover:bg-gray-800;
+		@apply block w-full text-left flex   items-center px-1 py-1 gap-2 transition whitespace-nowrap text-ellipsis hover:bg-gray-200 dark:hover:bg-gray-800;
 	}
-	.active {
-		@apply bg-gray-300 dark:bg-gray-900 shadow-md;
+	.active { 
+		@apply border-b-2 font-bold border-blue-500;
 	}
 </style>

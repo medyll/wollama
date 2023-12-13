@@ -21,7 +21,7 @@
 .appButton {
     @apply text-left px-1 py-1 rounded-md border border-gray-700;
     @apply text-gray-700 bg-gray-200;
-    @apply dark:bg-gray-900 dark:text-gray-100
+    @apply dark:bg-gray-900/40 dark:text-gray-100
 }
 
 .borderButton {
@@ -41,7 +41,22 @@
 
 input[type="text"] {
     @apply rounded-md p-2;
-    @apply  bg-gray-200 dark:bg-white/10 ;
+    @apply  bg-white/80 dark:bg-white/10 ;
     @apply  text-gray-700 dark:text-gray-100;
     @apply   border border-gray-400/60  hover:border-gray-400/90;
+}
+
+.iconify {
+	display: inline-block;
+		font-size: 1.1em;
+        color: inherit;
+	&.sm {
+		font-size: 1.1em;
+	}
+	&.md {
+		font-size: 1.6em;
+	}
+	&.lg {
+		font-size: 2em;
+	}
 }

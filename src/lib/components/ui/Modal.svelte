@@ -30,7 +30,7 @@
 	}
 	.inModal {
 		@apply m-auto rounded-xl max-w-full mx-2 bg-gradient-to-b ;
-		@apply  from-neutral-200 to-neutral-300;
+		@apply  from-neutral-100 to-neutral-200;
 		@apply   dark:from-gray-800 dark:to-gray-900
 	}
 </style>

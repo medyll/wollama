@@ -38,14 +38,14 @@
 </script>
 
 <svelte:head>
-	<title>wOOllama</title>
+	<title>wOOllama !</title>
 </svelte:head>
 
 <div class="flex w-full h-full overflow-hidden application">
-	<div class="h-full overflow-hidden">
+	<div class="h-full overflow-hidden fixed z-50">
 		<Sidebar />
 	</div>
-	<div class="flex-1 relative overflow-auto">
+	<div class="flex-1 relative overflow-auto z-0">
 		<div class="flex-v flex-1 h-full">
 			<div class="relative"><Navbar /></div>
 			<div class="flex-1 w-full relative">

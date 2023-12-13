@@ -20,7 +20,7 @@ html {
 	word-break : break-word;
 	height     : 100%;
 	min-height : 100%;
-	font-family: 'Segoe UI';
+	font-family: Mona-Sans, "ui-sans-serif", "system-ui", -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 	font-size  : 0.9em;
 }
 
@@ -51,62 +51,49 @@ body {
 	@apply rounded-lg;
 }
 
-.iconify {
-	display: inline-block;
-	&.sm {
-		font-size: 0.8em;
-	}
-	&.md {
-		font-size: 1.6em;
-	}
-	&.lg {
-		font-size: 2em;
-	}
-}
 
-html {
-	font-family: Roboto, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-}
+
+ 
 
 code.prismDone {
-	@apply bg-neutral-600   dark:bg-neutral-800  ;
+	@apply bg-neutral-600 dark:bg-neutral-800;
 }
 
-.codeFormat{
-	border-radius: 8px;
-	overflow: hidden;
-	@apply bg-neutral-600   dark:bg-neutral-800;
+.codeFormat {
+	border-radius             : 8px;
+	overflow                  : hidden;
+	@apply bg-neutral-600 dark:bg-neutral-800;
 
 }
 
-hr { 
-	margin: 1em 0;
-	border: 1px solid top;
-	@apply  border-indigo-500/30 dark:border-white/20
+hr {
+	margin                          : 1em 0;
+	border                          : 1px solid top;
+	@apply border-indigo-500/30 dark:border-white/20
 }
 
-code[class*="language-"]{ 
+code[class*="language-"] {
 	border-radius: 0;
-	border:none;
+	border       : none;
+	display      : block !important;
+	overflow-x   : auto;
+	padding      : 1em;
+	padding      : 1em;
+	white-space  : pre-wrap;
+	padding-top  : 1em;
+	margin       : 0;
+
 	display    : block !important;
 	overflow-x : auto;
-	padding    : 1em; 
-	padding    : 1em;
 	white-space: pre-wrap;
-	padding-top: 1em; 
-	margin:0; 
 
-	display    : block !important;
-	overflow-x : auto; 
-	white-space: pre-wrap; 
-	
-	color       : white; 
-	text-shadow : 0 0.1px rgba(255,255,255,0); 
+	color       : white;
+	text-shadow : 0 0.1px rgba(255, 255, 255, 0);
 	text-align  : left;
 	white-space : pre;
 	word-spacing: normal;
 	word-break  : normal;
-	word-wrap   : normal; 
+	word-wrap   : normal;
 
 	-moz-tab-size: 4;
 	-o-tab-size  : 4;
@@ -117,22 +104,23 @@ code[class*="language-"]{
 	-ms-hyphens    : none;
 	hyphens        : none;
 
-	@apply bg-neutral-600  dark:bg-neutral-800;
+	@apply bg-neutral-600 dark:bg-neutral-800;
 }
 
 pre[class*="language-"] {
-	padding: 0em;
-	margin : 0;
+	padding : 0em;
+	margin  : 0;
 	overflow: auto;
-	border:none;
+	border  : none;
 }
 
-code[class*="language-none"] { 
-	padding: 1em!important;
-	margin : 1em 0; 
+code[class*="language-none"] {
+	padding: 1em !important;
+	margin : 1em 0;
 }
 
-:not(pre) > code[class*="language-"], pre[class*="language-"] {
-    background: inherit;
-		@apply bg-neutral-600  dark:bg-neutral-800;
+:not(pre)>code[class*="language-"],
+pre[class*="language-"] {
+	background                : inherit;
+	@apply bg-neutral-600 dark:bg-neutral-800;
 }
