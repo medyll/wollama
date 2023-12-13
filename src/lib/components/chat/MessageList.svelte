@@ -10,11 +10,9 @@
 	 
 </script>
 
-<div class="flex-v w-full h-full overflow-hidden border">
+<div class="flex-v w-full h-full overflow-hidden">
 	{#each Object.values(messages) as message}
-		<div class="flex justify-between rounded-lg group">
 			<Message {message} />
-		</div>
 	{/each}
 	<Bottomer />
 </div>

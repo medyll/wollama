@@ -1,35 +1,86 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import type { MessageType } from '../../stores/messages';
-	import highlight from 'highlight.js';
-	import 'highlight.js/styles/github-dark.min.css';
-
-	let element: HTMLElement;
 
 	import { marked } from 'marked';
 	import { t } from '$lib/i18n';
 	import Skeleton from '../ui/Skeleton.svelte';
+	import Prism from 'prismjs';
 	export let message: MessageType;
+
+	let element: HTMLElement;
 
 	$: icon = message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one';
 
-	$: if (element && message?.content) {
-		formatText();
-	}
+	marked.use({
+		async: false,
+		pedantic: false,
+		gfm: true
+	});
 
-	
-
-	function formatText() {
-		if (element) {
-			element.querySelectorAll('code:not(.hljs)').forEach(async (block) => {
-				block.innerHTML = await marked(block.innerHTML);
-				highlight.highlightElement(block);
-				let codeName = block.classList.contains('hljs') ? block.classList[1] : '';
-			});
-		} else {
-			setTimeout(formatText, 100);
+	function wrap(el, wrapper) {
+		if (el && el.parentNode) {
+			el.parentNode.insertBefore(wrapper, el);
+			wrapper.appendChild(el);
 		}
 	}
+
+	function copyPaste() {
+		navigator.clipboard.writeText("redddd").then(
+			(success) => console.log('text copied'),
+			(err) => console.log('error copying text')
+		);
+	}
+
+	function selectCodeTags(textString: string) {
+		const parser = new DOMParser();
+		const htmlString = marked.parse(textString, { async: false }) as string;
+		const doc = parser.parseFromString(htmlString, 'text/html');
+
+		const codeElements = doc.querySelectorAll('code');
+
+		codeElements.forEach((codeElement) => {
+			const lang = codeElement.classList?.[0]
+				? codeElement.classList[0].replace('language-', '').trim()
+				: undefined;
+			if (!lang) return;
+			const wrapper = document.createElement('div');
+			const toolbar = document.createElement('div');
+			const pre = document.createElement('pre');
+
+			if (
+				codeElement.parentElement?.tagName === 'PRE' &&
+				codeElement.parentElement.childNodes.length == 1
+			) {
+				codeElement.parentElement.replaceWith(codeElement);
+			}
+			wrapper.className = 'codeFormat';
+			toolbar.className = 'flex items-center p-0.5';
+			wrap(codeElement, wrapper);
+			wrapper.insertBefore(toolbar, codeElement);
+			wrap(codeElement, pre);
+			toolbar.innerHTML = `<div class="flex-1">${lang}</div><div><button copyPaste >copy code</button></div>`;
+			Prism.highlightElement(codeElement);
+			codeElement.dataset.lang = lang;
+			toolbar.addEventListener('click', (e) => {
+				alert('re')
+				if (e.target.tagName === 'BUTTON') {
+					navigator.clipboard.writeText(codeElement.innerText).then(
+						(success) => console.log('text copied'),
+						(err) => console.log('error copying text')
+					);
+				}
+			});
+		});
+
+		return doc.body.innerHTML;
+	}
+
+	let assistantCode;
+	$: if (message?.role == 'assistant' && message?.content && message.content.length) {
+		assistantCode = selectCodeTags(message?.content);
+	}
+
 </script>
 
 <div class="flex-v w-full gap-1 mb-4 relative overflow-hidden" bind:this={element}>
@@ -38,11 +89,14 @@
 		<div class="flex-1 font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
 		<div>{message?.data?.model ?? ''}</div>
 	</div>
+
 	<div class="flex-1 ml-12 relative overflow-hidden">
 		{#if [undefined, ''].includes(message?.content)}
 			<Skeleton class="h-full" />
-		{:else}
-			{@html message?.role == 'assistant' ? marked.parse(message?.content) : message?.content}
+		{:else if message?.role == 'assistant'}
+			{@html assistantCode}
+		{:else if message?.role == 'user'}
+			{@html message?.content}
 		{/if}
 	</div>
 </div>

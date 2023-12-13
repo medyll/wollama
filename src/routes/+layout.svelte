@@ -38,7 +38,7 @@
 </script>
 
 <svelte:head>
-	<title>AIUI</title>
+	<title>wOOllama</title>
 </svelte:head>
 
 <div class="flex w-full h-full overflow-hidden application">

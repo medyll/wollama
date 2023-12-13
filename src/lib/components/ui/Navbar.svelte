@@ -10,7 +10,7 @@
 </script>
 
 <div class="flex-align-middle p-2 gap-8">
-	<div class="flex-1">AIUI</div>
+	<div class="flex-1">wOOllama</div>
 	<StatusBar />
 	<button
 		on:click={() => {

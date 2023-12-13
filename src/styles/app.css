@@ -59,12 +59,65 @@ html {
 	font-family: Roboto, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-code.hljs {
-	display   : block !important;
-	overflow-x: auto;
-	padding   : 1em;
-	border    : px solid red;
+code.prismDone {
+	@apply bg-neutral-600   dark:bg-neutral-800;
+}
+
+.codeFormat{
+	border-radius: 8px;
+	overflow: hidden;
+	@apply bg-neutral-600   dark:bg-neutral-800;
+
+}
+
+code[class*="language-"]{ 
+	border-radius: 0;
+	border:none;
+	display    : block !important;
+	overflow-x : auto;
+	padding    : 1em; 
+	padding    : 1em;
 	white-space: pre-wrap;
-	padding-top:1em;
-	margin: 1em 0;
+	padding-top: 1em; 
+	margin:0; 
+
+	display    : block !important;
+	overflow-x : auto; 
+	white-space: pre-wrap; 
+	
+	color       : white; 
+	text-shadow : 0 0.1px rgba(255,255,255,0); 
+	text-align  : left;
+	white-space : pre;
+	word-spacing: normal;
+	word-break  : normal;
+	word-wrap   : normal; 
+
+	-moz-tab-size: 4;
+	-o-tab-size  : 4;
+	tab-size     : 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens   : none;
+	-ms-hyphens    : none;
+	hyphens        : none;
+
+	@apply bg-neutral-600  dark:bg-neutral-800;
+}
+
+pre[class*="language-"] {
+	padding: 0em;
+	margin : 0;
+	overflow: auto;
+	border:none;
+}
+
+code[class*="language-none"] { 
+	padding: 1em!important;
+	margin : 1em 0; 
+}
+
+:not(pre) > code[class*="language-"], pre[class*="language-"] {
+    background: inherit;
+		@apply bg-neutral-600  dark:bg-neutral-800;
 }
