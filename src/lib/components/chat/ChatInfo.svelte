@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { activeChatId, chatter } from '$lib/stores/chatter';
+	import { activeChat, activeChatId, chatter } from '$lib/stores/chatter';
 	import { format } from 'date-fns';
-
-	$: chat = chatter.getChat($activeChatId);
-	$: formattedDate = chat?.dateCreation ? format(new Date(chat.dateCreation), 'EEEE, dd MMMM') : '';
+ 
+	$: formattedDate = $activeChat?.dateCreation ? format(new Date($activeChat?.dateCreation), 'EEEE, dd MMMM') : '';
 </script>
 
-{#if chat?.dateCreation}
+{#if $activeChat?.dateCreation}
 	<div>
 		<div>
 			{formattedDate}
 		</div>
 		<div>
-			{chat?.title ?? ''}
+			{$activeChat?.title ?? ''}
 		</div>
 	</div>
 {/if}
