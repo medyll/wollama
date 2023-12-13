@@ -70,6 +70,12 @@ code.prismDone {
 
 }
 
+hr { 
+	margin: 1em 0;
+	border: 1px solid top;
+	@apply  border-indigo-500/30 dark:border-white/20
+}
+
 code[class*="language-"]{ 
 	border-radius: 0;
 	border:none;

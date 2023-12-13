@@ -1,6 +1,6 @@
 <script lang="ts">
 
-export let title: string | undefined= undefined; 
+export let title: string | undefined= undefined;  
 export let vertical: boolean = false;
 
 </script>
@@ -10,9 +10,10 @@ export let vertical: boolean = false;
         {title}
     </div>
 {/if}
-<div class="{vertical? 'flex-v': 'flex-align-middle'} gap-2 ">
-	<div class="flex-1 font-semibold py-2 text-sm">		
-        <slot name="input">{title}</slot>
+<div class="{vertical? 'flex-v': 'flex-align-middle'} gap-4 py-3 ">
+	<div class="flex-1 flex text-sm">		
+        <div class="flex-1 font-semibold"><slot name="input">- {title}</slot></div>
+		<slot name="titleButton"></slot>
 	</div>
 	<div class="{vertical? 'px-2':''}">
 		<slot></slot>

@@ -61,16 +61,7 @@
 			wrap(codeElement, pre);
 			toolbar.innerHTML = `<div class="flex-1">${lang}</div><div><button copyPaste >copy code</button></div>`;
 			Prism.highlightElement(codeElement);
-			codeElement.dataset.lang = lang;
-			toolbar.addEventListener('click', (e) => {
-				alert('re')
-				if (e.target.tagName === 'BUTTON') {
-					navigator.clipboard.writeText(codeElement.innerText).then(
-						(success) => console.log('text copied'),
-						(err) => console.log('error copying text')
-					);
-				}
-			});
+			codeElement.dataset.lang = lang;			
 		});
 
 		return doc.body.innerHTML;
