@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { activeChatId, chatter } from '$lib/stores/chatter';
+	import { activeChat, activeChatId, chatter } from '$lib/stores/chatter';
 	import { settings } from '$lib/stores/settings.js';
 	import Icon from '@iconify/svelte';
 
@@ -13,8 +13,8 @@
 	}
 
 	$: chatModelKeys = chatter.getChat($activeChatId)?.models ?? [$settings.defaultModel];
- 
 
+	$: console.log($activeChat);
 </script>
 
 <div class="p-3 flex flex-wrap gap-2">
@@ -31,7 +31,7 @@
 		<div class="flex gap-2">
 			<div class="flex-1">
 				<select on:change={changeHandler}>
-					{#each $settings?.models ?? [] as model}
+					{#each $settings?.ollamaModels ?? [] as model}
 						{@const partial = model.name.split(':')[0]}
 						<option selected={partial === modelKey} value={model.name}>{model.name}</option>
 					{/each}

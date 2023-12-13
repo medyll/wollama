@@ -50,8 +50,9 @@
 		chatter.insertMessage(chatId, messageAssistant);
 
 		$aiResponseState = 'running';
-		let models = $chatter[chatId]?.models; 
-		let args = { prompt: content, context: chat?.context ?? [], models: [...models] }
+		const models = $chatter[chatId]?.models ?? [$settings.defaultModel]; 
+		
+		let args = { prompt: content, context: chat?.context ?? [], /* models: [...models]  */}
 		console.log(args) // args is ok
 		// use args as a parameter
 		sendPrompt(

@@ -5,10 +5,10 @@ export interface Settings {
 	theme?: string;
 	requestFormat?: string;
 	ollama_server?: string;
-	models?: string[];
+	ollamaModels?: string[];
 	defaultModels?: string[];
-	chatModelKeys?: string[];
 	defaultModel?: string;
+	chatModelKeys?: string[];
 	authHeader: boolean;
 	system_prompt?: string;
 	locale:string;

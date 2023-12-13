@@ -27,7 +27,7 @@
 
 		settings.update((n) => ({
 			...n,
-			['models']: [...models]
+			['ollamaModels']: [...models]
 		}));
 	}
 

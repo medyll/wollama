@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import type { MessageListType, MessageType } from './messages';
 import type { OllamaStreamLineLast } from '$lib/tools/ollamaFetch';
 
@@ -49,7 +49,7 @@ function chatListStore() {
 		subscribe,
 		set,
 		update,
-		getChat: (chatId?: string) => chatId ? currentStore?.[chatId] : undefined,
+		getChat: (chatId?: string) => (chatId ? currentStore?.[chatId] : undefined),
 		insertChat: (newChat: ChatDataType) => update((n) => ({ ...n, [newChat.id]: newChat })),
 		getChatMessages: (chatId: string) => currentStore?.[chatId]?.messages ?? {},
 		updateChat: (chatId: string, chatData: Partial<ChatDataType>) => {
@@ -88,7 +88,11 @@ function chatListStore() {
 				};
 				return { ...n, [chatId]: newChat };
 			}),
-		updateChatMessageData: (chatId: string, messageId: number, data: Partial<OllamaStreamLineLast>) => {
+		updateChatMessageData: (
+			chatId: string,
+			messageId: number,
+			data: Partial<OllamaStreamLineLast>
+		) => {
 			update((n) => {
 				const currentData = n[chatId]?.messages?.[messageId]?.data;
 				const newChat = {
@@ -97,7 +101,7 @@ function chatListStore() {
 						...n[chatId]?.messages,
 						[messageId]: {
 							...n[chatId]?.messages?.[messageId],
-							data: {...currentData, ...data}
+							data: { ...currentData, ...data }
 						}
 					}
 				};
@@ -114,3 +118,8 @@ function chatListStore() {
 		}
 	};
 }
+
+// activeChat derived from chatter
+export const activeChat = derived([chatter, activeChatId], ([$chatter, $activeChatId]) =>
+	$activeChatId ? $chatter?.[$activeChatId] : undefined
+);

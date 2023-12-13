@@ -2,7 +2,12 @@
 	import { t } from '$lib/i18n';
 	import { settings } from '$lib/stores/settings';
 	import Icon from '@iconify/svelte';
-	import InfoLine from '$lib/components/ui/InfoLine.svelte';
+	import InfoLine from '$lib/components/ui/InfoLine.svelte'; 
+
+	const models = $chatter[chatId]?.models ?? [$settings.defaultModel];
+	
+	
+	
 </script>
 
 
@@ -15,7 +20,7 @@
 <hr />
 <InfoLine title={$t('settings.model_delete')}>
 	<select slot="input" placeholder={$t('settings.enter_model')} class="w-full">
-		{#each $settings?.models ?? [] as model}
+		{#each $settings?.ollamaModels ?? [] as model}
 			{@const partial = model.name.split(':')[0]}
 			<option value={model.name}>{model.name}</option>
 		{/each}
