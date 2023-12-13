@@ -15,6 +15,7 @@
 	import { checkTitle } from '$lib/tools/utils';
 	import ChatInfo from './chat/ChatInfo.svelte';
 	import { t } from '$lib/i18n';
+	import { ui } from '$lib/stores/ui';
 
 	let voiceListening = false;
 
@@ -50,10 +51,8 @@
 		chatter.insertMessage(chatId, messageAssistant);
 
 		$aiResponseState = 'running';
-		const models = $chatter[chatId]?.models ?? [$settings.defaultModel];
 
-		let args = { prompt: content, context: chat?.context ?? [] /* models: [...models]  */ };
-		console.log(args); // args is ok
+		let args = { prompt: content, context: chat?.context ?? [] };
 		// use args as a parameter
 		sendPrompt(args, async (data) =>
 			postSendMessage(chatId, messageAssistant.id, messageUser.id, data)
@@ -76,6 +75,8 @@
 			chatter.updateChatMessageData(chatId, assistantMessageId, data);
 			//
 			checkTitle(chatId);
+			// set auto-scroll to false
+			ui.setAutoScroll(chatId, false);
 		} else {
 			streamResponseText += data.response ?? '';
 
@@ -87,10 +88,13 @@
 	}
 
 	function preSendMessage(content: string) {
-		const id = getChat();
+		const id = getChat() as string;
 		sendMessage(id, content);
 		window.history.replaceState(history.state, '', `/chat/${id}`);
+		// reset prompt
 		prompt = '';
+		// set auto-scroll to true
+		ui.setAutoScroll(id, true);
 	}
 
 	function keyPressHandler(e: KeyboardEvent) {

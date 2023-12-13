@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { t } from '$lib/i18n';
 	import { showSettings } from '$lib/stores/settings';
-	import { ui } from '$lib/stores/ui';
+	import { timeRetry } from '$lib/stores/timeRetry';
 	import Icon from '@iconify/svelte';
 	import StatusBar from './StatusBar.svelte';
 

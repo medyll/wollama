@@ -1,6 +1,6 @@
 import { connectionChecker } from '$lib/stores/connection';
 import { settings } from '$lib/stores/settings';
-import { ui } from '$lib/stores/ui';
+import { timeRetry } from '$lib/stores/timeRetry';
 import { OllamaFetch } from './ollamaFetch';
 
 let ollamaCheckRetries = 0;
