@@ -4,7 +4,6 @@
 	import Icon from '@iconify/svelte';
 
 	function changeHandler(event: Event) {
-		console.log(event.target.value);
 		chatter.updateChat($activeChatId, { models: [event.target.value] });
 	}
 
@@ -13,8 +12,6 @@
 	}
 
 	$: chatModelKeys = chatter.getChat($activeChatId)?.models ?? [$settings.defaultModel];
-
-	$: console.log($activeChat,$settings.defaultModels);
 </script>
 
 <div class="p-3 flex flex-wrap gap-2">
@@ -33,7 +30,9 @@
 				<select on:change={changeHandler}>
 					{#each $settings?.ollamaModels ?? [] as model}
 						{@const partial = model.name.split(':')[0]}
-						<option selected={partial === modelKey} value={model.name}>{model.name}</option>
+						<option selected={model.name === modelKey} value={model.name}
+							>{partial} {modelKey}
+						</option>
 					{/each}
 				</select>
 			</div>

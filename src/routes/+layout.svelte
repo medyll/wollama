@@ -13,16 +13,14 @@
 	import '../styles/tailwind.css';
 	import '../styles/snippets.css';
 	import { engine } from '$lib/tools/engine';
-
-	function setSettings() {}
+ 
 	// auto-load models
 	async function modelS() {
 		const ollamaFetcher = new OllamaFetch();
 		const models = await ollamaFetcher.listModels();
 
 		settings.setParameterValue('ollamaModels', [...models]);
-		if (!$settings.defaultModel) settings.setParameterValue('defaultModel', models[0].name);
-		console.log(models[0].name)
+		if (!$settings.defaultModel) settings.setParameterValue('defaultModel', models[0].name); 
 	}
 
 	engine.checkOllamaEndPoints();
