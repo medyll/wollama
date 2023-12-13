@@ -23,7 +23,7 @@
 					block: 'end',
 					behavior: 'smooth'
 				});
-			}, 200);
+			}, 0);
 	}
 </script>
 

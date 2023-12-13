@@ -39,7 +39,7 @@
     aspect-ratio: 1/1;
 }
 
-input[type="text"] {
+input[type="text"],input[type="search"] {
     @apply rounded-md p-2;
     @apply  bg-white/80 dark:bg-white/10 ;
     @apply  text-gray-700 dark:text-gray-100;

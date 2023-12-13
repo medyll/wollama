@@ -5,12 +5,27 @@
 
 	export let open = false;
 
+	let scrollInto = true;
+	let element: HTMLElement;
+
+	$: if (open) scrollDown();
+
 	function openClose() {
 		open = !open;
 	}
+
+	function scrollDown() {
+		if (element)
+			setTimeout(() => {
+				element?.scrollIntoView({
+					block: 'end',
+					behavior: 'smooth'
+				});
+			}, 200);
+	}
 </script>
 
-<div class="cartouche">
+<div class="cartouche"  bind:this={element} >
 	<button class="cartoucheTitle flex-align-middle" on:click={openClose} type="button">
 		<div>
 			<Icon icon="ci:main-component" style="font-size:1.6em" />

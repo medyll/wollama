@@ -6,10 +6,10 @@
 	import Icon from '@iconify/svelte';
 	import StatusBar from './StatusBar.svelte';
 
-	new Date().getSeconds()
+	new Date().getSeconds();
 </script>
 
-<div class="flex-align-middle p-2 gap-8">
+<div class="flex-align-middle p-2 gap-8 fixed right-8 z-50">
 	<div class="flex-1" />
 	<StatusBar />
 	<button

@@ -17,7 +17,7 @@
 
 <div class="flex-v h-full w-[360px] gap-3 px-8 pt-2">
 	<div class="flex-align-middle gap-2 ">
-	    <div class="flex-1 font-semibold text-xl">wOollama</div>
+	    <div class="flex-1 font-semibold text-xl">wOollama !</div>
 		<span>{$t('ui.newChat')}</span>
 		<button
 			on:click={async () => {
@@ -29,7 +29,7 @@
 			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
 		</button>
 	</div>
-	<input type="text" placeholder={$t('ui.searchChats')} bind:value={search} />
+	<input type="search" placeholder={$t('ui.searchChats')} bind:value={search} />
 	<hr class="ml-auto w-24   " />
 	<div class="text-right soft-title">{$t('ui.myChats')}</div>
 	<div class="chatZone">
