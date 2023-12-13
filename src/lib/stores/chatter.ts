@@ -90,7 +90,7 @@ function chatListStore() {
 			}),
 		updateChatMessageData: (
 			chatId: string,
-			messageId: number,
+			messageId: string,
 			data: Partial<OllamaStreamLineLast>
 		) => {
 			update((n) => {

@@ -29,7 +29,7 @@
 	function getChat() {
 		let chatId = $activeChatId ?? undefined;
 		if (!$activeChatId) {
-			const newChat = chatDataObject.createChatData({ models: $settings.defaultModels });
+			const newChat = chatDataObject.createChatData({ models: [$settings.defaultModel] });
 			chatId = newChat.id;
 			// set ActiveId
 			activeChatId.set(newChat.id);
@@ -62,7 +62,7 @@
 
 	async function postSendMessage(
 		chatId: string,
-		assistantMessageId: number,
+		assistantMessageId: string,
 		userMessageId: any,
 		data: OllamaStreamLine
 	) {

@@ -7,28 +7,22 @@
 	import Navbar from '$lib/components/ui/Navbar.svelte';
 	import Sidebar from '$lib/components/ui/Sidebar.svelte';
 	import { activeChatId, chatter } from '$lib/stores/chatter';
-	import type { MessageListType, MessageType } from '$lib/stores/messages';
 	import { settings, showSettings } from '$lib/stores/settings';
-	import { guessChatTitle } from '$lib/tools/askOllama';
 	import { OllamaFetch } from '$lib/tools/ollamaFetch';
 	import '../styles/app.css';
 	import '../styles/tailwind.css';
 	import '../styles/snippets.css';
 	import { engine } from '$lib/tools/engine';
-	import { ui } from '$lib/stores/ui';
 
-	function setSettings() {
-		
-	}
+	function setSettings() {}
 	// auto-load models
 	async function modelS() {
 		const ollamaFetcher = new OllamaFetch();
 		const models = await ollamaFetcher.listModels();
 
-		settings.update((n) => ({
-			...n,
-			['ollamaModels']: [...models]
-		}));
+		settings.setParameterValue('ollamaModels', [...models]);
+		if (!$settings.defaultModel) settings.setParameterValue('defaultModel', models[0].name);
+		console.log(models[0].name)
 	}
 
 	engine.checkOllamaEndPoints();

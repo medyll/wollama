@@ -5,7 +5,7 @@ export interface Settings {
 	theme?: string;
 	requestFormat?: string;
 	ollama_server?: string;
-	ollamaModels?: string[];
+	ollamaModels?: string[]; // by api
 	defaultModels?: string[];
 	defaultModel?: string;
 	chatModelKeys?: string[];
@@ -51,7 +51,7 @@ const settingStore = () => {
 
 	isBrowser && localStorage.settings && set(JSON.parse(localStorage.settings));
 
-	function setParameterValue(key: string, value: any) {
+	function setParameterValue(key: keyof Settings, value: any) {
 		update((n) => {
 			const newSettings = { ...n, [key]: value };
 			return newSettings;

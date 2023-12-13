@@ -14,7 +14,7 @@
 
 	$: chatModelKeys = chatter.getChat($activeChatId)?.models ?? [$settings.defaultModel];
 
-	$: console.log($activeChat);
+	$: console.log($activeChat,$settings.defaultModels);
 </script>
 
 <div class="p-3 flex flex-wrap gap-2">

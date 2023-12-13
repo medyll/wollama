@@ -8,7 +8,7 @@ export type OllamaStreamLine = {
 	create_at: string;
 	response: string;
 	done: boolean;
-	context: string[];
+	context: number[];
 	created_at: string;
 	eval_count: number;
 	eval_duration: number;
