@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { activeChatId } from '../../stores/chatter.js';
 	import { goto } from '$app/navigation';
-	import { getTimeTitle, messageByGroupDate } from '$lib/tools/utils.js';
+	import { getTimeTitle, messageByGroupDate } from '$lib/tools/chatMenuList.js';
 	import ChatButton from '../chat/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
 	import { showSettings } from '$lib/stores/settings.js';

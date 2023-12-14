@@ -2,7 +2,7 @@ import { chatter, type ChatDataType, type ChatListType } from '$lib/stores/chatt
 import { derived } from 'svelte/store';
 import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import type { MessageListType, MessageType } from '$lib/stores/messages';
-import { guessChatTitle } from './askOllama';
+import { guessChatTitle } from './chatUtils';
 
 export class Utils {
 	static resolveDotPath(
@@ -63,7 +63,6 @@ export async function checkTitle(chatId: string) {
 				.join('\n');
 
 			const res = await guessChatTitle(resume);
-			console.log('checkTitle', res);
 			//
 			if (res?.response !== '') chatter.updateChat(chatId, { title: res.response });
 		}

@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 // import { fr } from 'date-fns/locale';
 
 import fs from 'fs-extra';
-import { askOllama } from './askOllama.js';
+import { askOllama } from './chatUtils.js';
 
 function isNodeAgentRunning(): boolean {
 	try {

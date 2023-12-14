@@ -3,20 +3,18 @@
 	import Speech from '$lib/components/Speech.svelte';
 	import MessageList from '$lib/components/chat/MessageList.svelte';
 	import Model from '$lib/components/chat/Model.svelte';
-	import { sendPrompt } from '$lib/promptSender';
-	import { chatDataObject } from '$lib/tools/askOllama';
+	import { chatUtils } from '$lib/tools/chatUtils';
 	import { activeChatId, chatter } from '$lib/stores/chatter';
 	import { settings } from '$lib/stores/settings';
 	import { aiResponseState, chatEditListener } from '$lib/stores/chatEditListener';
 	import Icon from '@iconify/svelte';
-	import type { OllamaStreamLine } from '$lib/tools/ollamaFetch';
 	import Input from './chat/Input.svelte';
 	import Attachment from './chat/Attachment.svelte';
-	import { checkTitle } from '$lib/tools/utils';
 	import ChatInfo from './chat/ChatInfo.svelte';
 	import { t } from '$lib/i18n';
 	import { ui } from '$lib/stores/ui';
 	import Temperature from './chat/Temperature.svelte';
+	import { chatSender, type chatSenderMessageCB } from '$lib/tools/chatSender';
 
 	let voiceListening = false;
 
@@ -28,44 +26,18 @@
 
 	$: disableSubmit = prompt.trim() == '' || $chatEditListener.isTyping;
 
-	function getChat() {
-		let chatId = $activeChatId ?? undefined;
-		if (!$activeChatId) {
-			const newChat = chatDataObject.createChatData({ models: [$settings.defaultModel] });
-			chatId = newChat.id;
-			// set ActiveId
-			activeChatId.set(newChat.id);
-			// add chat to store
-			chatter.insertChat(newChat);
-		}
-		return chatId;
+	function preSendMessage(content: string) {
+		const id = chatSender.initChat() as string;
+		chatSender.sendMessage(content, postSendMessage);
+		// relocation without navigation
+		window.history.replaceState(history.state, '', `/chat/${id}`);
+		// reset prompt
+		prompt = '';
+		// set auto-scroll to true
+		ui.setAutoScroll(id, true);
 	}
 
-	function sendMessage(chatId: string, content: string) {
-		const chat = chatter.getChat(chatId);
-		//
-		const messageUser = chatDataObject.createMessageData({ role: 'user', content, chatId });
-		const messageAssistant = chatDataObject.createMessageData({ role: 'assistant' });
-
-		// add messages to store
-		chatter.insertMessage(chatId, messageUser);
-		chatter.insertMessage(chatId, messageAssistant);
-
-		$aiResponseState = 'running';
-
-		let args = { prompt: content, context: chat?.context ?? [] };
-		// use args as a parameter
-		sendPrompt(args, async (data) =>
-			postSendMessage(chatId, messageAssistant.id, messageUser.id, data)
-		);
-	}
-
-	async function postSendMessage(
-		chatId: string,
-		assistantMessageId: string,
-		userMessageId: any,
-		data: OllamaStreamLine
-	) {
+	async function postSendMessage({ chatId, assistantMessageId, data }: chatSenderMessageCB) {
 		if (data.done) {
 			streamResponseText = '';
 			$aiResponseState = 'done';
@@ -75,7 +47,7 @@
 			// update chat assistant message data
 			chatter.updateChatMessageData(chatId, assistantMessageId, data);
 			//
-			checkTitle(chatId);
+			chatUtils.checkTitle(chatId);
 			// set auto-scroll to false
 			ui.setAutoScroll(chatId, false);
 		} else {
@@ -87,17 +59,6 @@
 			});
 		}
 	}
-
-	function preSendMessage(content: string) {
-		const id = getChat() as string;
-		sendMessage(id, content);
-		window.history.replaceState(history.state, '', `/chat/${id}`);
-		// reset prompt
-		prompt = '';
-		// set auto-scroll to true
-		ui.setAutoScroll(id, true);
-	}
-
 	function keyPressHandler(e: KeyboardEvent) {
 		chatEditListener.setEvent();
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -129,7 +90,7 @@
 				preSendMessage(prompt);
 			}}
 		/>
-		<div  >
+		<div>
 			<Temperature />
 		</div>
 		<div class="mainInputArea">
