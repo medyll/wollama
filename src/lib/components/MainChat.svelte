@@ -16,6 +16,7 @@
 	import ChatInfo from './chat/ChatInfo.svelte';
 	import { t } from '$lib/i18n';
 	import { ui } from '$lib/stores/ui';
+	import Temperature from './chat/Temperature.svelte';
 
 	let voiceListening = false;
 
@@ -119,13 +120,18 @@
 			<img src={file.dataUri} alt="input" class="  " />
 		{/each}
 	</div>
-	<div class="w-full y-b fixed margb-0 max-w-3xl bottom-0">
+	<div
+		class="w-full y-b fixed margb-0 max-w-3xl bottom-0 backdrop-blur-xl bg-white/90 dark:bg-gray-500/50"
+	>
 		<form
 			id="prompt-form"
 			on:submit|preventDefault={() => {
 				preSendMessage(prompt);
 			}}
 		/>
+		<div  >
+			<Temperature />
+		</div>
 		<div class="mainInputArea">
 			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
 				<Attachment

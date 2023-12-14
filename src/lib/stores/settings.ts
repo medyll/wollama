@@ -12,6 +12,11 @@ export interface Settings {
 	authHeader: boolean;
 	system_prompt?: string;
 	locale:string;
+	temperatures: {
+		creative: number;
+		balanced: number;
+		accurate: number;
+	};
 	sender: {
 		speechAutoSend?: boolean;
 		speechRecognition?: boolean;

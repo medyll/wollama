@@ -18,7 +18,7 @@
 <div class="flex-v h-full w-[360px] gap-3 px-8 pt-2">
 	<div class="flex-align-middle gap-2 ">
 	    <div class="flex-1 font-semibold text-xl">wOollama !</div>
-		<span>{$t('ui.newChat')}</span>
+		<span class="underline">{$t('ui.newChat')}</span>
 		<button
 			on:click={async () => {
 				$activeChatId = undefined;
@@ -60,6 +60,6 @@
 		@apply flex flex-col gap-4;
 		@apply border rounded-lg p-2 py-4;
 		@apply border-neutral-600/30;
-		@apply bg-zinc-200/50 dark:bg-slate-400/30;
+		@apply bg-zinc-200/30 dark:bg-slate-400/30;
 	}
 </style>

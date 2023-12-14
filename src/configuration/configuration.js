@@ -9,6 +9,11 @@ export const defaultOptions  = {
 		speechAutoSend: false,
 		speechRecognition: true
 	}, 
+    temperatures:{
+        creative: 0.1,
+        balanced: 0.5,
+        accurate: 1,
+    }
 };
 
 export const defaultOllamaSettings = {
