@@ -1,6 +1,6 @@
-import { readerConst } from "$lib/promptSender";
-import { settings } from "$lib/stores/settings";
-import { get } from "svelte/store";
+import { readerConst } from '$lib/promptSender';
+import { settings } from '$lib/stores/settings';
+import { get } from 'svelte/store';
 
 export type OllamaStream = {
 	done: boolean;
@@ -38,30 +38,33 @@ export class OllamaFetch {
 		hook?: (data: OllamaStreamLine) => void,
 		options?: { sync: boolean; model: string }
 	) {
-		
 		readerConst.stop = false; // replcae
-		
+
 		const config = get(settings);
-		const query = await fetch(`${config.ollama_server}/api/generate`, {
+		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/event-stream'
 			},
 			body: JSON.stringify({
 				model: options?.model ?? options.model,
-				stream: options?.sync,
+				stream: !options?.sync,
 				system: config?.system_prompt,
 				// format: settings?.requestFormat,
 				options: config.llamaOptions,
 				prompt
 			})
-		}).then(async (res) => {
-			console.log(res)
+		});
+
+		
+		if (!options?.sync) {
+			this.stream(res, hook);
+		} else {
+
 			if (!res.ok) throw await res.json();
-			return await res.json() ;
-		})
-		if (options?.sync)  this.stream(query, hook);
-		return query;
+			return await res.json();
+		}
+		return res;
 	}
 
 	async listModels() {
@@ -84,7 +87,6 @@ export class OllamaFetch {
 	}
 
 	static async stream(query, hook?: (data: OllamaStreamLine) => void) {
-		console.log(query)
 		const streamReader = query.body
 			.pipeThrough(new TextDecoderStream())
 			.pipeThrough(splitStream('\n'))
@@ -92,13 +94,13 @@ export class OllamaFetch {
 
 		while (true ?? readerConst.stop) {
 			const { value, done } = await streamReader.read();
-
+ 
 			if (done) {
 				break;
 			}
 			if (value) {
 				const data: OllamaStreamLine = JSON.parse(value);
-
+				
 				if (hook) hook(data);
 			}
 		}

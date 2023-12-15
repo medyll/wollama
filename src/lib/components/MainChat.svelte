@@ -15,8 +15,8 @@
 	import { ui } from '$lib/stores/ui';
 	import Temperature from './chat/Temperature.svelte';
 	import { chatSender, type chatSenderMessageCB } from '$lib/tools/chatSender';
-	import { onMount } from 'svelte'; 
-	import { chatDB } from '$lib/db/chatDb.js'
+	import { onMount } from 'svelte';
+	import { dbQuery } from '$lib/db/chatDb.js';
 
 	let voiceListening = false;
 
@@ -33,10 +33,13 @@
 	$: disableSubmit = prompt.trim() == '' || $chatEditListener.isTyping;
 
 	async function preSendMessage(content: string) {
-		const chat = (await chatSender.initChat())  ;
-		chatSender.sendMessage(content, postSendMessage);
+		const chat = await chatSender.initChat();
+		// set active chat
+		$activeChatId = chat.chatId;
 		// relocation without navigation
 		window.history.replaceState(history.state, '', `/chat/${chat.chatId}`);
+		// send message
+		chatSender.sendMessage(chat.chatId, content, postSendMessage);
 		// reset prompt
 		prompt = '';
 		// set auto-scroll to true
@@ -48,28 +51,17 @@
 			streamResponseText = '';
 			$aiResponseState = 'done';
 
-			chatDB.updateChat(chatId, { context: data.context });
-			chatDB.insertMessageStats({ ...data, messageId: assistantMessageId });
-
-			// delete bellow
-			// register chat context
-			chatter.updateChat(chatId, { context: data.context });
-			// update chat assistant message data
-			chatter.updateChatMessageData(chatId, assistantMessageId, data);
+			dbQuery.updateChat(chatId, { context: data.context });
+			dbQuery.insertMessageStats({ ...data, messageId: assistantMessageId });
+			
 			//
 			chatUtils.checkTitle(chatId);
 			// set auto-scroll to false
 			ui.setAutoScroll(chatId, false);
 		} else {
-			streamResponseText += data.response ?? '';
+			streamResponseText += data.response ?? ''; 
 
-			chatDB.updateMessage(assistantMessageId, {
-				content: streamResponseText
-			});
-
-			// delete below
-			chatter.updateChatMessage(chatId, {
-				id: assistantMessageId,
+			dbQuery.updateMessage(assistantMessageId, {
 				content: streamResponseText
 			});
 		}
@@ -85,6 +77,9 @@
 </script>
 
 <div class="flex-v h-full w-full overflow-auto relative">
+	<div>
+		{$activeChatId}
+	</div>
 	<div class="flex-1 mb-32">
 		<DashBoard>
 			<ChatInfo />

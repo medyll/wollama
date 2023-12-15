@@ -40,7 +40,8 @@ export class chatUtils {
 			editedContent: '',
 			content: message.content,
 			role: message.role,
-			data: []
+			data: [],
+			...message
 		};
 	}
 

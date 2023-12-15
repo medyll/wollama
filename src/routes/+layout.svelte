@@ -14,7 +14,8 @@
 	import '../styles/snippets.css';
 	import { engine } from '$lib/tools/engine';
 	import { onMount } from 'svelte';
-	import { DataBase } from '$lib/db/db';
+	import { DataBase, dbase } from '$lib/db/db';
+	import { dbQuery } from '$lib/db/chatDb';
 
 	// auto-load models
 	async function modelS() {
@@ -34,13 +35,14 @@
 		dbase.init();
 	});
 
-	if ($page.params.id) {
-		if (!chatter.getChat($page.params.chatId)) {
-			$activeChatId = undefined;
-			goto('/');
-		} else {
-			activeChatId.set($page.params.chatId);
-		}
+	$: if ($page.params.id) { 
+		dbQuery.getChat($page.params.id).then((chat) => {
+			if (chat) {
+				activeChatId.set($page.params.id);
+			} else {
+				goto('/');
+			}
+		});
 	}
 </script>
 

@@ -4,6 +4,7 @@ import { writable } from 'svelte/store';
 export type MessageType = {
 	id: string;
 	chatId: string;
+	messageId: string;
 	edit: boolean;
 	editedContent: string;
 	content: string;
