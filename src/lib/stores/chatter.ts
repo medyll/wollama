@@ -1,4 +1,4 @@
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import type { MessageListType, MessageType } from './messages';
 import type { OllamaStreamLineLast } from '$lib/tools/ollamaFetch';
 
@@ -26,12 +26,12 @@ export const chatter = chatListStore();
  */
 function chatListStore() {
 	const isBrowser = typeof window !== 'undefined';
-	const { subscribe, set, update } = writable<ChatListType>({});
+	const store = writable<ChatListType>({});
 
 	let currentStore = {} as ChatListType;
 	let dataStoreTimer: NodeJS.Timeout;
 
-	subscribe((o) => {
+	store.subscribe((o) => {
 		currentStore = o;
 		storeData();
 	});
@@ -43,24 +43,24 @@ function chatListStore() {
 		}, 500);
 	}
 
-	isBrowser && localStorage.chatList && set(JSON.parse(localStorage.chatList));
+	isBrowser && localStorage.chatList && store.set(JSON.parse(localStorage.chatList));
 
 	return {
-		subscribe,
-		set,
-		update,
-		getChat: (chatId?: string) => (chatId ? currentStore?.[chatId] : undefined),
-		insertChat: (newChat: ChatDataType) => update((n) => ({ ...n, [newChat.id]: newChat })),
+		subscribe: store.subscribe,
+		set: store.set,
+		update: store.update,
+		getChat: (chatId?: string) => (chatId ? get(store)[chatId] : undefined),
+		insertChat: (newChat: ChatDataType) => store.update((n) => ({ ...n, [newChat.id]: newChat })),
 		getChatMessages: (chatId: string) => currentStore?.[chatId]?.messages ?? {},
 		updateChat: (chatId: string, chatData: Partial<ChatDataType>) => {
-			update((n) => {
+			store.update((n) => {
 				const currentChat = n[chatId];
 				const newChat = { ...currentChat, ...chatData };
 				return { ...n, [chatId]: newChat };
 			});
 		},
 		addChatModel: (chatId: string, model: string) => {
-			update((n) => {
+			store.update((n) => {
 				const currentChat = n[chatId];
 				const currentModels = n[chatId].models;
 				const newChat = { ...currentChat, models: [...currentModels, model] };
@@ -68,7 +68,7 @@ function chatListStore() {
 			});
 		},
 		insertMessage: (chatId: string, message: Partial<MessageType>) =>
-			update((n) => {
+			store.update((n) => {
 				const newChat = {
 					...n[chatId],
 					messages: { ...n[chatId]?.messages, [message.id]: message }
@@ -79,7 +79,7 @@ function chatListStore() {
 			return currentStore?.[chatId]?.messages?.[messageId];
 		},
 		updateChatMessage: (chatId: string, message: Partial<MessageType>) =>
-			update((n) => {
+			store.update((n) => {
 				const currentMessage = n[chatId]?.messages[message.id];
 				const newMessage = { ...currentMessage, ...message };
 				const newChat = {
@@ -93,7 +93,7 @@ function chatListStore() {
 			messageId: string,
 			data: Partial<OllamaStreamLineLast>
 		) => {
-			update((n) => {
+			store.update((n) => {
 				const currentData = n[chatId]?.messages?.[messageId]?.data;
 				const newChat = {
 					...n[chatId],

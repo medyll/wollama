@@ -15,6 +15,8 @@
 	import { ui } from '$lib/stores/ui';
 	import Temperature from './chat/Temperature.svelte';
 	import { chatSender, type chatSenderMessageCB } from '$lib/tools/chatSender';
+	import { onMount } from 'svelte'; 
+	import { get } from 'svelte/store';
 
 	let voiceListening = false;
 
@@ -24,9 +26,19 @@
 
 	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
 
+	onMount(async () => {
+		// console.log(await chatStore.getChats());
+	});
+
 	$: disableSubmit = prompt.trim() == '' || $chatEditListener.isTyping;
 
+	// $: console.log(chatStore.getChats());
+
+	// $: console.log($dbase.test, $dbase.exxa, chatStore.getChats());
+ 
+
 	function preSendMessage(content: string) {
+		 
 		const id = chatSender.initChat() as string;
 		chatSender.sendMessage(content, postSendMessage);
 		// relocation without navigation
@@ -59,6 +71,7 @@
 			});
 		}
 	}
+
 	function keyPressHandler(e: KeyboardEvent) {
 		chatEditListener.setEvent();
 		if (e.key === 'Enter' && !e.shiftKey) {

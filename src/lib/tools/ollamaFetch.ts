@@ -54,6 +54,10 @@ export class OllamaFetch {
 				options: config.llamaOptions,
 				prompt
 			})
+		}).then(async (res) => {
+			console.log(res)
+			if (!res.ok) throw await res.json();
+			return await res.json() ;
 		})
 		if (options?.sync)  this.stream(query, hook);
 		return query;

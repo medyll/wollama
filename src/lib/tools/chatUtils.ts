@@ -10,7 +10,7 @@ export async function guessChatTitle(message: string): Promise<OllamaStreamLine>
 	const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, please reply with only a few worlds:  ${message}`;
 
 	const ollama_fetch = new OllamaFetch();
-	return await ollama_fetch.generate(prompt);
+	return (await OllamaFetch.generate(prompt)).body;
 }
 
 export class chatUtils {

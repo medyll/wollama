@@ -50,7 +50,7 @@ export class chatSender {
 	}
 
 	static async sendPrompt(sender: PromptSenderType, hook: (data: OllamaStreamLine) => void) {
-		console.log(sender);
+		 
 		await Promise.all(
 			sender.models.map(async (model) => {
 				await OllamaFetch.generate(sender.prompt, hook, { sync: true, model });
