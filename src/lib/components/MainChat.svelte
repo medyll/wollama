@@ -16,7 +16,7 @@
 	import Temperature from './chat/Temperature.svelte';
 	import { chatSender, type chatSenderMessageCB } from '$lib/tools/chatSender';
 	import { onMount } from 'svelte'; 
-	import { get } from 'svelte/store';
+	import { chatDB } from '$lib/db/chatDb.js'
 
 	let voiceListening = false;
 
@@ -32,21 +32,15 @@
 
 	$: disableSubmit = prompt.trim() == '' || $chatEditListener.isTyping;
 
-	// $: console.log(chatStore.getChats());
-
-	// $: console.log($dbase.test, $dbase.exxa, chatStore.getChats());
- 
-
-	function preSendMessage(content: string) {
-		 
-		const id = chatSender.initChat() as string;
+	async function preSendMessage(content: string) {
+		const chat = (await chatSender.initChat())  ;
 		chatSender.sendMessage(content, postSendMessage);
 		// relocation without navigation
-		window.history.replaceState(history.state, '', `/chat/${id}`);
+		window.history.replaceState(history.state, '', `/chat/${chat.chatId}`);
 		// reset prompt
 		prompt = '';
 		// set auto-scroll to true
-		ui.setAutoScroll(id, true);
+		ui.setAutoScroll(chat.chatId, true);
 	}
 
 	async function postSendMessage({ chatId, assistantMessageId, data }: chatSenderMessageCB) {
@@ -54,6 +48,10 @@
 			streamResponseText = '';
 			$aiResponseState = 'done';
 
+			chatDB.updateChat(chatId, { context: data.context });
+			chatDB.insertMessageStats({ ...data, messageId: assistantMessageId });
+
+			// delete bellow
 			// register chat context
 			chatter.updateChat(chatId, { context: data.context });
 			// update chat assistant message data
@@ -65,6 +63,11 @@
 		} else {
 			streamResponseText += data.response ?? '';
 
+			chatDB.updateMessage(assistantMessageId, {
+				content: streamResponseText
+			});
+
+			// delete below
 			chatter.updateChatMessage(chatId, {
 				id: assistantMessageId,
 				content: streamResponseText

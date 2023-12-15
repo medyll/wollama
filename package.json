@@ -74,6 +74,7 @@
 		"@types/dom-speech-recognition": "^0.0.4",
 		"@types/marked": "^6.0.0",
 		"date-fns": "^2.30.0",
+		"dexie": "^4.0.1-beta.5",
 		"fs-extra": "^11.2.0",
 		"highlight.js": "^11.9.0",
 		"hljs": "^6.2.3",

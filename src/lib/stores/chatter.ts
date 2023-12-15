@@ -5,6 +5,7 @@ import type { OllamaStreamLineLast } from '$lib/tools/ollamaFetch';
 // Chat element
 export type ChatDataType = {
 	id: string;
+	chatId: string;
 	title: string;
 	models: string[];
 	messages: MessageListType;
@@ -39,18 +40,20 @@ function chatListStore() {
 	function storeData() {
 		clearTimeout(dataStoreTimer);
 		dataStoreTimer = setTimeout(() => {
-			localStorage.chatList = JSON.stringify(currentStore);
+			//localStorage.chatList = JSON.stringify(currentStore);
 		}, 500);
 	}
 
-	isBrowser && localStorage.chatList && store.set(JSON.parse(localStorage.chatList));
+	//isBrowser && localStorage?.chatList && store.set(JSON.parse(localStorage.chatList));
 
 	return {
 		subscribe: store.subscribe,
 		set: store.set,
 		update: store.update,
 		getChat: (chatId?: string) => (chatId ? get(store)[chatId] : undefined),
-		insertChat: (newChat: ChatDataType) => store.update((n) => ({ ...n, [newChat.id]: newChat })),
+		insertChat: (newChat: ChatDataType) => {
+			store.update((n) => ({ ...n, [newChat.id]: newChat }));
+		},
 		getChatMessages: (chatId: string) => currentStore?.[chatId]?.messages ?? {},
 		updateChat: (chatId: string, chatData: Partial<ChatDataType>) => {
 			store.update((n) => {

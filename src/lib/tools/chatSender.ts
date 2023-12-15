@@ -1,8 +1,9 @@
-import { activeChatId, chatter } from '$lib/stores/chatter';
+import { activeChatId, chatter, type ChatDataType } from '$lib/stores/chatter';
 import { get } from 'svelte/store';
 import { chatUtils } from './chatUtils';
-import { aiResponseState } from '$lib/stores/chatEditListener'; 
+import { aiResponseState } from '$lib/stores/chatEditListener';
 import { OllamaFetch, type OllamaStreamLine } from './ollamaFetch';
+import { chatDB } from '../db/chatDb';
 
 export type PromptSenderType = {
 	prompt: string;
@@ -16,29 +17,26 @@ export type chatSenderMessageCB = {
 	data: OllamaStreamLine;
 };
 export class chatSender {
-	static initChat(): string {
-		let chatId = get(activeChatId);
-		if (!get(activeChatId)) {
-			const newChat = chatUtils.createChatData();
-			chatId = newChat.id;
-			// set ActiveId
-			activeChatId.set(newChat.id);
-			// add chat to store.initChat
-			chatter.insertChat(newChat);
-		}
-		return chatId as string;
+	static async initChat(): Promise<ChatDataType> {
+		let activeId = get(activeChatId);
+		const chat: ChatDataType = activeId
+			? await chatDB.getChat(activeId as string)
+			: await chatDB.insertChat();
+
+		return chat;
 	}
 
-	static sendMessage(content: string, cb: (args: chatSenderMessageCB) => {}) {
-		const chatId = this.initChat();
-		const chat = chatter.getChat(chatId);
-		//
-		const messageUser = chatUtils.createMessageData({ role: 'user', content, chatId });
-		const messageAssistant = chatUtils.createMessageData({ role: 'assistant' });
+	static async sendMessage(content: string, cb: (args: chatSenderMessageCB) => {}) {
+		const chat = await this.initChat();
+		const chatId = chat.chatId;
 
 		// add messages to store
-		chatter.insertMessage(chatId, messageUser);
-		chatter.insertMessage(chatId, messageAssistant);
+		const messageUser = await chatter.insertMessage(chatId, { role: 'user', content, chatId });
+		const messageAssistant = await chatter.insertMessage(chatId, { role: 'assistant' });
+
+		// add messages to db
+		chatDB.insertMessage(chatId, { role: 'user', content, chatId });
+		chatDB.insertMessage(chatId, { role: 'assistant', chatId });
 
 		aiResponseState.set('running');
 
@@ -50,10 +48,9 @@ export class chatSender {
 	}
 
 	static async sendPrompt(sender: PromptSenderType, hook: (data: OllamaStreamLine) => void) {
-		 
 		await Promise.all(
 			sender.models.map(async (model) => {
-				await OllamaFetch.generate(sender.prompt, hook, { sync: true, model });
+				await OllamaFetch.generate(sender.prompt, hook, { sync: false, model });
 			})
 		);
 	}

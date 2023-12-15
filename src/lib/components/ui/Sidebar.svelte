@@ -34,7 +34,7 @@
 	<div class="text-right soft-title">{$t('ui.myChats')}</div>
 	<div class="chatZone">
 		<div class="flex-1">
-			{#each $messageByGroupDate as erd}
+			<!-- {#each $messageByGroupDate as erd}
 				<div>
 					<div class="font-bold whitespace-nowrap text-ellipsis py-2">
 						{$t(getTimeTitle(erd.code))}
@@ -50,7 +50,7 @@
 						{/each}
 					</div>
 				</div>
-			{/each}
+			{/each} -->
 		</div>
 	</div>
 </div>

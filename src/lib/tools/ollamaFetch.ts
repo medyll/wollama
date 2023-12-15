@@ -8,6 +8,7 @@ export type OllamaStream = {
 };
 
 export type OllamaStreamLine = {
+	messageId: string;
 	model: string;
 	create_at: string;
 	response: string;

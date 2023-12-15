@@ -13,6 +13,8 @@
 	import '../styles/tailwind.css';
 	import '../styles/snippets.css';
 	import { engine } from '$lib/tools/engine';
+	import { onMount } from 'svelte';
+	import { DataBase } from '$lib/db/db';
 
 	// auto-load models
 	async function modelS() {
@@ -27,12 +29,17 @@
 
 	modelS();
 
+	onMount(async () => {
+		const dbase = new DataBase();
+		dbase.init();
+	});
+
 	if ($page.params.id) {
-		if (!chatter.getChat($page.params.id)) {
+		if (!chatter.getChat($page.params.chatId)) {
 			$activeChatId = undefined;
 			goto('/');
 		} else {
-			activeChatId.set($page.params.id);
+			activeChatId.set($page.params.chatId);
 		}
 	}
 </script>

@@ -17,7 +17,7 @@ export class chatUtils {
 	static async checkTitle(chatId: string) {
 		const chat = chatter.getChat(chatId);
 
-		if (chat?.title === 'New Chat') { 
+		if (chat?.title === 'New Chat') {
 			const messages: MessageListType = chat.messages;
 
 			if (chat.title == 'New Chat' && Object.values(messages).length > 1) {
@@ -33,9 +33,9 @@ export class chatUtils {
 		}
 	}
 
-	static createMessageData(message: Partial<MessageType>):MessageType {
+	static getMessageDataObject(message: Partial<MessageType>): MessageType {
 		return {
-			id: crypto.randomUUID(),
+			messageId: crypto.randomUUID(),
 			edit: false,
 			editedContent: '',
 			content: message.content,
@@ -44,9 +44,9 @@ export class chatUtils {
 		};
 	}
 
-	static createChatData(chatData: Partial<ChatDataType> = {}):ChatDataType {
+	static getChatDataObject(chatData: Partial<ChatDataType> = {}): ChatDataType {
 		return {
-			id: crypto.randomUUID(),
+			chatId: crypto.randomUUID(),
 			title: 'New Chat',
 			models: [get(settings).defaultModel],
 			messages: {},
@@ -55,6 +55,13 @@ export class chatUtils {
 			dateLastMessage: new Date(),
 			context: [],
 			...chatData
+		};
+	}
+
+	static getMessageStatsObject(messageData: Partial<OllamaStreamLine>): OllamaStreamLine {
+		return {
+			messageId: crypto.randomUUID(),
+			...messageData
 		};
 	}
 }
