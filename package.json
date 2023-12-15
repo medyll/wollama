@@ -78,6 +78,7 @@
 		"highlight.js": "^11.9.0",
 		"hljs": "^6.2.3",
 		"i18n": "^0.15.1",
+		"idb": "^8.0.0",
 		"langchain": "^0.0.200",
 		"marked": "^11.0.0",
 		"marked-highlight": "^2.0.9",

@@ -49,7 +49,7 @@ export class OllamaFetch {
 			body: JSON.stringify({
 				model: options?.model ?? options.model,
 				stream: options?.sync,
-				// system: settings?.system,
+				system: config?.system_prompt,
 				// format: settings?.requestFormat,
 				options: config.llamaOptions,
 				prompt
