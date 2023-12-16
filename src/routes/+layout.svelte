@@ -13,7 +13,7 @@
 	import '../styles/snippets.css';
 	import { engine } from '$lib/tools/engine';
 	import { onMount } from 'svelte';
-	import { DataBase, dbase } from '$lib/db/db';
+	import { DataBase, dbase } from '$lib/db/dbSchema';
 	import { dbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
 

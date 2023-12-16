@@ -1,2 +1,2 @@
-import { DataBase } from "$lib/db/db";
+import { DataBase } from "$lib/db/dbSchema";
 export const ssr = false;

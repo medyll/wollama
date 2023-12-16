@@ -16,5 +16,3 @@ export type MessageType = {
 export type MessageListType = {
 	[key: string]: MessageType;
 };
-
-export const messageList = writable<MessageListType>({}); 

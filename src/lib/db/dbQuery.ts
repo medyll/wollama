@@ -2,7 +2,7 @@ import type { ChatDataType } from '$lib/stores/chatter';
 import type { MessageType } from '$lib/stores/messages';
 import { chatUtils } from '$lib/tools/chatUtils';
 import type { OllamaStreamLine } from '$lib/tools/ollamaFetch';
-import { dbase } from './db';
+import { dbase } from './dbSchema';
 
 export class dbQuery {
 	
