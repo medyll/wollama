@@ -1,14 +1,15 @@
 <script lang="ts">
+	import { ui } from '$lib/stores/ui';
 	import { fade } from 'svelte/transition';
 
 	export let show = true;
 </script>
 
-{#if show}
+{#if $ui.showSettings}
 	<div
 		class="modal"
 		on:click={() => {
-			show = false;
+			ui.showHideSettings();
 		}} 
 	>
 		<div

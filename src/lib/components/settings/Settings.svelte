@@ -1,13 +1,13 @@
 <script lang="ts">
 	import Models from './mdl/Models.svelte';
 	import Infos from './mdl/Infos.svelte';
-	import { showSettings } from '$lib/stores/settings';
 	import Icon from '@iconify/svelte';
 	import { t } from '$lib/i18n.js';
 	import General from './mdl/General.svelte';
 	import Advanced from './mdl/Advanced.svelte';
 	import Addons from './mdl/Addons.svelte';
 	import Cartouche from '../ui/Cartouche.svelte';
+	import { ui } from '$lib/stores/ui';
 
 	let settingList = {
 		general: General,
@@ -22,7 +22,7 @@
 <div class="flex-align-middle justify-between  px-5 py-4 gap-4">
 	<div class=" "><Icon icon="mdi:settings"  class="lg" /> </div>
 	<div class="flex-1 text-3xl font-medium self-center capitalize">{$t('ui.settings')}</div>
-	<button on:click={() => showSettings.set(false)} type="button" aria-label="close" >
+	<button on:click={() => ui.showHideSettings()} type="button" aria-label="close" >
 		<Icon icon="mdi:close" style="font-size:1.6em" />
 	</button>
 </div> 
