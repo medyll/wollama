@@ -50,11 +50,12 @@ const settingStore = () => {
 	function storeData() {
 		clearTimeout(dataStoreTimer);
 		dataStoreTimer = setTimeout(() => {
-			// localStorage.settings = JSON.stringify(currentStore);
+			 localStorage.settings = JSON.stringify(currentStore);
+			 localStorage.theme = currentStore.theme;
 		}, 500);
 	}
 
-	// isBrowser && localStorage.settings && set(JSON.parse(localStorage.settings));
+	isBrowser && localStorage.settings && set(JSON.parse(localStorage.settings));
 
 	function setParameterValue(key: keyof Settings, value: any) {
 		update((n) => {
