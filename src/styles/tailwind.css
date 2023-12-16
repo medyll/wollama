@@ -4,6 +4,20 @@
 
 
 @layer components {
+
+    .theme-font-color {
+        @apply text-gray-700 dark:text-gray-100;
+        @apply bg-gray-50 dark:bg-gray-800;
+    }
+    .theme-bg {
+        @apply text-gray-700 bg-gray-50;
+        @apply dark:bg-gray-800 dark:text-gray-100
+    }
+
+    .theme-border{
+        @apply border border-gray-400/60  dark:border-gray-700/90
+    }
+
     .soft-title{
         @apply   text-gray-500 dark:text-gray-100/50;
     }

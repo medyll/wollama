@@ -15,6 +15,8 @@
 	import Temperature from './chat/Temperature.svelte';
 	import { PromptSender, type SenderCallback } from '$lib/tools/promptSender';
 	import { dbQuery } from '$lib/db/dbQuery.js';
+	import { prompter } from '$lib/stores/prompter';
+	import { activeModels } from '$lib/stores';
 
 	type CallbackDataType = {
 		chatId: string;
@@ -31,24 +33,32 @@
 
 	$: disableSubmit = prompt.trim() == '' || $chatEditListener.isTyping;
 
-	async function createChatSession(): Promise<ChatDataType> {
-		return $ui.activeChatId
+	async function getChatSession(): Promise<ChatDataType> {
+		const chat = $ui.activeChatId &&  await dbQuery.getChat($ui.activeChatId as string)
 			? await dbQuery.getChat($ui.activeChatId as string)
 			: await dbQuery.insertChat();
+ 
+			return chat;
 	}
 
 	// add messages to chat to db
 	async function setChatSessionData(chatId: string, content: string) {
+		// update chat parameters
+		await dbQuery.updateChat(chatId, { temperature: $prompter.temperature, models: $activeModels });
+		// insert user message
 		await dbQuery.insertMessage(chatId, { role: 'user', content, chatId });
+		// insert assistant message
 		return await dbQuery.insertMessage(chatId, {
 			role: 'assistant',
 			chatId
 		});
 	}
 
-	async function sendPrompt(prompt: string) {
-		const chatSession = await createChatSession();
+	async function sendPrompt(prompt: string,args:any) {
+		const chatSession = await getChatSession();
 		const assistantData = await setChatSessionData(chatSession.chatId, prompt);
+
+		chatSession.temperature = $prompter.temperature;
 
 		const newSender = new PromptSender<CallbackDataType>(chatSession, {
 			cb: postSendMessage,
@@ -93,10 +103,12 @@
 	}
 
 	function keyPressHandler(e: KeyboardEvent) {
-		chatEditListener.setEvent();
+		$prompter.isPrompting = true;
+
+		chatEditListener.setEvent(); // deprecated
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
-			sendPrompt(prompt);
+			sendPrompt(prompt,{temperature:$prompter.temperature});
 		}
 	}
 </script>
@@ -115,7 +127,7 @@
 		{/each}
 	</div>
 	<div
-		class="w-full y-b fixed margb-0 max-w-3xl bottom-0 backdrop-blur-xl bg-white/90 dark:bg-gray-500/50"
+		class="w-full y-b fixed margb-0 max-w-3xl bottom-0 backdrop-blur-xl theme-bg"
 	>
 		<form
 			id="prompt-form"
@@ -123,10 +135,14 @@
 				sendPrompt(prompt);
 			}}
 		/>
-		<div>
+		<Temperature />
+		<!-- <div class="flex">
+		<div class="ss">		
 			<Temperature />
 		</div>
-		<div class="mainInputArea">
+		<Model /> 
+		</div> -->
+		<div class="inputTextarea">
 			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
 				<Attachment
 					slot="start"

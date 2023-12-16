@@ -12,6 +12,7 @@ export type ChatDataType = {
 	dateCreation: Date;
 	dateLastMessage: Date;
 	context: number[];
+	temperature: number;
 };
 
 // Object list of chat elements

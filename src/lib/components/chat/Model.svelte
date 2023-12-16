@@ -1,33 +1,47 @@
 <script lang="ts">
-	import { activeChat, activeChatId, chatter } from '$lib/stores/chatter';
+	import { dbQuery } from '$lib/db/dbQuery';
+	import { activeModels } from '$lib/stores'; 
 	import { settings } from '$lib/stores/settings.js';
-	import Icon from '@iconify/svelte';
+	import { ui } from '$lib/stores/ui';
+	import Icon from '@iconify/svelte'; 
 
-	function changeHandler(event: Event) {
-		chatter.updateChat($activeChatId, { models: [event.target.value] });
+	let chatModelKeys: string[] = [];
+
+	const changeHandler = (index:number)=>(event: Event) => {
+		$activeModels[index] = event?.target?.value; 
 	}
 
-	function addModel(chatId: string) {
-		chatter.updateChat(chatId, { models: [] });
+	async function loadChatKeys() {
+		chatModelKeys =  await dbQuery.getChat($ui.activeChatId)?.models 
+		?? [$settings.defaultModel]
 	}
 
-	$: chatModelKeys = chatter.getChat($activeChatId)?.models ?? [$settings.defaultModel];
+	function addModel(chatId: string)  {
+		 
+	}
+
+	loadChatKeys();
+
+	$: if($ui.activeChatId) {
+		loadChatKeys();
+	}
+
 </script>
 
 <div class="p-3 flex flex-wrap gap-2">
 	<div>
 		<button
 			on:click={() => {
-				addModel(activeChatId);
+				 
 			}}
 		>
 			<Icon icon="mdi:add" />
 		</button>
 	</div>
-	{#each chatModelKeys as modelKey}
+	{#each chatModelKeys as modelKey, index (index)}
 		<div class="flex gap-2">
 			<div class="flex-1">
-				<select on:change={changeHandler}>
+				<select on:change={changeHandler(index)}>
 					{#each $settings?.ollamaModels ?? [] as model}
 						{@const partial = model.name.split(':')[0]}
 						<option selected={model.name === modelKey} value={model.name}

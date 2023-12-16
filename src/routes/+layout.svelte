@@ -16,6 +16,7 @@
 	import { DataBase, dbase } from '$lib/db/dbSchema';
 	import { dbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
+	import { activeModels } from '$lib/stores';
 
 	// auto-load models
 	async function modelS() {
@@ -24,6 +25,7 @@
 
 		settings.setParameterValue('ollamaModels', [...models]);
 		if (!$settings.defaultModel) settings.setParameterValue('defaultModel', models[0].name);
+		$activeModels.push($settings.defaultModel);
 	}
 
 	engine.checkOllamaEndPoints();
