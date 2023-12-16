@@ -2,13 +2,17 @@ import type { ChatDataType } from '$lib/stores/chatter';
 import type { MessageType } from '$lib/stores/messages';
 import { chatUtils } from '$lib/tools/chatUtils';
 import type { OllamaStreamLine } from '$lib/tools/ollamaFetch';
-import { liveQuery } from 'dexie';
 import { dbase } from './db';
 
 export class dbQuery {
+	
 	static async getChat(chatId: string) {
 		if (!chatId) throw new Error('chatId is required');
-		return dbase.chat.where('chatId').equals(chatId).first();
+		return await dbase.chat.where('chatId').equals(chatId).first();
+	}
+
+	static async getChats() {		
+		return await dbase.chat.toArray();
 	}
 
 	static async insertChat(chatData?: ChatDataType): Promise<ChatDataType> {
@@ -23,6 +27,12 @@ export class dbQuery {
 		await dbase.chat.update(chatId, chatData);
 	}
 
+	static async initChat(activeChatId?: string): Promise<ChatDataType> {
+		return activeChatId
+			? await dbQuery.getChat(activeChatId as string)
+			: await dbQuery.insertChat();
+	}
+
 	static async insertMessage(chatId: string, messageData: Partial<MessageType>) {
 		if (!chatId) throw new Error('chatId is required');
 		const message = chatUtils.getMessageDataObject({ chatId, ...messageData });
@@ -35,7 +45,7 @@ export class dbQuery {
 	static async updateMessage(messageId: string, messageData: Partial<MessageType>) {
 		if (!messageId) throw new Error('messageId is required');
 
-		await dbase.messages.update(messageId, {messageId,...messageData});
+		await dbase.messages.update(messageId, { messageId, ...messageData });
 	}
 
 	static async getMessage(messageId: string) {
@@ -45,7 +55,7 @@ export class dbQuery {
 
 	static async getMessages(chatId: string) {
 		if (!chatId) throw new Error('chatId is required');
-		return await dbase.messages.where('chatId').equals(chatId).sortBy('dateCreation') ;
+		return await dbase.messages.where('chatId').equals(chatId).sortBy('dateCreation');
 	}
 
 	static async insertMessageStats(statsData: Partial<OllamaStreamLine>) {

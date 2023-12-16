@@ -18,12 +18,9 @@ export class DataBase extends Dexie {
 			messages: '&messageId, chatId, dateCreation',
 			messageStats:'&messageId, create_at'
 		});
-
-		// console.log(this.messages);
-		//alert(this.messages.schema.primKey.keyPath)
 	}
 
-	init() {}
+	init() {} 
 }
 
 export const dbase = new DataBase();

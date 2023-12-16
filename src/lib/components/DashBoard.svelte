@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { activeChatId, chatter } from '$lib/stores/chatter';
+	import { activeChatId, } from '$lib/stores/chatter';
 	import Icon from '@iconify/svelte';
  
 </script>

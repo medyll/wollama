@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { activeChatId, chatter } from '$lib/stores/chatter';
 	import { ui } from '$lib/stores/ui';
-	import { set } from 'date-fns';
 	import { onMount } from 'svelte';
 
 	let element: HTMLElement;

@@ -13,6 +13,8 @@
 		activeChatId.set(id);
 		goto(`/chat/${id}`);
 	};
+
+	$: console.log($messageByGroupDate)
 </script>
 
 <div class="flex-v h-full w-[360px] gap-3 px-8 pt-2">
@@ -34,7 +36,7 @@
 	<div class="text-right soft-title">{$t('ui.myChats')}</div>
 	<div class="chatZone">
 		<div class="flex-1">
-			<!-- {#each $messageByGroupDate as erd}
+			{#each $messageByGroupDate ?? [] as erd}
 				<div>
 					<div class="font-bold whitespace-nowrap text-ellipsis py-2">
 						{$t(getTimeTitle(erd.code))}
@@ -42,15 +44,15 @@
 					<div>
 						{#each erd.items as chat}
 							<ChatButton
-								chatId={chat.id}
+								chatId={chat.chatId}
 								on:click={() => {
-									loadChat(chat.id);
+									loadChat(chat.chatId);
 								}}
 							/>
 						{/each}
 					</div>
 				</div>
-			{/each} -->
+			{/each}
 		</div>
 	</div>
 </div>

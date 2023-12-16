@@ -1,14 +1,23 @@
 <script lang="ts">
-	import { activeChatId, chatter } from '$lib/stores/chatter';
+	import { dbQuery } from '$lib/db/dbQuery';
+	import { activeChatId, } from '$lib/stores/chatter';
 	import Icon from '@iconify/svelte';
+	import { liveQuery } from 'dexie';
 
-	export let chatId: string = '';
+	export let chatId: string|undefined = undefined;
 
-	$: chat = chatter.getChat(chatId);
+
+	$: chat = liveQuery(()=>{
+		console.log(chatId)
+		if(chatId) return dbQuery.getChat(chatId) 
+	})  ;
+	
+	$: console.log(chat);
+	$: active = Boolean($activeChatId == chatId);
+
 	const confirmDelete: boolean = false;
 	let editChat: boolean = false;
 
-	$: active = Boolean($activeChatId == chatId);
 
 	function deleteCha1tHandler() {
 		// chatter.deleteChat(chatId);
@@ -16,6 +25,11 @@
 
 	function editChatTitleHandler() {
 		editChat = true;
+	}
+
+
+	function liveData(arg0: Promise<import("$lib/stores/chatter").ChatDataType | undefined>): any {
+		throw new Error('Function not implemented.');
 	}
 </script>
 
@@ -27,13 +41,13 @@
 		{#if active}
 		{/if}
 		{#if editChat}
-			<input type="text" bind:value={chat.title} />
+			<input type="text" bind:value={$chat.title} />
 			<button on:click={editChatTitleHandler}>
 				<Icon icon="mdi:check" />
 			</button>
 		{:else}
 			<span class="w-full whitespace-nowrap overflow-hidden">
-				{chat.title}
+				{$chat?.title}
 			</span>
 		{/if}
 	</button>

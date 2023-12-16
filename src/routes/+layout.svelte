@@ -6,7 +6,7 @@
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
 	import Sidebar from '$lib/components/ui/Sidebar.svelte';
-	import { activeChatId, chatter } from '$lib/stores/chatter';
+	import { activeChatId } from '$lib/stores/chatter';
 	import { settings, showSettings } from '$lib/stores/settings';
 	import { OllamaFetch } from '$lib/tools/ollamaFetch';
 	import '../styles/app.css';
@@ -15,7 +15,7 @@
 	import { engine } from '$lib/tools/engine';
 	import { onMount } from 'svelte';
 	import { DataBase, dbase } from '$lib/db/db';
-	import { dbQuery } from '$lib/db/chatDb';
+	import { dbQuery } from '$lib/db/dbQuery';
 
 	// auto-load models
 	async function modelS() {

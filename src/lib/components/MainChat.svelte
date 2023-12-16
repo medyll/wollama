@@ -4,8 +4,7 @@
 	import MessageList from '$lib/components/chat/MessageList.svelte';
 	import Model from '$lib/components/chat/Model.svelte';
 	import { chatUtils } from '$lib/tools/chatUtils';
-	import { activeChatId, chatter } from '$lib/stores/chatter';
-	import { settings } from '$lib/stores/settings';
+	import { activeChatId,  type ChatDataType } from '$lib/stores/chatter';
 	import { aiResponseState, chatEditListener } from '$lib/stores/chatEditListener';
 	import Icon from '@iconify/svelte';
 	import Input from './chat/Input.svelte';
@@ -14,9 +13,13 @@
 	import { t } from '$lib/i18n';
 	import { ui } from '$lib/stores/ui';
 	import Temperature from './chat/Temperature.svelte';
-	import { chatSender, type chatSenderMessageCB } from '$lib/tools/chatSender';
-	import { onMount } from 'svelte';
-	import { dbQuery } from '$lib/db/chatDb.js';
+	import { ChatSender, type SenderCallback } from '$lib/tools/chatSender';
+	import { dbQuery } from '$lib/db/dbQuery.js';
+
+	type CallbackDataType = {
+		chatId: string;
+		assistantData: any;
+	};
 
 	let voiceListening = false;
 
@@ -26,42 +29,64 @@
 
 	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
 
-	onMount(async () => {
-		// console.log(await chatStore.getChats());
-	});
-
 	$: disableSubmit = prompt.trim() == '' || $chatEditListener.isTyping;
 
-	async function preSendMessage(content: string) {
-		const chat = await chatSender.initChat();
-		// set active chat
-		$activeChatId = chat.chatId;
-		// relocation without navigation
-		window.history.replaceState(history.state, '', `/chat/${chat.chatId}`);
-		// send message
-		chatSender.sendMessage(chat.chatId, content, postSendMessage);
-		// reset prompt
-		prompt = '';
-		// set auto-scroll to true
-		ui.setAutoScroll(chat.chatId, true);
+	async function createChatSession(): Promise<ChatDataType> {
+		return $ui.activeChatId
+			? await dbQuery.getChat($ui.activeChatId as string)
+			: await dbQuery.insertChat();
 	}
 
-	async function postSendMessage({ chatId, assistantMessageId, data }: chatSenderMessageCB) {
+	// add messages to chat to db
+	async function setChatSessionData(chatId: string, content: string) {
+		await dbQuery.insertMessage(chatId, { role: 'user', content, chatId });
+		return await dbQuery.insertMessage(chatId, {
+			role: 'assistant',
+			chatId
+		});
+	}
+
+	async function preSendMessage(prompt: string) {
+		const chatSession = await createChatSession();
+		const assistantData = await setChatSessionData(chatSession.chatId, prompt);
+
+		const newSender = new ChatSender<CallbackDataType>(chatSession, {
+			cb: postSendMessage,
+			cbData: { chatId: chatSession.chatId, assistantData }
+		});
+
+		newSender.sendMessage(prompt);
+		// set active chat
+		ui.setActiveChatId(chatSession.chatId);
+		// set auto-scroll to true
+		ui.setAutoScroll(chatSession.chatId, true);
+		$activeChatId = chatSession.chatId;
+		// relocation without navigation
+		window.history.replaceState(history.state, '', `/chat/${chatSession.chatId}`);
+		// reset prompt
+		prompt = '';
+	}
+
+	async function postSendMessage({
+		chatId,
+		assistantData,
+		data
+	}: SenderCallback<CallbackDataType>) {
 		if (data.done) {
 			streamResponseText = '';
 			$aiResponseState = 'done';
 
 			dbQuery.updateChat(chatId, { context: data.context });
-			dbQuery.insertMessageStats({ ...data, messageId: assistantMessageId });
-			
+			dbQuery.insertMessageStats({ ...data, messageId: assistantData.messageId });
+
 			//
 			chatUtils.checkTitle(chatId);
 			// set auto-scroll to false
 			ui.setAutoScroll(chatId, false);
 		} else {
-			streamResponseText += data.response ?? ''; 
+			streamResponseText += data.response ?? '';
 
-			dbQuery.updateMessage(assistantMessageId, {
+			dbQuery.updateMessage(assistantData.messageId, {
 				content: streamResponseText
 			});
 		}

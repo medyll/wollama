@@ -3,6 +3,8 @@ import { derived } from 'svelte/store';
 import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import type { MessageListType, MessageType } from '$lib/stores/messages';
 import { guessChatTitle } from './chatUtils';
+import { dbQuery } from '$lib/db/dbQuery';
+import { liveQuery } from 'dexie';
 
 export class Utils {
 	static resolveDotPath(
@@ -22,8 +24,8 @@ type GroupItem = {
 	period: { start: Date; end: Date };
 };
 
-function sortList(list: ChatListType): ChatDataType[] {
-	return Object.values(list).sort(
+function sortList(list: ChatDataType[]): ChatDataType[] {
+	return list.sort(
 		(a, b) => new Date(b.dateCreation).getTime() - new Date(a.dateCreation).getTime()
 	);
 }
@@ -177,6 +179,11 @@ function groupChatMessages(
 	}
 }
 // derived from chatList
-export const messageByGroupDate = derived(chatter, ($chatter) => {
-	return groupChatMessages(sortList($chatter));
+export const messageByGroupDate = liveQuery(async ()=> {
+	const chats = await dbQuery.getChats();
+	console.log(groupChatMessages(sortList(chats)))
+	return groupChatMessages(sortList(chats));
 });
+/* export const messageByGroupDate = derived(qy, ($qy) => {
+	return groupChatMessages(sortList($qy));
+}); */
