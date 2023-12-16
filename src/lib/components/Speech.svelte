@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { readerConst } from '$lib/promptSender';
 	import { speechRecognitionHandler, type SpeechReturn } from '$lib/speechHandler';
+	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
 	import toast from 'svelte-french-toast';
 
@@ -13,7 +13,7 @@
 	export let disabled: boolean = false;
 
 	const stopResponse = () => {
-		readerConst.stop = true;
+		$ui.stopSystemResponse = true;
 	};
 
 	let voiceRecognition = speechRecognitionHandler(speechListener, { autoStart: false });

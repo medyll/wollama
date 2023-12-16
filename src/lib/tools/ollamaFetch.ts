@@ -1,5 +1,5 @@
-import { readerConst } from '$lib/promptSender';
 import { settings } from '$lib/stores/settings';
+import { ui } from '$lib/stores/ui';
 import { get } from 'svelte/store';
 
 export type OllamaStream = {
@@ -24,6 +24,8 @@ export type OllamaStreamLine = {
 };
 export interface OllamaStreamLineLast {}
 
+type PromptType = { stream: boolean; model: string; context: number[], temperature: number };
+
 export class OllamaFetch {
 	private options = {
 		model: 'llama2-uncensored'
@@ -36,9 +38,9 @@ export class OllamaFetch {
 	static async generate(
 		prompt: string,
 		hook?: (data: OllamaStreamLine) => void,
-		options?: { stream: boolean; model: string, context: number[] }
+		options?: Partial<PromptType>
 	) {
-		readerConst.stop = false; // replcae
+		get(ui).stopSystemResponse = false;
 
 		const config = get(settings);
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
@@ -57,14 +59,13 @@ export class OllamaFetch {
 			})
 		});
 
-		
 		if (options?.stream) {
 			this.stream(res, hook);
 		} else {
 			if (!res.ok) throw await res.json();
-			const out =  await res.json();
+			const out = await res.json();
 
-			return out
+			return out;
 		}
 		return res;
 	}
@@ -94,15 +95,15 @@ export class OllamaFetch {
 			.pipeThrough(splitStream('\n'))
 			.getReader();
 
-		while (true ?? readerConst.stop) {
+		while (true ?? !get(ui).stopSystemResponse) {
 			const { value, done } = await streamReader.read();
- 
+
 			if (done) {
 				break;
 			}
 			if (value) {
 				const data: OllamaStreamLine = JSON.parse(value);
-				
+
 				if (hook) hook(data);
 			}
 		}

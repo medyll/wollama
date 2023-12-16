@@ -1,10 +1,6 @@
-import type { ChatDataType } from '$lib/stores/chatter';
-import { get } from 'svelte/store';
-import { chatUtils } from './chatUtils';
+import type { ChatDataType } from '$lib/stores/chatter'; 
 import { aiResponseState } from '$lib/stores/chatEditListener';
-import { OllamaFetch, type OllamaStreamLine } from './ollamaFetch';
-import { dbQuery } from '../db/dbQuery';
-import type { MessageType } from '$lib/stores/messages';
+import { OllamaFetch, type OllamaStreamLine } from './ollamaFetch'; 
 
 export type PromptSenderType = {
 	prompt: string;
@@ -21,7 +17,7 @@ type ArgsType<T> = {
 	cbData:   T   ;
 };
 
-export class ChatSender<T>  {
+export class PromptSender<T>  {
 	chatId!: string;
 	chat!: ChatDataType;
 	cb!: (args: SenderCallback<T>) => void;

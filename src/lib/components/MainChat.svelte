@@ -13,7 +13,7 @@
 	import { t } from '$lib/i18n';
 	import { ui } from '$lib/stores/ui';
 	import Temperature from './chat/Temperature.svelte';
-	import { ChatSender, type SenderCallback } from '$lib/tools/chatSender';
+	import { PromptSender, type SenderCallback } from '$lib/tools/promptSender';
 	import { dbQuery } from '$lib/db/dbQuery.js';
 
 	type CallbackDataType = {
@@ -50,7 +50,7 @@
 		const chatSession = await createChatSession();
 		const assistantData = await setChatSessionData(chatSession.chatId, prompt);
 
-		const newSender = new ChatSender<CallbackDataType>(chatSession, {
+		const newSender = new PromptSender<CallbackDataType>(chatSession, {
 			cb: postSendMessage,
 			cbData: { chatId: chatSession.chatId, assistantData }
 		});
@@ -102,9 +102,6 @@
 </script>
 
 <div class="flex-v h-full w-full overflow-auto relative">
-	<div>
-		{$ui.activeChatId}
-	</div>
 	<div class="flex-1 mb-32">
 		<DashBoard>
 			<ChatInfo />

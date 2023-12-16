@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 type UiStoreType = {
 	activeChatId?: string;
+	stopSystemResponse?: boolean;
 	autoScroll: {
 		[chatId: string]: boolean;
 	};
