@@ -36,7 +36,7 @@ export class OllamaFetch {
 	static async generate(
 		prompt: string,
 		hook?: (data: OllamaStreamLine) => void,
-		options?: { stream: boolean; model: string }
+		options?: { stream: boolean; model: string, context: number[] }
 	) {
 		readerConst.stop = false; // replcae
 
@@ -52,6 +52,7 @@ export class OllamaFetch {
 				system: config?.system_prompt,
 				// format: settings?.requestFormat,
 				options: config.llamaOptions,
+				context: options?.context ?? [],
 				prompt
 			})
 		});

@@ -1,10 +1,10 @@
-<script lang="ts">
-	import { activeChatId, } from '$lib/stores/chatter';
+<script lang="ts"> 
+	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
  
 </script>
 
-{#if !$activeChatId}
+{#if !$ui.activeChatId}
 	<div class="flex place-content-center"><Icon icon="fluent-emoji-high-contrast:llama" style="font-size:10em" /></div>
 {:else}
 	<slot />

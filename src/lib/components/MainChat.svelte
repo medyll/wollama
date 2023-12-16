@@ -46,7 +46,7 @@
 		});
 	}
 
-	async function preSendMessage(prompt: string) {
+	async function sendPrompt(prompt: string) {
 		const chatSession = await createChatSession();
 		const assistantData = await setChatSessionData(chatSession.chatId, prompt);
 
@@ -96,7 +96,7 @@
 		chatEditListener.setEvent();
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
-			preSendMessage(prompt);
+			sendPrompt(prompt);
 		}
 	}
 </script>
@@ -123,7 +123,7 @@
 		<form
 			id="prompt-form"
 			on:submit|preventDefault={() => {
-				preSendMessage(prompt);
+				sendPrompt(prompt);
 			}}
 		/>
 		<div>
@@ -138,7 +138,7 @@
 					disabled={$chatEditListener.isTyping}
 				/>
 				<div slot="end" class="flex-align-middle">
-					<Speech onEnd={preSendMessage} bind:prompt bind:voiceListening />
+					<Speech onEnd={sendPrompt} bind:prompt bind:voiceListening />
 					<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
 						<Icon icon="mdi:send" style="font-size:1.6em" />
 					</button>

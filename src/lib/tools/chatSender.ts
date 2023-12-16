@@ -41,10 +41,10 @@ export class ChatSender<T>  {
 
 		aiResponseState.set('running');
 
-		let args = { prompt: content, context: chat?.context ?? [], models: chat.models };
+		let sender = { prompt: content, context: chat?.context ?? [], models: chat.models };
 		// use args as a parameter
 		this.sendPrompt(
-			args,
+			sender,
 			async (data) => this.cb({ ...this.cbData, data })
 		);
 	}
@@ -52,7 +52,7 @@ export class ChatSender<T>  {
 	async sendPrompt(sender: PromptSenderType, hook: (data: OllamaStreamLine) => void) {
 		await Promise.all(
 			sender.models.map(async (model) => {
-				await OllamaFetch.generate(sender.prompt, hook, { stream: true, model });
+				await OllamaFetch.generate(sender.prompt, hook, { stream: true, model, context: sender.context });
 			})
 		);
 	}
