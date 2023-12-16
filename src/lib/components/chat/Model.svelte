@@ -28,16 +28,7 @@
 
 </script>
 
-<div class="p-3 flex flex-wrap gap-2">
-	<div>
-		<button
-			on:click={() => {
-				 
-			}}
-		>
-			<Icon icon="mdi:add" />
-		</button>
-	</div>
+<div class="p-1 flex flex-wrap gap-2">
 	{#each chatModelKeys as modelKey, index (index)}
 		<div class="flex gap-2">
 			<div class="flex-1">
@@ -52,4 +43,13 @@
 			</div>
 		</div>
 	{/each}
+	<div>
+		<button
+			on:click={() => {
+				 
+			}}
+		>
+			<Icon icon="mdi:add" />
+		</button>
+	</div>
 </div>

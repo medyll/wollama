@@ -116,8 +116,9 @@
 <div class="flex-v h-full w-full overflow-auto relative">
 	<div class="flex-1 mb-32">
 		<DashBoard>
-			<ChatInfo />
+			<ChatInfo >			
 			<Model />
+			</ChatInfo>
 			<MessageList chatId={$ui.activeChatId} />
 		</DashBoard>
 	</div>
@@ -137,11 +138,11 @@
 		/>
 		<Temperature />
 		<!-- <div class="flex">
-		<div class="ss">		
+		<div>
+		<div class="ce div toujours centré">		
 			<Temperature />
 		</div>
-		<Model /> 
-		</div> -->
+		<div><Model /></div>	</div> -->
 		<div class="inputTextarea">
 			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
 				<Attachment
