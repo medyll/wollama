@@ -36,7 +36,7 @@ export class OllamaFetch {
 	static async generate(
 		prompt: string,
 		hook?: (data: OllamaStreamLine) => void,
-		options?: { sync: boolean; model: string }
+		options?: { stream: boolean; model: string }
 	) {
 		readerConst.stop = false; // replcae
 
@@ -47,8 +47,8 @@ export class OllamaFetch {
 				'Content-Type': 'text/event-stream'
 			},
 			body: JSON.stringify({
-				model: options?.model ?? options.model,
-				stream: !options?.sync,
+				model: options?.model ?? options?.model ?? 'llama2-uncensored',
+				stream: options?.stream,
 				system: config?.system_prompt,
 				// format: settings?.requestFormat,
 				options: config.llamaOptions,
@@ -57,12 +57,13 @@ export class OllamaFetch {
 		});
 
 		
-		if (!options?.sync) {
+		if (options?.stream) {
 			this.stream(res, hook);
 		} else {
-
 			if (!res.ok) throw await res.json();
-			return await res.json();
+			const out =  await res.json();
+
+			return out
 		}
 		return res;
 	}

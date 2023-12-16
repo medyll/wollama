@@ -1,4 +1,4 @@
-import { chatter, type ChatDataType, type ChatListType } from '$lib/stores/chatter';
+import type {  ChatDataType,   } from '$lib/stores/chatter';
 import { derived } from 'svelte/store';
 import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import type { MessageListType, MessageType } from '$lib/stores/messages';
@@ -51,25 +51,7 @@ function getStartAndEndOfWeek(date: Date, firstDayOfWeek: any = 1): { start: Dat
 	return { start, end };
 }
 
-export async function checkTitle(chatId: string) {
-	const chat = chatter.getChat(chatId);
 
-	if (chat?.title === 'New Chat') {
-		const chat = chatter.getChat(chatId);
-		const messages: MessageListType = chat.messages;
-
-		if (chat.title == 'New Chat' && Object.values(messages).length > 1) {
-			const resume = Object.values(messages)
-				.slice(0, 2)
-				.map((message: MessageType) => message.content)
-				.join('\n');
-
-			const res = await guessChatTitle(resume);
-			//
-			if (res?.response !== '') chatter.updateChat(chatId, { title: res.response });
-		}
-	}
-}
 
 export function getTimeTitle(inputText: string) {
 	const match = inputText.match(/(weeks|months)(\d+)/);

@@ -53,9 +53,9 @@ export class dbQuery {
 		return await dbase.messages.where('messageId').equals(messageId).first();
 	}
 
-	static async getMessages(chatId: string) {
+	static getMessages(chatId: string) {
 		if (!chatId) throw new Error('chatId is required');
-		return await dbase.messages.where('chatId').equals(chatId).sortBy('dateCreation');
+		return   dbase.messages.where('chatId').equals(chatId).sortBy('dateCreation');
 	}
 
 	static async insertMessageStats(statsData: Partial<OllamaStreamLine>) {

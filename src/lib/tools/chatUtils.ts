@@ -1,8 +1,9 @@
-import { chatter, type ChatDataType } from '$lib/stores/chatter';
+import type { ChatDataType } from '$lib/stores/chatter';
 import { get } from 'svelte/store';
-import type { MessageListType, MessageType } from '../stores/messages';
+import type { MessageType } from '../stores/messages';
 import { OllamaFetch, type OllamaStreamLine } from './ollamaFetch';
 import { settings } from '$lib/stores/settings';
+import { dbQuery } from '$lib/db/dbQuery';
 
 export async function askOllama(prompt: string, model: string) {}
 
@@ -10,25 +11,24 @@ export async function guessChatTitle(message: string): Promise<OllamaStreamLine>
 	const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, please reply with only a few worlds:  ${message}`;
 
 	const ollama_fetch = new OllamaFetch();
-	return (await OllamaFetch.generate(prompt)).body;
+	return (await OllamaFetch.generate(prompt,()=>{}, {stream:false}));
 }
 
 export class chatUtils {
 	static async checkTitle(chatId: string) {
-		const chat = chatter.getChat(chatId);
+		const chat = await dbQuery.getChat(chatId);
+		const chatMessages = await dbQuery.getMessages(chatId);
 
-		if (chat?.title === 'New Chat') {
-			const messages: MessageListType = chat.messages;
-
-			if (chat.title == 'New Chat' && Object.values(messages).length > 1) {
-				const resume = Object.values(messages)
+		if (!chat?.title || chat?.title === 'New Chat') {
+			if (chatMessages.length > 1) {
+				const resume = chatMessages
 					.slice(0, 2)
 					.map((message: MessageType) => message.content)
 					.join('\n');
 
 				const res = await guessChatTitle(resume);
-				//
-				if (res?.response !== '') chatter.updateChat(chatId, { title: res.response });
+				
+				if (res?.response !== '') dbQuery.updateChat(chatId, { title: res.response });
 			}
 		}
 	}
@@ -36,6 +36,7 @@ export class chatUtils {
 	static getMessageDataObject(message: Partial<MessageType>): MessageType {
 		return {
 			messageId: crypto.randomUUID(),
+			dateCreation: new Date(),
 			edit: false,
 			editedContent: '',
 			content: message.content,

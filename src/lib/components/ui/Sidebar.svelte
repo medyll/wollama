@@ -8,13 +8,12 @@
 	import { t } from '$lib/i18n.js';
 	let search: any = '';
 	import { format } from 'date-fns';
+	import { ui } from '$lib/stores/ui.js';
 
 	const loadChat = async (id: string) => {
-		activeChatId.set(id);
+		ui.setActiveChatId(id)
 		goto(`/chat/${id}`);
 	};
-
-	$: console.log($messageByGroupDate)
 </script>
 
 <div class="flex-v h-full w-[360px] gap-3 px-8 pt-2">

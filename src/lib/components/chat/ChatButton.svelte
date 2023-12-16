@@ -8,11 +8,9 @@
 
 
 	$: chat = liveQuery(()=>{
-		console.log(chatId)
 		if(chatId) return dbQuery.getChat(chatId) 
 	})  ;
-	
-	$: console.log(chat);
+
 	$: active = Boolean($activeChatId == chatId);
 
 	const confirmDelete: boolean = false;
@@ -20,7 +18,7 @@
 
 
 	function deleteCha1tHandler() {
-		// chatter.deleteChat(chatId);
+		
 	}
 
 	function editChatTitleHandler() {

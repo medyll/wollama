@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { activeChat, activeChatId, chatter } from '$lib/stores/chatter';
+	import { activeChat } from '$lib/stores/chatter';
 	import { format } from 'date-fns';
  
 	$: formattedDate = $activeChat?.dateCreation ? format(new Date($activeChat?.dateCreation), 'EEEE, dd MMMM') : '';

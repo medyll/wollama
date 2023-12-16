@@ -5,8 +5,7 @@
 	import Settings from '$lib/components/settings/Settings.svelte';
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import Navbar from '$lib/components/ui/Navbar.svelte';
-	import Sidebar from '$lib/components/ui/Sidebar.svelte';
-	import { activeChatId } from '$lib/stores/chatter';
+	import Sidebar from '$lib/components/ui/Sidebar.svelte'; 
 	import { settings, showSettings } from '$lib/stores/settings';
 	import { OllamaFetch } from '$lib/tools/ollamaFetch';
 	import '../styles/app.css';
@@ -16,6 +15,7 @@
 	import { onMount } from 'svelte';
 	import { DataBase, dbase } from '$lib/db/db';
 	import { dbQuery } from '$lib/db/dbQuery';
+	import { ui } from '$lib/stores/ui';
 
 	// auto-load models
 	async function modelS() {
@@ -37,8 +37,8 @@
 
 	$: if ($page.params.id) { 
 		dbQuery.getChat($page.params.id).then((chat) => {
-			if (chat) {
-				activeChatId.set($page.params.id);
+			if (chat) { 
+				ui.setActiveChatId($page.params.id);
 			} else {
 				goto('/');
 			}

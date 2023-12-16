@@ -103,13 +103,13 @@
 
 <div class="flex-v h-full w-full overflow-auto relative">
 	<div>
-		{$activeChatId}
+		{$ui.activeChatId}
 	</div>
 	<div class="flex-1 mb-32">
 		<DashBoard>
 			<ChatInfo />
 			<Model />
-			<MessageList chatId={$activeChatId} />
+			<MessageList chatId={$ui.activeChatId} />
 		</DashBoard>
 	</div>
 	<div>

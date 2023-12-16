@@ -7,7 +7,7 @@
 	export let chatId: string;
  
 
-	let messages = liveQuery(()=> dbQuery.getMessages(chatId));
+	$: messages = liveQuery(()=> chatId ? dbQuery.getMessages(chatId) : []);
 
 </script>
 
