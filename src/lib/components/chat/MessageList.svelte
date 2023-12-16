@@ -11,8 +11,9 @@
 
 </script>
 
-<div class="flex-v w-full h-full overflow-hidden">
+<div class="flex-v w-full h-full overflow-hidden gap-4">
 	{#each ($messages ?? []) as message}
+		<hr class="w-16" />
 		<Message {message} />
 	{/each}
 	<Bottomer />
