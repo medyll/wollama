@@ -4,17 +4,16 @@
 	import Bottomer from '../ui/Bottomer.svelte'; 
 	import { dbQuery } from '$lib/db/dbQuery';
 
-	export let chatId: string;
+	export let chatId: string | undefined;
  
 
 	$: messages = liveQuery(()=> chatId ? dbQuery.getMessages(chatId) : []);
 
 </script>
 
-<div class="flex-v w-full h-full overflow-hidden gap-4">
+<div class="flex-v w-full gap-4">
 	{#each ($messages ?? []) as message}
-		<hr class="w-16" />
-		<Message {message} />
+	    <slot {message}></slot>
 	{/each}
 	<Bottomer />
 </div>

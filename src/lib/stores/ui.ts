@@ -15,7 +15,7 @@ const defaultUiStoreOptions: UiStoreType = {
 const uiStore = () => {
 	const { set, update, subscribe } = writable(defaultUiStoreOptions);
 
-	function setActiveChatId(chatId: string) {
+	function setActiveChatId(chatId?: string) {
 		return update((state) => ({ ...state, activeChatId: chatId }));
 	}
 	function showHideSettings() {

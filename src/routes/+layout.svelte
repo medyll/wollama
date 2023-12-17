@@ -45,6 +45,8 @@
 				goto('/');
 			}
 		});
+	}else{
+		ui.setActiveChatId();
 	}
 </script>
 

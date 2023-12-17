@@ -46,6 +46,11 @@ input[type="text"],input[type="search"] {
     @apply   border border-gray-400/60  hover:border-gray-400/90;
 }
 
+button:disabled {
+    opacity: 0.5;
+}
+
+
 .iconify {
 	display: inline-block;
 		font-size: 1.1em;

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { chatter } from '$lib/stores/chatter';
 	import { ui } from '$lib/stores/ui';
 	import { onMount } from 'svelte';
 
@@ -7,7 +6,7 @@
 
 	$: if (element && $ui.activeChatId && $ui.autoScroll?.[$ui.activeChatId]) scrollDown();
 
-	chatter.subscribe((chat) => {
+	ui.subscribe((chat) => {
 		scrollDown();
 	});
 

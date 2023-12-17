@@ -1,5 +1,5 @@
+import { aiState } from '$lib/stores';
 import type { ChatDataType } from '$lib/stores/chatter';
-import { aiResponseState } from '$lib/stores/chatEditListener';
 import { OllamaFetch, type OllamaStreamLine } from './ollamaFetch';
 
 export type PromptSenderType = {
@@ -39,7 +39,7 @@ export class PromptSender<T> {
 	async sendMessage(content: string) {
 		const chat = this.chat;
 
-		aiResponseState.set('running');
+		aiState.set('running');
 
 		let sender:PromptSenderType = {
 			prompt: content,

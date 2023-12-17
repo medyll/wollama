@@ -4,8 +4,7 @@
 	import MessageList from '$lib/components/chat/MessageList.svelte';
 	import Model from '$lib/components/chat/Model.svelte';
 	import { chatUtils } from '$lib/tools/chatUtils';
-	import { activeChatId,  type ChatDataType } from '$lib/stores/chatter';
-	import { aiResponseState, chatEditListener } from '$lib/stores/chatEditListener';
+	import type {  ChatDataType } from '$lib/stores/chatter';
 	import Icon from '@iconify/svelte';
 	import Input from './chat/Input.svelte';
 	import Attachment from './chat/Attachment.svelte';
@@ -16,7 +15,8 @@
 	import { PromptSender, type SenderCallback } from '$lib/tools/promptSender';
 	import { dbQuery } from '$lib/db/dbQuery.js';
 	import { prompter } from '$lib/stores/prompter';
-	import { activeModels } from '$lib/stores';
+	import { activeModels,  aiState } from '$lib/stores';
+	import Message from '$lib/components/chat/Message.svelte'; 
 
 	type CallbackDataType = {
 		chatId: string;
@@ -25,13 +25,13 @@
 
 	let voiceListening = false;
 
-	let prompt: string = '';
+	let prompt = $prompter.prompt
 	let streamResponseText: string = '';
 	let userFiles: any[] = [];
 
 	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
 
-	$: disableSubmit = prompt.trim() == '' || $chatEditListener.isTyping;
+	$: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
 	async function getChatSession(): Promise<ChatDataType> {
 		const chat = $ui.activeChatId &&  await dbQuery.getChat($ui.activeChatId as string)
@@ -54,23 +54,22 @@
 		});
 	}
 
-	async function sendPrompt(prompt: string,args:any) {
+	async function sendPrompt(prompt: string) {
 		const chatSession = await getChatSession();
 		const assistantData = await setChatSessionData(chatSession.chatId, prompt);
 
 		chatSession.temperature = $prompter.temperature;
 
-		const newSender = new PromptSender<CallbackDataType>(chatSession, {
+		const sender = new PromptSender<CallbackDataType>(chatSession, {
 			cb: postSendMessage,
 			cbData: { chatId: chatSession.chatId, assistantData }
 		});
 
-		newSender.sendMessage(prompt);
+		sender.sendMessage(prompt);
 		// set active chat
 		ui.setActiveChatId(chatSession.chatId);
 		// set auto-scroll to true
 		ui.setAutoScroll(chatSession.chatId, true);
-		$activeChatId = chatSession.chatId;
 		// relocation without navigation
 		window.history.replaceState(history.state, '', `/chat/${chatSession.chatId}`);
 		// reset prompt
@@ -84,7 +83,7 @@
 	}: SenderCallback<CallbackDataType>) {
 		if (data.done) {
 			streamResponseText = '';
-			$aiResponseState = 'done';
+			$aiState = 'done';
 
 			dbQuery.updateChat(chatId, { context: data.context });
 			dbQuery.insertMessageStats({ ...data, messageId: assistantData.messageId });
@@ -104,11 +103,12 @@
 
 	function keyPressHandler(e: KeyboardEvent) {
 		$prompter.isPrompting = true;
+ 		$prompter.prompt = e.target?.value;
 
-		chatEditListener.setEvent(); // deprecated
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			sendPrompt(prompt,{temperature:$prompter.temperature});
+ 			$prompter.prompt = '';
 		}
 	}
 </script>
@@ -118,8 +118,11 @@
 		<DashBoard>
 			<ChatInfo >			
 			<Model />
-			</ChatInfo>
-			<MessageList chatId={$ui.activeChatId} />
+			</ChatInfo> 
+			<MessageList chatId={$ui.activeChatId} let:message >
+				<hr class="w-16" />
+				<Message {message} />
+			</MessageList>
 		</DashBoard>
 	</div>
 	<div>
@@ -137,22 +140,16 @@
 			}}
 		/>
 		<Temperature />
-		<!-- <div class="flex">
-		<div>
-		<div class="ce div toujours centré">		
-			<Temperature />
-		</div>
-		<div><Model /></div>	</div> -->
 		<div class="inputTextarea">
 			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
 				<Attachment
 					slot="start"
 					form="prompt-form"
 					bind:userFiles
-					disabled={$chatEditListener.isTyping}
+					disabled={false}
 				/>
 				<div slot="end" class="flex-align-middle">
-					<Speech onEnd={sendPrompt} bind:prompt bind:voiceListening />
+					<Speech onEnd={sendPrompt} bind:prompt bind:voiceListening  disabled={disableSubmit}/>
 					<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
 						<Icon icon="mdi:send" style="font-size:1.6em" />
 					</button>

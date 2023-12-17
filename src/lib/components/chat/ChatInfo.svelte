@@ -17,7 +17,7 @@
 			{$activeChat?.title ?? ''}
 		</div>
 		<div class="flex-align-middle">
-		<div class="opacity-40">
+		<div class="opacity-40 flex-1">
 			{$t('ui.startondate')} {formattedDate}
 		</div>
 		<slot />

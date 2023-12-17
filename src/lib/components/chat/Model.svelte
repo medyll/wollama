@@ -32,7 +32,7 @@
 	{#each chatModelKeys as modelKey, index (index)}
 		<div class="flex gap-2">
 			<div class="flex-1">
-				<select on:change={changeHandler(index)}>
+				<select class="rounded-md" on:change={changeHandler(index)}>
 					{#each $settings?.ollamaModels ?? [] as model}
 						{@const partial = model.name.split(':')[0]}
 						<option selected={model.name === modelKey} value={model.name}

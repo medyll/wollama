@@ -1,13 +1,10 @@
 <script lang="ts">
-	import { activeChatId } from '../../stores/chatter.js';
 	import { goto } from '$app/navigation';
 	import { getTimeTitle, messageByGroupDate } from '$lib/tools/chatMenuList.js';
 	import ChatButton from '../chat/ChatButton.svelte';
-	import Icon from '@iconify/svelte';
-	import { showSettings } from '$lib/stores/settings.js';
+	import Icon from '@iconify/svelte'; 
 	import { t } from '$lib/i18n.js';
-	let search: any = '';
-	import { format } from 'date-fns';
+	let search: any = ''; 
 	import { ui } from '$lib/stores/ui.js';
 
 	const loadChat = async (id: string) => {
@@ -22,7 +19,7 @@
 		<span class="underline">{$t('ui.newChat')}</span>
 		<button
 			on:click={async () => {
-				$activeChatId = undefined;
+				ui.setActiveChatId();
 				goto('/');
 			}}
 			class="borderButton iconButton"

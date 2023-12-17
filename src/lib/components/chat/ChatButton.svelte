@@ -1,6 +1,6 @@
-<script lang="ts">
-	import { dbQuery } from '$lib/db/dbQuery';
-	import { activeChatId, } from '$lib/stores/chatter';
+<script lang="ts"> 
+	import { dbQuery } from '$lib/db/dbQuery'; 
+	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
 	import { liveQuery } from 'dexie';
 
@@ -11,7 +11,7 @@
 		if(chatId) return dbQuery.getChat(chatId) 
 	})  ;
 
-	$: active = Boolean($activeChatId == chatId);
+	$: active = Boolean($ui.activeChatId === chatId);
 
 	const confirmDelete: boolean = false;
 	let editChat: boolean = false;

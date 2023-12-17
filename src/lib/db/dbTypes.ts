@@ -1,4 +1,4 @@
-import type { MessageListType } from './messages';
+import type { MessageListType } from "$lib/stores/messages";
 
 /**
  * Represents a chat.

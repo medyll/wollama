@@ -42,6 +42,7 @@
 <div class="place-items-center">
 	<button
 		type="button"
+		{disabled}
 		on:click={() => {
 			if (!voiceListening) {
 				stopResponse();
