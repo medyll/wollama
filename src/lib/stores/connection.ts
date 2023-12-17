@@ -1,4 +1,3 @@
-import type { get } from 'http';
 import { writable } from 'svelte/store';
 
 type ConnectionStoreType = {

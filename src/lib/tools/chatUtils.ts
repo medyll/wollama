@@ -1,13 +1,14 @@
-import type { ChatDataType } from '$lib/stores/chatter';
+import type { ChatType } from '$types/db';
+import type { MessageType } from '$types/db';
 import { get } from 'svelte/store';
-import type { MessageType } from '../stores/messages';
-import { OllamaFetch, type OllamaStreamLine } from './ollamaFetch';
+import { OllamaFetch, } from './ollamaFetch';
 import { settings } from '$lib/stores/settings';
 import { dbQuery } from '$lib/db/dbQuery';
+import type { OllamaResponseType } from '$types/ollama';
 
 export async function askOllama(prompt: string, model: string) {}
 
-export async function guessChatTitle(message: string): Promise<OllamaStreamLine> {
+export async function guessChatTitle(message: string): Promise<OllamaResponseType> {
 	const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, please reply with only a few worlds:  ${message}`;
 
 	const ollama_fetch = new OllamaFetch();
@@ -46,7 +47,7 @@ export class chatUtils {
 		};
 	}
 
-	static getChatDataObject(chatData: Partial<ChatDataType> = {}): ChatDataType {
+	static getChatDataObject(chatData: Partial<ChatType> = {}): ChatType {
 		return {
 			chatId: crypto.randomUUID(),
 			title: 'New Chat',
@@ -60,7 +61,7 @@ export class chatUtils {
 		};
 	}
 
-	static getMessageStatsObject(messageData: Partial<OllamaStreamLine>): OllamaStreamLine {
+	static getMessageStatsObject(messageData: Partial<OllamaResponseType>): OllamaResponseType {
 		return {
 			messageId: crypto.randomUUID(),
 			...messageData

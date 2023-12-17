@@ -1,16 +1,17 @@
-import { aiState } from '$lib/stores';
-import type { ChatDataType } from '$lib/stores/chatter';
-import { OllamaFetch, type OllamaStreamLine } from './ollamaFetch';
+import type { ChatType } from '$types/db';
+import type { OllamaOptionsType, OllamaResponseType } from '$types/ollama';
+import { OllamaFetch, } from './ollamaFetch'; 
 
 export type PromptSenderType = {
 	prompt: string;
 	context: number[];
 	models: string[];
-	temperature: number;
+	images?: string[];
+	options: OllamaOptionsType;
 };
 
 export type SenderCallback<T> = {
-	data: OllamaStreamLine;
+	data: OllamaResponseType;
 } & T;
 
 type ArgsType<T> = {
@@ -20,44 +21,44 @@ type ArgsType<T> = {
 
 export class PromptSender<T> {
 	chatId!: string;
-	chat!: ChatDataType;
-	cb!: (args: SenderCallback<T>) => void;
-	fetcherData;
+	chat!: ChatType;
+	cb!: (args: SenderCallback<T>) => void; 
 
 	private cbData!: any;
 
-	constructor(chat: ChatDataType, args: ArgsType<T>) {
+	constructor(chat: ChatType, args: ArgsType<T>) {
 		this.chat = chat;
 		this.chatId = chat.chatId;
 
 		this.cb = args.cb;
 		this.cbData = args.cbData;
-
-		this.fetcherData = args.fetcherData ?? {};
+ 
 	}
 
-	async sendMessage(content: string) {
+	async sendMessage(prompt: string) {
 		const chat = this.chat;
 
-		aiState.set('running');
 
-		let sender:PromptSenderType = {
-			prompt: content,
+		let sender: PromptSenderType = {
+			prompt: prompt,
 			context: chat?.context ?? [],
 			models: chat.models,
-			temperature: chat.temperature
+			images: chat.images,
+			options: chat.options
 		};
 		// use args as a parameter
 		this.sendPrompt(sender, async (data) => this.cb({ ...this.cbData, data }));
 	}
 
-	async sendPrompt(sender: PromptSenderType, hook: (data: OllamaStreamLine) => void) {
+	async sendPrompt(sender: PromptSenderType, hook: (data: OllamaResponseType) => void) {
 		await Promise.all(
 			sender.models.map(async (model) => {
 				await OllamaFetch.generate(sender.prompt, hook, {
 					stream: true,
 					model,
-					context: sender.context
+					context: sender.context,
+					options: sender.options,
+					images: sender.images
 				});
 			})
 		);

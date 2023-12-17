@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import type { MessageType } from '../../stores/messages';
+	import type { MessageType } from '$types/db';
 
 	import { marked } from 'marked';
-	import { t } from '$lib/i18n';
-	import Skeleton from '../ui/Skeleton.svelte';
+	import { t } from '$lib/stores/i18n';
+	import Skeleton from '$components/ui/Skeleton.svelte';
 	import Prism from 'prismjs';
 	export let message: MessageType;
 

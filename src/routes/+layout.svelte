@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import MainChat from '$lib/components/MainChat.svelte';
-	import Settings from '$lib/components/settings/Settings.svelte';
-	import Modal from '$lib/components/ui/Modal.svelte';
-	import Navbar from '$lib/components/ui/Navbar.svelte';
-	import Sidebar from '$lib/components/ui/Sidebar.svelte'; 
+	import MainChat from '$components/chat/MainChat.svelte';
+	import Settings from '$components/settings/Settings.svelte';
+	import Modal from '$components/ui/Modal.svelte';
+	import Navbar from '$components/ui/Navbar.svelte';
+	import Sidebar from '$components/ui/Sidebar.svelte'; 
 	import { settings, showSettings } from '$lib/stores/settings';
 	import { OllamaFetch } from '$lib/tools/ollamaFetch';
 	import '../styles/app.css';

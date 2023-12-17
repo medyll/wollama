@@ -5,7 +5,10 @@
 </script>
 
 {#if !$ui.activeChatId}
+<div class="p-8">
+
 	<div class="flex place-content-center"><Icon icon="fluent-emoji-high-contrast:llama" style="font-size:10em" /></div>
+</div>
 {:else}
 	<slot />
 {/if}

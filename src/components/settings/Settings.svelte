@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Models from './mdl/Models.svelte';
+	import Models from '$components/settings/mdl/Models.svelte';
 	import Infos from './mdl/Infos.svelte';
 	import Icon from '@iconify/svelte';
-	import { t } from '$lib/i18n.js';
+	import { t } from '$lib/stores/i18n.js';
 	import General from './mdl/General.svelte';
 	import Advanced from './mdl/Advanced.svelte';
 	import Addons from './mdl/Addons.svelte';
@@ -16,7 +16,7 @@
 		addons: Addons,
 		infos: Infos
 	};
-	let activeSetting = 'general';
+	
 </script>
 
 <div class="flex-align-middle justify-between  px-5 py-4 gap-4">

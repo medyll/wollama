@@ -1,5 +1,5 @@
 <script lang="ts">
-	import InfoLine from "$lib/components/ui/InfoLine.svelte";
+	import InfoLine from "$components/ui/InfoLine.svelte";
 
 </script>
 

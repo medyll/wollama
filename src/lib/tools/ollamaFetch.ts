@@ -1,30 +1,8 @@
-import { settings } from '$lib/stores/settings';
+import { settings,   } from '$lib/stores/settings';
 import { ui } from '$lib/stores/ui';
+import type { OllamaFetchBodyType, OllamaResponseType } from '$types/ollama';
 import { get } from 'svelte/store';
 
-export type OllamaStream = {
-	done: boolean;
-	value: string;
-};
-
-export type OllamaStreamLine = {
-	messageId: string;
-	model: string;
-	create_at: string;
-	response: string;
-	done: boolean;
-	context: number[];
-	created_at: string;
-	eval_count: number;
-	eval_duration: number;
-	load_duration: number;
-	prompt_eval_count: number;
-	prompt_eval_duration: number;
-	total_duration: number;
-};
-export interface OllamaStreamLineLast {}
-
-type PromptType = { stream: boolean; model: string; context: number[], temperature: number };
 
 export class OllamaFetch {
 	private options = {
@@ -37,26 +15,27 @@ export class OllamaFetch {
 
 	static async generate(
 		prompt: string,
-		hook?: (data: OllamaStreamLine) => void,
-		options?: Partial<PromptType>
+		hook?: (data: OllamaResponseType) => void,
+		options?: Partial<OllamaFetchBodyType>
 	) {
 		get(ui).stopSystemResponse = false;
 
 		const config = get(settings);
+		const defaultOptions = {
+			prompt,
+			system: config?.system_prompt,
+			model: config?.defaultModel,
+			options: config.llamaOptions,
+			context: [],
+			// format: settings?.format,
+			...options
+		};
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/event-stream'
 			},
-			body: JSON.stringify({
-				model: options?.model ?? options?.model ?? 'llama2-uncensored',
-				stream: options?.stream,
-				system: config?.system_prompt,
-				// format: settings?.requestFormat,
-				options: config.llamaOptions,
-				context: options?.context ?? [],
-				prompt
-			})
+			body: JSON.stringify(defaultOptions)
 		});
 
 		if (options?.stream) {
@@ -89,7 +68,7 @@ export class OllamaFetch {
 			});
 	}
 
-	static async stream(query, hook?: (data: OllamaStreamLine) => void) {
+	static async stream(query, hook?: (data: OllamaResponseType) => void) {
 		const streamReader = query.body
 			.pipeThrough(new TextDecoderStream())
 			.pipeThrough(splitStream('\n'))
@@ -102,7 +81,7 @@ export class OllamaFetch {
 				break;
 			}
 			if (value) {
-				const data: OllamaStreamLine = JSON.parse(value);
+				const data: OllamaResponseType = JSON.parse(value);
 
 				if (hook) hook(data);
 			}

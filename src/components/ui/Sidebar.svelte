@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { getTimeTitle, messageByGroupDate } from '$lib/tools/chatMenuList.js';
-	import ChatButton from '../chat/ChatButton.svelte';
+	import ChatButton from '$components/chat/input/ChatButton.svelte';
 	import Icon from '@iconify/svelte'; 
-	import { t } from '$lib/i18n.js';
+	import { t } from '$lib/stores/i18n.js';
 	let search: any = ''; 
 	import { ui } from '$lib/stores/ui.js';
 

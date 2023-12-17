@@ -1,6 +1,6 @@
 import { derived, writable } from 'svelte/store';
-import translations from '../locales/translations.js';
-import { Utils } from './tools/chatMenuList.js';
+import translations from '../../locales/translations.js';
+import { Utils } from '../tools/chatMenuList.js';
 
 export const locale = writable<string>('en');
 export const locales = Object.keys(translations);

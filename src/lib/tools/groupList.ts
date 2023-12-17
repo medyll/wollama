@@ -1,4 +1,4 @@
-import type { ChatDataType } from '$lib/stores/chatter';
+import type { ChatType } from '$types/db';
 
 type Group<T = any> = {
 	code: string;
@@ -10,7 +10,7 @@ type Group<T = any> = {
 
 type GroupList<T = any> = Record<string, Group<T>>;
 
-class ChatDataGrouper<T = ChatDataType> {
+class ChatDataGrouper<T = ChatType> {
 	data: T[];
 	fieldName: keyof T;
 
@@ -130,7 +130,7 @@ class ChatDataGrouper<T = ChatDataType> {
 }
 
 // Exemple d'utilisation
-const chatData: ChatDataType[] = [
+const chatData: ChatType[] = [
 	// Insérez ici vos éléments ChatDataType
 ];
 

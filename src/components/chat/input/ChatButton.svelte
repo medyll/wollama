@@ -1,6 +1,7 @@
 <script lang="ts"> 
 	import { dbQuery } from '$lib/db/dbQuery'; 
 	import { ui } from '$lib/stores/ui';
+	import type { ChatType } from '$types/db';
 	import Icon from '@iconify/svelte';
 	import { liveQuery } from 'dexie';
 
@@ -26,7 +27,7 @@
 	}
 
 
-	function liveData(arg0: Promise<import("$lib/stores/chatter").ChatDataType | undefined>): any {
+	function liveData(arg0: Promise<ChatType | undefined>): any {
 		throw new Error('Function not implemented.');
 	}
 </script>

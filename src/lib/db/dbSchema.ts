@@ -1,14 +1,14 @@
 // db.js
 
 import Dexie, { type Table } from 'dexie';
-import type { ChatDataType } from '../stores/chatter';
-import type { MessageType } from '../stores/messages';
-import type { OllamaStreamLine } from '../tools/ollamaFetch';
+import type { ChatType } from '$types/db';
+import type { MessageType } from '$types/db';
+import type { OllamaResponseType } from '$types/ollama';
 
 export class DataBase extends Dexie {
-	chat!: Table<ChatDataType>;
+	chat!: Table<ChatType>;
 	messages!: Table<MessageType>;
-	messageStats!: Table<OllamaStreamLine>;
+	messageStats!: Table<OllamaResponseType>;
 
 	constructor() {
 		super('woolama');

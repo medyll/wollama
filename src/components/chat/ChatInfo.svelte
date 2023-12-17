@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { dbQuery } from '$lib/db/dbQuery'; 
-	import { t } from '$lib/i18n';
+	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import { format } from 'date-fns';
 	import { liveQuery } from 'dexie'; 

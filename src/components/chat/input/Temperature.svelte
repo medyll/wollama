@@ -5,7 +5,7 @@
 
 
     function setTemperature(temperature: number) {
-        $prompter.temperature = temperature;
+        $prompter.options.temperature = temperature;
     }
 </script>
 
@@ -13,7 +13,7 @@
 	<div class="p-0.5  flex justify-center gauge relative">
 		<div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
 		{#each Object.keys($settings.temperatures ?? {}) as temperature}
-        {@const active = $prompter.temperature == $settings.temperatures[temperature]}
+        {@const active = $prompter.options.temperature == $settings.temperatures[temperature]}
 			<button on:click={()=>{setTemperature($settings.temperatures[temperature])}} 
             class:active
             class="button-temp">{temperature}</button>

@@ -1,45 +1,16 @@
 import { writable } from 'svelte/store';
 import { defaultOllamaSettings, defaultOptions } from '../../configuration/configuration';
 
-export interface Settings {
-	theme?: string;
-	requestFormat?: string;
-	ollama_server?: string;
-	ollamaModels?: string[]; // by api
-	defaultModels?: string[];
-	defaultModel?: string;
-	chatModelKeys?: string[];
-	authHeader: boolean;
-	system_prompt?: string;
-	locale:string;
-	temperatures: {
-		creative: number;
-		balanced: number;
-		accurate: number;
-	};
-	sender: {
-		speechAutoSend?: boolean;
-		speechRecognition?: boolean;
-		system?: string;
-	};
-	llamaOptions?: {
-		seed?: string;
-		temperature?: number;
-		repeat_penalty?: number;
-		top_k?: number;
-		top_p?: number;
-		num_ctx?: number;
-	};
-}
+import type { SettingsType } from '$types/settings';
 
 const settingStore = () => {
 	const isBrowser = typeof window !== 'undefined';
-	const { subscribe, set, update } = writable<Partial<Settings>>({
+	const { subscribe, set, update } = writable<Partial<SettingsType>>({
 		...defaultOptions,
 		llamaOptions: defaultOllamaSettings
 	});
 
-	let currentStore = {} as Partial<Settings>;
+	let currentStore = {} as Partial<SettingsType>;
 	let dataStoreTimer: NodeJS.Timeout;
 
 	subscribe((o) => {
@@ -57,7 +28,7 @@ const settingStore = () => {
 
 	isBrowser && localStorage.settings && set(JSON.parse(localStorage.settings));
 
-	function setParameterValue(key: keyof Settings, value: any) {
+	function setParameterValue(key: keyof SettingsType, value: any) {
 		update((n) => {
 			const newSettings = { ...n, [key]: value };
 			return newSettings;

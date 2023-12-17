@@ -1,7 +1,6 @@
-import type {  ChatDataType,   } from '$lib/stores/chatter';
+import type {  ChatType,   } from '$types/db';
 import { derived } from 'svelte/store';
-import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
-import type { MessageListType, MessageType } from '$lib/stores/messages';
+import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'; 
 import { guessChatTitle } from './chatUtils';
 import { dbQuery } from '$lib/db/dbQuery';
 import { liveQuery } from 'dexie';
@@ -20,21 +19,21 @@ type GroupItem = {
 	code: string;
 	name: string;
 	order: number;
-	items: ChatDataType[];
+	items: ChatType[];
 	period: { start: Date; end: Date };
 };
 
-function sortList(list: ChatDataType[]): ChatDataType[] {
+function sortList(list: ChatType[]): ChatType[] {
 	return list.sort(
 		(a, b) => new Date(b.dateCreation).getTime() - new Date(a.dateCreation).getTime()
 	);
 }
 
 const groups: {
-	last7Days: ChatDataType[];
-	last30Days: ChatDataType[];
-	byMonth: Record<string, ChatDataType[]>;
-	byYear: Record<string, ChatDataType[]>;
+	last7Days: ChatType[];
+	last30Days: ChatType[];
+	byMonth: Record<string, ChatType[]>;
+	byYear: Record<string, ChatType[]>;
 } = {
 	last7Days: [],
 	last30Days: [],
@@ -83,7 +82,7 @@ export function getTimeTitle(inputText: string) {
 }
 
 function groupChatMessages(
-	sortedList: ChatDataType[],
+	sortedList: ChatType[],
 	args = { weekGroupSize: 3, monthGroupSize: 5 }
 ) {
 	const firstDayOfWee = 1;

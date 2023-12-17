@@ -10,7 +10,12 @@ const config = {
 			pages: 'build',
 			assets: 'build',
 			fallback: '200.html'
-		})
+		}),
+		alias: {
+			$types: './src/types',
+			$configuration: './src/configuration',
+			$components: './src/components',
+		},
 	}
 };
 

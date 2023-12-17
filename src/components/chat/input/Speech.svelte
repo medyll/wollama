@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { speechRecognitionHandler, type SpeechReturn } from '$lib/speechHandler';
+	import { speechRecognitionHandler, type SpeechReturn } from '$lib/tools/speech';
 	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
 	import toast from 'svelte-french-toast';

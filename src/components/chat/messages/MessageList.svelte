@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { liveQuery } from 'dexie';
-	import Message from '$lib/components/chat/Message.svelte'; 
-	import Bottomer from '../ui/Bottomer.svelte'; 
+	import Bottomer from '$components/ui/Bottomer.svelte'; 
 	import { dbQuery } from '$lib/db/dbQuery';
 
 	export let chatId: string | undefined;

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { t } from '$lib/i18n';
+	import { t } from '$lib/stores/i18n';
 	import Icon from '@iconify/svelte';
-	import InfoLine from '$lib/components/ui/InfoLine.svelte';
+	import InfoLine from '$components/ui/InfoLine.svelte';
 	import { settings } from '$lib/stores/settings.js';
 	import { engine } from '$lib/tools/engine';
 
@@ -9,7 +9,6 @@
 
 	function changeThemeHandler() {
 		engine.setTheme($settings.theme == 'light' ? 'dark' : 'light')
-		// $settings.theme = $settings.theme == 'light' ? 'dark' : 'light';
 	}
 
 	function settingsUrl(url: string) {

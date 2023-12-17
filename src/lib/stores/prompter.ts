@@ -1,4 +1,6 @@
+import type { OllamaOptionsType } from '$types/ollama';
 import { writable } from 'svelte/store';
+ 
 
 export type PrompterType = {
 	prompt: string;
@@ -6,6 +8,7 @@ export type PrompterType = {
 	isPrompting: boolean;
 	temperature: number;
 	voiceListening: boolean;
+	options: OllamaOptionsType;
 };
 
 function prompterStore() {
@@ -14,7 +17,8 @@ function prompterStore() {
 		temperature: 0.5,
 		voiceListening: false,
 		isPrompting: false,
-        disabledPrompt: false
+        disabledPrompt: false,
+		options: {}
 	});
 
 	let promptTimer: NodeJS.Timeout;
