@@ -79,6 +79,7 @@
 	<div class="flex-align-middle">
 		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
 		<div class="flex-1 font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
+		<div class="soft-title">{#if message?.status=='streaming'}<Icon style="font-size:1.6em" icon='mdi:reload' />{/if}</div>
 		<div class="soft-title">{message?.data?.model ?? ''}</div>
 	</div>
 
@@ -88,13 +89,15 @@
 			<img src={[image.header,image.base64].join(',')} alt="list" style="height:100px" />
 		{/each}
 	{/if}
-		{#if [undefined, ''].includes(message?.content)}
-			<Skeleton class="h-full" />
-		{:else if message?.role == 'assistant'}
-			{@html assistantCode}
+		{#if message?.role == 'assistant'}
+			{#if message.status == 'sent'}
+				<Skeleton class="h-full" />
+			{:else if ['streaming','done'].includes(message.status)}
+				{@html assistantCode}
+			{/if}	
 		{:else if message?.role == 'user'}
 			{@html message?.content}
-		{/if}
+		{/if}	 
 	</div>
 </div>
 

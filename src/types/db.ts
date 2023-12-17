@@ -27,14 +27,13 @@ export interface ChatListType {
 export type MessageType = {
 	id: string;
 	chatId: string;
-	messageId: string;
-	edit: boolean;
-	editedContent: string;
+	messageId: string; 
 	content: string;
 	role: 'user' | 'assistant';
 	context: number[];
 	images?: MessageImageType[];
-	data: OllamaResponseType /**@deprecated */;
+	status: 'done' | 'sent' | 'streaming' | 'error';
+	data: OllamaResponseType ;/**@deprecated */
 };
 
 export type MessageListType = {

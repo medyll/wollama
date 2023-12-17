@@ -43,7 +43,7 @@
 			return chat;
 	}
 
-	// add messages to chat to db
+	// add messages chat to db
 	async function setChatSessionData(chatId: string, content: string, images: MessageImageType[]=[]) {
 		// update chat parameters
 		await dbQuery.updateChat(chatId, { 
@@ -53,8 +53,8 @@
 			} }); 
 
 		const ty = await Promise.all([
-			await dbQuery.insertMessage(chatId, { role: 'user', content, chatId ,images }),
-			await dbQuery.insertMessage(chatId, {role: 'assistant', chatId})
+			await dbQuery.insertMessage(chatId, { role: 'user', status: 'done', content, chatId ,images }),
+			await dbQuery.insertMessage(chatId, {role: 'assistant', status: 'sent', chatId})
 		]).then(res=>res)
 
 		// insert assistant message
@@ -102,8 +102,8 @@
 			$aiState = 'done';
 
 			dbQuery.updateChat(chatId, { context: data.context });
+			dbQuery.updateMessage(assistantData.messageId, { status: 'done' });
 			dbQuery.insertMessageStats({ ...data, messageId: assistantData.messageId }); 
-
 			//
 			chatUtils.checkTitle(chatId);
 			// set auto-scroll to false
@@ -112,7 +112,8 @@
 			streamResponseText += data.response ?? '';
 			// fire scroll position
 			dbQuery.updateMessage(assistantData.messageId, {
-				content: streamResponseText
+				content: streamResponseText,
+				status: 'streaming'
 			});
 		}
 	}
