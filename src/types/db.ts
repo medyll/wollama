@@ -1,4 +1,4 @@
-import type { OllamaOptionsType, OllamaResponseType } from "./ollama";
+import type { OllamaOptionsType, OllamaResponseType } from './ollama';
 
 /**
  * Represents a chat.
@@ -12,9 +12,9 @@ export type ChatType = {
 	dateCreation: Date;
 	dateLastMessage: Date;
 	context: number[];
-	images: string[];  
-	temperature: number;/** @deprecated */ 
-	options: OllamaOptionsType
+	images: string[] /** @deprecated */;
+	temperature: number /** @deprecated */;
+	options: OllamaOptionsType;
 };
 
 /**
@@ -33,9 +33,17 @@ export type MessageType = {
 	content: string;
 	role: 'user' | 'assistant';
 	context: number[];
-	data: OllamaResponseType;
+	images?: MessageImageType[];
+	data: OllamaResponseType /**@deprecated */;
 };
 
 export type MessageListType = {
 	[key: string]: MessageType;
+};
+
+export type MessageImageType = {
+	name: string;
+	type: string;
+	header: string;
+	base64: string;
 };

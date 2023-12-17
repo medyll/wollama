@@ -30,6 +30,9 @@ export class OllamaFetch {
 			// format: settings?.format,
 			...options
 		};
+
+console.log({defaultOptions})
+
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			method: 'POST',
 			headers: {

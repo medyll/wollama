@@ -1,4 +1,5 @@
-import type { OllamaOptionsType } from '$types/ollama';
+import type { MessageImageType } from '$types/db';
+import type { OllamaOptionsType } from '$types/ollama'; 
 import { writable } from 'svelte/store';
  
 
@@ -6,9 +7,10 @@ export type PrompterType = {
 	prompt: string;
     disabledPrompt: boolean;
 	isPrompting: boolean;
-	temperature: number;
+	temperature: number; /** @deprecated */
 	voiceListening: boolean;
 	options: OllamaOptionsType;
+	images?: MessageImageType[]; 
 };
 
 function prompterStore() {
@@ -37,7 +39,19 @@ function prompterStore() {
 	return {
 		subscribe,
 		set,
-		update
+		update,
+		reset: () => {
+			update((n) => {
+				return {
+					...n,
+					prompt: '',
+					images: [],
+					voiceListening: false,
+					isPrompting: false,
+					disabledPrompt: false,
+				};
+			});
+		}
 	};
 }
 

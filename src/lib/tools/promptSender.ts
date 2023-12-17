@@ -1,6 +1,6 @@
 import type { ChatType } from '$types/db';
 import type { OllamaOptionsType, OllamaResponseType } from '$types/ollama';
-import { OllamaFetch, } from './ollamaFetch'; 
+import { OllamaFetch } from './ollamaFetch';
 
 export type PromptSenderType = {
 	prompt: string;
@@ -15,39 +15,32 @@ export type SenderCallback<T> = {
 } & T;
 
 type ArgsType<T> = {
-	cb: (args: SenderCallback<T>) => void;
-	cbData: T;
+	cb: (args: SenderCallback<T>) => void; /** callback */
+	cbData: T; /** data to merge with the callback data */
+	images?: string[];
 };
 
 export class PromptSender<T> {
-	chatId!: string;
 	chat!: ChatType;
-	cb!: (args: SenderCallback<T>) => void; 
-
-	private cbData!: any;
+	args: ArgsType<T>;
 
 	constructor(chat: ChatType, args: ArgsType<T>) {
 		this.chat = chat;
-		this.chatId = chat.chatId;
-
-		this.cb = args.cb;
-		this.cbData = args.cbData;
- 
+		this.args = args;
 	}
 
 	async sendMessage(prompt: string) {
 		const chat = this.chat;
 
-
 		let sender: PromptSenderType = {
 			prompt: prompt,
 			context: chat?.context ?? [],
 			models: chat.models,
-			images: chat.images,
+			images: this.args.images ?? [],
 			options: chat.options
 		};
 		// use args as a parameter
-		this.sendPrompt(sender, async (data) => this.cb({ ...this.cbData, data }));
+		this.sendPrompt(sender, async (data) => this.args.cb({ ...this.args.cbData, data }));
 	}
 
 	async sendPrompt(sender: PromptSenderType, hook: (data: OllamaResponseType) => void) {
