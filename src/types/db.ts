@@ -32,8 +32,12 @@ export type MessageType = {
 	role: 'user' | 'assistant';
 	context: number[];
 	images?: MessageImageType[];
+<<<<<<< HEAD
 	status: 'done' | 'sent' | 'streaming' | 'error';
 	data: OllamaResponseType ;/**@deprecated */
+=======
+	data: OllamaResponseType /**@deprecated */;
+>>>>>>> 08fe1431484dc4ad54b825d42d4f527f5cfe740d
 };
 
 export type MessageListType = {

@@ -43,7 +43,11 @@
 			return chat;
 	}
 
+<<<<<<< HEAD
 	// add messages chat to db
+=======
+	// add messages to chat to db
+>>>>>>> 08fe1431484dc4ad54b825d42d4f527f5cfe740d
 	async function setChatSessionData(chatId: string, content: string, images: MessageImageType[]=[]) {
 		// update chat parameters
 		await dbQuery.updateChat(chatId, { 
@@ -53,8 +57,13 @@
 			} }); 
 
 		const ty = await Promise.all([
+<<<<<<< HEAD
 			await dbQuery.insertMessage(chatId, { role: 'user', status: 'done', content, chatId ,images }),
 			await dbQuery.insertMessage(chatId, {role: 'assistant', status: 'sent', chatId})
+=======
+			await dbQuery.insertMessage(chatId, { role: 'user', content, chatId ,images }),
+			await dbQuery.insertMessage(chatId, {role: 'assistant', chatId})
+>>>>>>> 08fe1431484dc4ad54b825d42d4f527f5cfe740d
 		]).then(res=>res)
 
 		// insert assistant message
@@ -76,7 +85,11 @@
 
 		const sender = new PromptSender<CallbackDataType>(chatSession, 
 														{  
+<<<<<<< HEAD
 															images: images?.map(n=>n.header+','+n.base64),
+=======
+															images: images?.map(n=>n.base64),
+>>>>>>> 08fe1431484dc4ad54b825d42d4f527f5cfe740d
 															cb: onResponseMessage,
 															cbData: { chatId: chatSession.chatId, assistantData : sessionData.assistantData }
 														});
