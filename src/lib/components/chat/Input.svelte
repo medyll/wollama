@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { timeRetry } from "$lib/stores/timeRetry";
 
-	export let prompt: string = '';
+	export let value: string = '';
 	export let placeholder: string = '';
 	export let form: string = '';
 	export let disabled: boolean = $timeRetry.connectionStatus == 'error';
@@ -9,7 +9,7 @@
 
 <div class="relative flex-align-middle">
 	<div class="sides"><slot name="start" /></div>
-	<textarea {disabled} {form} {placeholder} bind:value={prompt} on:keypress rows="1" />
+	<textarea {disabled} {form} {placeholder} bind:value  on:keypress rows="1" />
 	<div class="sides absolute h-full right-0"><slot name="end" /></div>
 </div>
 

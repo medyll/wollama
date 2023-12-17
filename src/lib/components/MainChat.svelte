@@ -141,7 +141,10 @@
 		/>
 		<Temperature />
 		<div class="inputTextarea">
-			<Input on:keypress={keyPressHandler} bind:prompt {placeholder} form="prompt-form">
+			<Input 
+			on:keypress={keyPressHandler} 
+			bind:value={$prompter.prompt} 
+			{placeholder} form="prompt-form">
 				<Attachment
 					slot="start"
 					form="prompt-form"
@@ -149,7 +152,7 @@
 					disabled={false}
 				/>
 				<div slot="end" class="flex-align-middle">
-					<Speech onEnd={sendPrompt} bind:prompt bind:voiceListening  disabled={disableSubmit}/>
+					<Speech onEnd={sendPrompt} bind:prompt={$prompter.prompt} bind:voiceListening  disabled={disableSubmit}/>
 					<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
 						<Icon icon="mdi:send" style="font-size:1.6em" />
 					</button>
