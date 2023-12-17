@@ -6,6 +6,7 @@
 	import { t } from '$lib/stores/i18n';
 	import Skeleton from '$components/ui/Skeleton.svelte';
 	import Prism from 'prismjs';
+	import MessageList from './MessageList.svelte';
 	export let message: MessageType;
 
 	let element: HTMLElement;
@@ -67,7 +68,7 @@
 		return doc.body.innerHTML;
 	}
 
-	let assistantCode;
+	let assistantCode:string;
 	$: if (message?.role == 'assistant' && message?.content && message.content.length) {
 		assistantCode = selectCodeTags(message?.content);
 	}
@@ -82,6 +83,11 @@
 	</div>
 
 	<div class="flex-1 ml-12 relative overflow-hidden">
+	{#if message.images}
+		{#each message.images as image, imageIdx}
+			<img src={image.header+','+image.base64} alt="list" style="height:100px" />
+		{/each}
+	{/if}
 		{#if [undefined, ''].includes(message?.content)}
 			<Skeleton class="h-full" />
 		{:else if message?.role == 'assistant'}

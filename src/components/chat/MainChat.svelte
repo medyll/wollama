@@ -4,7 +4,7 @@
 	import MessageList from '$components/chat/messages/MessageList.svelte';
 	import Model from '$components/chat/input/Model.svelte';
 	import { chatUtils } from '$lib/tools/chatUtils';
-	import type {  ChatType } from '$types/db';
+	import type {  ChatType, MessageImageType } from '$types/db';
 	import Icon from '@iconify/svelte';
 	import Input from './input/Input.svelte';
 	import Attachment from './input/Attachment.svelte';
@@ -19,23 +19,24 @@
 	import Message from '$components/chat/messages/Message.svelte'; 
 	import { settings} from '$lib/stores/settings';
 	import DashBoard from '$components/DashBoard.svelte';
+	import Images from './input/Images.svelte';
 
 	type CallbackDataType = {
 		chatId: string;
 		assistantData: any;
 	};
 
+ 
 	let voiceListening = false;
 
 	let streamResponseText: string = '';
-	let userFiles: any[] = [];
 
 	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
 
 	$: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
 	async function getChatSession(): Promise<ChatType> {
-		const chat = $ui.activeChatId &&  await dbQuery.getChat($ui.activeChatId as string)
+		const chat = Boolean($ui.activeChatId) &&  await dbQuery.getChat($ui.activeChatId as string)
 			? await dbQuery.getChat($ui.activeChatId as string)
 			: await dbQuery.insertChat();
  
@@ -43,38 +44,46 @@
 	}
 
 	// add messages to chat to db
-	async function setChatSessionData(chatId: string, content: string) {
+	async function setChatSessionData(chatId: string, content: string, images: MessageImageType[]=[]) {
 		// update chat parameters
 		await dbQuery.updateChat(chatId, { 
 			models: $activeModels, 
 			options:{
 				...$prompter.options, 
-			} });
-		// insert user message
-		await dbQuery.insertMessage(chatId, { role: 'user', content, chatId });
+			} }); 
+
+		const ty = await Promise.all([
+			await dbQuery.insertMessage(chatId, { role: 'user', content, chatId ,images }),
+			await dbQuery.insertMessage(chatId, {role: 'assistant', chatId})
+		]).then(res=>res)
+
 		// insert assistant message
-		return await dbQuery.insertMessage(chatId, {
-			role: 'assistant',
-			chatId
-		});
+		return {
+			userData : ty[0],
+			assistantData : ty[1] 
+		} 
 	}
 
 	async function sendPrompt(prompter: PrompterType) {
+
+		const {prompt,options,images} = prompter; // clear reference
+
 		const chatSession = await getChatSession();
-		const assistantData = await setChatSessionData(chatSession.chatId, prompter.prompt);
+		const sessionData = await setChatSessionData(chatSession.chatId, prompt,images);
 
 		// set chat options for ollama call
-		chatSession.options = { ...$settings.llamaOptions,...prompter.options};
+		chatSession.options = { ...$settings.llamaOptions,...options};
 
 		const sender = new PromptSender<CallbackDataType>(chatSession, 
 														{  
+															images: images?.map(n=>n.base64),
 															cb: onResponseMessage,
-															cbData: { chatId: chatSession.chatId, assistantData }
+															cbData: { chatId: chatSession.chatId, assistantData : sessionData.assistantData }
 														});
 		// set ai state to running
 		aiState.set('running');
 		// send prompt to ai
-		sender.sendMessage(prompter.prompt);
+		sender.sendMessage(prompt);
 		// set active chat
 		ui.setActiveChatId(chatSession.chatId);
 		// set auto-scroll to true
@@ -108,16 +117,20 @@
 		}
 	}
 
+	function submitHandler(){
+			sendPrompt($prompter);
+			prompter.reset(); 
+	}
+
 	function keyPressHandler(e: KeyboardEvent) {
 		$prompter.isPrompting = true;
- 		$prompter.prompt = e.target?.value;
 
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
-			sendPrompt($prompter);
- 			$prompter.prompt = '';
+			submitHandler();
 		}
 	}
+ 
 </script>
 
 <div class="flex-v h-full w-full overflow-auto relative">
@@ -132,21 +145,15 @@
 			</MessageList>
 		</DashBoard>
 	</div>
-	<div>
-		{#each userFiles as file, fileIdx}
-			<img src={file.dataUri} alt="input" class="  " />
-		{/each}
-	</div>
 	<div
 		class="w-full y-b fixed margb-0 max-w-3xl bottom-0 backdrop-blur-xl theme-bg"
 	>
 		<form
 			id="prompt-form"
-			on:submit|preventDefault={() => {
-				sendPrompt($prompter);
-			}}
+			on:submit|preventDefault={submitHandler}
 		/>
 		<Temperature />
+			<Images />
 		<div class="inputTextarea">
 			<Input 
 			on:keypress={keyPressHandler} 
@@ -155,11 +162,11 @@
 				<Attachment
 					slot="start"
 					form="prompt-form"
-					bind:userFiles
+					bind:userFiles={$prompter.images}
 					disabled={false}
 				/>
 				<div slot="end" class="flex-align-middle">
-					<Speech onEnd={sendPrompt} bind:prompt={$prompter.prompt} bind:voiceListening  disabled={disableSubmit}/>
+					<Speech onEnd={submitHandler} bind:prompt={$prompter.prompt} bind:voiceListening  disabled={disableSubmit}/>
 					<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
 						<Icon icon="mdi:send" style="font-size:1.6em" />
 					</button>
