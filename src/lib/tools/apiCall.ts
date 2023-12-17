@@ -1,10 +1,10 @@
-import { settings,   } from '$lib/stores/settings';
+import { aiState } from '$lib/stores';
+import { settings } from '$lib/stores/settings';
 import { ui } from '$lib/stores/ui';
 import type { OllamaFetchBodyType, OllamaResponseType } from '$types/ollama';
 import { get } from 'svelte/store';
 
-
-export class OllamaFetch {
+export class ApiCall {
 	private options = {
 		model: 'llama2-uncensored'
 	};
@@ -18,8 +18,6 @@ export class OllamaFetch {
 		hook?: (data: OllamaResponseType) => void,
 		options?: Partial<OllamaFetchBodyType>
 	) {
-		get(ui).stopSystemResponse = false;
-
 		const config = get(settings);
 		const defaultOptions = {
 			prompt,
@@ -31,12 +29,11 @@ export class OllamaFetch {
 			...options
 		};
 
-console.log({defaultOptions})
-
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'text/event-stream'
+				'Content-Type': 'text/event-stream',
+				...getHeader()
 			},
 			body: JSON.stringify(defaultOptions)
 		});
@@ -53,10 +50,12 @@ console.log({defaultOptions})
 	}
 
 	async listModels() {
-		return fetch(`http://127.0.0.1:11434/api/tags`, {
+		const config = get(settings);
+		return fetch(`${config.ollama_server}/api/tags`, {
 			method: 'GET',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				...getHeader()
 			}
 		})
 			.then(async (res) => {
@@ -77,12 +76,10 @@ console.log({defaultOptions})
 			.pipeThrough(splitStream('\n'))
 			.getReader();
 
-		while (true ?? !get(ui).stopSystemResponse) {
+		while (true) {
 			const { value, done } = await streamReader.read();
 
-			if (done) {
-				break;
-			}
+			if (Boolean(done) || get(aiState) == 'request_stop') break;
 			if (value) {
 				const data: OllamaResponseType = JSON.parse(value);
 
@@ -105,4 +102,8 @@ function splitStream(separator: string) {
 			if (buffer) controller.enqueue(buffer);
 		}
 	});
+}
+
+function getHeader() {
+	return {};
 }

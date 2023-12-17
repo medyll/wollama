@@ -1,6 +1,6 @@
 import type { ChatType } from '$types/db';
 import type { OllamaOptionsType, OllamaResponseType } from '$types/ollama';
-import { OllamaFetch } from './ollamaFetch';
+import { ApiCall } from './apiCall';
 
 export type PromptSenderType = {
 	prompt: string;
@@ -46,7 +46,7 @@ export class PromptSender<T> {
 	async sendPrompt(sender: PromptSenderType, hook: (data: OllamaResponseType) => void) {
 		await Promise.all(
 			sender.models.map(async (model) => {
-				await OllamaFetch.generate(sender.prompt, hook, {
+				await ApiCall.generate(sender.prompt, hook, {
 					stream: true,
 					model,
 					context: sender.context,

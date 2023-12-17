@@ -79,14 +79,13 @@
 	<div class="flex-align-middle">
 		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
 		<div class="flex-1 font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
-		<div class="soft-title">{#if message?.status=='streaming'}<Icon style="font-size:1.6em" icon='mdi:reload' />{/if}</div>
+		<div class="soft-title">{#if message?.status=='streaming'}<Icon style="font-size:1.6em" icon='mdi:reload' class="spin" />{/if}</div>
 		<div class="soft-title">{message?.data?.model ?? ''}</div>
 	</div>
 
 	<div class="flex-1 ml-12 relative overflow-hidden">
 	{#if message.images}
 		{#each message.images as image, imageIdx}
-<<<<<<< HEAD
 			<img src={[image.header,image.base64].join(',')} alt="list" style="height:100px" />
 		{/each}
 	{/if}
@@ -96,15 +95,6 @@
 			{:else if ['streaming','done'].includes(message.status)}
 				{@html assistantCode}
 			{/if}	
-=======
-			<img src={image.header+','+image.base64} alt="list" style="height:100px" />
-		{/each}
-	{/if}
-		{#if [undefined, ''].includes(message?.content)}
-			<Skeleton class="h-full" />
-		{:else if message?.role == 'assistant'}
-			{@html assistantCode}
->>>>>>> 08fe1431484dc4ad54b825d42d4f527f5cfe740d
 		{:else if message?.role == 'user'}
 			{@html message?.content}
 		{/if}	 

@@ -1,6 +1,6 @@
 import { connectionChecker } from '$lib/stores/connection';
 import { settings } from '$lib/stores/settings';
-import { OllamaFetch } from './ollamaFetch';
+import { ApiCall } from './apiCall';
 
 export class engine {
 	public static setTheme(theme: string) {
@@ -13,7 +13,7 @@ export class engine {
 	}
 
 	public static async checkOllamaEndPoints(fn: () => any = () => {}) {
-		const ollama_fetch = new OllamaFetch();
+		const ollama_fetch = new ApiCall();
 
 		connectionChecker.setConnectionStatus('connecting');
 

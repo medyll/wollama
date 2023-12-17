@@ -4,6 +4,7 @@
 
 </script>
 
+{#if $prompter?.images?.length > 0}
 <div class="flex justify-center p-2">
     <div class='flex-align-middle px-2 gap-4'  >    
     {#each $prompter.images ?? [] as file, fileIdx}
@@ -14,3 +15,4 @@
     {/each}
     </div>
 </div> 
+{/if}

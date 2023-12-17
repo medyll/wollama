@@ -7,7 +7,7 @@
 	import Navbar from '$components/ui/Navbar.svelte';
 	import Sidebar from '$components/ui/Sidebar.svelte'; 
 	import { settings, showSettings } from '$lib/stores/settings';
-	import { OllamaFetch } from '$lib/tools/ollamaFetch';
+	import { ApiCall } from '$lib/tools/apiCall';
 	import '../styles/app.css';
 	import '../styles/tailwind.css';
 	import '../styles/snippets.css';
@@ -20,7 +20,7 @@
 
 	// auto-load models
 	async function modelS() {
-		const ollamaFetcher = new OllamaFetch();
+		const ollamaFetcher = new ApiCall();
 		const models = await ollamaFetcher.listModels();
 
 		settings.setParameterValue('ollamaModels', [...models]);

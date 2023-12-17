@@ -1,7 +1,7 @@
 import type { ChatType } from '$types/db';
 import type { MessageType } from '$types/db';
 import { get } from 'svelte/store';
-import { OllamaFetch, } from './ollamaFetch';
+import { ApiCall, } from './apiCall';
 import { settings } from '$lib/stores/settings';
 import { dbQuery } from '$lib/db/dbQuery';
 import type { OllamaResponseType } from '$types/ollama';
@@ -11,8 +11,8 @@ export async function askOllama(prompt: string, model: string) {}
 export async function guessChatTitle(message: string): Promise<OllamaResponseType> {
 	const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, please reply with only a few worlds:  ${message}`;
 
-	const ollama_fetch = new OllamaFetch();
-	return (await OllamaFetch.generate(prompt,()=>{}, {stream:false}));
+	const ollama_fetch = new ApiCall();
+	return (await ApiCall.generate(prompt,()=>{}, {stream:false}));
 }
 
 export class chatUtils {
