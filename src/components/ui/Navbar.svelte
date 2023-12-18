@@ -18,7 +18,7 @@
 		title={$t('ui.userProfile')}
 	>
 		<Icon icon="mdi:account-circle-outline" style="font-size:1.6em" />
-	</button>
+	</button> 
 	<button title={$t('ui.settings')} class="borderButton" on:click={() => ui.showHideSettings()}>
 		<Icon icon="mdi:cog-outline" style="font-size:1.6em" />
 	</button>

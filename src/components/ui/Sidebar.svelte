@@ -8,12 +8,13 @@
 	import { ui } from '$lib/stores/ui.js';
 
 	const loadChat = async (id: string) => {
-		ui.setActiveChatId(id)
+		ui.setActiveChatId(id);
+		ui.showHideMenu(false);
 		goto(`/chat/${id}`);
 	};
 </script>
 
-<div class="flex-v h-full w-[280px] gap-3 p-3">
+<div class="flex-v h-full w-full gap-3 p-3">
 	<div class="flex-align-middle gap-2 ">
 	    <div class="flex-1 font-semibold text-xl">wOollama !</div>
 		<span class="underline">{$t('ui.newChat')}</span>

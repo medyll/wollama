@@ -18,7 +18,7 @@ export const defaultOptions  = {
 
 export const defaultOllamaSettings = {
     seed: undefined,
-    temperature: 0.4,
+    temperature: 0.5,
     repeat_penalty: undefined,
     top_k: undefined,
     top_p: undefined,

@@ -155,8 +155,8 @@
 	}
 </script>
 
-<div class="flex-v h-full w-full overflow-auto relative">
-	<div class="flex-1 mb-32">
+<div class="flex-v h-full mx-auto relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[50rem]">
+	<div class="flex-1 mb-32 px-8">
 		<DashBoard>
 			<ChatInfo>
 				<Model />
@@ -166,7 +166,7 @@
 			</MessageList>
 		</DashBoard>
 	</div>
-	<div class="w-full y-b fixed margb-0 max-w-3xl bottom-0 backdrop-blur-xl theme-bg">
+	<div class="w-full y-b sticky margb-0  bottom-0 px-8 backdrop-blur-xl theme-bg">
 		<form id="prompt-form" on:submit|preventDefault={submitHandler} />
 		<Temperature />
 		<Images />

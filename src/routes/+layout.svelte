@@ -5,7 +5,7 @@
 	import Settings from '$components/settings/Settings.svelte';
 	import Modal from '$components/ui/Modal.svelte';
 	import Navbar from '$components/ui/Navbar.svelte';
-	import Sidebar from '$components/ui/Sidebar.svelte'; 
+	import Sidebar from '$components/ui/Sidebar.svelte';
 	import { settings, showSettings } from '$lib/stores/settings';
 	import { ApiCall } from '$lib/tools/apiCall';
 	import '../styles/app.css';
@@ -17,6 +17,7 @@
 	import { dbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
 	import { activeModels } from '$lib/stores';
+	import MenuMobile from '$components/ui/MenuMobile.svelte';
 
 	// auto-load models
 	async function modelS() {
@@ -37,15 +38,15 @@
 		dbase.init();
 	});
 
-	$: if ($page.params.id) { 
+	$: if ($page.params.id) {
 		dbQuery.getChat($page.params.id).then((chat) => {
-			if (chat) { 
+			if (chat) {
 				ui.setActiveChatId($page.params.id);
 			} else {
 				goto('/');
 			}
 		});
-	}else{
+	} else {
 		ui.setActiveChatId();
 	}
 </script>
@@ -54,18 +55,17 @@
 	<title>wOOllama !</title>
 </svelte:head>
 
-<div class="application flex w-full h-full overflow-hidden ">
-	<div class="h-full overflow-hidden z-50">
+<div class="application flex w-full h-full overflow-hidden">
+	<MenuMobile />
+	<div class="h-full flex-shrink overflow-hidden z-50 hidden w-[280px] md:block">
 		<Sidebar />
 	</div>
-	<div class="flex-1 relative overflow-auto z-0">
-		<div class="flex-v flex-1 h-full">
-			<div class="relative"><Navbar /></div>
-			<div class="flex-1 w-full relative">
-				<div class="h-full relative overflow-hidden mx-auto max-w-3xl">
-					<slot><MainChat /></slot>
-				</div>
-			</div>
+	<div class="flex-1 flex-v relative overflow-auto z-0">
+		<div class="relative"><Navbar /></div>
+		<div class="flex-1 flex h-full max-w-full relative overflow-hidden">
+			<main class="relative h-full w-full  overflow-auto transition-width">
+				<slot><MainChat /></slot>
+			</main>
 		</div>
 	</div>
 	<Modal show={$showSettings}>
