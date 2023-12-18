@@ -166,8 +166,6 @@ export const testStore = derived([ui, chatList], ([$ui, $chatList]) => {
 
 	const chatGrouper = new ChatDataGrouper($chatList ?? [], options);
 
-console.log('Groupes par jour :');
-console.log(chatGrouper.groupByDays());
 
 	return groupChatMessages(sortList(list ?? []));
 });

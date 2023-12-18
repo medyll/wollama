@@ -5,6 +5,14 @@ type UiStoreType = {
 	showMenu: boolean;
 	activeChatId?: string;
 	searchString?: string;
+	pullStatus?: {
+		status : string;
+		completed: number;
+		total: number;
+		error?: string;
+		digest?: string;
+		
+	};
 	autoScroll: {
 		[chatId: string]: boolean;
 	};

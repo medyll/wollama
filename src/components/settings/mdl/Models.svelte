@@ -4,16 +4,18 @@
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$components/ui/InfoLine.svelte';
 	import { ApiCall } from '$lib/tools/apiCall';
+	import { ui } from '$lib/stores/ui'; 
+	import { pullModelState } from '$lib/stores';
 
 	let pullStatus = '';
 	let addModel = '';
-	let progress: number;
+	let progress: number = 0;
 
 	function pullModel() {
 		if (addModel.trim() == '') return;
-		console.log(addModel);
+
 		ApiCall.pullModel(addModel, (res) => {
-			console.log(res);
+			$pullModelState = res;
 			pullStatus = res?.status ?? res?.error;
 			if (res.digest) {
 				progress = res.completed - res.total;
@@ -37,16 +39,19 @@
 </InfoLine>
 <hr />
 <InfoLine vertical title={$t('settings.pull_model') + ' ' + pullStatus}>
-	<form on:submit|preventDefault={(e) => pullModel} class="flex">
-		<input
-			bind:value={addModel}
-			placeholder={$t('settings.enter_model')}
-			type="text"
-			class="w-full"
-		/>
-		<button on:click={pullModel}>
-			<Icon icon="mdi:download" />
-		</button>
+	<form on:submit|preventDefault={(e) => pullModel}>
+		<progress hidden={progress===0} class="w-full" value={progress} max="100"></progress>
+		<div class="flex">
+			<input
+				bind:value={addModel}
+				placeholder={$t('settings.enter_model')}
+				type="text"
+				class="w-full"
+			/>
+			<button on:click={pullModel}>
+				<Icon icon="mdi:download" />
+			</button>
+		</div>
 	</form>
 </InfoLine>
 <hr />
