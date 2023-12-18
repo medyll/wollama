@@ -1,4 +1,5 @@
 import type { ChatType } from '$types/db';
+import { startOfDay, endOfDay, isThisWeek, format } from 'date-fns';
 
 type Group<T = any> = {
 	code: string;
@@ -10,7 +11,7 @@ type Group<T = any> = {
 
 type GroupList<T = any> = Record<string, Group<T>>;
 
-class ChatDataGrouper<T = ChatType> {
+export class ChatDataGrouper<T = ChatType> {
 	data: T[];
 	fieldName: keyof T;
 
@@ -36,6 +37,38 @@ class ChatDataGrouper<T = ChatType> {
 		}
 	}
 
+	// groups by days for the current week only
+	groupByDays() {
+		const groups: GroupList = {};
+
+		this.data.forEach((item) => {
+			const itemDate = new Date(item[this.fieldName]); 
+
+			if (isThisWeek(itemDate)) {
+				const day = itemDate.getDate();
+
+				// if group does not exist, create it
+				if (!groups[`D${day}`]) {
+					const startDate = new Date(itemDate);
+					startDate.setHours(0, 0, 0, 0);
+					const endDate = new Date(itemDate);
+					endDate.setHours(23, 59, 59, 999);
+
+					groups[`D${day}`] = {
+						code: `D${day}`,
+						name: itemDate.toLocaleString('default', { weekday: 'long' }),
+						order: day,
+						items: [],
+						period: { start: startDate, end: endDate }
+					};
+				}
+				// store item in the dedicated group
+				groups[`D${day}`].items.push(item);
+			}
+		});
+
+		return groups;
+	}
 	// group weeks on a maximum 4 weeks period, for the current month only
 	groupByWeek() {
 		const now = new Date();
@@ -136,6 +169,9 @@ const chatData: ChatType[] = [
 
 const options = { fieldName: 'dateCreation' };
 const chatGrouper = new ChatDataGrouper(chatData, options);
+
+console.log('Groupes par jour :');
+console.log(chatGrouper.groupByDays());
 
 console.log('Groupes par semaine :');
 console.log(chatGrouper.groupByWeek());

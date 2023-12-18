@@ -1,10 +1,11 @@
-import type {  ChatType,   } from '$types/db';
+import type { ChatType } from '$types/db';
 import { derived, get } from 'svelte/store';
-import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'; 
+import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import { guessChatTitle } from './chatUtils';
 import { dbQuery } from '$lib/db/dbQuery';
 import { liveQuery } from 'dexie';
 import { ui } from '$lib/stores/ui';
+import { ChatDataGrouper } from './groupList';
 
 export class Utils {
 	static resolveDotPath(
@@ -51,8 +52,6 @@ function getStartAndEndOfWeek(date: Date, firstDayOfWeek: any = 1): { start: Dat
 	return { start, end };
 }
 
-
-
 export function getTimeTitle(inputText: string) {
 	const match = inputText.match(/(weeks|months)(\d+)/);
 
@@ -82,10 +81,7 @@ export function getTimeTitle(inputText: string) {
 	return 'Format invalide';
 }
 
-function groupChatMessages(
-	sortedList: ChatType[],
-	args = { weekGroupSize: 3, monthGroupSize: 5 }
-) {
+function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, monthGroupSize: 5 }) {
 	const firstDayOfWee = 1;
 	const now = new Date();
 	const finalGroupList: GroupItem[] = [];
@@ -160,12 +156,18 @@ function groupChatMessages(
 		};
 	}
 }
- 
 
-const chatList = liveQuery(()=>dbQuery.getChats())
+const chatList = liveQuery(() => dbQuery.getChats());
 export const testStore = derived([ui, chatList], ([$ui, $chatList]) => {
 	const regex = new RegExp($ui.searchString, 'i');
 	const list = ($chatList ?? []).filter((x) => regex.test(x?.title));
-	
+
+	const options = { fieldName: 'dateCreation' };
+
+	const chatGrouper = new ChatDataGrouper($chatList ?? [], options);
+
+console.log('Groupes par jour :');
+console.log(chatGrouper.groupByDays());
+
 	return groupChatMessages(sortList(list ?? []));
 });
