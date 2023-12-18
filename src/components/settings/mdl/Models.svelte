@@ -3,26 +3,51 @@
 	import { settings } from '$lib/stores/settings';
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$components/ui/InfoLine.svelte';
+	import { ApiCall } from '$lib/tools/apiCall';
 
-	let defaultModel = '';
+	let pullStatus = '';
+	let addModel = '';
+	let progress: number;
 
-	function registerDefaultModel() {
-		if (defaultModel.trim() == '') return;
-		settings.setParameterValue('defaultModel', defaultModel, 'string');
+	function pullModel() {
+		if (addModel.trim() == '') return;
+		console.log(addModel);
+		ApiCall.pullModel(addModel, (res) => {
+			console.log(res);
+			pullStatus = res?.status ?? res?.error;
+			if (res.digest) {
+				progress = res.completed - res.total;
+			}
+		});
 	}
 </script>
 
 <InfoLine title={$t('settings.pull_model')}>
-	<input
-		bind:value={defaultModel}
-		slot="input"
-		placeholder={$t('settings.enter_model')}
-		type="text"
-		class="w-full"
-	/>
-	<button on:click={registerDefaultModel}>
-		<Icon icon="mdi:content-save" />
-	</button>
+	<select slot="input" class="w-full" bind:value={$settings.defaultModel}>
+		<option>{$t('settings.default_model')}</option>
+		{#each $settings?.ollamaModels ?? [] as model}
+			{@const partial = model.name.split(':')[0]}
+			{@const selected = model.name === $settings.defaultModel}
+			<option {selected} value={model.name}>
+				{selected ? 'default model: ' : '-'}
+				{model.name}
+			</option>
+		{/each}
+	</select>
+</InfoLine>
+<hr />
+<InfoLine vertical title={$t('settings.pull_model') + ' ' + pullStatus}>
+	<form on:submit|preventDefault={(e) => pullModel} class="flex">
+		<input
+			bind:value={addModel}
+			placeholder={$t('settings.enter_model')}
+			type="text"
+			class="w-full"
+		/>
+		<button on:click={pullModel}>
+			<Icon icon="mdi:download" />
+		</button>
+	</form>
 </InfoLine>
 <hr />
 <InfoLine title={$t('settings.model_delete')}>

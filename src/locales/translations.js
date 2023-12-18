@@ -26,6 +26,10 @@ export default {
       theme: "theme",
       theme_light: "light",
       theme_dark: "dark",
+      pull_model: "enter a model name to pull",
+      enter_model: "enter a model name to pull",
+      model_delete: "delete model",
+      default_model: "enter default model",
       modules: {
         infos: "infos",
         addons: "addons",

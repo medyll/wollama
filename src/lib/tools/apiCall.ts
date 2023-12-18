@@ -70,6 +70,31 @@ export class ApiCall {
 			});
 	}
 
+	static async pullModel(model: string,hook:(args:any)=>void) {
+		const config = get(settings);
+			console.log('res',model)
+		const res = await fetch(`${config.ollama_server}/api/pull`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/event-stream',
+				...getHeader()
+			},
+			body: JSON.stringify({ name: model })
+		})
+			.then(async (res) => {
+				 
+				return   res 
+			})
+			.then(async (res) => {
+				return res;
+			})
+			.catch((error) => {
+				throw error;
+			});
+			console.log(res)
+		this.stream(res, hook);
+	}
+
 	static async stream(query, hook?: (data: OllamaResponseType) => void) {
 		const streamReader = query.body
 			.pipeThrough(new TextDecoderStream())
