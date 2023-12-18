@@ -2,13 +2,16 @@ import { writable } from 'svelte/store';
 
 type UiStoreType = {
 	showSettings?: boolean;
+	showMenu: boolean;
 	activeChatId?: string;
 	autoScroll: {
 		[chatId: string]: boolean;
 	};
 };
 const defaultUiStoreOptions: UiStoreType = {
-	autoScroll: {}
+	autoScroll: {},
+	showSettings: false,
+	showMenu: false
 };
 
 const uiStore = () => {
@@ -19,6 +22,9 @@ const uiStore = () => {
 	}
 	function showHideSettings() {
 		return update((state) => ({ ...state, showSettings: !state.showSettings }));
+	}
+	function showHideMenu(val?:boolean) {
+		return update((state) => ({ ...state, showMenu: val ?? !state.showMenu }));
 	}
 	function setAutoScroll(chatId: string, scroll: boolean) {
 		return update((state) => ({
@@ -37,6 +43,7 @@ const uiStore = () => {
 		setAutoScroll,
 		setActiveChatId,
 		showHideSettings,
+		showHideMenu,
 		setParameterValue: <T = UiStoreType>(key: keyof T, value: typeof key) =>
 			update((state) => ({ ...state, [key]: value }))
 	};
