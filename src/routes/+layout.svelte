@@ -54,8 +54,8 @@
 	<title>wOOllama !</title>
 </svelte:head>
 
-<div class="flex w-full h-full overflow-hidden application">
-	<div class="h-full overflow-hidden fixed z-50">
+<div class="application flex w-full h-full overflow-hidden ">
+	<div class="h-full overflow-hidden z-50">
 		<Sidebar />
 	</div>
 	<div class="flex-1 relative overflow-auto z-0">

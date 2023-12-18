@@ -13,7 +13,7 @@
 	};
 </script>
 
-<div class="flex-v h-full w-[360px] gap-3 px-8 pt-2">
+<div class="flex-v h-full w-[280px] gap-3 p-3">
 	<div class="flex-align-middle gap-2 ">
 	    <div class="flex-1 font-semibold text-xl">wOollama !</div>
 		<span class="underline">{$t('ui.newChat')}</span>
@@ -34,7 +34,7 @@
 		<div class="flex-1">
 			{#each $messageByGroupDate ?? [] as erd}
 				<div>
-					<div class="font-bold whitespace-nowrap text-ellipsis py-2">
+					<div class="font-bold whitespace-nowrap text-ellipsis py-2 soft-title">
 						{$t(getTimeTitle(erd.code))}
 					</div>
 					<div>
@@ -57,7 +57,8 @@
 	.chatZone {
 		@apply flex flex-col gap-4;
 		@apply border rounded-lg p-2 py-4;
-		@apply border-neutral-600/30;
-		@apply bg-zinc-200/30 dark:bg-slate-400/30;
+		@apply border-neutral-600/10;
+		@apply bg-zinc-200 dark:bg-slate-600/30;
+		@apply shadow shadow-gray-400/70 dark:shadow-black/80;
 	}
 </style>

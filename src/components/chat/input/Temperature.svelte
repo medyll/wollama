@@ -10,7 +10,7 @@
 </script>
 
 <div class="p-1 flex justify-center ">
-	<div class="p-0.5  flex justify-center gauge relative">
+	<div class="flex justify-center gauge relative">
 		<div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
 		{#each Object.keys($settings.temperatures ?? {}) as temperature}
         {@const active = $prompter.options.temperature == $settings.temperatures[temperature]}
@@ -23,14 +23,15 @@
 
 <style lang="postcss">
 	.gauge{
-		@apply shadow-gray-950 rounded-md dark:bg-white/10;
+		@apply p-1  shadow shadow-gray-400 dark:shadow-black/80 rounded-md dark:bg-white/5;
 	}
 	.button-temp {
 		@apply rounded-md;
 		@apply p-1 px-2;
+		@apply opacity-50;
 		&.active {
-			@apply bg-gradient-to-tl from-gray-500 to-gray-800 shadow-gray-950;
-			@apply text-white;
+			@apply opacity-100 bg-gradient-to-tl from-gray-600 to-gray-800 shadow shadow-gray-950;
+			@apply text-white; 
 		}
 	}
 </style>

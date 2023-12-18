@@ -75,15 +75,15 @@
 
 </script>
 
-<div class="flex-v w-full gap-1 mb-4 relative overflow-hidden" bind:this={element}>
-	<div class="flex-align-middle">
+<div class="flex-v w-auto gap-1 mb-4 relative overflow-hidden" bind:this={element}>
+	<div class="flex-align-middle {message?.role == 'assistant'? 'flex-row-reverse':''}">
 		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
-		<div class="flex-1 font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
+		<div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
 		<div class="soft-title">{#if message?.status=='streaming'}<Icon style="font-size:1.6em" icon='mdi:reload' class="spin" />{/if}</div>
-		<div class="soft-title">{message?.data?.model ?? ''}</div>
+		<div class="flex-1 soft-title">{message?.data?.model ?? ''}</div>
 	</div>
 
-	<div class="flex-1 ml-12 relative overflow-hidden">
+	<div class="flex-1 ml-12 relative overflow-hidden ">
 	{#if message.images}
 		{#each message.images as image, imageIdx}
 			<img src={[image.header,image.base64].join(',')} alt="list" style="height:100px" />

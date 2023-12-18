@@ -161,8 +161,7 @@
 			<ChatInfo>
 				<Model />
 			</ChatInfo>
-			<MessageList chatId={$ui.activeChatId} let:message>
-				<hr class="w-16" />
+			<MessageList chatId={$ui.activeChatId} let:message> 
 				<Message {message} />
 			</MessageList>
 		</DashBoard>
