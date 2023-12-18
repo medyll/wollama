@@ -4,6 +4,7 @@ type UiStoreType = {
 	showSettings?: boolean;
 	showMenu: boolean;
 	activeChatId?: string;
+	searchString?: string;
 	autoScroll: {
 		[chatId: string]: boolean;
 	};
@@ -11,7 +12,8 @@ type UiStoreType = {
 const defaultUiStoreOptions: UiStoreType = {
 	autoScroll: {},
 	showSettings: false,
-	showMenu: false
+	showMenu: false,
+	searchString: undefined
 };
 
 const uiStore = () => {

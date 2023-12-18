@@ -1,9 +1,10 @@
 import type {  ChatType,   } from '$types/db';
-import { derived } from 'svelte/store';
+import { derived, get } from 'svelte/store';
 import { addWeeks, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'; 
 import { guessChatTitle } from './chatUtils';
 import { dbQuery } from '$lib/db/dbQuery';
 import { liveQuery } from 'dexie';
+import { ui } from '$lib/stores/ui';
 
 export class Utils {
 	static resolveDotPath(
@@ -159,12 +160,12 @@ function groupChatMessages(
 		};
 	}
 }
-// derived from chatList
-export const messageByGroupDate = liveQuery(async ()=> {
-	const chats = await dbQuery.getChats();
-	console.log(groupChatMessages(sortList(chats)))
-	return groupChatMessages(sortList(chats));
+ 
+
+const chatList = liveQuery(()=>dbQuery.getChats())
+export const testStore = derived([ui, chatList], ([$ui, $chatList]) => {
+	const regex = new RegExp($ui.searchString, 'i');
+	const list = ($chatList ?? []).filter((x) => regex.test(x?.title));
+	
+	return groupChatMessages(sortList(list ?? []));
 });
-/* export const messageByGroupDate = derived(qy, ($qy) => {
-	return groupChatMessages(sortList($qy));
-}); */
