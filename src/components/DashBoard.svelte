@@ -4,12 +4,12 @@
 </script>
 
 {#if !$ui.activeChatId}
-	<div class="h-full w-full flex-col border">
-		<div></div>
-		<div class="flex justify-self-end">
+	<div class="h-full w-full flex flex-col"> 
+		<div class="flex-1"></div>
+		<div class="flex self-center text-center">
 			<Icon icon="fluent-emoji-high-contrast:llama" style="font-size:10em" />
 		</div>
-		<div></div>
+		<div class="flex-1"></div>
 	</div>
 {:else}
 	<slot />

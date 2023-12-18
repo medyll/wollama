@@ -83,7 +83,7 @@
 		<div class="flex-1 soft-title">{message?.data?.model ?? ''}</div>
 	</div>
 
-	<div class="flex-1 ml-12 relative overflow-hidden ">
+	<div class="flex-1 pl-12 relative overflow-hidden ">
 	{#if message.images}
 		{#each message.images as image, imageIdx}
 			<img src={[image.header,image.base64].join(',')} alt="list" style="height:100px" />

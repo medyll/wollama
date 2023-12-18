@@ -5,7 +5,7 @@
 	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte'; 
 
-	let chatModelKeys: string[] = [];
+	let chatModelKeys: string[] = [$settings.defaultModel];
 
 	const changeHandler = (index:number)=>(event: Event) => {
 		$activeModels[index] = event?.target?.value; 
@@ -18,21 +18,19 @@
 
 	function addModel(chatId: string)  {
 		 
-	}
+	} 
 
-	loadChatKeys();
-
-	$: if($ui.activeChatId) {
+	$: if($ui?.activeChatId) { 
 		loadChatKeys();
 	}
 
 </script>
 
-<div class="p-1 flex flex-wrap gap-2">
+<div class="p-1 flex-align-middle flex-wrap gap-2 sticky top-0 py-4">
 	{#each chatModelKeys as modelKey, index (index)}
 		<div class="flex gap-2">
 			<div class="flex-1">
-				<select class="naked" on:change={changeHandler(index)}>
+				<select class="naked"   on:change={changeHandler(index)}>
 					{#each $settings?.ollamaModels ?? [] as model}
 						{@const partial = model.name.split(':')[0]}
 						<option selected={model.name === modelKey} value={model.name}
@@ -44,7 +42,7 @@
 		</div>
 	{/each}
 	<div>
-		<button
+		<button class="borderButton" 
 			on:click={() => {
 				 
 			}}

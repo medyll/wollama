@@ -12,6 +12,7 @@
 		ui.showHideMenu(false);
 		goto(`/chat/${id}`);
 	};
+	
 </script>
 
 <div class="flex-v h-full w-full gap-3 p-3">

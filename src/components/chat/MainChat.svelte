@@ -1,4 +1,4 @@
-<script lang="ts"> 
+<script lang="ts">
 	import Speech from '$components/chat/input/Speech.svelte';
 	import MessageList from '$components/chat/messages/MessageList.svelte';
 	import Model from '$components/chat/input/Model.svelte';
@@ -46,7 +46,7 @@
 			options: { ...args.options }
 		});
 
-		return chat;
+		return chat as ChatType;
 	}
 
 	// add messages chat to db
@@ -62,14 +62,14 @@
 				status: 'done',
 				content,
 				chatId: chat.chatId,
-				images,				
+				images
 			}),
 			// insert assistant message
 			await dbQuery.insertMessage(chat.chatId, {
 				role: 'assistant',
 				status: 'sent',
-				chatId: chat.chatId,	
-				model: chat.models[0],			
+				chatId: chat.chatId,
+				model: chat.models[0]
 			})
 		]).then((res) => res);
 
@@ -155,18 +155,19 @@
 	}
 </script>
 
-<div class="flex-v h-full mx-auto relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[50rem]">
+<div
+	class="flex-v h-full mx-auto relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[50rem] 2xl:max-w-[120-rem]"
+>
+		<Model />
 	<div class="flex-1 mb-32 px-8">
 		<DashBoard>
-			<ChatInfo>
-				<Model />
-			</ChatInfo>
-			<MessageList chatId={$ui.activeChatId} let:message> 
+			<ChatInfo></ChatInfo>
+			<MessageList chatId={$ui.activeChatId} let:message>
 				<Message {message} />
 			</MessageList>
 		</DashBoard>
 	</div>
-	<div class="w-full y-b sticky margb-0  bottom-0 px-8 backdrop-blur-xl theme-bg">
+	<div class="w-full y-b sticky margb-0 bottom-0 px-8 backdrop-blur-xl theme-bg">
 		<form id="prompt-form" on:submit|preventDefault={submitHandler} />
 		<Temperature />
 		<Images />

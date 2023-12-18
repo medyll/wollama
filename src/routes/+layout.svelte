@@ -26,7 +26,7 @@
 
 		settings.setParameterValue('ollamaModels', [...models]);
 		if (!$settings.defaultModel) settings.setParameterValue('defaultModel', models[0].name);
-		$activeModels.push($settings.defaultModel);
+		if ($settings.defaultModel) $activeModels.push($settings.defaultModel);
 	}
 
 	engine.checkOllamaEndPoints();
