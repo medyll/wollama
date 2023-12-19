@@ -169,8 +169,8 @@
 	</div>
 	<div class="w-full y-b sticky margb-0 bottom-0 px-8 backdrop-blur-xl theme-bg">
 		<form id="prompt-form" on:submit|preventDefault={submitHandler} />
-		<Temperature />
 		<Images />
+		<Temperature />
 		<div class="inputTextarea">
 			<Input
 				on:keypress={keyPressHandler}
