@@ -8,21 +8,29 @@
 	export let disabled: boolean = $timeRetry.connectionStatus == 'error';
 	export let showCancel: boolean = false;
 
-	export let requestStop:string;
+	export let requestStop: string;
 
-	export let onsubmit = (e: Event) => requestStop='request_stop';
+	export let onsubmit = (e: Event) => (requestStop = 'request_stop');
+
+	let element: HTMLTextAreaElement;
 </script>
 
 <div class="relative flex-align-middle">
 	<div class="sides"><slot name="start" /></div>
-	<textarea {disabled} {form} {placeholder} bind:value on:keypress rows="1" />
+	<div class="w-full grow-wrap" data-replicated-value={value}>
+		<textarea
+			bind:this={element}
+			{disabled}
+			{form}
+			{placeholder}
+			bind:value
+			on:keypress
+			rows="1"
+		/>
+	</div>
 	<div class="sides absolute h-full right-0">
 		{#if showCancel}
-			<button  class="w-12"
-				on:click={onsubmit}
-				type="button"
-				{disabled}
-			>
+			<button class="w-12" on:click={onsubmit} type="button" {disabled}>
 				<Icon icon="mdi:stop" class="md" />
 			</button>
 		{:else}
@@ -37,5 +45,26 @@
 	}
 	.sides {
 		@apply flex flex-row;
+	}
+	.grow-wrap {
+		display: grid;
+	}
+	.grow-wrap::after {
+		content: attr(data-replicated-value) ' ';
+		white-space: pre-wrap;
+		visibility: hidden;
+	}
+	.grow-wrap > textarea {
+		resize: none;
+		overflow: hidden;
+	}
+	.grow-wrap > textarea,
+	.grow-wrap::after {
+		/* Identical styling required!! */
+		border: none;
+		padding: 1rem;
+		font: inherit;
+
+		grid-area: 1 / 1 / 2 / 2;
 	}
 </style>
