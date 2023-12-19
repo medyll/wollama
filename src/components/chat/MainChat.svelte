@@ -156,7 +156,7 @@
 </script>
 
 <div
-	class="flex-v h-full mx-auto relative md:max-w-3xl lg:max-w-[40rem] xl:max-w-[50rem] 2xl:max-w-[120-rem]"
+	class="flex-v h-full mx-auto relative md:max-w-3xl lg:max-w-[45rem] xl:max-w-[50rem] 2xl:max-w-[120-rem]"
 >
 		<Model />
 	<div class="flex-1 mb-32 px-8">
