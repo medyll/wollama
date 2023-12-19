@@ -16,7 +16,7 @@
 </script>
 
 <div class="flex-align-middle gap-2">
-	<div>{pullStatus}</div>
+	<div>{ pullStatus ? pullStatus : ''}</div>
 	<div><progress hidden={progress === 0} class="w-full" value={completed ?? 0} max={total ?? 0}></progress></div>
 	<div>{$t(`status.${$connectionChecker.connectionStatus}`)}</div>
 	<div>
