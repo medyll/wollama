@@ -4,7 +4,6 @@
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$components/ui/InfoLine.svelte';
 	import { ApiCall } from '$lib/tools/apiCall';
-	import { ui } from '$lib/stores/ui'; 
 	import { pullModelState } from '$lib/stores';
 
 	let pullStatus = '';
@@ -22,9 +21,15 @@
 			}
 		});
 	}
+
+	function deleteModel() {
+		if (addModel.trim() == '') return;
+
+		ApiCall.deleteModel(addModel);
+	}
 </script>
 
-<InfoLine title={$t('settings.pull_model')}>
+<InfoLine title={$t('settings.default_model')}>
 	<select slot="input" class="w-full" bind:value={$settings.defaultModel}>
 		<option>{$t('settings.default_model')}</option>
 		{#each $settings?.ollamaModels ?? [] as model}
@@ -40,7 +45,7 @@
 <hr />
 <InfoLine vertical title={$t('settings.pull_model') + ' ' + pullStatus}>
 	<form on:submit|preventDefault={(e) => pullModel}>
-		<progress hidden={progress===0} class="w-full" value={progress} max="100"></progress>
+		<progress hidden={progress === 0} class="w-full" value={progress} max="100"></progress>
 		<div class="flex">
 			<input
 				bind:value={addModel}
@@ -62,7 +67,7 @@
 			<option value={model.name}>{model.name}</option>
 		{/each}
 	</select>
-	<button>
+	<button on:click={deleteModel}>
 		<Icon icon="mdi:delete" />
 	</button>
 </InfoLine>

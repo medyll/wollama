@@ -70,6 +70,29 @@ export class ApiCall {
 			});
 	}
 
+	static async deleteModel(model: string) {
+
+		const config = get(settings);
+		return fetch(`${config.ollama_server}/api/delete`, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+				...getHeader()
+			},
+			body: JSON.stringify({ name: model })
+		})
+			.then(async (res) => {
+				if (!res.ok) throw await res.json();
+				return await res.json();
+			})
+			.then(async (res) => {
+				return res;
+			})
+			.catch((error) => {
+				throw error;
+			});
+	}
+
 	static async pullModel(model: string,hook:(args:any)=>void) {
 		const config = get(settings);
 			console.log('res',model)
