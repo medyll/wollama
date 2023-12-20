@@ -21,15 +21,16 @@
     @apply dark:bg-gray-900 dark:text-gray-100
 }
 .appButton {
-    @apply text-left px-1 py-1 rounded-md border border-gray-700;
+    @apply text-left px-1 flex items-center  rounded-md border border-gray-700;
     @apply text-gray-700 bg-gray-200;
     @apply dark:bg-gray-900/40 dark:text-gray-100
 }
 
 .borderButton {
-    @apply text-left px-1 py-1 rounded-md border ;
-    @apply text-gray-700 bg-gray-50 border-gray-300;
-    @apply dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700
+    @apply text-left px-1 py-1 rounded-md border flex items-center ;
+    @apply border-gray-700/30 dark:border-gray-300/20;
+    /* @apply text-gray-700 bg-gray-50 border-gray-300; */
+   /*  @apply dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700 */
 }
 
 .inputTextarea {

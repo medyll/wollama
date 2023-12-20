@@ -20,6 +20,12 @@ export class dbQuery {
 		return { ...newChat, ...chatData };
 	}
 
+	static async deleteChat(chatId?: number): Promise<number> {
+		if (!chatId) throw new Error('chatId is required');
+		await dbase.chat.delete(chatId);
+		return chatId;	 
+	}
+
 	static async updateChat(chatId: string, chatData: Partial<ChatType>) {
 		if (!chatId) throw new Error('chatId is required');
 
