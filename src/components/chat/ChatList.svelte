@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { getTimeTitle, chatMenuList } from '$lib/tools/chatMenuList.js';
-	import ChatButton from '$components/chat/input/ChatButton.svelte'; 
+	import ChatButton from '$components/chat/input/ChatButton.svelte';
 	import { t } from '$lib/stores/i18n.js';
 
 	import { ui } from '$lib/stores/ui.js';
+	import List from '$components/fragments/List.svelte';
 
 	const loadChat = async (id: string) => {
 		ui.setActiveChatId(id);
@@ -16,23 +17,21 @@
 <div class="text-right soft-title">{$t('ui.myChats')}</div>
 <div class="chatZone">
 	<div class="flex-1">
-		{#each $chatMenuList ?? [] as erd}
+		<List data={$chatMenuList ?? []} let:item>
 			<div>
 				<div class="font-bold whitespace-nowrap text-ellipsis py-2 soft-title">
-					{$t(getTimeTitle(erd.code))}
+					{$t(getTimeTitle(item.code))}
 				</div>
-				<div>
-					{#each erd.items as chat}
-						<ChatButton
-							chatId={chat.chatId}
-							on:click={() => {
-								loadChat(chat.chatId);
-							}}
-						/>
-					{/each}
-				</div>
+				<List data={item.items ?? []} let:item={chat}>
+					<ChatButton
+						chatId={chat.chatId}
+						on:click={() => {
+							loadChat(chat.chatId);
+						}}
+					/>
+				</List>
 			</div>
-		{/each}
+		</List>
 		{#if Object.keys($chatMenuList)?.length == 0}
 			<div class="text-center text-2xl text-neutral-500 dark:text-neutral-400">
 				{$t('ui.noChats')}

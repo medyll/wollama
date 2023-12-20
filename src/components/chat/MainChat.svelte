@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Speech from '$components/chat/input/Speech.svelte';
-	import MessageList from '$components/chat/messages/MessageList.svelte';
+	import Speech from '$components/chat/input/Speech.svelte'; 
 	import Model from '$components/chat/input/Model.svelte';
 	import { chatUtils } from '$lib/tools/chatUtils';
 	import type { ChatType, MessageImageType, MessageType } from '$types/db';
@@ -19,6 +18,8 @@
 	import { settings } from '$lib/stores/settings';
 	import DashBoard from '$components/DashBoard.svelte';
 	import Images from './input/Images.svelte';
+	import List from '$components/fragments/List.svelte';
+	import { liveQuery } from 'dexie';
 
 	type CallbackDataType = {
 		chatId: string;
@@ -33,6 +34,8 @@
 
 	$: disableSubmit =
 		$prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
+
+	$: messages = liveQuery(() => ($ui.activeChatId ? dbQuery.getMessages($ui.activeChatId) : []));
 
 	async function getChatSession(args: Partial<ChatType>): Promise<ChatType> {
 		const chat = await dbQuery.initChat($ui.activeChatId);
@@ -152,6 +155,7 @@
 	}
 </script>
 
+<form id="prompt-form" on:submit|preventDefault={submitHandler} />
 <div
 	class="flex-v h-full mx-auto relative md:max-w-3xl lg:max-w-[45rem] xl:max-w-[50rem] 2xl:max-w-[120-rem]"
 >
@@ -160,13 +164,12 @@
 			<ChatInfo>
 				<Model />
 			</ChatInfo>
-			<MessageList chatId={$ui.activeChatId} let:message>
+			<List class="flex-v w-full gap-4" data={$messages} let:item={message}>
 				<Message {message} />
-			</MessageList>
+			</List>
 		</DashBoard>
 	</div>
 	<div class="flex flex-col gap-1 w-full y-b sticky margb-0 bottom-0 px-8">
-		<form id="prompt-form" on:submit|preventDefault={submitHandler} />
 		<Temperature />
 		<div class="inputTextarea">
 			<Images />
@@ -197,6 +200,6 @@
 				</div>
 			</Input>
 		</div>
-		<div class="text-xs text-center theme-bg">{$t('ui.aiCautionMessage')}</div>
+		<div class="text-xs text-center theme-bg pb-1">{$t('ui.aiCautionMessage')}</div>
 	</div>
 </div>

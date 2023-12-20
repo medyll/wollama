@@ -4,7 +4,7 @@
 
 	import { marked } from 'marked';
 	import { t } from '$lib/stores/i18n';
-	import Skeleton from '$components/ui/Skeleton.svelte';
+	import Skeleton from '$components/fragments/Skeleton.svelte';
 	import Prism from 'prismjs';
 	export let message: MessageType;
 
@@ -87,6 +87,8 @@
 					/>{/if}
 			</div>
 			<div class="soft-title">{message?.model ?? ''}</div>
+			<div class="flex-1"></div>
+			<div class="soft-title">{message?.status !='done' ? message?.status : ''}</div>
 		</div> 
 		<div class="px-2 py-1 w-full flex-1 relative overflow-hidden">
 			{#if message.images}

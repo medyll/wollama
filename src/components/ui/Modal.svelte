@@ -7,6 +7,7 @@
 
 {#if $ui.showSettings}
 	<div
+		aria-modal="true"
 		class="modal"
 		on:click={() => {
 			ui.showHideSettings();

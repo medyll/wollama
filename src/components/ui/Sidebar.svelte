@@ -10,18 +10,18 @@
 
 	const createChat = async () => {
 		ui.setActiveChatId();
-				goto('/');
+		goto('/');
 	};
 </script>
 
 <div class="flex-v h-full w-full gap-2 p-3">
 	<div class="flex-align-middle gap-2 py-2">
-		<div class="flex-1 font-semibold text-xl">wOollama !</div>
-		<a href="/"  class="underline" on:click={createChat} >{$t('ui.newChat')}</a>
-		<button
-			on:click={createChat}
-			class="borderButton iconButton"
-		>
+		<div class="flex-align-middle flex-1 gap-2">
+			<img class="iconify" width="24" src="/assets/svg/lama.svg" /> 
+			<div class="font-semibold text-xl">wOollama !</div>
+		</div>
+		<a href="/" class="underline" on:click={createChat}>{$t('ui.newChat')}</a>
+		<button on:click={createChat} class="borderButton iconButton">
 			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
 		</button>
 	</div>

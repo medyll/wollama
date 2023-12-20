@@ -6,7 +6,7 @@
 	import Icon from '@iconify/svelte'; 
 
 
-	let defaultModelKeys: string[] = [$settings.defaultModel];
+	let defaultModelKeys: string[] = []; // $settings.defaultModel
 
 	const changeHandler = (index:number)=>(event: Event) => {
 		$activeModels[index] = event?.target?.value; 
@@ -22,6 +22,8 @@
 	} 
 
 	$: if($ui?.activeChatId) { 
+		loadChatKeys();
+	}else{
 		loadChatKeys();
 	}
 
@@ -41,7 +43,7 @@
 			</div>
 		</div>
 	{/each}
-	<div>
+	<!-- <div>
 		<button class="borderButton" 
 			on:click={() => {
 				 
@@ -49,5 +51,5 @@
 		>
 			<Icon icon="mdi:add" />
 		</button>
-	</div>
+	</div> -->
 </div>
