@@ -5,14 +5,15 @@
 	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte'; 
 
-	let chatModelKeys: string[] = [$settings.defaultModel];
+
+	let defaultModelKeys: string[] = [$settings.defaultModel];
 
 	const changeHandler = (index:number)=>(event: Event) => {
 		$activeModels[index] = event?.target?.value; 
 	}
 
 	async function loadChatKeys() {
-		chatModelKeys =  await dbQuery.getChat($ui.activeChatId)?.models 
+		defaultModelKeys =  await dbQuery.getChat($ui.activeChatId)?.models 
 		?? [$settings.defaultModel]
 	}
 
@@ -25,9 +26,8 @@
 	}
 
 </script>
-
 <div class="p-1 flex-align-middle flex-wrap gap-2 sticky top-0 py-4">
-	{#each chatModelKeys as modelKey, index (index)}
+	{#each defaultModelKeys as modelKey, index (index)}
 		<div class="flex gap-2">
 			<div class="flex-1">
 				<select class="naked"   on:change={changeHandler(index)}>

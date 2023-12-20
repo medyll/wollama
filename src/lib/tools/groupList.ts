@@ -170,7 +170,7 @@ const chatData: ChatType[] = [
 const options = { fieldName: 'dateCreation' };
 const chatGrouper = new ChatDataGrouper(chatData, options);
 
-console.log('Groupes par jour :');
+/* console.log('Groupes par jour :');
 console.log(chatGrouper.groupByDays());
 
 console.log('Groupes par semaine :');
@@ -180,4 +180,4 @@ console.log('Groupes par mois :');
 console.log(chatGrouper.groupByMonth());
 
 console.log('Groupes par année :');
-console.log(chatGrouper.groupByYear());
+console.log(chatGrouper.groupByYear()); */

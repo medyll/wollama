@@ -13,7 +13,7 @@
 	import '../styles/snippets.css';
 	import { engine } from '$lib/tools/engine';
 	import { onMount } from 'svelte';
-	import { DataBase, dbase } from '$lib/db/dbSchema';
+	import { DataBase, dbase, dbase2 } from '$lib/db/dbSchema';
 	import { dbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
 	import { activeModels } from '$lib/stores';
@@ -32,8 +32,9 @@
 	engine.checkOllamaEndPoints();
 
 	modelS();
+	$: console.log(dbase2) 
 
-	onMount(async () => {
+ 	onMount(async () => {
 		const dbase = new DataBase();
 		dbase.init();
 	});
