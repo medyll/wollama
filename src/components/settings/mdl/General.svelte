@@ -9,19 +9,11 @@
 
 	function changeThemeHandler() {
 		engine.setTheme($settings.theme == 'light' ? 'dark' : 'light')
-	}
-
-	function settingsUrl(url: string) {
-		$settings.ollama_server = url;
-	}
-
-	function settingAuth() {
-		$settings.authHeader = $settings.authHeader == true ? false : true;
 	} 
 </script>
 
 <InfoLine title={$t('settings.theme')}>
-	<button on:click={() => changeThemeHandler()}>
+	<button class="theme-border" on:click={() => changeThemeHandler()}>
 		{$settings.theme}
 		<Icon icon="mdi:theme-light-dark" />
 	</button>
@@ -30,12 +22,12 @@
 <InfoLine title={'Ollama ' + $t('settings.server_url')} vertical>
 	<form on:submit|preventDefault={(e)=>{$settings.ollama_server= ollama_server}} class="flex">
 		<input bind:value={ollama_server} class="flex-1" type="text"  />
-		<button on:click={()=> settingsUrl(ollama_server)} title={$t('settings.test_connection')}><Icon icon="mdi:upload" /> </button>
+		<button on:click={()=>  {$settings.ollama_server = ollama_server}} title={$t('settings.test_connection')}><Icon icon="mdi:upload" /> </button>
 	</form>
 </InfoLine>
 <hr />
 <InfoLine title={$t('settings.auth')}>
-	<button on:click={settingAuth}>
+	<button on:click={()=>$settings.authHeader = !$settings.authHeader}>
 		{$settings.authHeader}
 	</button>
 </InfoLine>

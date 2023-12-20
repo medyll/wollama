@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n';
-	import InfoLine from '../../ui/InfoLine.svelte';
+	import InfoLine from '$components/ui/InfoLine.svelte';
+	import { settings } from '$lib/stores/settings';
 </script>
 
 <InfoLine title={$t('settings.title_auto')}>
-	<button>on</button>
+	<button on:click={()=>{$settings.title_auto=!$settings.title_auto}}>{$settings.title_auto}</button>
 </InfoLine>
 <InfoLine title={$t('settings.voice_auto_stop')}>
-	<button>on</button>
+		<button on:click={()=>{$settings.voice_auto_stop=!$settings.voice_auto_stop}}>{$settings.voice_auto_stop}</button>
+
 </InfoLine>
-<InfoLine title={$t('ui.avatar')} vertical>
-	<input type="text" class="w-full" placeholder={$t('settings.avatar_email')}  />
+<InfoLine title={$t('settings.avatar')} vertical>
+	<input type="text" class="w-full" bind:value={$settings.avatar_email} placeholder={$t('settings.avatar_email')}  />
 </InfoLine>

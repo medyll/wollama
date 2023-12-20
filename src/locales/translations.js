@@ -13,15 +13,15 @@ export default {
 			thisWeek: 'this week',
 			lastWeek: 'last week',
 			retryInSeconds: 'retry in {{seconds}} seconds',
-      noChats: 'no chats',
-      startondate: 'date'
+			noChats: 'no chats',
+			startondate: 'date'
 		},
 		settings: {
 			auth: 'authentication',
 			avatar: 'avatar',
 			avatar_email: 'email from gravatar',
 			voice_auto_stop: 'auto stop voice',
-			title_auto_stop: 'auto title generation',
+			title_auto: 'auto title generation',
 			test_connection: 'test connection',
 			system_prompt: 'system prompt',
 			server_url: 'Ollama server url',
@@ -32,6 +32,7 @@ export default {
 			enter_model: 'enter a model name to pull',
 			model_delete: 'delete model',
 			default_model: 'enter default model',
+			request_mode: 'plain',
 			modules: {
 				infos: 'infos',
 				addons: 'addons',
