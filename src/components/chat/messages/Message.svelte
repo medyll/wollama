@@ -6,12 +6,10 @@
 	import { t } from '$lib/stores/i18n';
 	import Skeleton from '$components/ui/Skeleton.svelte';
 	import Prism from 'prismjs';
-	import MessageList from './MessageList.svelte';
 	export let message: MessageType;
 
-	let element: HTMLElement;
-
 	$: icon = message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one';
+	$: place = message.role === 'user' ? 'mr-24' : 'ml-24';
 
 	marked.use({
 		async: false,
@@ -27,7 +25,7 @@
 	}
 
 	function copyPaste() {
-		navigator.clipboard.writeText("redddd").then(
+		navigator.clipboard.writeText('redddd').then(
 			(success) => console.log('text copied'),
 			(err) => console.log('error copying text')
 		);
@@ -62,43 +60,52 @@
 			wrap(codeElement, pre);
 			toolbar.innerHTML = `<div class="flex-1">${lang}</div><div><button copyPaste >copy code</button></div>`;
 			Prism.highlightElement(codeElement);
-			codeElement.dataset.lang = lang;			
+			codeElement.dataset.lang = lang;
 		});
 
 		return doc.body.innerHTML;
 	}
 
-	let assistantCode:string;
+	let assistantCode: string;
 	$: if (message?.role == 'assistant' && message?.content && message.content.length) {
 		assistantCode = selectCodeTags(message?.content);
 	}
-
 </script>
 
-<div class="flex-v w-auto gap-1 mb-4 relative overflow-hidden" bind:this={element}>
-	<div class="flex-align-middle {message?.role == 'assistant'? 'flex-row-reverse':''}">
-		<div class="w-12 text-center"><Icon style="font-size:1.6em" {icon} /></div>
-		<div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
-		<div class="soft-title">{#if message?.status=='streaming'}<Icon style="font-size:1.6em" icon='mdi:reload' class="spin" />{/if}</div>
-		<div class="flex-1 soft-title">{message?.data?.model ?? ''}</div>
-	</div>
-
-	<div class="flex-1 pl-12 relative overflow-hidden ">
-	{#if message.images}
-		{#each message.images as image, imageIdx}
-			<img src={[image.header,image.base64].join(',')} alt="list" style="height:100px" />
-		{/each}
-	{/if}
-		{#if message?.role == 'assistant'}
-			{#if message.status == 'sent'}
-				<Skeleton class="h-full" />
-			{:else if ['streaming','done'].includes(message.status)}
-				{@html assistantCode}
-			{/if}	
-		{:else if message?.role == 'user'}
-			{@html message?.content}
-		{/if}	 
-	</div>
+<div class="{place}   flex  w-auto gap-1 elative overflow-hidden">
+	{#if message.role=='user'}<div class="p-1"><Icon style="font-size:1.6em" {icon} /></div>{/if}	
+	<div class="flex flex-col w-full">
+		<div
+			class="flex-align-middle p-1 gap-2 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}"
+		>
+			<div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
+			<div class="soft-title">
+				{#if message?.status == 'streaming'}<Icon
+						style="font-size:1.6em"
+						icon="mdi:reload"
+						class="spin"
+					/>{/if}
+			</div>
+			<div class="soft-title">{message?.model ?? ''}</div>
+		</div> 
+		<div class="px-2 py-1 w-full flex-1 relative overflow-hidden">
+			{#if message.images}
+				{#each message.images as image, imageIdx}
+					<img src={[image.header, image.base64].join(',')} alt="list" style="height:100px" />
+				{/each}
+			{/if}
+			{#if message?.role == 'assistant'}
+				{#if message.status == 'sent'}
+					<Skeleton class="h-full" />
+				{:else if ['streaming', 'done'].includes(message.status)}
+					{@html assistantCode}
+				{/if}
+			{:else if message?.role == 'user'}
+				{@html message?.content}
+			{/if}
+		</div>
+	</div>	
+	{#if message.role=='assistant'}<div class="p-1"><Icon style="font-size:1.6em" {icon} /></div>{/if}
 </div>
 
 <style lang="postcss">

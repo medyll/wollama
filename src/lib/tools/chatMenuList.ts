@@ -158,7 +158,7 @@ function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, mo
 }
 
 const chatList = liveQuery(() => dbQuery.getChats());
-export const testStore = derived([ui, chatList], ([$ui, $chatList]) => {
+export const chatMenuList = derived([ui, chatList], ([$ui, $chatList]) => {
 	const regex = new RegExp($ui.searchString, 'i');
 	const list = ($chatList ?? []).filter((x) => regex.test(x?.title));
 

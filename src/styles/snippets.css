@@ -35,6 +35,7 @@
 
 .inputTextarea {
      @apply border overflow-hidden rounded-md  ;
+     @apply dark:bg-white;
      @apply  text-gray-700  dark:text-gray-700;
      @apply shadow shadow-gray-500/60 dark:shadow-black;
 }

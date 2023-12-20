@@ -6,7 +6,7 @@
 	import Icon from '@iconify/svelte';
 	import { liveQuery } from 'dexie';
 
-	export let chatId: number;
+	export let chatId: string;
 
 	$: chat = liveQuery(() => {
 		if (chatId) return dbQuery.getChat(chatId);

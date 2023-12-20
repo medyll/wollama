@@ -33,6 +33,7 @@ export type MessageType = {
 	images?: MessageImageType[];
 	status: 'done' | 'sent' | 'streaming' | 'error';
 	context: number[];
+	model:string;
 } & ({
 			role: 'user';
 	  } | {

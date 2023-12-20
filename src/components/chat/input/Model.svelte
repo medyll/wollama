@@ -26,7 +26,7 @@
 	}
 
 </script>
-<div class="p-1 flex-align-middle flex-wrap gap-2 sticky top-0 py-4">
+<div class="flex-align-middle flex-wrap gap-2 sticky top-0">
 	{#each defaultModelKeys as modelKey, index (index)}
 		<div class="flex gap-2">
 			<div class="flex-1">
@@ -34,7 +34,7 @@
 					{#each $settings?.ollamaModels ?? [] as model}
 						{@const partial = model.name.split(':')[0]}
 						<option selected={model.name === modelKey} value={model.name}
-							>{partial} {modelKey}
+							>{model.name}
 						</option>
 					{/each}
 				</select>

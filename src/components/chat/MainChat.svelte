@@ -35,10 +35,7 @@
 		$prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
 	async function getChatSession(args: Partial<ChatType>): Promise<ChatType> {
-		const chat =
-			Boolean($ui.activeChatId) && Boolean(await dbQuery.getChat($ui.activeChatId as string))
-				? await dbQuery.getChat($ui.activeChatId as string)
-				: await dbQuery.insertChat();
+		const chat = await dbQuery.initChat($ui.activeChatId);
 
 		// update chat parameters
 		await dbQuery.updateChat(chat.chatId, {
@@ -158,20 +155,21 @@
 <div
 	class="flex-v h-full mx-auto relative md:max-w-3xl lg:max-w-[45rem] xl:max-w-[50rem] 2xl:max-w-[120-rem]"
 >
-		<Model />
 	<div class="flex-1 mb-32 px-8">
 		<DashBoard>
-			<ChatInfo></ChatInfo>
+			<ChatInfo>
+				<Model />
+			</ChatInfo>
 			<MessageList chatId={$ui.activeChatId} let:message>
 				<Message {message} />
 			</MessageList>
 		</DashBoard>
 	</div>
-	<div class="w-full y-b sticky margb-0 bottom-0 px-8 backdrop-blur-xl theme-bg">
+	<div class="flex flex-col gap-1 w-full y-b sticky margb-0 bottom-0 px-8">
 		<form id="prompt-form" on:submit|preventDefault={submitHandler} />
-		<Images />
 		<Temperature />
 		<div class="inputTextarea">
+			<Images />
 			<Input
 				on:keypress={keyPressHandler}
 				bind:value={$prompter.prompt}
@@ -199,6 +197,6 @@
 				</div>
 			</Input>
 		</div>
-		<div class="text-xs text-center py-2">{$t('ui.aiCautionMessage')}</div>
+		<div class="text-xs text-center theme-bg">{$t('ui.aiCautionMessage')}</div>
 	</div>
 </div>

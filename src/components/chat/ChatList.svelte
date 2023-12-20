@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { getTimeTitle, testStore } from '$lib/tools/chatMenuList.js';
+	import { getTimeTitle, chatMenuList } from '$lib/tools/chatMenuList.js';
 	import ChatButton from '$components/chat/input/ChatButton.svelte'; 
 	import { t } from '$lib/stores/i18n.js';
 
@@ -16,7 +16,7 @@
 <div class="text-right soft-title">{$t('ui.myChats')}</div>
 <div class="chatZone">
 	<div class="flex-1">
-		{#each $testStore ?? [] as erd}
+		{#each $chatMenuList ?? [] as erd}
 			<div>
 				<div class="font-bold whitespace-nowrap text-ellipsis py-2 soft-title">
 					{$t(getTimeTitle(erd.code))}
@@ -33,7 +33,7 @@
 				</div>
 			</div>
 		{/each}
-		{#if Object.keys($testStore)?.length == 0}
+		{#if Object.keys($chatMenuList)?.length == 0}
 			<div class="text-center text-2xl text-neutral-500 dark:text-neutral-400">
 				{$t('ui.noChats')}
 			</div>

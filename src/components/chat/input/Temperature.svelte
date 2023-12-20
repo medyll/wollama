@@ -9,7 +9,7 @@
     }
 </script>
 
-<div class="p-1 flex justify-center ">
+<div class="p-1 flex justify-center theme-bg">
 	<div class="flex justify-center gauge relative">
 		<div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
 		{#each Object.keys($settings.temperatures ?? {}) as temperature}

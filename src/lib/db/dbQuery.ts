@@ -33,7 +33,7 @@ export class dbQuery {
 	}
 
 	static async initChat(activeChatId?: string): Promise<ChatType> {
-		return activeChatId
+		return (activeChatId && Boolean(await dbQuery.getChat(activeChatId as string)))
 			? await dbQuery.getChat(activeChatId as string)
 			: await dbQuery.insertChat();
 	}

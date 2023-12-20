@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { getTimeTitle, testStore } from '$lib/tools/chatMenuList.js';
+	import { getTimeTitle, chatMenuList } from '$lib/tools/chatMenuList.js';
 	import ChatButton from '$components/chat/input/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
 	import { t } from '$lib/stores/i18n.js';
@@ -8,22 +8,18 @@
 	import { ui } from '$lib/stores/ui.js';
 	import ChatList from '$components/chat/ChatList.svelte';
 
-	const loadChat = async (id: string) => {
-		ui.setActiveChatId(id);
-		ui.showHideMenu(false);
-		goto(`/chat/${id}`);
+	const createChat = async () => {
+		ui.setActiveChatId();
+				goto('/');
 	};
 </script>
 
 <div class="flex-v h-full w-full gap-2 p-3">
-	<div class="flex-align-middle gap-2">
+	<div class="flex-align-middle gap-2 py-2">
 		<div class="flex-1 font-semibold text-xl">wOollama !</div>
-		<span class="underline">{$t('ui.newChat')}</span>
+		<a href="/"  class="underline" on:click={createChat} >{$t('ui.newChat')}</a>
 		<button
-			on:click={async () => {
-				ui.setActiveChatId();
-				goto('/');
-			}}
+			on:click={createChat}
 			class="borderButton iconButton"
 		>
 			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />

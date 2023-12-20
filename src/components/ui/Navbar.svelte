@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { t } from '$lib/stores/i18n';
 	import Icon from '@iconify/svelte';
-	import StatusBar from './StatusBar.svelte';
+	import StatusBar from '../settings/StatusBar.svelte';
 	import { ui } from '$lib/stores/ui';
 
 	new Date().getSeconds();
