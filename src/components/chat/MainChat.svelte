@@ -20,6 +20,7 @@
 	import Images from './input/Images.svelte';
 	import List from '$components/fragments/List.svelte';
 	import { liveQuery } from 'dexie';
+	import Bottomer from '$components/ui/Bottomer.svelte';
 
 	type CallbackDataType = {
 		chatId: string;
@@ -167,6 +168,7 @@
 			<List class="flex-v w-full gap-4" data={$messages} let:item={message}>
 				<Message {message} />
 			</List>
+			<Bottomer />
 		</DashBoard>
 	</div>
 	<div class="flex flex-col gap-1 w-full y-b sticky margb-0 bottom-0 px-8">

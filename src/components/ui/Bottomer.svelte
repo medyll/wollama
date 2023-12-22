@@ -10,10 +10,6 @@
 		scrollDown();
 	});
 
-	onMount(() => {
-		scrollDown();
-	});
-
 	function scrollDown() {
 		if (element)
 			setTimeout(() => {
