@@ -2,7 +2,7 @@
 	import { t } from '$lib/stores/i18n';
 	import { settings } from '$lib/stores/settings';
 	import Icon from '@iconify/svelte';
-	import InfoLine from '$components/ui/InfoLine.svelte';
+	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { ApiCall } from '$lib/tools/apiCall';
 	import { pullModelState } from '$lib/stores';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n';
 	import Icon from '@iconify/svelte';
-	import InfoLine from '$components/ui/InfoLine.svelte';
+	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { settings } from '$lib/stores/settings.js';
 	import { engine } from '$lib/tools/engine';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n';
-	import InfoLine from '$components/ui/InfoLine.svelte';
+	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { settings } from '$lib/stores/settings';
 </script>
 

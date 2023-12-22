@@ -6,7 +6,7 @@
 	import General from './mdl/General.svelte';
 	import Advanced from './mdl/Advanced.svelte';
 	import Addons from './mdl/Addons.svelte';
-	import Cartouche from '../ui/Cartouche.svelte';
+	import Cartouche from '../fragments/Cartouche.svelte';
 	import { ui } from '$lib/stores/ui';
 
 	let settingList = {

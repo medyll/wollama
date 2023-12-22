@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n';
 	import { settings } from '$lib/stores/settings';
-	import InfoLine from '$components/ui/InfoLine.svelte';
+	import InfoLine from '$components/fragments/InfoLine.svelte';
 
 	function setRequestMode() {
 		$settings.request_mode = $settings.request_mode =='json' ? 'plain' : 'json';
