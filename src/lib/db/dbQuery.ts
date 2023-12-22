@@ -6,7 +6,7 @@ import { dbase } from './dbSchema';
 export class dbQuery {
 	
 	static async getChat(chatId: string) {
-		if (!chatId) throw new Error('chatId is required');
+		if (!chatId) return undefined;// throw new Error('chatId is required');
 		return await dbase.chat.where('chatId').equals(chatId).first();
 	}
 

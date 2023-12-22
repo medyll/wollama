@@ -18,6 +18,7 @@
 	import { ui } from '$lib/stores/ui';
 	import { activeModels } from '$lib/stores';
 	import MenuMobile from '$components/ui/MenuMobile.svelte';
+	import { browser } from '$app/environment';
 
 	// auto-load models
 	async function modelS() {
@@ -31,15 +32,13 @@
 
 	engine.checkOllamaEndPoints();
 
-	modelS();
-	$: console.log(dbase2) 
-
- 	onMount(async () => {
+	onMount(async () => {
+		modelS();
 		const dbase = new DataBase();
 		dbase.init();
 	});
 
-	$: if ($page.params.id) {
+	$: if (browser && $page.params.id) {
 		dbQuery.getChat($page.params.id).then((chat) => {
 			if (chat) {
 				ui.setActiveChatId($page.params.id);
@@ -64,7 +63,7 @@
 	<div class="flex-1 flex-v relative overflow-auto z-0">
 		<div class="relative"><Navbar /></div>
 		<div class="flex-1 flex h-full max-w-full relative overflow-hidden">
-			<main class="relative h-full w-full  overflow-auto transition-width">
+			<main class="relative h-full w-full overflow-auto transition-width">
 				<slot><MainChat /></slot>
 			</main>
 		</div>

@@ -14,7 +14,7 @@
 	import { dbQuery } from '$lib/db/dbQuery.js';
 	import { prompter, type PrompterType } from '$lib/stores/prompter';
 	import { activeModels, aiState } from '$lib/stores';
-	import Message from '$components/chat/messages/Message.svelte';
+	import Message from '$components/chat/Message.svelte';
 	import { settings } from '$lib/stores/settings';
 	import DashBoard from '$components/DashBoard.svelte';
 	import Images from './input/Images.svelte';

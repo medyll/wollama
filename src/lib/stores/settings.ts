@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import { defaultOllamaSettings, defaultOptions } from '../../configuration/configuration';
 
@@ -23,8 +24,10 @@ const settingStore = () => {
 	function storeData() {
 		clearTimeout(dataStoreTimer);
 		dataStoreTimer = setTimeout(() => {
-			 localStorage.settings = JSON.stringify(currentStore);
-			 localStorage.theme = currentStore.theme;
+			if (browser) {
+				localStorage.settings = JSON.stringify(currentStore);
+				localStorage.theme = currentStore.theme;
+			}
 		}, 500);
 	}
 

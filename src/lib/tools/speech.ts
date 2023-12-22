@@ -1,3 +1,5 @@
+import { browser } from '$app/environment';
+
 export interface RecognitionHandler {
 	fn: (args: SpeechReturn) => SpeechReturn;
 }
@@ -26,7 +28,7 @@ const defaultOptions = {
 	stopOnWord: 'Stop.'
 };
 
-const speechRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+const speechRecognition = (browser)? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : ()=>{};
 
 export const speechRecognitionTracker = {
 	isListening: false
