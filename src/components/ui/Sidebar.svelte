@@ -6,7 +6,7 @@
 	import { t } from '$lib/stores/i18n.js';
 
 	import { ui } from '$lib/stores/ui.js';
-	import ChatList from '$components/chat/ChatList.svelte';
+	import ChatList from '$components/ui/ChatMenu.svelte';
 
 	const createChat = async () => {
 		ui.setActiveChatId();

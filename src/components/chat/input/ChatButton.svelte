@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Confirm from '$components/ui/Confirm.svelte';
+	import Confirm from '$components/fragments/Confirm.svelte';
 	import { dbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
 	import type { ChatType } from '$types/db';
