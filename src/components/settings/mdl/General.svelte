@@ -3,49 +3,51 @@
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { settings } from '$lib/stores/settings.js';
-	import { engine } from '$lib/tools/engine';
 	import translations from '../../../locales/translations';
+	import Selector from '$components/fragments/Selector.svelte';
+	import { engine } from '$lib/tools/engine'; 
 
 	let ollama_server = $settings.ollama_server;
 
 	function changeThemeHandler() {
-		engine.applyTheme($settings.theme == 'light' ? 'dark' : 'light');
+		// engine.applyTheme()
+		settings.setSetting('theme', $settings.theme == 'light' ? 'dark' : 'light');
 	}
+
+	settings.subscribe((o) => {
+		if($settings.theme != o.theme) engine.applyTheme(o.theme)
+	});
 </script>
 
 <InfoLine title={$t('settings.theme')}>
-	<button class="borderButton  flex-align-middle gap-2" on:click={() => changeThemeHandler()}>
-		{$settings.theme}
-		<Icon icon="mdi:theme-light-dark" />
-	</button>
+	<div class="flex-align-middle gap-4">
+		<Selector values={['light','dark']} value={$settings.theme} let:item let:active>
+			<button on:click={() => settings.setSetting('theme', item)}>
+			<Icon icon="mdi:theme" />
+			{item}</button>
+		</Selector>
+	</div>
 </InfoLine>
 <hr />
 <InfoLine title={$t('settings.lang')}>
-	<div class="flex-align-middle gap-2">
-		{#each Object.keys(translations) as lang}
-			<button
-				class="borderButton aspect-square"
-				on:click={() => {
-					$settings.locale = lang;
-				}}
-			>
-				{lang}
-			</button>
-		{/each}
+	<div class="flex-align-middle gap-4">
+		<Selector values={Object.keys(translations)} value={$settings.locale} let:item let:active>
+			<button on:click={() => settings.setSetting('locale', item)}>{item}</button>
+		</Selector>
 	</div>
 </InfoLine>
 <hr />
 <InfoLine title={'Ollama ' + $t('settings.server_url')} vertical>
 	<form
 		on:submit|preventDefault={(e) => {
-			$settings.ollama_server = ollama_server;
+			settings.setSetting('ollama_server', ollama_server);
 		}}
 		class="flex"
 	>
 		<input bind:value={ollama_server} class="flex-1" type="text" />
 		<button
 			on:click={() => {
-				$settings.ollama_server = ollama_server;
+				settings.setSetting('ollama_server', ollama_server);
 			}}
 			title={$t('settings.test_connection')}
 			><Icon icon="mdi:upload" />
@@ -54,11 +56,11 @@
 </InfoLine>
 <hr />
 <InfoLine title={$t('settings.auth')}>
-	<button on:click={() => ($settings.authHeader = !$settings.authHeader)}>
+	<button on:click={() => settings.setSetting('authHeader', !$settings.authHeader)}>
 		{$settings.authHeader}
 	</button>
 </InfoLine>
 <hr />
 <InfoLine title={$t('settings.system_prompt')} vertical>
-	<textarea cols="4" class="w-full">{$settings.system_prompt}</textarea>
+	<textarea cols="4" class="w-full h-24">{$settings.system_prompt}</textarea>
 </InfoLine>

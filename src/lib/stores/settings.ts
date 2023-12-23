@@ -3,14 +3,12 @@ import { writable } from 'svelte/store';
 import { defaultOllamaSettings, defaultOptions } from '../../configuration/configuration';
 
 import type { SettingsType } from '$types/settings';
-import { liveQuery } from 'dexie';
-import { dbase } from '$lib/db/dbSchema';
 
 const settingStore = () => {
 	const isBrowser = typeof window !== 'undefined';
 	const { subscribe, set, update } = writable<SettingsType>({
 		...defaultOptions,
-		llamaOptions: defaultOllamaSettings
+		ollamaOptions: defaultOllamaSettings
 	} as SettingsType);
 
 	let currentStore = {} as SettingsType;
@@ -33,7 +31,7 @@ const settingStore = () => {
 
 	isBrowser && localStorage.settings && set(JSON.parse(localStorage.settings));
 
-	function setParameterValue(key: keyof SettingsType, value: any) {
+	function setSetting(key: keyof SettingsType, value: any) {
 		update((n) => {
 			const newSettings = { ...n, [key]: value };
 			return newSettings;
@@ -44,12 +42,10 @@ const settingStore = () => {
 		subscribe,
 		set,
 		update,
-		setParameterValue
+		setSetting
 	};
 };
 
 export const settings = settingStore();
 
 export const showSettings = writable<boolean>(false);
-
-const settingss = liveQuery(() => dbase.settings.toArray());

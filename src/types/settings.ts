@@ -1,7 +1,7 @@
 import type { OllamaOptionsType } from '$types/ollama';
 
 export interface SettingsType {
-	theme?: string;
+	theme: string;
 	request_mode?: 'plain' | 'json';
 	ollama_server?: string;
 	ollamaModels?: string[]; // by api
@@ -24,5 +24,5 @@ export interface SettingsType {
 		speechRecognition?: boolean;
 		system?: string;
 	};
-	llamaOptions: OllamaOptionsType;
+	ollamaOptions: OllamaOptionsType;
 }

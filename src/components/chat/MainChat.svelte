@@ -93,7 +93,7 @@
 		const sessionMessages = await createChatSessionMessages(chatSession, prompt, images);
 
 		// set chat options for ollama call
-		chatSession.options = { ...$settings.llamaOptions, ...options };
+		chatSession.options = { ...$settings.ollamaOptions, ...options };
 
 		const sender = new PromptSender<CallbackDataType>(chatSession, {
 			images: images?.map((n) => n.header + ',' + n.base64),

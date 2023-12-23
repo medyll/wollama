@@ -21,8 +21,6 @@ function doTranslate(locale: string = 'en', key: string, vars: Record<string, st
 	if (!locale) throw new Error(`no locale for "${key}"`);
 	if (!translations[locale] && locale !=='en') locale = 'en';
 
-console.log(translations)
-
 	let text = translations[locale][key.trim()] ?? engine.resolveDotPath(translations[locale], key);
 
 	Object.keys(vars).map((k) => {
@@ -39,9 +37,3 @@ export const t = derived(
 		(key: ResolverKeysType, vars = {}) =>
 			doTranslate($settings.locale, key, vars)
 );
-
-export const setLocale = (locale: string) => {
-	if (Object.keys(translations).includes(locale)) {
-		locale.set(locale);
-	}
-};

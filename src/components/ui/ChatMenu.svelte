@@ -1,4 +1,4 @@
-<script lang="ts"> 
+<script lang="ts">
 	import { getTimeTitle, chatMenuList } from '$lib/tools/chatMenuList.js';
 	import ChatButton from '$components/chat/input/ChatButton.svelte';
 	import { t } from '$lib/stores/i18n.js';
@@ -41,6 +41,10 @@
 </div>
 
 <style lang="postcss">
+	.chatZone {
+		max-height: 100%;
+		overflow: auto;
+	}
 	.chatZone {
 		@apply flex flex-col gap-4;
 		@apply border rounded-lg p-2 py-4;

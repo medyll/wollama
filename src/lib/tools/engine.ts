@@ -5,9 +5,8 @@ import { ApiCall } from './apiCall';
 import { goto } from '$app/navigation';
 
 export class engine {
-	
+
 	public static applyTheme(theme: string) {
-		settings.setParameterValue('theme', theme);
 		const currentTheme = theme == 'light' ? 'dark' : 'light';
 
 		if (document?.documentElement) {

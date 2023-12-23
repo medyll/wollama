@@ -23,7 +23,7 @@ export class ApiCall {
 			prompt,
 			system: config?.system_prompt,
 			model: config?.defaultModel,
-			options: config.llamaOptions,
+			options: config.ollamaOptions,
 			context: [],
 			// format: settings?.format,
 			...options

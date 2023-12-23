@@ -3,16 +3,14 @@
 	import MainChat from '$components/chat/MainChat.svelte';
 	import Settings from '$components/settings/Settings.svelte';
 	import Modal from '$components/ui/Modal.svelte';
-	import Navbar from '$components/ui/Navbar.svelte';
+	import Navbar from '$components/ui/TopBar.svelte';
 	import Sidebar from '$components/ui/Sidebar.svelte';
-	import { settings, showSettings } from '$lib/stores/settings';
-	import { ApiCall } from '$lib/tools/apiCall';
+	import { settings, showSettings } from '$lib/stores/settings'; 
 	import '../styles/app.css';
 	import '../styles/tailwind.css';
 	import '../styles/snippets.css';
 	import { engine } from '$lib/tools/engine';
-	import { onMount } from 'svelte';
-	import { DataBase } from '$lib/db/dbSchema';
+	import { onMount } from 'svelte'; 
 	import { idbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
 	import { activeModels } from '$lib/stores';
@@ -25,17 +23,15 @@
 	// load models into store
 	async function loadModels(models: Record<string, any>[]) { 
 
-		settings.setParameterValue('ollamaModels', [...models]);
-		if (!$settings.defaultModel) settings.setParameterValue('defaultModel', models[0].name);
+		settings.setSetting('ollamaModels', [...models]);
+		if (!$settings.defaultModel) settings.setSetting('defaultModel', models[0].name);
 		if ($settings.defaultModel) $activeModels.push($settings.defaultModel);
 	}
 
 	engine.checkOllamaEndPoints();
 
 	onMount(async () => {
-		loadModels(data.models);
-		const dbase = new DataBase();
-		dbase.init();
+		loadModels(data.models); 
 	});
 
 	$: if (browser && $page.params.id) {
@@ -50,7 +46,6 @@
 		ui.setActiveChatId();
 	}
 
-	$:console.log(data)
 </script>
 
 <svelte:head>

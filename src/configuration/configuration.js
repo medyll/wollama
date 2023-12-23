@@ -1,11 +1,11 @@
-
 export const defaultOllamaSettings = {
-	seed: undefined,
+	seed: 0,
 	temperature: 0.5,
-	repeat_penalty: undefined,
-	top_k: undefined,
-	top_p: undefined,
-	num_ctx: undefined
+	repeat_last_n: '',
+	repeat_penalty: '',
+	top_k: '',
+	top_p: '',
+	num_ctx: ''
 };
 
 export const defaultOptions = {
@@ -26,12 +26,5 @@ export const defaultOptions = {
 		balanced: 0.5,
 		accurate: 1
 	},
-	llamaOptions: {
-		seed: undefined,
-		temperature: 0.5,
-		repeat_penalty: undefined,
-		top_k: undefined,
-		top_p: undefined,
-		num_ctx: undefined
-	}
+	ollamaOptions: defaultOllamaSettings
 };
