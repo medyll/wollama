@@ -3,7 +3,7 @@ import type { MessageType } from '$types/db';
 import { get } from 'svelte/store';
 import { ApiCall, } from './apiCall';
 import { settings } from '$lib/stores/settings';
-import { dbQuery } from '$lib/db/dbQuery';
+import { idbQuery } from '$lib/db/dbQuery';
 import type { OllamaResponseType } from '$types/ollama';
 
 export async function askOllama(prompt: string, model: string) {}
@@ -17,8 +17,8 @@ export async function guessChatTitle(message: string): Promise<OllamaResponseTyp
 
 export class chatUtils {
 	static async checkTitle(chatId: string) {
-		const chat = await dbQuery.getChat(chatId);
-		const chatMessages = await dbQuery.getMessages(chatId);
+		const chat = await idbQuery.getChat(chatId);
+		const chatMessages = await idbQuery.getMessages(chatId);
 
 		if (!chat?.title || chat?.title === 'New Chat') {
 			if (chatMessages.length > 1) {
@@ -29,7 +29,7 @@ export class chatUtils {
 
 				const res = await guessChatTitle(resume);
 				
-				if (res?.response !== '') dbQuery.updateChat(chatId, { title: res.response });
+				if (res?.response !== '') idbQuery.updateChat(chatId, { title: res.response });
 			}
 		}
 	}

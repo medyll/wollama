@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dbQuery } from '$lib/db/dbQuery';
+	import { idbQuery } from '$lib/db/dbQuery';
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import { format } from 'date-fns';
@@ -9,7 +9,7 @@
 		? format(new Date($activeChat?.dateCreation), 'EEEE, dd MMMM')
 		: '';
 
-	$: activeChat = liveQuery(() => ($ui.activeChatId ? dbQuery.getChat($ui.activeChatId) : null));
+	$: activeChat = liveQuery(() => ($ui.activeChatId ? idbQuery.getChat($ui.activeChatId) : null));
 </script>
 
 {#if $activeChat?.dateCreation}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Confirm from '$components/fragments/Confirm.svelte';
-	import { dbQuery } from '$lib/db/dbQuery';
+	import { idbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
 	import type { ChatType } from '$types/db';
 	import Icon from '@iconify/svelte';
@@ -9,7 +9,7 @@
 	export let chatId: string;
 
 	$: chat = liveQuery(() => {
-		if (chatId) return dbQuery.getChat(chatId);
+		if (chatId) return idbQuery.getChat(chatId);
 	});
 
 	$: active = Boolean($ui.activeChatId === chatId);
@@ -18,7 +18,7 @@
 	let editChat: boolean = false;
 
 	function deleteCha1tHandler() {
-		dbQuery.deleteChat(chatId);
+		idbQuery.deleteChat(chatId);
 	}
 
 	function editChatTitleHandler() {

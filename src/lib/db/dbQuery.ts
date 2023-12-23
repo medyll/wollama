@@ -3,7 +3,7 @@ import type { OllamaResponseType } from '$types/ollama';
 import { chatUtils } from '$lib/tools/chatUtils';
 import { dbase } from './dbSchema';
 
-export class dbQuery {
+export class idbQuery {
 	
 	static async getChat(chatId: string) {
 		if (!chatId) return undefined;// throw new Error('chatId is required');
@@ -33,9 +33,9 @@ export class dbQuery {
 	}
 
 	static async initChat(activeChatId?: string): Promise<ChatType> {
-		return (activeChatId && Boolean(await dbQuery.getChat(activeChatId as string)))
-			? await dbQuery.getChat(activeChatId as string)
-			: await dbQuery.insertChat();
+		return (activeChatId && Boolean(await idbQuery.getChat(activeChatId as string)))
+			? await idbQuery.getChat(activeChatId as string)
+			: await idbQuery.insertChat();
 	}
 
 	static async insertMessage(chatId: string, messageData: Partial<MessageType>) {

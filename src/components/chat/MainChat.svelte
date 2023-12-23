@@ -11,7 +11,7 @@
 	import { ui } from '$lib/stores/ui';
 	import Temperature from './input/Temperature.svelte';
 	import { PromptSender, type SenderCallback } from '$lib/tools/promptSender';
-	import { dbQuery } from '$lib/db/dbQuery.js';
+	import { idbQuery } from '$lib/db/dbQuery.js';
 	import { prompter, type PrompterType } from '$lib/stores/prompter';
 	import { activeModels, aiState } from '$lib/stores';
 	import Message from '$components/chat/Message.svelte';
@@ -36,13 +36,13 @@
 	$: disableSubmit =
 		$prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
-	$: messages = liveQuery(() => ($ui.activeChatId ? dbQuery.getMessages($ui.activeChatId) : []));
+	$: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
 	async function getChatSession(args: Partial<ChatType>): Promise<ChatType> {
-		const chat = await dbQuery.initChat($ui.activeChatId);
+		const chat = await idbQuery.initChat($ui.activeChatId);
 
 		// update chat parameters
-		await dbQuery.updateChat(chat.chatId, {
+		await idbQuery.updateChat(chat.chatId, {
 			models: args.models,
 			options: { ...args.options }
 		});
@@ -58,7 +58,7 @@
 	) {
 		const ty = await Promise.all([
 			// insert user message
-			await dbQuery.insertMessage(chat.chatId, {
+			await idbQuery.insertMessage(chat.chatId, {
 				role: 'user',
 				status: 'done',
 				content,
@@ -66,7 +66,7 @@
 				images
 			}),
 			// insert assistant message
-			await dbQuery.insertMessage(chat.chatId, {
+			await idbQuery.insertMessage(chat.chatId, {
 				role: 'assistant',
 				status: 'sent',
 				chatId: chat.chatId,
@@ -124,9 +124,9 @@
 			streamResponseText = '';
 			aiState.set('done');
 
-			dbQuery.updateChat(chatId, { context: data.context });
-			dbQuery.updateMessage(assistantData.messageId, { status: 'done' });
-			dbQuery.insertMessageStats({ ...data, messageId: assistantData.messageId });
+			idbQuery.updateChat(chatId, { context: data.context });
+			idbQuery.updateMessage(assistantData.messageId, { status: 'done' });
+			idbQuery.insertMessageStats({ ...data, messageId: assistantData.messageId });
 			//
 			chatUtils.checkTitle(chatId);
 			// set auto-scroll to false
@@ -134,7 +134,7 @@
 		} else {
 			streamResponseText += data.response ?? '';
 			// fire scroll position
-			dbQuery.updateMessage(assistantData.messageId, {
+			idbQuery.updateMessage(assistantData.messageId, {
 				content: streamResponseText,
 				status: 'streaming'
 			});

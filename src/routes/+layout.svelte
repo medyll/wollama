@@ -14,16 +14,17 @@
 	import { engine } from '$lib/tools/engine';
 	import { onMount } from 'svelte';
 	import { DataBase, dbase, dbase2 } from '$lib/db/dbSchema';
-	import { dbQuery } from '$lib/db/dbQuery';
+	import { idbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
 	import { activeModels } from '$lib/stores';
 	import MenuMobile from '$components/ui/MenuMobile.svelte';
 	import { browser } from '$app/environment';
 
-	// auto-load models
-	async function modelS() {
-		const ollamaFetcher = new ApiCall();
-		const models = await ollamaFetcher.listModels();
+	export let data;
+
+ 
+	// load models into store
+	async function loadModels(models: Record<string, any>[]) { 
 
 		settings.setParameterValue('ollamaModels', [...models]);
 		if (!$settings.defaultModel) settings.setParameterValue('defaultModel', models[0].name);
@@ -33,13 +34,13 @@
 	engine.checkOllamaEndPoints();
 
 	onMount(async () => {
-		modelS();
+		loadModels(data.models);
 		const dbase = new DataBase();
 		dbase.init();
 	});
 
 	$: if (browser && $page.params.id) {
-		dbQuery.getChat($page.params.id).then((chat) => {
+		idbQuery.getChat($page.params.id).then((chat) => {
 			if (chat) {
 				ui.setActiveChatId($page.params.id);
 			} else {
@@ -49,6 +50,8 @@
 	} else {
 		ui.setActiveChatId();
 	}
+
+	$:console.log(data)
 </script>
 
 <svelte:head>

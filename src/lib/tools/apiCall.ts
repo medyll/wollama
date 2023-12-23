@@ -95,7 +95,7 @@ export class ApiCall {
 
 	static async pullModel(model: string,hook:(args:any)=>void) {
 		const config = get(settings);
-			console.log('res',model)
+
 		const res = await fetch(`${config.ollama_server}/api/pull`, {
 			method: 'POST',
 			headers: {
