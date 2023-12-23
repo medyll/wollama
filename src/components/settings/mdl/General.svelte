@@ -7,12 +7,7 @@
 	import Selector from '$components/fragments/Selector.svelte';
 	import { engine } from '$lib/tools/engine'; 
 
-	let ollama_server = $settings.ollama_server;
-
-	function changeThemeHandler() {
-		// engine.applyTheme()
-		settings.setSetting('theme', $settings.theme == 'light' ? 'dark' : 'light');
-	}
+	let ollama_server = $settings.ollama_server; 
 
 	settings.subscribe((o) => {
 		if($settings.theme != o.theme) engine.applyTheme(o.theme)
@@ -50,7 +45,8 @@
 				settings.setSetting('ollama_server', ollama_server);
 			}}
 			title={$t('settings.test_connection')}
-			><Icon icon="mdi:upload" />
+			class="aspect-square"
+			><Icon class="md" icon="iconoir:server-connection" />
 		</button>
 	</form>
 </InfoLine>

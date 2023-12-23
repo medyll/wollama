@@ -11,7 +11,7 @@
 	}
 </script>
 
-<InfoLine title={$t('settings.request_mode')}>
+<InfoLine title={$t('settings.request_mode')} class="flex-align-middle gap-4">
 	<Selector values={['json', 'plain']} value={$settings.request_mode} let:item>
 		<button on:click={() => settings.setSetting('request_mode', item)}>{item}</button>
 	</Selector>

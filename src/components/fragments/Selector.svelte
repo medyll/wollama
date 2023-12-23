@@ -1,8 +1,16 @@
 <script lang="ts">
 	export let values: any = [];
-	export let value:any|undefined = undefined; 
+	export let value: any | undefined = undefined;
 </script>
 
 {#each values as valueO}
-	<div><slot item={valueO} active={valueO === value} /></div>
+	<div class={valueO === value ? 'active' : ''}>
+		<slot item={valueO} active={valueO === value} />
+	</div>
 {/each}
+
+<style>
+	.active {
+		@apply border-b-2 border-neutral-500;
+	}
+</style>

@@ -1,7 +1,8 @@
 <script lang="ts">
-
+let className='';
 export let title: string | undefined= undefined;  
 export let vertical: boolean = false;
+export {className as class}
 
 </script>
 
@@ -15,7 +16,7 @@ export let vertical: boolean = false;
         <div class="flex-1 font-semibold"><slot name="input">- {title}</slot></div>
 		<slot name="titleButton"></slot>
 	</div>
-	<div class="{vertical? 'px-2':''}">
+	<div class="{vertical? 'px-2':''} {className}">
 		<slot></slot>
 	</div>
 </div>
