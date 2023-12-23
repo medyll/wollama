@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { t } from '$lib/stores/i18n';
 	import Icon from '@iconify/svelte';
 	import StatusBar from '../settings/StatusBar.svelte';
 	import { ui } from '$lib/stores/ui';
+	import { engine } from '$lib/tools/engine';
 
 	new Date().getSeconds();
 </script>
@@ -13,7 +13,7 @@
 	<StatusBar />
 	<button
 		on:click={() => {
-			goto('/signing');
+			engine.goto('/signing');
 		}}
 		title={$t('ui.userProfile')}
 	>

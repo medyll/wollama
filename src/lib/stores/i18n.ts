@@ -1,6 +1,7 @@
 import { derived, writable } from 'svelte/store';
-import translations from '../../locales/translations.js';
-import { Utils } from '../tools/chatMenuList.js';
+import translations from '../../locales/translations.js'; 
+import { settings } from './settings.js';
+import { engine } from '$lib/tools/engine.js';
 
 export const locale = writable<string>('en');
 export const locales = Object.keys(translations);
@@ -15,11 +16,14 @@ type ResolverPathType<T> = T extends object
 
 type ResolverKeysType = ResolverPathType<typeof translations.en>;
 
-function doTranslate(locale: string, key: string, vars: Record<string, string | number>) {
+function doTranslate(locale: string = 'en', key: string, vars: Record<string, string | number>) {
 	if (!key) throw new Error('no key provided to $t()');
-	if (!locale) throw new Error(`no translation for key "${key}"`);
+	if (!locale) throw new Error(`no locale for "${key}"`);
+	if (!translations[locale] && locale !=='en') locale = 'en';
 
-	let text = translations[locale][key.trim()] ?? Utils.resolveDotPath(translations[locale], key);
+console.log(translations)
+
+	let text = translations[locale][key.trim()] ?? engine.resolveDotPath(translations[locale], key);
 
 	Object.keys(vars).map((k) => {
 		const regex = new RegExp(`{{${k}}}`, 'g');
@@ -30,10 +34,10 @@ function doTranslate(locale: string, key: string, vars: Record<string, string | 
 }
 
 export const t = derived(
-	locale,
-	($locale) =>
+	settings,
+	($settings) =>
 		(key: ResolverKeysType, vars = {}) =>
-			doTranslate($locale, key, vars)
+			doTranslate($settings.locale, key, vars)
 );
 
 export const setLocale = (locale: string) => {

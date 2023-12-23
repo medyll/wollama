@@ -7,15 +7,7 @@ import { liveQuery } from 'dexie';
 import { ui } from '$lib/stores/ui';
 import { ChatDataGrouper } from './groupList';
 
-export class Utils {
-	static resolveDotPath(
-		object: Record<string, any>,
-		path: string,
-		defaultValue?: any
-	): any | undefined {
-		return path.split('.').reduce((r, s) => (r ? r[s] : defaultValue), object) ?? undefined;
-	}
-}
+ 
 
 type GroupItem = {
 	code: string;

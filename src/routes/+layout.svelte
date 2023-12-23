@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import MainChat from '$components/chat/MainChat.svelte';
 	import Settings from '$components/settings/Settings.svelte';
@@ -13,7 +12,7 @@
 	import '../styles/snippets.css';
 	import { engine } from '$lib/tools/engine';
 	import { onMount } from 'svelte';
-	import { DataBase, dbase, dbase2 } from '$lib/db/dbSchema';
+	import { DataBase } from '$lib/db/dbSchema';
 	import { idbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
 	import { activeModels } from '$lib/stores';
@@ -44,7 +43,7 @@
 			if (chat) {
 				ui.setActiveChatId($page.params.id);
 			} else {
-				goto('/');
+				engine.goto('/');
 			}
 		});
 	} else {

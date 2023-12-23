@@ -1,15 +1,32 @@
 import { connectionChecker } from '$lib/stores/connection';
 import { settings } from '$lib/stores/settings';
+import { get } from 'svelte/store';
 import { ApiCall } from './apiCall';
+import { goto } from '$app/navigation';
 
 export class engine {
-	public static setTheme(theme: string) {
+	
+	public static applyTheme(theme: string) {
 		settings.setParameterValue('theme', theme);
 		const currentTheme = theme == 'light' ? 'dark' : 'light';
 
 		if (document?.documentElement) {
 			document.documentElement.classList.replace(currentTheme, theme);
 		}
+	}
+
+	public static goto(url: string) {
+		const locale = get(settings).locale;
+		const prefix = ['en', undefined].includes(locale) ? '' : `/${locale}`;
+		goto(`${prefix}${url}`);
+	}
+
+	public static resolveDotPath(
+		object: Record<string, any>,
+		path: string,
+		defaultValue?: any
+	): any | undefined {
+		return path.split('.').reduce((r, s) => (r ? r[s] : defaultValue), object) ?? undefined;
 	}
 
 	public static async checkOllamaEndPoints(fn: () => any = () => {}) {

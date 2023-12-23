@@ -1,3 +1,8 @@
+import de from "./de";
+import es from "./es";
+import fr from "./fr";
+import it from "./it";
+
 export default {
 	en: {
 		ui: {
@@ -18,6 +23,7 @@ export default {
 		},
 		settings: {
 			auth: 'authentication',
+			lang: 'language',
 			avatar: 'avatar',
 			avatar_email: 'email from gravatar',
 			voice_auto_stop: 'auto stop voice',
@@ -46,5 +52,9 @@ export default {
 			error: 'error',
 			connected: 'connected'
 		}
-	}
+	}, 
+	fr: fr.fr,
+	de: de.de,
+	es:  es.es,
+	it: it.it
 };

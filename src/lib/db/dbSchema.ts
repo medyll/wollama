@@ -3,8 +3,7 @@
 import Dexie, { type Table } from 'dexie';
 import type { ChatType } from '$types/db';
 import type { MessageType } from '$types/db';
-import type { OllamaResponseType } from '$types/ollama';
-import { IndexedDBWrapper, Table2 } from '$lib/external/indexed.js';
+import type { OllamaResponseType } from '$types/ollama'; 
 import type { SettingsType } from '$types/settings';
 
 export class DataBase extends Dexie {
@@ -28,21 +27,3 @@ export class DataBase extends Dexie {
 }
 
 export const dbase = new DataBase();
-
-export class DataBas2e extends IndexedDBWrapper {
-	chat!: Table2<ChatType>;
-	messages!: Table2<MessageType>;
-	messageStats!: Table<OllamaResponseType>;
-
-	constructor() {
-		super('woolamaself');
-
-		this.version(11).stores({
-			chat: '&chatId, dateCreation, dateLastMessage',
-			messages: '&messageId, chatId, dateCreation',
-			messageStats: '&messageId, create_at'
-		});
-	}
-}
-
-export const dbase2 = new DataBas2e();

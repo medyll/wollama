@@ -1,8 +1,8 @@
-<script lang="ts">
-	import { goto } from '$app/navigation';
+<script lang="ts"> 
 	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
 	import Sidebar from './Sidebar.svelte';
+	import { engine } from '$lib/tools/engine';
 </script>
 
 <div class="md:hidden flex shadow md:w-full theme-bg-dark">
@@ -18,7 +18,7 @@
 			on:click={async () => {
 				ui.showHideMenu(false);
 				ui.setActiveChatId();
-				goto('/');
+				engine.goto('/');
 			}}
 			class="  iconButton"
 		>

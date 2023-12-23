@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { getTimeTitle, chatMenuList } from '$lib/tools/chatMenuList.js';
 	import ChatButton from '$components/chat/input/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
@@ -7,10 +6,11 @@
 
 	import { ui } from '$lib/stores/ui.js';
 	import ChatList from '$components/ui/ChatMenu.svelte';
+	import { engine } from '$lib/tools/engine';
 
 	const createChat = async () => {
 		ui.setActiveChatId();
-		goto('/');
+		engine.goto('/');
 	};
 </script>
 

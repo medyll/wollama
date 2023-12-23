@@ -1,16 +1,16 @@
-<script lang="ts">
-	import { goto } from '$app/navigation';
+<script lang="ts"> 
 	import { getTimeTitle, chatMenuList } from '$lib/tools/chatMenuList.js';
 	import ChatButton from '$components/chat/input/ChatButton.svelte';
 	import { t } from '$lib/stores/i18n.js';
 
 	import { ui } from '$lib/stores/ui.js';
 	import List from '$components/fragments/List.svelte';
+	import { engine } from '$lib/tools/engine';
 
 	const loadChat = async (id: string) => {
 		ui.setActiveChatId(id);
 		ui.showHideMenu(false);
-		goto(`/chat/${id}`);
+		engine.goto(`/chat/${id}`);
 	};
 </script>
 
