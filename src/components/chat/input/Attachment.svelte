@@ -9,8 +9,7 @@
 	let fileinput: HTMLInputElement;
 
 	const onFileSelected = (e: any) => {
-		let image = e.target.files[0];
-		console.log(e.target.files)
+		let image = e.target.files[0]; 
 		let reader = new FileReader();
 		reader.readAsDataURL(image);
 		reader.onload = (e) => {
@@ -29,8 +28,7 @@
 	};
 </script>
 
-<button
-	class="borderButton"
+<button 
 	on:click={() => {
 		fileinput.click();
 	}}
