@@ -13,7 +13,6 @@
 	let settingList = {
 		general: General,
 		advanced: Advanced,
-		models: Models,
 		addons: Addons,
 		infos: Infos
 	};

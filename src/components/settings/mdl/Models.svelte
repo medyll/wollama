@@ -63,9 +63,9 @@
 <hr />
 <InfoLine title={$t('settings.default_model')} vertical>
 	<List class="flex flex-col gap-2" data={$settings?.ollamaModels ?? []} let:item let:idx>
-	<div class="flex-align-middle gap-8">
-		<div>{idx +1}</div>
-		<div class="flex-1" >{item.name}</div>
-	</div>
-	</List>	
+		<div class="flex-align-middle gap-8">
+			<div>{idx + 1}</div>
+			<div class="flex-1">{item.name}</div>
+		</div>
+	</List>
 </InfoLine>
