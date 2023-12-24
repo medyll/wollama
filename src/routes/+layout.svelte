@@ -61,7 +61,7 @@
 		<div class="relative"><Navbar /></div>
 		<div class="flex-1 flex h-full max-w-full relative overflow-hidden">
 			<main class="relative h-full w-full overflow-auto transition-width">
-				<slot><MainChat /></slot>
+				<slot />
 			</main>
 		</div>
 	</div>

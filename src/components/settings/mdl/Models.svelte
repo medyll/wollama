@@ -5,6 +5,7 @@
 	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { ApiCall } from '$lib/tools/apiCall';
 	import { pullModelState } from '$lib/stores';
+	import List from '$components/fragments/List.svelte';
 
 	let pullStatus = '';
 	let addModel = '';
@@ -60,14 +61,11 @@
 	</form>
 </InfoLine>
 <hr />
-<InfoLine title={$t('settings.model_delete')}>
-	<select slot="input" placeholder={$t('settings.enter_model')} class="w-full">
-		{#each $settings?.ollamaModels ?? [] as model}
-			{@const partial = model.name.split(':')[0]}
-			<option value={model.name}>{model.name}</option>
-		{/each}
-	</select>
-	<button on:click={deleteModel}>
-		<Icon icon="mdi:delete" />
-	</button>
+<InfoLine title={$t('settings.default_model')} vertical>
+	<List class="flex flex-col gap-2" data={$settings?.ollamaModels ?? []} let:item let:idx>
+	<div class="flex-align-middle gap-8">
+		<div>{idx +1}</div>
+		<div class="flex-1" >{item.name}</div>
+	</div>
+	</List>	
 </InfoLine>

@@ -1,10 +1,12 @@
 <script lang="ts">
+	let className = '';
 	export let values: any = [];
 	export let value: any | undefined = undefined;
+ 
 </script>
 
 {#each values as valueO}
-	<div class={valueO === value ? 'active' : ''}>
+	<div class={valueO === value ? 'active ' : ''}>
 		<slot item={valueO} active={valueO === value} />
 	</div>
 {/each}

@@ -8,6 +8,7 @@
 	import Addons from './mdl/Addons.svelte';
 	import Cartouche from '../fragments/Cartouche.svelte';
 	import { ui } from '$lib/stores/ui';
+	import { engine } from '$lib/tools/engine';
 
 	let settingList = {
 		general: General,
@@ -16,29 +17,37 @@
 		addons: Addons,
 		infos: Infos
 	};
-	
 </script>
 
-<div class="flex-align-middle justify-between  px-5 py-4 gap-4">
-	<div class=" "><Icon icon="mdi:settings"  class="lg" /> </div>
+<div class="flex-align-middle justify-between px-5 py-4 gap-4">
+	<div class=" "><Icon icon="mdi:settings" class="lg" /></div>
 	<div class="flex-1 text-3xl font-medium self-center capitalize">{$t('ui.settings')}</div>
-	<button on:click={() => ui.showHideSettings()} type="button" aria-label="close" >
+	<div>
+		<a
+			class="underline"
+			on:click={() => {
+				engine.goto('configuration');
+				ui.showHideSettings()
+			}}>advanced configuration</a
+		>
+	</div>
+	<button on:click={() => ui.showHideSettings()} type="button" aria-label="close">
 		<Icon icon="mdi:close" style="font-size:1.6em" />
 	</button>
-</div> 
+</div>
 <div class="flex w-full settings p-4 px-8">
 	<div class=" w-full">
 		{#each Object.keys(settingList) as setting}
-			<Cartouche title={$t(`settings.modules.${setting}`)}> 
+			<Cartouche title={$t(`settings.modules.${setting}`)}>
 				<svelte:component this={settingList[setting]} />
 			</Cartouche>
 		{/each}
-	</div> 
+	</div>
 </div>
 
 <style lang="postcss">
 	.settings {
 		height: 750px;
-		overflow:auto;
+		overflow: auto;
 	}
 </style>

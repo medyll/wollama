@@ -11,8 +11,8 @@
 	{/each}
 {:else}
 	<div class={className}>
-		{#each data ?? [] as item}
-			<slot {item} />
+		{#each data ?? [] as item, idx}
+			<slot {item} {idx} />
 		{/each}
 	</div>
 {/if}
