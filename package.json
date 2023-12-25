@@ -85,7 +85,6 @@
 		"marked-highlight": "^2.0.9",
 		"ollama-node": "^0.1.27",
 		"prismjs": "^1.29.0",
-		"svelte-french-toast": "^1.2.0",
 		"svelte-loading-skeleton": "^1.0.1",
 		"svelte-notifications": "^0.9.98",
 		"ts-node": "^10.9.1"

@@ -2,7 +2,7 @@
 	import { speechRecognitionHandler, type SpeechReturn } from '$lib/tools/speech';
 	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
-	import toast from 'svelte-french-toast';
+	import { notifierState } from '$lib/stores/notifications';
 
 	export let voiceListening = false;
 	export let transcript: string = '';
@@ -31,7 +31,7 @@
 				break;
 			case 'onerror':
 				voiceListening = false;
-				toast.error(`Speech recognition error: ${args.message}`);
+				notifierState.notify('error', `Speech recognition error: ${args.message}`);
 				break;
 			default:
 				break;
@@ -48,12 +48,11 @@
 				stopResponse();
 				voiceListening = true;
 				voiceRecognition.listen();
-			}else{
+			} else {
 				stopResponse();
 			}
 		}}
 	>
-		<Icon   icon={ voiceListening? 'ooui:ellipsis':'mdi:microphone'}
-		style="font-size:1.8em" />
-	</button>  
+		<Icon icon={voiceListening ? 'ooui:ellipsis' : 'mdi:microphone'} style="font-size:1.8em" />
+	</button>
 </div>

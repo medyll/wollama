@@ -8,23 +8,10 @@
 	import ChatList from '$components/ui/ChatMenu.svelte';
 	import { engine } from '$lib/tools/engine';
 
-	const createChat = async () => {
-		ui.setActiveChatId();
-		engine.goto('/');
-	};
+
 </script>
 
-<div class="flex-v h-full w-full gap-2 p-3">
-	<div class="flex-align-middle gap-2 py-2">
-		<div class="flex-align-middle flex-1 gap-2">
-			<img class="iconify" width="24" src="/assets/svg/lama.svg" style="transform: scaleX(-1);" />
-			<div class="font-semibold text-xl">wOollama !</div>
-		</div>
-		<a href="/" class="underline" on:click={createChat}>{$t('ui.newChat')}</a>
-		<button on:click={createChat} class="borderButton iconButton">
-			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
-		</button>
-	</div>
+<div class="flex-v h-full w-full gap-2 p-3 pt-14">
 	<input type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
 	<hr class="ml-auto w-24" />
 	<ChatList />
