@@ -25,4 +25,8 @@
     .soft-title{
         @apply   text-gray-500 dark:text-gray-100/50;
     }
+
+    .container {
+        @apply relative md:max-w-3xl lg:max-w-[45rem] xl:max-w-[50rem] 2xl:max-w-[120-rem];
+    }
 }

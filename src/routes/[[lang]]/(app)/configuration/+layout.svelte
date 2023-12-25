@@ -8,7 +8,7 @@
 	let activeTab = 'ollama';
 </script>
 
-<div class="h-full w-full flex-col">
+<div class="container h-full w-full flex-col">
 	<div class="p-2 flex-align-middle gap-8">
 		<Selector value={activeTab} values={tabs} let:item>
 			<button on:click={()=>{engine.goto(`/configuration/${item}`)}}>{item}</button>

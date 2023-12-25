@@ -12,7 +12,6 @@
 
 	let settingList = {
 		general: General,
-		advanced: Advanced,
 		addons: Addons,
 		infos: Infos
 	};

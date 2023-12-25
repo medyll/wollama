@@ -5,12 +5,43 @@
 	import { ollamaOptionsRanges } from '$configuration/configuration';
 	import Selector from '$components/fragments/Selector.svelte';
 	import List from '$components/fragments/List.svelte';
+	import Icon from '@iconify/svelte';
+	import translations from '../../../locales/translations';
+
+	let ollama_server = $settings.ollama_server;
 
 	function setRequestMode() {
 		$settings.request_mode = $settings.request_mode == 'json' ? 'plain' : 'json';
 	}
 </script>
 
+<InfoLine title={'Ollama ' + $t('settings.server_url')} vertical>
+	<form
+		on:submit|preventDefault={(e) => {
+			settings.setSetting('ollama_server', ollama_server);
+		}}
+		class="flex"
+	>
+		<input bind:value={ollama_server} class="flex-1" type="text" />
+		<button
+			on:click={() => {
+				settings.setSetting('ollama_server', ollama_server);
+			}}
+			title={$t('settings.test_connection')}
+			class="aspect-square"
+			><Icon class="md" icon="iconoir:server-connection" />
+		</button>
+	</form>
+</InfoLine>
+<hr />
+<InfoLine title={$t('settings.lang')}>
+	<div class="flex-align-middle gap-4">
+		<Selector values={Object.keys(translations)} value={$settings.locale} let:item let:active>
+			<button on:click={() => settings.setSetting('locale', item)}>{item}</button>
+		</Selector>
+	</div>
+</InfoLine>
+<hr />
 <InfoLine title={$t('settings.request_mode')} class="flex-align-middle gap-4">
 	<Selector values={['json', 'plain']} value={$settings.request_mode} let:item>
 		<button on:click={() => settings.setSetting('request_mode', item)}>{item}</button>
