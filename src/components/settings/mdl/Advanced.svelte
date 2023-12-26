@@ -2,7 +2,7 @@
 	import { t } from '$lib/stores/i18n';
 	import { settings } from '$lib/stores/settings';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
-	import { ollamaOptionsRanges } from '$configuration/configuration';
+	import { OllamaOptionsDefaults, ollamaOptionsRanges } from '$configuration/configuration';
 	import Selector from '$components/fragments/Selector.svelte';
 	import List from '$components/fragments/List.svelte';
 	import Icon from '@iconify/svelte';
@@ -42,25 +42,31 @@
 	</div>
 </InfoLine>
 <hr />
-<InfoLine title={$t('settings.request_mode')} class="flex-align-middle gap-4">
-	<Selector values={['json', 'plain']} value={$settings.request_mode} let:item>
-		<button on:click={() => settings.setSetting('request_mode', item)}>{item}</button>
-	</Selector>
-</InfoLine>
-<hr />
-<List data={Object.keys($settings.ollamaOptions)} let:item={setting}>
-	<InfoLine title={$t(`settings.${setting}`)}>
-		{#if Array.isArray(ollamaOptionsRanges[setting])}
-			<input
-				type="range"
-				min={ollamaOptionsRanges[setting][0]}
-				max={ollamaOptionsRanges[setting][1]}
-				step={ollamaOptionsRanges[setting][2]}
-				bind:value={$settings.ollamaOptions[setting]}
-			/>
-		{:else}
-			<input type="text" bind:value={$settings.ollamaOptions[setting]} />
-		{/if}
-		<div slot="titleButton">{$settings.ollamaOptions[setting]}</div>
-	</InfoLine>
+<div class="soft-title p-2">Options</div>
+<List data={Object.keys(OllamaOptionsDefaults)} let:item={setting}>
+	<div class="flex-align-middle gap-2">
+		<div class="flex-1">{setting}</div>
+		<div>
+			{#if Array.isArray(ollamaOptionsRanges[setting])}
+				<input
+					type="range"
+					min={ollamaOptionsRanges[setting][0]}
+					max={ollamaOptionsRanges[setting][1]}
+					step={ollamaOptionsRanges[setting][2]}
+					bind:value={$settings.ollamaOptions[setting]}
+				/>
+			{:else}
+				<input class="inputTiny" type="text" bind:value={$settings.ollamaOptions[setting]} />
+			{/if}
+		</div>
+		<div class="w-16 text-center">{$settings.ollamaOptions[setting] ?? ''}</div>
+		<div class="w-16"><button>reset</button></div>
+	</div>
+	<hr />
 </List>
+
+<style>
+	.inputTiny {
+		width: 3rem;
+	}
+</style>

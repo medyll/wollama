@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Speech from '$components/chat/input/Speech.svelte'; 
+	import Speech from '$components/chat/input/Speech.svelte';
 	import Model from '$components/chat/input/Model.svelte';
 	import { chatUtils } from '$lib/tools/chatUtils';
 	import type { ChatType, MessageImageType, MessageType } from '$types/db';
@@ -21,6 +21,7 @@
 	import List from '$components/fragments/List.svelte';
 	import { liveQuery } from 'dexie';
 	import Bottomer from '$components/ui/Bottomer.svelte';
+	import Selector from "$components/fragments/Selector.svelte"
 
 	type CallbackDataType = {
 		chatId: string;
@@ -156,10 +157,8 @@
 	}
 </script>
 
-<form id="prompt-form" on:submit|preventDefault={submitHandler} />
-<div
-	class="container flex-v h-full mx-auto "
->
+<form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
+<div class="container flex-v h-full mx-auto">
 	<div class="flex-1 mb-32 px-8">
 		<DashBoard>
 			<ChatInfo>
@@ -173,6 +172,10 @@
 	</div>
 	<div class="flex flex-col gap-1 w-full y-b sticky margb-0 bottom-0 px-8">
 		<Temperature />
+		<hr />
+		<Selector values={['json', 'plain']} value={$settings.request_mode} let:item>
+			<button on:click={() => settings.setSetting('request_mode', item)}>{item}</button>
+		</Selector>
 		<div class="inputTextarea">
 			<Images />
 			<Input

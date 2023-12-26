@@ -48,7 +48,7 @@ export class engine {
 					connectionChecker.get('connectionStatus') != 'connected' &&
 					connectionChecker.get('connectionRetryTimeout') != 0
 				) {
-					ollamaCheckRetries = setTimeout(
+					let ollamaCheckRetries = setTimeout(
 						() => this.checkOllamaEndPoints(fn),
 						connectionChecker.get('connectionRetryTimeout')
 					);

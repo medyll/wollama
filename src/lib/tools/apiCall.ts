@@ -25,9 +25,8 @@ export class ApiCall {
 			model: config?.defaultModel,
 			options: config.ollamaOptions,
 			context: [],
-			// format: settings?.format,
 			...options
-		};
+		}; 
 
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			method: 'POST',

@@ -7,11 +7,21 @@
 	import { ui } from '$lib/stores/ui.js';
 	import ChatList from '$components/ui/ChatMenu.svelte';
 	import { engine } from '$lib/tools/engine';
-
-
 </script>
 
-<div class="flex-v h-full w-full gap-2 p-3 pt-14">
+<div class="flex-v h-full w-full gap-2 p-3">
+	<div class="flex-align-middle gap-2 py-2">
+		<div class="flex-align-middle flex-1 gap-2">
+			<img
+				alt="logo"
+				class="iconify"
+				width="24"
+				src="/assets/svg/lama.svg"
+				style="transform: scaleX(-1);"
+			/>
+			<div class="font-semibold text-xl">wOollama !</div>
+		</div>
+	</div>
 	<input type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
 	<hr class="ml-auto w-24" />
 	<ChatList />

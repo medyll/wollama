@@ -22,4 +22,4 @@
 </script>
 
 <div class="flex-1" />
-<div class="border p-4 h-32 theme-bg" bind:this={element} />
+<div class="p-4 h-32" bind:this={element} />

@@ -16,7 +16,7 @@
 	<div class="flex-align-middle gap-4">
 		<Selector values={['light','dark']} value={$settings.theme} let:item let:active>
 			<button on:click={() => settings.setSetting('theme', item)}>
-			<Icon icon="mdi:theme" />
+			<Icon icon="system-uicons:{item=='light' ? 'sun': 'moon'}" />
 			{item}</button>
 		</Selector>
 	</div>

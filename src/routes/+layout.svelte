@@ -17,6 +17,8 @@
 	import { browser } from '$app/environment';
 	import Notifications from '$components/ui/Notifications.svelte';
 	import { notifierState } from '$lib/stores/notifications';
+	import { connectionChecker } from '$lib/stores/connection';
+	import Opening from '$components/Opening.svelte';
 
 	export let data;
 
@@ -30,6 +32,14 @@
 	onMount(async () => {
 		loadModels(data.models);
 		engine.checkOllamaEndPoints();
+
+		connectionChecker.subscribe((state) => {
+			if (state.connectionStatus === 'error') {
+				notifierState.notify('error', 'state.connectionRetryTimeout', 'conn-status');
+			} else {
+				notifierState.delete('conn-status');
+			}
+		});
 	});
 
 	$: if (browser && $page.params.id) {
@@ -49,21 +59,20 @@
 	<title>wOOllama !</title>
 </svelte:head>
 
-<div class="application flex w-full h-full overflow-hidden">
-	<Notifications />
-	<MenuMobile />
-	<div class="h-full flex-shrink overflow-hidden z-40 hidden w-[280px] md:block">
-		<Sidebar />
-	</div>
-	<div class="flex-1 flex-v relative overflow-auto z-0">
-		<div class="relative"><TopBar /></div>
-		<div class="flex-1 flex h-full max-w-full relative overflow-hidden">
-			<main class="relative h-full w-full overflow-auto transition-width">
+<Opening>
+	<div class="application flex w-full h-full overflow-hidden">
+		<Notifications />
+		<MenuMobile />
+		<div class="h-full flex-shrink overflow-hidden z-30 hidden w-[280px] md:block">
+			<Sidebar />
+		</div>
+		<div class="flex-1 flex-v relative overflow-hidden z-0">
+			<main class="relative h-full w-full overflow-auto transition-width"><TopBar />
 				<slot />
 			</main>
 		</div>
+		<Modal show={$showSettings}>
+			<Settings />
+		</Modal>
 	</div>
-	<Modal show={$showSettings}>
-		<Settings />
-	</Modal>
-</div>
+</Opening>

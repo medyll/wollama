@@ -25,10 +25,20 @@ export type OllamaResponseType = {
 };
 
 export type OllamaOptionsType = {
-	seed?: string;
-	temperature?: number;
-	repeat_penalty?: number;
-	top_k?: number;
-	top_p?: number;
-	num_ctx?: number;
+    seed?: number;
+    temperature?: number;
+    repeat_penalty?: number;
+    top_k?: number;
+    top_p?: number;
+    num_ctx?: number;
+    mirostat?: number;
+    mirostat_eta?: number;
+    mirostat_tau?: number;
+    num_gqa?: number;
+    num_gpu?: number;
+    num_thread?: number;
+    repeat_last_n?: number;
+    stop?: string;
+    tfs_z?: number;
+    num_predict?: number;
 };
