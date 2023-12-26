@@ -24,11 +24,12 @@
 			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
 		</button>
 	</div>
-	<div class="flex-1 text-center soft-title">
+	<div class="flex-1 text-center soft-title relative">
 		{#await chat then value}
 			{value?.title ?? ''}
 		{/await}
 	</div>
+	<button on:click={()=>{engine.goto('/configuration')}}>configure ollama</button>
 	<StatusBar />
 	<button
 		on:click={() => {

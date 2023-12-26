@@ -13,10 +13,7 @@
 </script>
 
 {#if $activeChat?.dateCreation}
-	<div class="p-1 py-4">
-		<div class="text-lg">
-			{$activeChat?.title ?? ''}
-		</div>
+	<div class="p-1 py-4"> 
 		<div class="flex-align-middle">
 			<div class="opacity-40 flex-1 px-2">
 				{$t('ui.startondate')}:
