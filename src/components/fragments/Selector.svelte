@@ -6,7 +6,7 @@
 </script>
 
 {#each values as valueO}
-	<div class={valueO == value ? 'active ' : ''}>
+	<div class={valueO == value ? 'active ' : 'opacity-60'}>
 		<slot item={valueO} active={valueO === value} />
 	</div>
 {/each}

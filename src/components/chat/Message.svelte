@@ -6,8 +6,9 @@
 	import { t } from '$lib/stores/i18n';
 	import Skeleton from '$components/fragments/Skeleton.svelte';
 	import Prism from 'prismjs';
+	import { tick } from 'svelte';
 	export let message: MessageType;
-
+		import "prismjs/themes/prism-tomorrow.css";
 	$: icon = message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one';
 	$: place = message.role === 'user' ? 'mr-24' : 'ml-24';
 
@@ -38,7 +39,8 @@
 
 		const codeElements = doc.querySelectorAll('code');
 
-		codeElements.forEach((codeElement) => {
+		codeElements.forEach(async (codeElement) => {
+			console.log(codeElement);
 			const lang = codeElement.classList?.[0]
 				? codeElement.classList[0].replace('language-', '').trim()
 				: undefined;
@@ -58,9 +60,10 @@
 			wrap(codeElement, wrapper);
 			wrapper.insertBefore(toolbar, codeElement);
 			wrap(codeElement, pre);
-			toolbar.innerHTML = `<div class="flex-1">${lang}</div><div><button copyPaste >copy code</button></div>`;
-			Prism.highlightElement(codeElement);
+			toolbar.innerHTML = `<div class="flex-1 p-1 soft-title">${lang}</div><div class="p-1"><button copyPaste >copy</button></div>`;
 			codeElement.dataset.lang = lang;
+			Prism.highlightElement(codeElement);
+			await tick();
 		});
 
 		return doc.body.innerHTML;
@@ -72,11 +75,11 @@
 	}
 </script>
 
-<div class="{place}   flex  w-auto gap-1 elative overflow-hidden">
+<div class="{place}   flex  w-auto gap-1 elative overflow-hidden mb-1">
 	{#if message.role=='user'}<div class="p-1"><Icon style="font-size:1.6em" {icon} /></div>{/if}	
 	<div class="flex flex-col w-full">
 		<div
-			class="flex-align-middle p-1 gap-2 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}"
+			class="flex-align-middle mb-1 p-1 gap-2 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}"
 		>
 			<div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
 			<div class="soft-title">
