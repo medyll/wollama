@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Advanced from '$components/settings/mdl/Advanced.svelte';
+	import Options from '$components/settings/mdl/Options.svelte';
 	import Models from '$components/settings/mdl/Models.svelte';
 
 	$: tab = $page.params?.config ?? 'ollama';
@@ -11,5 +11,5 @@
 {:else if tab == 'model'}
 	<Models />
 {:else}
-	<Advanced />
+	<Options />
 {/if}

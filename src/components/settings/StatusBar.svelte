@@ -25,8 +25,8 @@
 	</div>
 	<div>
 		{$t(`status.${$connectionChecker.connectionStatus}`)}
-		<Icon {icon} class="md" />
 	</div>
+	<div><Icon {icon} class="md" /></div>
 	<div>
 		{#if printCountDown}
 			{$t('ui.retryInSeconds', { seconds: $connectionChecker.connectionRemainingSeconds })}
