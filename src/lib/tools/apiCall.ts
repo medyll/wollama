@@ -1,4 +1,5 @@
 import { aiState } from '$lib/stores';
+import { ollamaParams } from '$lib/stores/ollamaParams';
 import { settings } from '$lib/stores/settings';
 import { ui } from '$lib/stores/ui';
 import type { OllamaFetchBodyType, OllamaResponseType } from '$types/ollama';
@@ -19,11 +20,13 @@ export class ApiCall {
 		options?: Partial<OllamaFetchBodyType>
 	) {
 		const config = get(settings);
+		const ollamaOptions = get(ollamaParams);
+
 		const defaultOptions = {
 			prompt,
 			system: config?.system_prompt,
 			model: config?.defaultModel,
-			options: config.ollamaOptions,
+			options: ollamaOptions,
 			context: [],
 			...options
 		};
@@ -35,16 +38,34 @@ export class ApiCall {
 				...getHeader()
 			},
 			body: JSON.stringify(defaultOptions)
-		});
+		}); /* .then((russ)=>{
+			console.log({russ})
+			return russ
+		}).catch((error) => {
+			console.log({error})
+		}) */
 
-		if (options?.stream) {
+		if (!res.ok) {
+			throw await res.json();
+		} else {
+			if (options?.stream) {
+				this.stream(res, hook);
+			} else {
+				if (!res.ok) throw await res.json();
+				const out = await res.json();
+
+				return out;
+			}
+		}
+
+		/* if (options?.stream) {
 			this.stream(res, hook);
 		} else {
 			if (!res.ok) throw await res.json();
 			const out = await res.json();
 
 			return out;
-		}
+		} */
 		return res;
 	}
 
@@ -70,6 +91,7 @@ export class ApiCall {
 
 	async listModels() {
 		const config = get(settings);
+		console.log(config);
 		return fetch(`${config.ollama_server}/api/tags`, {
 			method: 'GET',
 			headers: {

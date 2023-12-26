@@ -18,6 +18,7 @@
 			
 			on:click={() => {
 				validate();
+				status= 'default'
 			}}
 		>
 			{message ?? ''}

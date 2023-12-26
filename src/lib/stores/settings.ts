@@ -1,20 +1,14 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-import {
-	OllamaOptionsDefaults,
-	defaultOllamaSettings,
-	defaultOptions
-} from '../../configuration/configuration';
+import { defaultOptions } from '../../configuration/configuration';
 
 import type { SettingsType } from '$types/settings';
 import type { OllamaOptionsType } from '$types/ollama';
 
-
 // set to indexedDB
 const settingStore = () => {
 	const { subscribe, set, update } = writable<SettingsType>({
-		...defaultOptions,
-		ollamaOptions: defaultOllamaSettings
+		...defaultOptions
 	} as SettingsType);
 
 	let currentStore = {} as SettingsType;
@@ -27,16 +21,8 @@ const settingStore = () => {
 
 	function initSettings() {
 		if (browser) {
-			const defaultOptions: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce(
-				(acc, key) => {
-					acc[key] = OllamaOptionsDefaults[key].default;
-					return acc;
-				},
-				{}
-			);
-
-			const actualSettings = JSON.parse(localStorage.getItem('settings') ?? "{}");
-			set({ ...defaultOptions, ...actualSettings });
+			const actualSettings = JSON.parse(localStorage.getItem('settings') ?? '{}');
+			set({ ...actualSettings });
 		}
 	}
 
@@ -50,7 +36,7 @@ const settingStore = () => {
 		}, 500);
 	}
 
-	 initSettings();
+	initSettings();
 
 	function setSetting(key: keyof SettingsType, value: any) {
 		update((n) => {

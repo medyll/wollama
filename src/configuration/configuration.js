@@ -27,6 +27,8 @@ export const defaultOptions = {
 	title_auto: true,
 	voice_auto_stop: true,
 	avatar_email: '',
+	theme: 'light',
+	locale:'fr',
 	sender: {
 		speechAutoSend: false,
 		speechRecognition: true
@@ -35,13 +37,12 @@ export const defaultOptions = {
 		creative: 0.1,
 		balanced: 0.5,
 		accurate: 1
-	},
-	ollamaOptions: defaultOllamaSettings
+	}
 };
 
 export const OllamaOptionsDefaults = {
-	seed: { default: 0, min: 0, max: Number.MAX_SAFE_INTEGER },
-	temperature: { default: 0.8, min: 0, max: 1 },
+	seed: { default: 0, min: 0, max: undefined },
+	temperature: { default: 0.5, min: 0, max: 1 },
 	repeat_penalty: { default: 1.1, min: 0, max: 2 },
 	top_k: { default: 40, min: 0, max: 200 },
 	top_p: { default: 0.9, min: 0, max: 1 },
@@ -49,13 +50,13 @@ export const OllamaOptionsDefaults = {
 	mirostat: { default: 0, min: 0, max: 2 },
 	mirostat_eta: { default: 0.1, min: 0, max: 1 },
 	mirostat_tau: { default: 5.0, min: 0, max: 20 },
-	num_gqa: { default: 1, min: 0, max: Number.MAX_SAFE_INTEGER },
-	num_gpu: { default: 1, min: 0, max: Number.MAX_SAFE_INTEGER },
-	num_thread: { default: 8, min: 0, max: Number.MAX_SAFE_INTEGER },
-	repeat_last_n: { default: 64, min: 0, max: Number.MAX_SAFE_INTEGER },
-	stop: { default: '', min: 0, max: Number.MAX_SAFE_INTEGER },
-	tfs_z: { default: 1, min: 0, max: Number.MAX_SAFE_INTEGER },
-	num_predict: { default: 128, min: -2, max: Number.MAX_SAFE_INTEGER }
+	num_gqa: { default: 1, min: 0, max: undefined },
+	num_gpu: { default: 1, min: 0, max: undefined },
+	num_thread: { default: 8, min: 0, max: undefined },
+	repeat_last_n: { default: 64, min: 0, max: undefined },
+	stop: { default: ['STOP AI'], min: 0, max: undefined },
+	tfs_z: { default: 1, min: 0, max: undefined },
+	num_predict: { default: 128, min: -2, max: undefined }
 };
 
 export const ollamaOptionsInfo = {

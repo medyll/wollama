@@ -15,12 +15,12 @@
 	import { prompter, type PrompterType } from '$lib/stores/prompter';
 	import { activeModels, aiState } from '$lib/stores';
 	import Message from '$components/chat/Message.svelte';
-	import { settings } from '$lib/stores/settings';
 	import DashBoard from '$components/DashBoard.svelte';
 	import Images from './input/Images.svelte';
 	import List from '$components/fragments/List.svelte';
 	import { liveQuery } from 'dexie';
 	import Bottomer from '$components/ui/Bottomer.svelte';
+	import { ollamaParams } from '$lib/stores/ollamaParams';
 
 	type CallbackDataType = {
 		chatId: string;
@@ -84,15 +84,14 @@
 		// retrieve or set a chat session
 		const chatSession = await getChatSession({
 			models: $activeModels,
-			options: { ...prompter.options }
+			options: { ...$ollamaParams, ...prompter.options }
 		});
 
-		console.log($activeModels, chatSession);
-		return;
+		// create messages for chat session
 		const sessionMessages = await createChatSessionMessages(chatSession, prompt, images);
 
-		// set chat options for ollama call
-		chatSession.options = { ...$settings.ollamaOptions, ...options };
+		// update ollama options for ollama call
+		chatSession.options = { ...$ollamaParams, ...options };
 
 		const sender = new PromptSender<CallbackDataType>(chatSession, {
 			images: images?.map((n) => n.header + ',' + n.base64),

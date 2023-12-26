@@ -1,3 +1,4 @@
+import { notifierState } from '$lib/stores/notifications';
 import type { ChatType } from '$types/db';
 import type { OllamaOptionsType, OllamaResponseType } from '$types/ollama';
 import { ApiCall } from './apiCall';
@@ -15,8 +16,8 @@ export type SenderCallback<T> = {
 } & T;
 
 type ArgsType<T> = {
-	cb: (args: SenderCallback<T>) => void; /** callback */
-	cbData: T; /** data to merge with the callback data */
+	cb: (args: SenderCallback<T>) => void /** callback */;
+	cbData: T /** data to merge with the callback data */;
 	images?: string[];
 };
 
@@ -46,13 +47,19 @@ export class PromptSender<T> {
 	async sendPrompt(sender: PromptSenderType, hook: (data: OllamaResponseType) => void) {
 		await Promise.all(
 			sender.models.map(async (model) => {
-				await ApiCall.generate(sender.prompt, hook, {
-					stream: true,
-					model,
-					context: sender.context,
-					options: sender.options,
-					images: sender.images
-				});
+				try {
+					await ApiCall.generate(sender.prompt, hook, {
+						stream: true,
+						model,
+						context: sender.context,
+						options: sender.options,
+						images: sender.images
+					});
+				} catch (e) {
+					if (e.error) {
+						notifierState.notify('error', e.error);
+					}
+				}
 			})
 		);
 	}

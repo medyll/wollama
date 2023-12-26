@@ -24,5 +24,4 @@ export interface SettingsType {
 		speechRecognition?: boolean;
 		system?: string;
 	};
-	ollamaOptions: OllamaOptionsType;
 }

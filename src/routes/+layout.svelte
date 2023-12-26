@@ -19,6 +19,7 @@
 	import { notifierState } from '$lib/stores/notifications';
 	import { connectionChecker } from '$lib/stores/connection';
 	import Opening from '$components/Opening.svelte';
+	import { ollamaParams } from '$lib/stores/ollamaParams';
 
 	export let data;
 
@@ -31,6 +32,7 @@
 
 	onMount(async () => {
 		loadModels(data.models);
+		ollamaParams.init();
 		engine.checkOllamaEndPoints();
 
 		connectionChecker.subscribe((state) => {
