@@ -95,9 +95,7 @@
 		</div> 
 		<div class="px-2 py-1 w-full flex-1 relative overflow-hidden">
 			{#if message.images}
-				{#each message.images as image, imageIdx}
-					<img src={[image.header, image.base64].join(',')} alt="list" style="height:100px" />
-				{/each}
+					<img src={message.images.dataUri} alt="list" style="height:100px" />
 			{/if}
 			{#if message?.role == 'assistant'}
 				{#if message.status == 'sent'}

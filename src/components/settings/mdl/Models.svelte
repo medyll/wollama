@@ -12,15 +12,17 @@
 	let pullStatus = '';
 	let addModel = '';
 	let progress: number = 0;
+	let progressMax = 100;
 
 	function pullModel() {
 		if (addModel.trim() == '') return;
 
-		ApiCall.pullModel(addModel, (res) => {
+		ApiCall.pullModel(addModel, (res) => { 
 			$pullModelState = res;
 			pullStatus = res?.status ?? res?.error;
 			if (res.digest) {
-				progress = res.completed - res.total;
+				progress = res.completed;
+				progressMax = res.total;
 			}
 		});
 	}
@@ -47,7 +49,6 @@
 	<select class="w-full" bind:value={$settings.defaultModel}>
 		<option>{$t('settings.default_model')}</option>
 		{#each $settings?.ollamaModels ?? [] as model}
-			{@const partial = model.name.split(':')[0]}
 			{@const selected = model.name === $settings.defaultModel}
 			<option {selected} value={model.name}>
 				{selected ? 'default model: ' : '-'}
@@ -57,9 +58,9 @@
 	</select>
 </InfoLine>
 <hr />
-<InfoLine vertical title={$t('settings.pull_model') + ' ' + pullStatus}>
+<InfoLine vertical title={$t('settings.pull_model') + ': ' + pullStatus}>
 	<form name="pull-form" on:submit|preventDefault={(e) => pullModel} />
-	<progress hidden={progress === 0} class="w-full" value={progress} max="100"></progress>
+	<progress hidden={progress === 0} class="w-full" value={progress} max={progressMax}></progress>
 	<div class="flex gap-2">
 		<input
 			bind:value={addModel}

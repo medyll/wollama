@@ -30,7 +30,7 @@ export type MessageType = {
 	chatId: string;
 	messageId: string;
 	content: string;
-	images?: MessageImageType[];
+	images?: MessageImageType;
 	status: 'done' | 'sent' | 'streaming' | 'error';
 	context: number[];
 	model:string;
@@ -48,6 +48,7 @@ export type MessageListType = {
 export type MessageImageType = {
 	name: string;
 	type: string;
+	dataUri: string;
 	header: string;
 	base64: string;
 };

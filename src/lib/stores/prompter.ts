@@ -10,7 +10,7 @@ export type PrompterType = {
 	temperature: number; /** @deprecated */
 	voiceListening: boolean;
 	options: OllamaOptionsType;
-	images?: MessageImageType[]; 
+	images?: MessageImageType ; 
 };
 
 function prompterStore() {
@@ -41,11 +41,11 @@ function prompterStore() {
 		set,
 		update,
 		reset: () => {
-			update((n) => {
+			update((n: PrompterType) => {
 				return {
 					...n,
 					prompt: '',
-					images: [],
+					images: undefined,
 					voiceListening: false,
 					isPrompting: false,
 					disabledPrompt: false,

@@ -51,7 +51,7 @@
 	async function createChatSessionMessages(
 		chat: ChatType,
 		content: string,
-		images: MessageImageType[] = []
+		images?: MessageImageType
 	) {
 		const ty = await Promise.all([
 			// insert user message
@@ -60,7 +60,7 @@
 				status: 'done',
 				content,
 				chatId: chat.chatId,
-				images
+				images: images
 			}),
 			// insert assistant message
 			await idbQuery.insertMessage(chat.chatId, {
@@ -94,7 +94,7 @@
 		chatSession.options = { ...$ollamaParams, ...options };
 
 		const sender = new PromptSender<CallbackDataType>(chatSession, {
-			images: images?.map((n) => n.header + ',' + n.base64),
+			images: images?.base64,
 			cb: onResponseMessage,
 			cbData: {
 				chatId: chatSession.chatId,
@@ -183,7 +183,7 @@
 					<Attachment
 						slot="start"
 						form="prompt-form"
-						bind:userFiles={$prompter.images}
+						bind:imageFile={$prompter.images}
 						disabled={false}
 					/>
 					<div slot="end" class="flex-align-middle">

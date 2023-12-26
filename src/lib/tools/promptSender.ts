@@ -18,7 +18,7 @@ export type SenderCallback<T> = {
 type ArgsType<T> = {
 	cb: (args: SenderCallback<T>) => void /** callback */;
 	cbData: T /** data to merge with the callback data */;
-	images?: string[];
+	images?: string;
 };
 
 export class PromptSender<T> {
