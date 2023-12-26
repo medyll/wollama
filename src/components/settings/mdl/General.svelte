@@ -8,7 +8,7 @@
 	import { engine } from '$lib/tools/engine';  
 
 	settings.subscribe((o) => {
-		if($settings.theme != o.theme) engine.applyTheme(o.theme)
+		engine.applyTheme(o.theme)
 	});
 </script>
 

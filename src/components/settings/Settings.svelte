@@ -24,7 +24,7 @@
 		<a
 			class="underline"
 			on:click={() => {
-				engine.goto('configuration');
+				engine.goto('/configuration');
 				ui.showHideSettings()
 			}}>advanced configuration</a
 		>

@@ -7,7 +7,7 @@
 
 	const tabs = ['ollama', 'model', 'create'];
 
-	let activeTab = $page.params?.config ?? 'ollama';
+	$: activeTab = $page.params?.config ?? 'ollama';
 </script>
 
 <div class="h-full w-full overflow-hidden pl-12">
