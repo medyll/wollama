@@ -66,8 +66,9 @@
 		<div class="h-full flex-shrink overflow-hidden z-30 hidden w-[280px] md:block">
 			<Sidebar />
 		</div>
-		<div class="flex-1 flex-col flex relative overflow-hidden z-0"><TopBar />
-			<main class="relative h-full w-full overflow-hidden transition-width ">
+		<div class="flex-1 flex-col flex relative overflow-hidden z-0">
+			<TopBar />
+			<main class="relative h-full w-full overflow-hidden transition-width">
 				<slot />
 			</main>
 		</div>

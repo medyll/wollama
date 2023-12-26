@@ -24,7 +24,8 @@
 			>
 		{/each}
 	</div>
-	<div class="flex-1 flex justify-center gap-2">
+	<div class="flex-1 flex-align-middle justify-center gap-2">
+		<Icon icon="charm:binary" class="sm" />
 		<Selector values={['json', 'plain']} value={$settings.request_mode} let:item>
 			<button on:click={() => settings.setSetting('request_mode', item)}>{item}</button>
 		</Selector>
