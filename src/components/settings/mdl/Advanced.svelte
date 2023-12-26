@@ -20,7 +20,8 @@
 	}
 </script>
 
-<div class="soft-title p-2 py-4">{$t('settings.server_url')}</div>
+<div class="soft-title p-2 py-4">
+{$t('settings.server_url')}</div>
 <form
 	on:submit|preventDefault={(e) => {
 		setEndPoint(ollama_server)
