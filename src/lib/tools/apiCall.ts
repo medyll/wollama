@@ -26,7 +26,7 @@ export class ApiCall {
 			options: config.ollamaOptions,
 			context: [],
 			...options
-		}; 
+		};
 
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			method: 'POST',
@@ -46,6 +46,26 @@ export class ApiCall {
 			return out;
 		}
 		return res;
+	}
+
+	static async ping(url: string) {
+		return fetch(`${url}/api/tags`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				...getHeader()
+			}
+		})
+			.then(async (res) => {
+				if (!res.ok) throw await res.json();
+				return await res.json();
+			})
+			.then(async (res) => {
+				return res?.models;
+			})
+			.catch((error) => {
+				throw error;
+			});
 	}
 
 	async listModels() {
@@ -70,7 +90,6 @@ export class ApiCall {
 	}
 
 	static async deleteModel(model: string) {
-
 		const config = get(settings);
 		return fetch(`${config.ollama_server}/api/delete`, {
 			method: 'DELETE',
@@ -92,7 +111,7 @@ export class ApiCall {
 			});
 	}
 
-	static async pullModel(model: string,hook:(args:any)=>void) {
+	static async pullModel(model: string, hook: (args: any) => void) {
 		const config = get(settings);
 
 		const res = await fetch(`${config.ollama_server}/api/pull`, {
@@ -104,8 +123,7 @@ export class ApiCall {
 			body: JSON.stringify({ name: model })
 		})
 			.then(async (res) => {
-				 
-				return   res 
+				return res;
 			})
 			.then(async (res) => {
 				return res;
@@ -113,7 +131,7 @@ export class ApiCall {
 			.catch((error) => {
 				throw error;
 			});
-			console.log(res)
+		console.log(res);
 		this.stream(res, hook);
 	}
 

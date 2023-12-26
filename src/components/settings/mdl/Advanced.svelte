@@ -1,48 +1,45 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n';
 	import { settings } from '$lib/stores/settings';
-	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { OllamaOptionsDefaults, ollamaOptionsRanges } from '$configuration/configuration';
-	import Selector from '$components/fragments/Selector.svelte';
 	import List from '$components/fragments/List.svelte';
 	import Icon from '@iconify/svelte';
-	import translations from '../../../locales/translations';
+	import { ApiCall } from '$lib/tools/apiCall';
+	import { notifierState } from '$lib/stores/notifications';
 
 	let ollama_server = $settings.ollama_server;
 
-	function setRequestMode() {
-		$settings.request_mode = $settings.request_mode == 'json' ? 'plain' : 'json';
+	function setEndPoint(url:string){
+		ApiCall.ping(url).then((res)=>{ 
+			notifierState.notify('success', $t('settings.server_url_success'), 'server-url');
+			settings.setSetting('ollama_server', url);
+		}).catch((e)=>{ 
+			notifierState.notify('error', $t('settings.server_url_error'), 'server-url');
+		});
+		// 
 	}
 </script>
 
-<InfoLine title={'Ollama ' + $t('settings.server_url')} vertical>
-	<form
-		on:submit|preventDefault={(e) => {
-			settings.setSetting('ollama_server', ollama_server);
+<div class="soft-title p-2 py-4">{$t('settings.server_url')}</div>
+<form
+	on:submit|preventDefault={(e) => {
+		setEndPoint(ollama_server)
+	}}
+	class="flex gap-2"
+>
+	<input bind:value={ollama_server} class="flex-1" type="text" />
+	<button
+		on:click={() => {
+			setEndPoint(ollama_server)
 		}}
-		class="flex"
-	>
-		<input bind:value={ollama_server} class="flex-1" type="text" />
-		<button
-			on:click={() => {
-				settings.setSetting('ollama_server', ollama_server);
-			}}
-			title={$t('settings.test_connection')}
-			class="aspect-square"
-			><Icon class="md" icon="iconoir:server-connection" />
-		</button>
-	</form>
-</InfoLine>
+			type="submit"
+		title={$t('settings.test_connection')}
+		class="aspect-square"
+		><Icon class="md" icon="iconoir:server-connection" />
+	</button>
+</form>
 <hr />
-<InfoLine title={$t('settings.lang')}>
-	<div class="flex-align-middle gap-4">
-		<Selector values={Object.keys(translations)} value={$settings.locale} let:item let:active>
-			<button on:click={() => settings.setSetting('locale', item)}>{item}</button>
-		</Selector>
-	</div>
-</InfoLine>
-<hr />
-<div class="soft-title p-2">Options</div>
+<div class="soft-title p-2  py-4">Options</div>
 <List data={Object.keys(OllamaOptionsDefaults)} let:item={setting}>
 	<div class="flex-align-middle gap-2">
 		<div class="flex-1">{setting}</div>

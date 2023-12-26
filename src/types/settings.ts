@@ -3,7 +3,7 @@ import type { OllamaOptionsType } from '$types/ollama';
 export interface SettingsType {
 	theme: string;
 	request_mode?: 'plain' | 'json';
-	ollama_server?: string;
+	ollama_server: string;
 	ollamaModels?: string[]; // by api
 	defaultModels?: string[];
 	defaultModel?: string;

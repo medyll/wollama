@@ -156,49 +156,51 @@
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
-<div class="container flex-v h-full mx-auto">
-	<div class="flex-1 mb-32 px-8">
-		<DashBoard>
-			<ChatInfo>
-				<Model />
-			</ChatInfo>
-			<List class="flex-v w-full gap-4" data={$messages} let:item={message}>
-				<Message {message} />
-			</List>
-			<Bottomer />
-		</DashBoard>
-	</div>
-	<div class="flex flex-col w-full y-b sticky margb-0 bottom-0 px-8">
-		<Temperature />
-		<div class="inputTextarea">
-			<Images />
-			<Input
-				on:keypress={keyPressHandler}
-				bind:value={$prompter.prompt}
-				bind:requestStop={$aiState}
-				showCancel={$aiState == 'running'}
-				{placeholder}
-				form="prompt-form"
-			>
-				<Attachment
-					slot="start"
-					form="prompt-form"
-					bind:userFiles={$prompter.images}
-					disabled={false}
-				/>
-				<div slot="end" class="flex-align-middle">
-					<Speech
-						onEnd={submitHandler}
-						bind:prompt={$prompter.prompt}
-						bind:voiceListening
-						disabled={disableSubmit}
-					/>
-					<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
-						<Icon icon="mdi:send" style="font-size:1.6em" />
-					</button>
-				</div>
-			</Input>
+<div class="h-full w-full overflow-auto">
+	<div class="container flex-v h-full mx-auto">
+		<div class="flex-1 mb-32 px-8">
+			<DashBoard>
+				<ChatInfo>
+					<Model />
+				</ChatInfo>
+				<List class="flex-v w-full gap-4" data={$messages} let:item={message}>
+					<Message {message} />
+				</List>
+				<Bottomer />
+			</DashBoard>
 		</div>
-		<div class="text-xs text-center theme-bg pb-1">{$t('ui.aiCautionMessage')}</div>
+		<div class="flex flex-col w-full y-b sticky margb-0 bottom-0 px-8">
+			<Temperature />
+			<div class="inputTextarea">
+				<Images />
+				<Input
+					on:keypress={keyPressHandler}
+					bind:value={$prompter.prompt}
+					bind:requestStop={$aiState}
+					showCancel={$aiState == 'running'}
+					{placeholder}
+					form="prompt-form"
+				>
+					<Attachment
+						slot="start"
+						form="prompt-form"
+						bind:userFiles={$prompter.images}
+						disabled={false}
+					/>
+					<div slot="end" class="flex-align-middle">
+						<Speech
+							onEnd={submitHandler}
+							bind:prompt={$prompter.prompt}
+							bind:voiceListening
+							disabled={disableSubmit}
+						/>
+						<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
+							<Icon icon="mdi:send" style="font-size:1.6em" />
+						</button>
+					</div>
+				</Input>
+			</div>
+			<div class="text-xs text-center theme-bg pb-1">{$t('ui.aiCautionMessage')}</div>
+		</div>
 	</div>
 </div>

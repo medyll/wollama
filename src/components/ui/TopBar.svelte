@@ -17,7 +17,7 @@
 	};
 </script>
 
-<div class="w-full flex-align-middle px-2 gap-2 sticky top-0 mt-0 right-0 z-50">
+<div class="flex-align-middle px-2 gap-2 sticky top-0 mt-0 right-4 left-4 z-50">
 	<div class="flex-align-middle gap-2 py-2">
 		<a href="/" class="underline" on:click={createChat}>{$t('ui.newChat')}</a>
 		<button on:click={createChat} class="borderButton iconButton">
