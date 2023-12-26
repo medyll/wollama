@@ -1,16 +1,15 @@
-import type { ChatType, MessageType } from '$types/db'; 
+import type { ChatType, MessageType } from '$types/db';
 import type { OllamaResponseType } from '$types/ollama';
 import { chatUtils } from '$lib/tools/chatUtils';
 import { dbase } from './dbSchema';
 
 export class idbQuery {
-	
 	static async getChat(chatId: string) {
-		if (!chatId) return undefined;// throw new Error('chatId is required');
+		if (!chatId) return undefined; // throw new Error('chatId is required');
 		return await dbase.chat.where('chatId').equals(chatId).first();
 	}
 
-	static async getChats() {		
+	static async getChats() {
 		return await dbase.chat.toArray();
 	}
 
@@ -23,7 +22,7 @@ export class idbQuery {
 	static async deleteChat(chatId?: number): Promise<number> {
 		if (!chatId) throw new Error('chatId is required');
 		await dbase.chat.delete(chatId);
-		return chatId;	 
+		return chatId;
 	}
 
 	static async updateChat(chatId: string, chatData: Partial<ChatType>) {
@@ -32,10 +31,13 @@ export class idbQuery {
 		await dbase.chat.update(chatId, chatData);
 	}
 
-	static async initChat(activeChatId?: string): Promise<ChatType> {
-		return (activeChatId && Boolean(await idbQuery.getChat(activeChatId as string)))
+	static async initChat(
+		activeChatId?: string,
+		chatData: ChatType = {} as ChatType
+	): Promise<ChatType> {
+		return activeChatId && Boolean(await idbQuery.getChat(activeChatId as string))
 			? await idbQuery.getChat(activeChatId as string)
-			: await idbQuery.insertChat();
+			: await idbQuery.insertChat(chatData);
 	}
 
 	static async insertMessage(chatId: string, messageData: Partial<MessageType>) {
@@ -60,7 +62,7 @@ export class idbQuery {
 
 	static getMessages(chatId: string) {
 		if (!chatId) throw new Error('chatId is required');
-		return   dbase.messages.where('chatId').equals(chatId).sortBy('dateCreation');
+		return dbase.messages.where('chatId').equals(chatId).sortBy('dateCreation');
 	}
 
 	static async insertMessageStats(statsData: Partial<OllamaResponseType>) {

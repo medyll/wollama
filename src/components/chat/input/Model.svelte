@@ -1,25 +1,22 @@
 <script lang="ts">
 	import { idbQuery } from '$lib/db/dbQuery';
 	import { activeModels } from '$lib/stores'; 
+	import { prompter } from '$lib/stores/prompter';
 	import { settings } from '$lib/stores/settings.js';
-	import { ui } from '$lib/stores/ui';
-	import Icon from '@iconify/svelte'; 
+	import { ui } from '$lib/stores/ui'; 
 
 
 	let defaultModelKeys: string[] = []; // $settings.defaultModel
 
 	const changeHandler = (index:number)=>(event: Event) => {
 		$activeModels[index] = event?.target?.value; 
+		console.log($activeModels)
 	}
 
 	async function loadChatKeys() {
 		defaultModelKeys =  await idbQuery.getChat($ui.activeChatId)?.models 
 		?? [$settings.defaultModel]
 	}
-
-	function addModel(chatId: string)  {
-		 
-	} 
 
 	$: if($ui?.activeChatId) { 
 		loadChatKeys();
@@ -43,13 +40,4 @@
 			</div>
 		</div>
 	{/each}
-	<!-- <div>
-		<button class="borderButton" 
-			on:click={() => {
-				 
-			}}
-		>
-			<Icon icon="mdi:add" />
-		</button>
-	</div> -->
 </div>

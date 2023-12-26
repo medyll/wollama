@@ -21,7 +21,6 @@
 	import List from '$components/fragments/List.svelte';
 	import { liveQuery } from 'dexie';
 	import Bottomer from '$components/ui/Bottomer.svelte';
-	import Selector from "$components/fragments/Selector.svelte"
 
 	type CallbackDataType = {
 		chatId: string;
@@ -40,10 +39,7 @@
 	$: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
 	async function getChatSession(args: Partial<ChatType>): Promise<ChatType> {
-		const chat = await idbQuery.initChat($ui.activeChatId);
-
-		// update chat parameters
-		await idbQuery.updateChat(chat.chatId, {
+		const chat = await idbQuery.initChat($ui.activeChatId, {
 			models: args.models,
 			options: { ...args.options }
 		});
@@ -91,6 +87,8 @@
 			options: { ...prompter.options }
 		});
 
+		console.log($activeModels, chatSession);
+		return;
 		const sessionMessages = await createChatSessionMessages(chatSession, prompt, images);
 
 		// set chat options for ollama call
@@ -170,12 +168,8 @@
 			<Bottomer />
 		</DashBoard>
 	</div>
-	<div class="flex flex-col gap-1 w-full y-b sticky margb-0 bottom-0 px-8">
+	<div class="flex flex-col w-full y-b sticky margb-0 bottom-0 px-8">
 		<Temperature />
-		<hr />
-		<Selector values={['json', 'plain']} value={$settings.request_mode} let:item>
-			<button on:click={() => settings.setSetting('request_mode', item)}>{item}</button>
-		</Selector>
 		<div class="inputTextarea">
 			<Images />
 			<Input
