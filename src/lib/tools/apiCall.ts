@@ -153,7 +153,6 @@ export class ApiCall {
 			.catch((error) => {
 				throw error;
 			});
-		console.log(res);
 		this.stream(res, hook);
 	}
 

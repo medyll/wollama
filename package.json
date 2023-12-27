@@ -1,8 +1,8 @@
 {
-	"name": "aiui",
+	"name": "wollama",
 	"version": "0.0.7",
 	"author": "Medyll",
-	"description": "AIUI",
+	"description": "web ui for ollama",
 	"private": false,
 	"config": {
 		"commitizen": {
