@@ -1,7 +1,7 @@
 import type { ChatType } from '$types/db';
 import type { MessageType } from '$types/db';
 import { get } from 'svelte/store';
-import { ApiCall, } from './apiCall';
+import { ApiCall, } from '../db/apiCall';
 import { settings } from '$lib/stores/settings';
 import { idbQuery } from '$lib/db/dbQuery';
 import type { OllamaResponseType } from '$types/ollama';

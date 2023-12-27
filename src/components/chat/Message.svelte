@@ -40,7 +40,6 @@
 		const codeElements = doc.querySelectorAll('code');
 
 		codeElements.forEach(async (codeElement) => {
-			console.log(codeElement);
 			const lang = codeElement.classList?.[0]
 				? codeElement.classList[0].replace('language-', '').trim()
 				: undefined;

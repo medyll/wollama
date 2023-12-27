@@ -1,3 +1,5 @@
+ 
+
 export const defaultOllamaSettings = {
 	seed: 0,
 	temperature: 0.5,
@@ -18,9 +20,9 @@ export const ollamaOptionsRanges = {
 	num_ctx: [0, 100, 1]
 };
 
-export const defaultOptions = {
+export const defaultSettings = {
 	defaultModel: 'llama2-uncensored',
-	ollama_server: 'http://127.0.0.1:11434',
+	ollama_server: import.meta.env.PUBLIC_OLLAMA_SERVER_API,
 	authHeader: false,
 	system_prompt: '',
 	request_mode: 'plain',

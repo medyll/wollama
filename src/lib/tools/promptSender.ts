@@ -1,7 +1,7 @@
 import { notifierState } from '$lib/stores/notifications';
 import type { ChatType } from '$types/db';
 import type { OllamaOptionsType, OllamaResponseType } from '$types/ollama';
-import { ApiCall } from './apiCall';
+import { ApiCall } from '../db/apiCall';
 
 export type PromptSenderType = {
 	prompt: string;
@@ -18,7 +18,7 @@ export type SenderCallback<T> = {
 type ArgsType<T> = {
 	cb: (args: SenderCallback<T>) => void /** callback */;
 	cbData: T /** data to merge with the callback data */;
-	images?: string;
+	images?: string[];
 };
 
 export class PromptSender<T> {

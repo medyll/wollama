@@ -1,7 +1,7 @@
 import { connectionChecker } from '$lib/stores/connection';
 import { settings } from '$lib/stores/settings';
 import { get } from 'svelte/store';
-import { ApiCall } from './apiCall';
+import { ApiCall } from '../db/apiCall';
 import { goto } from '$app/navigation';
 
 export class engine {

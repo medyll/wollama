@@ -94,13 +94,15 @@
 		chatSession.options = { ...$ollamaParams, ...options };
 
 		const sender = new PromptSender<CallbackDataType>(chatSession, {
-			images: images?.base64,
+			images: images?.base64 ? [images?.base64] : [],
 			cb: onResponseMessage,
 			cbData: {
 				chatId: chatSession.chatId,
 				assistantData: sessionMessages.assistantData
 			}
 		});
+		//
+ 
 		// set ai state to running
 		aiState.set('running');
 		// send prompt to ai

@@ -20,8 +20,8 @@
 	import { connectionChecker } from '$lib/stores/connection';
 	import Opening from '$components/Opening.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
-
-	export let data;
+	import { ApiCall } from '$lib/db/apiCall';
+ 
 
 	// load models into store
 	async function loadModels(models: Record<string, any>[]) {
@@ -31,7 +31,15 @@
 	}
 
 	onMount(async () => {
-		loadModels(data.models);
+		settings.initSettings();
+		const apiCall = new ApiCall();
+		let models = [];
+		try {
+			models = (await apiCall.listModels()) ?? [];
+		} catch (e) {
+			console.log(e);
+		}
+		loadModels(models);
 		ollamaParams.init();
 		engine.checkOllamaEndPoints();
 
@@ -46,7 +54,7 @@
 
 	$: if (browser && $page.params.id) {
 		idbQuery.getChat($page.params.id).then((chat) => {
-			if (chat) {
+			if (chat) { 
 				ui.setActiveChatId($page.params.id);
 			} else {
 				engine.goto('/');
@@ -55,6 +63,7 @@
 	} else {
 		ui.setActiveChatId();
 	}
+ 
 </script>
 
 <svelte:head>

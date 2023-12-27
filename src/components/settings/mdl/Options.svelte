@@ -4,7 +4,7 @@
 	import { OllamaOptionsDefaults, ollamaOptionsInfo } from '$configuration/configuration';
 	import List from '$components/fragments/List.svelte';
 	import Icon from '@iconify/svelte';
-	import { ApiCall } from '$lib/tools/apiCall';
+	import { ApiCall } from '$lib/db/apiCall';
 	import { notifierState } from '$lib/stores/notifications';
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';

@@ -1,30 +1,32 @@
-import { get } from 'http';
 import type { RequestHandler } from './$types';
+import { error, json } from '@sveltejs/kit';
+ 
 
-export const GET: RequestHandler = async (req) => {
-	// /api/tags
-	// console.log('req')
-	return new Response(JSON.stringify(req));
+export const GET: RequestHandler = async (req) => { 
+
+	const res = await req.fetch(`http://127.0.0.1:11434/${req.params.api}`).then((res) => res.json()).catch((err) => {return   error(err)});
+
+	return json(res) 
 };
 
 export const POST: RequestHandler = async (req) => {
-	/* /api/generate
+	/* 
+	/api/generate
     /api/chat
-
     /api/create
     /api/show
     /api/copy
-    /api/pull */
+    /api/pull */ 
 
-	return new Response();
-	/* return fetch(`${config.ollama_server}/api/generate`, {
+	return req
+		.fetch(`http;//127.0.0.1:11434/${req.params.api}`, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'text/event-stream',
-				...getHeader()
-			},
-			body: JSON.stringify(defaultOptions)
-		});; */
+			headers: req.request.headers,
+			body: JSON.stringify(req)
+		})
+		.then((res) => {
+			return res.json();
+		});
 };
 
 export const DELETE: RequestHandler = async () => {

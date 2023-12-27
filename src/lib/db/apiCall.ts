@@ -1,9 +1,8 @@
 import { aiState } from '$lib/stores';
 import { ollamaParams } from '$lib/stores/ollamaParams';
 import { settings } from '$lib/stores/settings';
-import { ui } from '$lib/stores/ui';
 import type { OllamaFetchBodyType, OllamaResponseType } from '$types/ollama';
-import { get } from 'svelte/store';
+import { get } from 'svelte/store'; 
 
 export class ApiCall {
 	private options = {
@@ -38,12 +37,7 @@ export class ApiCall {
 				...getHeader()
 			},
 			body: JSON.stringify(defaultOptions)
-		}); /* .then((russ)=>{
-			console.log({russ})
-			return russ
-		}).catch((error) => {
-			console.log({error})
-		}) */
+		});
 
 		if (!res.ok) {
 			throw await res.json();
@@ -78,7 +72,7 @@ export class ApiCall {
 			}
 		})
 			.then(async (res) => {
-				if (!res.ok) throw await res.json();
+				if (!res?.ok) throw await res.json();
 				return await res.json();
 			})
 			.then(async (res) => {
@@ -91,7 +85,7 @@ export class ApiCall {
 
 	async listModels() {
 		const config = get(settings);
-		console.log(config);
+		
 		return fetch(`${config.ollama_server}/api/tags`, {
 			method: 'GET',
 			headers: {
@@ -100,7 +94,7 @@ export class ApiCall {
 			}
 		})
 			.then(async (res) => {
-				if (!res.ok) throw await res.json();
+				if (!res?.ok) throw await res.json();
 				return await res.json();
 			})
 			.then(async (res) => {
@@ -156,8 +150,11 @@ export class ApiCall {
 		this.stream(res, hook);
 	}
 
-	static async stream(query, hook?: (data: OllamaResponseType) => void) {
-		const streamReader = query.body
+	static async stream(response: Response, hook?: (data: OllamaResponseType) => void) {
+		/* for await (const chunk of response.body) { 
+		} */
+
+		const streamReader = response.body
 			.pipeThrough(new TextDecoderStream())
 			.pipeThrough(splitStream('\n'))
 			.getReader();
