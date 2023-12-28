@@ -21,10 +21,11 @@
 	<div class="flex-1 text-3xl font-medium self-center capitalize">{$t('ui.settings')}</div>
 	<div>
 		<a
+			href="/configuration"
 			class="underline"
-			on:click={() => {
+			on:click|preventDefault={() => {
 				engine.goto('/configuration');
-				ui.showHideSettings()
+				ui.showHideSettings();
 			}}>advanced configuration</a
 		>
 	</div>

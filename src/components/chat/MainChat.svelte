@@ -9,7 +9,7 @@
 	import ChatInfo from './ChatInfo.svelte';
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
-	import Temperature from './input/Temperature.svelte';
+	import ChatOptions from './input/ChatOptions.svelte';
 	import { PromptSender, type SenderCallback } from '$lib/tools/promptSender';
 	import { idbQuery } from '$lib/db/dbQuery.js';
 	import { prompter, type PrompterType } from '$lib/stores/prompter';
@@ -21,92 +21,94 @@
 	import { liveQuery } from 'dexie';
 	import Bottomer from '$components/ui/Bottomer.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
+	import { settings } from '$lib/stores/settings';
 
 	type CallbackDataType = {
 		chatId: string;
 		assistantData: MessageType;
 	};
 
-	let voiceListening = false;
-
-	let streamResponseText: string = '';
-
-	let placeholder = voiceListening ? 'Listening...' : 'Message to ai';
+	$: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
 	$: disableSubmit =
-		$prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
+		$prompter.ollamaBody.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
 	$: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
-	async function getChatSession(args: Partial<ChatType>): Promise<ChatType> {
+	async function getChatSession(args: ChatType): Promise<ChatType> {
 		const chat = await idbQuery.initChat($ui.activeChatId, {
 			models: args.models,
-			options: { ...args.options }
-		});
+			ollamaBody: args.ollamaBody
+		} as ChatType);
 
 		return chat as ChatType;
 	}
 
 	// add messages chat to db
-	async function createChatSessionMessages(
-		chat: ChatType,
-		content: string,
-		images?: MessageImageType
-	) {
-		const ty = await Promise.all([
-			// insert user message
-			await idbQuery.insertMessage(chat.chatId, {
-				role: 'user',
-				status: 'done',
-				content,
-				chatId: chat.chatId,
-				images: images
-			}),
-			// insert assistant message
-			await idbQuery.insertMessage(chat.chatId, {
-				role: 'assistant',
-				status: 'sent',
-				chatId: chat.chatId,
-				model: chat.models[0]
-			})
-		]).then((res) => res);
+	async function createMessages(chat: ChatType, content: string, images?: MessageImageType) {
+		const ty = await idbQuery.insertMessage(chat.chatId, {
+			role: 'user',
+			status: 'done',
+			content,
+			chatId: chat.chatId,
+			images: images
+		});
 
+		const ay = await Promise.all([
+			...chat.models.map(
+				async (model) =>
+					await idbQuery.insertMessage(chat.chatId, {
+						role: 'assistant',
+						status: 'sent',
+						chatId: chat.chatId,
+						model
+					})
+			)
+		]);
 		// insert assistant message
 		return {
-			userData: ty[0],
-			assistantData: ty[1]
+			userData: ty,
+			assistantModelData: ay
 		};
 	}
 
 	async function sendPrompt(prompter: PrompterType) {
-		const { prompt, options, images } = prompter; // clear reference
+		const { ollamaBody, images } = prompter; // clear reference
 
 		// retrieve or set a chat session
-		const chatSession = await getChatSession({
-			models: $activeModels,
-			options: { ...$ollamaParams, ...prompter.options }
-		});
+		const chatSession = await idbQuery.initChat($ui.activeChatId, {
+			models: prompter.models,
+			ollamaBody: prompter.ollamaBody
+		} as ChatType);
+
+		// set default options
+		ollamaBody.options = { ...$ollamaParams, ...ollamaBody.options };
+		ollamaBody.images = images?.base64 ? [images?.base64] : [];
+		ollamaBody.format = ollamaBody.format?.replace('plain', '');
+		ollamaBody.context = chatSession.context ?? [];
 
 		// create messages for chat session
-		const sessionMessages = await createChatSessionMessages(chatSession, prompt, images);
+		const sessionMessages = await createMessages(chatSession, ollamaBody.prompt as string, images);
 
-		// update ollama options for ollama call
-		chatSession.options = { ...$ollamaParams, ...options };
-
-		const sender = new PromptSender<CallbackDataType>(chatSession, {
-			images: images?.base64 ? [images?.base64] : [],
-			cb: onResponseMessage,
-			cbData: {
-				chatId: chatSession.chatId,
-				assistantData: sessionMessages.assistantData
-			}
-		});
-		//
- 
 		// set ai state to running
 		aiState.set('running');
-		// send prompt to ai
-		sender.sendMessage(prompt);
+		// create prompt sender for each model
+		sessionMessages.assistantModelData.forEach((assistantMessage) => {
+			const sender = new PromptSender<CallbackDataType>(
+				{ ...ollamaBody, model: assistantMessage.model },
+				{
+					cb: onResponseMessage,
+					cbData: {
+						chatId: assistantMessage.chatId,
+						assistantData: assistantMessage
+					}
+				}
+			);
+			console.log('sending prompt to ai', assistantMessage);
+			// send prompt to ai
+			sender.sendMessage();
+		});
+
 		// set active chat
 		ui.setActiveChatId(chatSession.chatId);
 		// set auto-scroll to true
@@ -117,25 +119,23 @@
 
 	async function onResponseMessage({
 		chatId,
-		assistantData,
+		assistantData: assistantMessage,
 		data
 	}: SenderCallback<CallbackDataType>) {
 		if (data.done) {
-			streamResponseText = '';
 			aiState.set('done');
 
 			idbQuery.updateChat(chatId, { context: data.context });
-			idbQuery.updateMessage(assistantData.messageId, { status: 'done' });
-			idbQuery.insertMessageStats({ ...data, messageId: assistantData.messageId });
+			idbQuery.updateMessage(assistantMessage.messageId, { status: 'done' });
+			idbQuery.insertMessageStats({ ...data, messageId: assistantMessage.messageId });
 			//
 			chatUtils.checkTitle(chatId);
 			// set auto-scroll to false
 			ui.setAutoScroll(chatId, false);
 		} else {
-			streamResponseText += data.response ?? '';
-			// fire scroll position
-			idbQuery.updateMessage(assistantData.messageId, {
-				content: streamResponseText,
+			const message = await idbQuery.getMessage(assistantMessage.messageId);
+			idbQuery.updateMessage(assistantMessage.messageId, {
+				content: (message?.content ?? '') + (data.response ?? ''),
 				status: 'streaming'
 			});
 		}
@@ -154,29 +154,29 @@
 			submitHandler();
 		}
 	}
+
+	$: console.log($settings.defaultModel);
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
 <div class="h-full w-full overflow-auto">
 	<div class="container flex-v h-full mx-auto">
-		<div class="flex-1 mb-32 px-8">
-			<DashBoard>
-				<ChatInfo>
-					<Model />
-				</ChatInfo>
-				<List class="flex-v w-full gap-4" data={$messages} let:item={message}>
-					<Message {message} />
-				</List>
-				<Bottomer />
-			</DashBoard>
-		</div>
+		<DashBoard>
+			<ChatInfo>
+				<Model bind:activeModels={$prompter.models} />
+			</ChatInfo>
+			<List class="flex-v w-full gap-4" data={$messages} let:item={message}>
+				<Message {message} />
+			</List>
+			<Bottomer />
+		</DashBoard>
 		<div class="flex flex-col w-full y-b sticky margb-0 bottom-0 px-8">
-			<Temperature />
+			<ChatOptions />
 			<div class="inputTextarea">
 				<Images />
 				<Input
 					on:keypress={keyPressHandler}
-					bind:value={$prompter.prompt}
+					bind:value={$prompter.ollamaBody.prompt}
 					bind:requestStop={$aiState}
 					showCancel={$aiState == 'running'}
 					{placeholder}
@@ -191,8 +191,8 @@
 					<div slot="end" class="flex-align-middle">
 						<Speech
 							onEnd={submitHandler}
-							bind:prompt={$prompter.prompt}
-							bind:voiceListening
+							bind:prompt={$prompter.ollamaBody.prompt}
+							bind:voiceListening={$prompter.voiceListening}
 							disabled={disableSubmit}
 						/>
 						<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>

@@ -1,11 +1,12 @@
 // Type definitions for Ollama API
-export type OllamaFetchBodyType = {
+export type OllamaApiBody = {
 	prompt: string;
-	stream: boolean;
+	stream?: boolean;
 	model: string;
 	context: number[];
 	options: OllamaOptionsType;
-	images?: string[];
+	images: string[];
+	format: 'json' | 'plain' | '' |string
 };
 
 export type OllamaResponseType = {

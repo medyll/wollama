@@ -6,7 +6,7 @@ export interface SettingsType {
 	ollama_server: string;
 	ollamaModels?: string[]; // by api
 	defaultModels?: string[];
-	defaultModel?: string;
+	defaultModel: string;
 	chatModelKeys?: string[];
 	authHeader: boolean;
 	system_prompt?: string;
@@ -18,6 +18,7 @@ export interface SettingsType {
 		creative: number;
 		balanced: number;
 		accurate: number;
+		[key: string]: number;
 	};
 	sender: {
 		speechAutoSend?: boolean;

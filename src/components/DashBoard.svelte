@@ -9,18 +9,20 @@
 	export { className as class };
 </script>
 
-{#if !$ui.activeChatId}
-	<div class="h-full w-full flex flex-col">
-		<div class="flex-1"></div>
-		<div class="flex self-center text-center opacity-70">
-			<Icon icon="fluent-emoji-high-contrast:llama" style="font-size:10em" />
+<div class="flex-1 mb-32 px-8">
+	{#if !$ui.activeChatId}
+		<div class="h-full w-full flex flex-col">
+			<div class="flex-1"></div>
+			<div class="flex self-center text-center opacity-70">
+				<Icon icon="fluent-emoji-high-contrast:llama" style="font-size:10em" />
+			</div>
+			<div class="flex-col self-center text-center p-4">
+				<div class="soft-title">{$t('ui.use_model')}</div>
+				<Model />
+			</div>
+			<div class="flex-1"></div>
 		</div>
-		<div class="flex-col self-center text-center p-4">
-			<div class="soft-title">{$t('ui.use_model')}</div>
-			<Model />
-		</div>
-		<div class="flex-1"></div>
-	</div>
-{:else}
-	<slot />
-{/if}
+	{:else}
+		<slot />
+	{/if}
+</div>

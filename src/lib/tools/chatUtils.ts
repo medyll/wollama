@@ -9,9 +9,8 @@ import type { OllamaResponseType } from '$types/ollama';
 export async function askOllama(prompt: string, model: string) {}
 
 export async function guessChatTitle(message: string): Promise<OllamaResponseType> {
-	const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, please reply with only a few worlds:  ${message}`;
+	const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, reply with only a few worlds, no more than six words. here is the content to resume shortly:  ${message}`;
 
-	const ollama_fetch = new ApiCall();
 	return (await ApiCall.generate(prompt,()=>{}, {stream:false}));
 }
 
@@ -47,13 +46,11 @@ export class chatUtils {
 		};
 	}
 
-	static getChatDataObject(chatData: Partial<ChatType> = {}): ChatType {
+	static getChatDataObject(chatData: ChatType= {} as ChatType): ChatType {
 		return {
 			chatId: crypto.randomUUID(),
 			title: 'New Chat',
-			models: [get(settings).defaultModel],
-			messages: {},
-			resume: '',
+			models: [get(settings).defaultModel], 
 			dateCreation: new Date(),
 			dateLastMessage: new Date(),
 			context: [],

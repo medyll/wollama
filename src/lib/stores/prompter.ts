@@ -1,6 +1,7 @@
 import type { MessageImageType } from '$types/db';
 import type { OllamaApiBody, OllamaOptionsType } from '$types/ollama';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
+import { settings } from './settings';
 
 export type PrompterType = {
 	disabledPrompt: boolean;
@@ -8,27 +9,27 @@ export type PrompterType = {
 	voiceListening: boolean;
 	options: OllamaOptionsType;
 	images?: MessageImageType;
-	format: 'json' | 'plain';
+	models: string[];
 	ollamaBody: OllamaApiBody;
 };
 
 function prompterStore() {
-	const { subscribe, set, update } = writable<PrompterType>({
+	const defaultPromptState = {
 		voiceListening: false,
 		isPrompting: false,
 		disabledPrompt: false,
 		options: { temperature: 0.5 },
-		format: 'plain', /** @deprecated */
+		models: [get(settings).defaultModel],
 		ollamaBody: {
 			prompt: '',
 			model: '',
 			context: [],
 			options: {},
 			images: [],
-			format: 'plain',
-			
+			format: 'plain'
 		} as OllamaApiBody
-	});
+	};
+	const { subscribe, set, update } = writable<PrompterType>(defaultPromptState);
 
 	let promptTimer: NodeJS.Timeout;
 
@@ -39,7 +40,7 @@ function prompterStore() {
 				update((n) => {
 					return { ...n, isPrompting: false };
 				});
-			}, 500);
+			}, 100);
 		}
 	});
 
@@ -48,24 +49,7 @@ function prompterStore() {
 		set,
 		update,
 		reset: () => {
-			update((n: PrompterType) => {
-				return {
-					...n,
-					images: undefined,
-					voiceListening: false,
-					isPrompting: false,
-					disabledPrompt: false,
-					format: 'plain',
-					ollamaBody: {
-						prompt: '',
-						model: '',
-						context: [],
-						options: {},
-						images: [],
-						format: 'plain'
-					} as OllamaApiBody
-				};
-			});
+			set(defaultPromptState);
 		}
 	};
 }

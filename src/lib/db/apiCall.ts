@@ -1,8 +1,8 @@
 import { aiState } from '$lib/stores';
 import { ollamaParams } from '$lib/stores/ollamaParams';
 import { settings } from '$lib/stores/settings';
-import type { OllamaFetchBodyType, OllamaResponseType } from '$types/ollama';
-import { get } from 'svelte/store'; 
+import type { OllamaApiBody as OllamaApiBody, OllamaResponseType } from '$types/ollama';
+import { get } from 'svelte/store';
 
 export class ApiCall {
 	private options = {
@@ -16,7 +16,7 @@ export class ApiCall {
 	static async generate(
 		prompt: string,
 		hook?: (data: OllamaResponseType) => void,
-		options?: Partial<OllamaFetchBodyType>
+		apiBody?: Partial<OllamaApiBody>
 	) {
 		const config = get(settings);
 		const ollamaOptions = get(ollamaParams);
@@ -25,10 +25,9 @@ export class ApiCall {
 			prompt,
 			system: config?.system_prompt,
 			model: config?.defaultModel,
-			options: ollamaOptions,
-			context: [],
-			...options
-		};
+			...apiBody,
+			options: { ...ollamaOptions, ...apiBody?.options }
+		} as OllamaApiBody;
 
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			method: 'POST',
@@ -42,7 +41,7 @@ export class ApiCall {
 		if (!res.ok) {
 			throw await res.json();
 		} else {
-			if (options?.stream) {
+			if (apiBody?.stream) {
 				this.stream(res, hook);
 			} else {
 				if (!res.ok) throw await res.json();
@@ -85,7 +84,7 @@ export class ApiCall {
 
 	async listModels() {
 		const config = get(settings);
-		
+
 		return fetch(`${config.ollama_server}/api/tags`, {
 			method: 'GET',
 			headers: {
@@ -154,19 +153,21 @@ export class ApiCall {
 		/* for await (const chunk of response.body) { 
 		} */
 
-		const streamReader = response.body
-			.pipeThrough(new TextDecoderStream())
-			.pipeThrough(splitStream('\n'))
-			.getReader();
+		if (response.body) {
+			const streamReader = response.body
+				.pipeThrough(new TextDecoderStream())
+				.pipeThrough(splitStream('\n'))
+				.getReader();
 
-		while (true) {
-			const { value, done } = await streamReader.read();
+			while (true) {
+				const { value, done } = await streamReader.read();
 
-			if (Boolean(done) || get(aiState) == 'request_stop') break;
-			if (value) {
-				const data: OllamaResponseType = JSON.parse(value);
+				if (Boolean(done) || get(aiState) == 'request_stop') break;
+				if (value) {
+					const data: OllamaResponseType = JSON.parse(value);
 
-				if (hook) hook(data);
+					if (hook) hook(data);
+				}
 			}
 		}
 	}

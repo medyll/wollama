@@ -1,4 +1,4 @@
-import type { OllamaOptionsType, OllamaResponseType } from './ollama';
+import type { OllamaApiBody, OllamaOptionsType, OllamaResponseType } from './ollama';
 
 /**
  * Represents a chat.
@@ -8,13 +8,10 @@ export type ChatType = {
 	chatId: string;
 	title: string;
 	models: string[];
-	messages: MessageListType; /** @deprecated */
 	dateCreation: Date;
 	dateLastMessage: Date;
-	context: number[];
-	images: string[] /** @deprecated */;
-	temperature: number /** @deprecated */;
-	options: OllamaOptionsType;
+	context: number[] /** @deprecated find in ollamaBody */;
+	ollamaBody: Partial<OllamaApiBody>;
 };
 
 /**
@@ -24,7 +21,6 @@ export interface ChatListType {
 	[key: string]: ChatType;
 }
 
-
 export type MessageType = {
 	id: string;
 	chatId: string;
@@ -33,13 +29,16 @@ export type MessageType = {
 	images?: MessageImageType;
 	status: 'done' | 'sent' | 'streaming' | 'error';
 	context: number[];
-	model:string;
-} & ({
+	model: string;
+} & (
+	| {
 			role: 'user';
-	  } | {
+	  }
+	| {
 			role: 'assistant';
 			model?: string;
-	  });
+	  }
+);
 
 export type MessageListType = {
 	[key: string]: MessageType;

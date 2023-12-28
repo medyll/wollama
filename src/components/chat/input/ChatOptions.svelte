@@ -7,6 +7,10 @@
 	function setTemperature(temperature: number) {
 		$prompter.options.temperature = temperature;
 	}
+	function setRequestMode(format: 'json' | 'plain' | unknown) {
+		$prompter.ollamaBody.format = format as 'json' | 'plain';
+	}
+ 
 </script>
 
 <div class="p-1 flex-align-middle theme-bg rounded-md pb-2">
@@ -26,8 +30,8 @@
 	</div>
 	<div class="flex-1 flex-align-middle justify-center gap-2">
 		<Icon icon="charm:binary" class="sm" />
-		<Selector values={['json', 'plain']} value={$settings.request_mode} let:item>
-			<button on:click={() => settings.setSetting('request_mode', item)}>{item}</button>
+		<Selector values={['json', 'plain']} value={$prompter.ollamaBody.format} let:item>
+			<button on:click={() => setRequestMode(item)}>{item}</button>
 		</Selector>
 	</div>
 </div>

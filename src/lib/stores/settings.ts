@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 import { defaultSettings } from '$configuration/configuration';
 
 import type { SettingsType } from '$types/settings';
-console.log({defaultSettings})
+
 // set to indexedDB
 const settingStore = () => {
 	const { subscribe, set, update } = writable<SettingsType>({
