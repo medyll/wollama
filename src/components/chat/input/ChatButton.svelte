@@ -14,11 +14,13 @@
 
 	$: active = Boolean($ui.activeChatId === chatId);
 
-	const confirmDelete: boolean = false;
 	let editChat: boolean = false;
 
 	function deleteCha1tHandler() {
 		idbQuery.deleteChat(chatId);
+		if($ui.activeChatId === chatId) {
+			ui.setActiveChatId(undefined);
+		}
 	}
 
 	function editChatTitleHandler() {
