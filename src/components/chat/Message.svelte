@@ -8,7 +8,10 @@
 	import Prism from 'prismjs';
 	import { tick } from 'svelte';
 	export let message: MessageType;
-		import "prismjs/themes/prism-tomorrow.css";
+	import 'prismjs/themes/prism-tomorrow.css';
+	import { format } from 'date-fns';
+
+
 	$: icon = message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one';
 	$: place = message.role === 'user' ? 'mr-24' : 'ml-24';
 
@@ -74,11 +77,13 @@
 	}
 </script>
 
-<div class="{place}   flex  w-auto gap-1 elative overflow-hidden mb-1">
-	{#if message.role=='user'}<div class="p-1"><Icon style="font-size:1.6em" {icon} /></div>{/if}	
+<div class="{place}   relative  flex w-auto gap-1 elative overflow-hidden mb-1">
+	{#if message.role == 'user'}<div class="p-1"><Icon style="font-size:1.6em" {icon} /></div>{/if}
 	<div class="flex flex-col w-full">
 		<div
-			class="flex-align-middle mb-1 p-1 gap-2 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}"
+			class="flex-align-middle mb-1 p-1 gap-2 {message?.role == 'assistant'
+				? 'flex-row-reverse'
+				: ''}"
 		>
 			<div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
 			<div class="soft-title">
@@ -90,11 +95,12 @@
 			</div>
 			<div class="soft-title">{message?.model ?? ''}</div>
 			<div class="flex-1"></div>
-			<div class="soft-title">{message?.status !='done' ? message?.status : ''}</div>
-		</div> 
-		<div class="px-2 py-1 w-full flex-1 relative overflow-hidden">
+			<div class="soft-title">{message?.status != 'done' ? message?.status : ''}</div>
+			<div class="soft-title">{format(new Date(message?.dateCreation), 'dd MMMM y hh:mm')}</div>
+		</div>
+		<div class="px-2  w-full flex-1 relative overflow-hidden theme-border p-4 py-4 rounded-md">
 			{#if message.images}
-					<img src={message.images.dataUri} alt="list" style="height:100px" />
+				<img src={message.images.dataUri} alt="list" style="height:100px" />
 			{/if}
 			{#if message?.role == 'assistant'}
 				{#if message.status == 'sent'}
@@ -106,8 +112,10 @@
 				{@html message?.content}
 			{/if}
 		</div>
-	</div>	
-	{#if message.role=='assistant'}<div class="p-1"><Icon style="font-size:1.6em" {icon} /></div>{/if}
+	</div>
+	{#if message.role == 'assistant'}<div class="p-1">
+			<Icon style="font-size:1.6em" {icon} />
+		</div>{/if}
 </div>
 
 <style lang="postcss">

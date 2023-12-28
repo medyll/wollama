@@ -30,9 +30,27 @@ export class PromptSender<T> {
 	}
 
 	async sendMessage() {
+		return new Promise(async (resolve, reject) => {
+			try {
+				await ApiCall.generate(
+					this.ollamaBody.prompt,
+					async (data) => this.args.cb({ ...this.args.cbData, data }),
+					{
+						...this.ollamaBody,
+						stream: true
+					}
+				);
+				resolve(true)
+			} catch (e) {
+				if (e.error) {
+					notifierState.notify('error', e.error);
+				}
+				reject(e);
+			}
+		});
 		// use args as a parameter
 		try {
-			await ApiCall.generate(
+			return  ApiCall.generate(
 				this.ollamaBody.prompt,
 				async (data) => this.args.cb({ ...this.args.cbData, data }),
 				{

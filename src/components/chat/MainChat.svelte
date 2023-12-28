@@ -13,7 +13,7 @@
 	import { PromptSender, type SenderCallback } from '$lib/tools/promptSender';
 	import { idbQuery } from '$lib/db/dbQuery.js';
 	import { prompter, type PrompterType } from '$lib/stores/prompter';
-	import { activeModels, aiState } from '$lib/stores';
+	import { aiState } from '$lib/stores';
 	import Message from '$components/chat/Message.svelte';
 	import DashBoard from '$components/DashBoard.svelte';
 	import Images from './input/Images.svelte';
@@ -21,7 +21,6 @@
 	import { liveQuery } from 'dexie';
 	import Bottomer from '$components/ui/Bottomer.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
-	import { settings } from '$lib/stores/settings';
 
 	type CallbackDataType = {
 		chatId: string;
@@ -34,15 +33,6 @@
 		$prompter.ollamaBody.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
 	$: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
-
-	async function getChatSession(args: ChatType): Promise<ChatType> {
-		const chat = await idbQuery.initChat($ui.activeChatId, {
-			models: args.models,
-			ollamaBody: args.ollamaBody
-		} as ChatType);
-
-		return chat as ChatType;
-	}
 
 	// add messages chat to db
 	async function createMessages(chat: ChatType, content: string, images?: MessageImageType) {
@@ -59,7 +49,7 @@
 				async (model) =>
 					await idbQuery.insertMessage(chat.chatId, {
 						role: 'assistant',
-						status: 'sent',
+						status: 'idle',
 						chatId: chat.chatId,
 						model
 					})
@@ -93,7 +83,7 @@
 		// set ai state to running
 		aiState.set('running');
 		// create prompt sender for each model
-		sessionMessages.assistantModelData.forEach((assistantMessage) => {
+		sessionMessages.assistantModelData.forEach(async (assistantMessage) => {
 			const sender = new PromptSender<CallbackDataType>(
 				{ ...ollamaBody, model: assistantMessage.model },
 				{
@@ -104,7 +94,7 @@
 					}
 				}
 			);
-			console.log('sending prompt to ai', assistantMessage);
+			
 			// send prompt to ai
 			sender.sendMessage();
 		});
@@ -154,8 +144,6 @@
 			submitHandler();
 		}
 	}
-
-	$: console.log($settings.defaultModel);
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
@@ -167,6 +155,7 @@
 			</ChatInfo>
 			<List class="flex-v w-full gap-4" data={$messages} let:item={message}>
 				<Message {message} />
+				<hr class="mx-auto w-64" />
 			</List>
 			<Bottomer />
 		</DashBoard>

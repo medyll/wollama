@@ -26,8 +26,9 @@ export type MessageType = {
 	chatId: string;
 	messageId: string;
 	content: string;
+	dateCreation: Date;
 	images?: MessageImageType;
-	status: 'done' | 'sent' | 'streaming' | 'error';
+	status: 'idle' | 'done' | 'sent' | 'streaming' | 'error';
 	context: number[];
 	model: string;
 } & (
