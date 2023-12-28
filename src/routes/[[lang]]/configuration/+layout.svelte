@@ -10,9 +10,9 @@
 	$: activeTab = $page.params?.config ?? 'ollama';
 </script>
 
-<div class="h-full w-full overflow-hidden pl-12">
-	<div class="h-full w-full flex flex-col overflow-auto">
-		<div class="sticky top-0 bg-white/80 z-10">
+<div class="h-full w-full overflow-hidden pl-8">
+	<div class="h-full w-full flex flex-col overflow-auto px-4">
+		<div class="sticky top-0 theme-bg z-10">
 			<div class="p-8 text-lg">
 				<Icon icon="mdi:server-network" class="mr-2" />
 				{$t(`configuration.home`)}
