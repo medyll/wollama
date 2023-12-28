@@ -94,7 +94,7 @@
 					}
 				}
 			);
-			
+
 			// send prompt to ai
 			sender.sendMessage();
 		});
@@ -133,7 +133,7 @@
 
 	function submitHandler() {
 		sendPrompt($prompter);
-		prompter.reset();
+		//prompter.reset();
 	}
 
 	function keyPressHandler(e: KeyboardEvent) {

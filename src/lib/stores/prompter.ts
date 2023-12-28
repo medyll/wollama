@@ -24,7 +24,7 @@ function prompterStore() {
 			prompt: '',
 			model: '',
 			context: [],
-			options: {},
+			options: { temperature: 0.5 },
 			images: [],
 			format: 'plain'
 		} as OllamaApiBody

@@ -103,7 +103,7 @@
 				<img src={message.images.dataUri} alt="list" style="height:100px" />
 			{/if}
 			{#if message?.role == 'assistant'}
-				{#if message.status == 'sent'}
+				{#if message.status == 'idle'}
 					<Skeleton class="h-full" />
 				{:else if ['streaming', 'done'].includes(message.status)}
 					{@html assistantCode}
