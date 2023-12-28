@@ -7,6 +7,7 @@ export type OllamaApiBody = {
 	options: OllamaOptionsType;
 	images: string[];
 	format: 'json' | 'plain' | '' |string
+	system: string | null;
 };
 
 export type OllamaResponseType = {

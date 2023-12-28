@@ -36,7 +36,3 @@
 		{$settings.authHeader}
 	</button>
 </InfoLine>
-<hr />
-<InfoLine title={$t('settings.system_prompt')} vertical>
-	<textarea cols="4" class="w-full h-24">{$settings.system_prompt}</textarea>
-</InfoLine>

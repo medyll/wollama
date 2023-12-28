@@ -48,20 +48,5 @@ export class PromptSender<T> {
 				reject(e);
 			}
 		});
-		// use args as a parameter
-		try {
-			return  ApiCall.generate(
-				this.ollamaBody.prompt,
-				async (data) => this.args.cb({ ...this.args.cbData, data }),
-				{
-					...this.ollamaBody,
-					stream: true
-				}
-			);
-		} catch (e) {
-			if (e.error) {
-				notifierState.notify('error', e.error);
-			}
-		}
 	}
 }

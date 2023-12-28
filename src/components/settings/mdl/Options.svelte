@@ -8,6 +8,7 @@
 	import { notifierState } from '$lib/stores/notifications';
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
+	import InfoLine from '$components/fragments/InfoLine.svelte';
 
 	let ollama_server = $settings.ollama_server;
 
@@ -44,11 +45,24 @@
 		><Icon class="md" icon="iconoir:server-connection" />
 	</button>
 </form>
+
+<hr />
+<div class="soft-title p-2 py-4">
+	{$t('settings.system_prompt')}
+</div>
+<InfoLine title={"prompt"} vertical>
+	<textarea bind:value={$settings.system_prompt} cols="4" class="w-full h-24 theme-bg p-2 rounded-md" />
+</InfoLine>
 <hr />
 <div class="flex-align-middle gap-8">
 	<div class="soft-title p-2 py-4">Options</div>
 	<div>
-		<Confirm validate={() => {ollamaParams.resetAll()}} message={$t('settings.resetOllamaOptions')}>
+		<Confirm
+			validate={() => {
+				ollamaParams.resetAll();
+			}}
+			message={$t('settings.resetOllamaOptions')}
+		>
 			{$t('settings.resetAll')}
 		</Confirm>
 	</div>
@@ -80,7 +94,13 @@
 				/>
 			{/if}
 		</div>
-		<div class="w-16"><button on:click={()=>{ollamaParams.resetParam(setting)}}>reset</button></div>
+		<div class="w-16">
+			<button
+				on:click={() => {
+					ollamaParams.resetParam(setting);
+				}}>reset</button
+			>
+		</div>
 	</div>
 	<hr />
 </List>
