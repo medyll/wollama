@@ -98,7 +98,8 @@
 			// send prompt to ai
 			sender.sendMessage();
 		});
-
+		// reset prompt
+		$prompter.ollamaBody.prompt = '';
 		// set active chat
 		ui.setActiveChatId(chatSession.chatId);
 		// set auto-scroll to true
@@ -133,6 +134,7 @@
 
 	function submitHandler() {
 		sendPrompt($prompter);
+		//$prompter.ollamaBody.prompt = '';
 		//prompter.reset();
 	}
 
