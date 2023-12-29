@@ -7,10 +7,15 @@
 	import { ui } from '$lib/stores/ui.js';
 	import ChatList from '$components/ui/ChatMenu.svelte';
 	import { engine } from '$lib/tools/engine';
+
+		const createChat = async () => {
+		ui.setActiveChatId();
+		engine.goto('/');
+	};
 </script>
 
 <div class="flex-v h-full w-full gap-2 p-3">
-	<div class="flex-align-middle gap-2 py-2">
+	<div class="flex-align-middle gap-2 py-2 relative">
 		<div class="flex-align-middle flex-1 gap-2">
 			<img
 				alt="logo"
@@ -20,6 +25,15 @@
 				style="transform: scaleX(-1);"
 			/>
 			<div class="font-semibold text-xl">wOollama !</div>
+			<div
+				class="hidden md:block absolute border theme-border theme-bg rounded-full gap-2 p-2 right-0"
+			>
+				
+				<button title={$t('ui.newChat')} on:click={ createChat} class="  iconButton">
+					<Icon icon="mdi:chat-plus-outline" class="lg" />
+				</button><!-- <a href="/" class="underline" on:click={createChat}>{$t('ui.newChat')}</a>
+		<br /> -->
+			</div>
 		</div>
 	</div>
 	<input type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />

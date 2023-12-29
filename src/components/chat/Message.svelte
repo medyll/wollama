@@ -11,7 +11,6 @@
 	import 'prismjs/themes/prism-tomorrow.css';
 	import { format } from 'date-fns';
 
-
 	$: icon = message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one';
 	$: place = message.role === 'user' ? 'mr-24' : 'ml-24';
 
@@ -77,8 +76,12 @@
 	}
 </script>
 
-<div class="{place}   relative  flex w-auto gap-1 elative overflow-hidden mb-1">
-	{#if message.role == 'user'}<div class="p-1"><Icon style="font-size:1.6em" {icon} /></div>{/if}
+<div class="{place}   relative flex w-auto gap-1 elative overflow-hidden mb-1">
+	{#if message.role == 'user'}<div class="p-1">
+			<div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
+				<Icon style="font-size:1.6em" {icon} />
+			</div>
+		</div>{/if}
 	<div class="flex flex-col w-full">
 		<div
 			class="flex-align-middle mb-1 p-1 gap-2 {message?.role == 'assistant'
@@ -98,7 +101,7 @@
 			<div class="soft-title">{message?.status != 'done' ? message?.status : ''}</div>
 			<div class="soft-title">{format(new Date(message?.dateCreation), 'dd MMMM y hh:mm')}</div>
 		</div>
-		<div class="px-2  w-full flex-1 relative overflow-hidden theme-border p-4 py-4 rounded-md">
+		<div class="px-2 w-full flex-1 relative overflow-hidden theme-border p-4 py-4 rounded-md">
 			{#if message.images}
 				<img src={message.images.dataUri} alt="list" style="height:100px" />
 			{/if}
@@ -114,7 +117,9 @@
 		</div>
 	</div>
 	{#if message.role == 'assistant'}<div class="p-1">
-			<Icon style="font-size:1.6em" {icon} />
+			<div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
+				<Icon style="font-size:1.6em" {icon} />
+			</div>
 		</div>{/if}
 </div>
 

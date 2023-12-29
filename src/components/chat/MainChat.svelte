@@ -9,7 +9,7 @@
 	import ChatInfo from './ChatInfo.svelte';
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
-	import ChatOptions from './input/ChatOptions.svelte';
+	import ChatOptions from './ChatOptions.svelte';
 	import { PromptSender, type SenderCallback } from '$lib/tools/promptSender';
 	import { idbQuery } from '$lib/db/dbQuery.js';
 	import { prompter, type PrompterType } from '$lib/stores/prompter';
@@ -148,8 +148,8 @@
 	}
 </script>
 
-<form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
-<div class="h-full w-full overflow-auto">
+<form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />  
+<div class="h-full w-full">
 	<div class="container flex-v h-full mx-auto">
 		<DashBoard>
 			<ChatInfo>
@@ -157,7 +157,6 @@
 			</ChatInfo>
 			<List class="flex-v w-full gap-4" data={$messages} let:item={message}>
 				<Message {message} />
-				<hr class="mx-auto w-64" />
 			</List>
 			<Bottomer />
 		</DashBoard>

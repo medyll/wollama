@@ -17,13 +17,12 @@
 	};
 </script>
 
-<div class="flex-align-middle px-2 gap-2 sticky top-0 mt-0 right-4 left-4 z-50">
-	<div class="flex-align-middle gap-2 py-2">
-		<a href="/" class="underline" on:click={createChat}>{$t('ui.newChat')}</a>
-		<button on:click={createChat} class="borderButton iconButton">
-			<Icon icon="mdi:chat-plus-outline" style="font-size:1.6em" />
+<div class="sticky  flex-align-middle px-2 gap-2   top-0 mt-0 right-4 left-4 z-50">
+	<!-- <div class="hidden md:block absolute border theme-border theme-bg rounded-full gap-2 p-2 mt-72"> 
+		<button title={$t('ui.newChat')} on:click={createChat} class="  iconButton">
+			<Icon icon="mdi:chat-plus-outline" class="lg"/>
 		</button>
-	</div>
+	</div> -->
 	<div class="flex-1 text-center soft-title relative">
 		{#await chat then value}
 			{value?.title ?? ''}

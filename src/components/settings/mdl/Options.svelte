@@ -23,6 +23,9 @@
 			});
 		//
 	}
+
+		$: console.log($ollamaParams)
+
 </script>
 
 <div class="soft-title p-2 py-4">

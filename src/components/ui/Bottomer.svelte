@@ -11,7 +11,7 @@
 	});
 
 	function scrollDown() {
-		if (element)
+		if (element && $ui.autoScroll?.[$ui.activeChatId])
 			setTimeout(() => {
 				element?.scrollIntoView({
 					block: 'end',

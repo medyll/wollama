@@ -4,11 +4,22 @@
 
 @layer components {
 	:root {
-        --theme-primary: rgb(59 130 246);
-
+		--theme-primary: rgb(59 130 246);
 
 		--theme-bg-top: rgb(239 246 255);
 		--theme-bg-dark: rgb(31 41 55);
+	}
+
+	.theme-primary-color {
+		@apply text-yellow-600;
+	}
+
+	.theme-primary-bg {
+		@apply bg-yellow-600;
+	}
+
+	.theme-primary-border{
+		@apply border-yellow-600/50
 	}
 
 	.theme-color-bg {
@@ -36,7 +47,7 @@
 	}
 
 	.container {
-		@apply relative md:max-w-3xl lg:max-w-[45rem] xl:max-w-[50rem] 2xl:max-w-[120-rem];
+		@apply relative   lg:max-w-[55rem] xl:max-w-[65] 2xl:max-w-[75rem] 3xl:max-w-[100rem];
 	}
 
 	.application {

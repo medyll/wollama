@@ -79,7 +79,7 @@
 		</div>
 		<div class="flex-1 flex-col flex relative overflow-hidden z-0">
 			<TopBar />
-			<main class="relative h-full w-full overflow-hidden transition-width">
+			<main class="relative h-full w-full overflow-auto transition-width">
 				<slot />
 			</main>
 		</div>

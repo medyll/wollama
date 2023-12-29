@@ -43,7 +43,7 @@ export const defaultSettings = {
 };
 
 export const OllamaOptionsDefaults = {
-	seed: { default: 0, min: 0, max: undefined },
+	seed: { default: 4, min: 0, max: undefined },
 	temperature: { default: 0.5, min: 0, max: 1 },
 	repeat_penalty: { default: 1.1, min: 0, max: 2 },
 	top_k: { default: 40, min: 0, max: 200 },
