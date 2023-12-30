@@ -2,7 +2,7 @@
 	import Icon from '@iconify/svelte';
 
 	export let validate: Function;
-	export let message: string|undefined;
+	export let message: string|undefined = undefined;
 
 	let status = 'default';
 </script>

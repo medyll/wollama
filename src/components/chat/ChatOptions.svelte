@@ -3,6 +3,11 @@
 	import { settings } from '$lib/stores/settings';
 	import Icon from '@iconify/svelte';
 	import Selector from '$components/fragments/Selector.svelte';
+	import Prompts from '$components/settings/Prompts.svelte';
+	import { t } from '$lib/stores/i18n';
+	import { ui } from '$lib/stores/ui';
+
+	$: component = $ui.showPrompt ? Prompts : undefined;
 
 	function setTemperature(temperature: number) {
 		$prompter.options.temperature = temperature;
@@ -12,13 +17,11 @@
 	}
 </script>
 
-<div class="absolute flex gap-4 p-2 theme-border theme-bg w-48 -top-8">
-	<div>default</div>
-	<div></div>
-	{$prompter.ollamaBody.system}
-</div>
 <div class="p-1 flex-align-middle theme-bg rounded-md pb-2">
-	<div class="flex-1">system prompt</div>
+	<div class="flex-1 text-center relative">
+		<svelte:component this={component} />
+		<button on:click={() => ui.showHidePromptMenu()}>{$t('prompt.systemPrompt')}</button>
+	</div>
 	<div class="flex justify-center gauge relative">
 		<div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
 		{#each Object.keys($settings.temperatures ?? {}) as temperature}

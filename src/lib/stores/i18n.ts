@@ -1,4 +1,4 @@
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import translations from '../../locales/translations.js';
 import { settings } from './settings.js';
 import { engine } from '$lib/tools/engine.js';
@@ -32,9 +32,9 @@ function doTranslate(locale: string = 'en', key: string, vars: Record<string, st
 	});
 	if (!text) {
 		clearTimeout(timerUn)
-		timerUn = setTimeout(() => {
-			missingLocale.update((n) => [...n, key]);
-			console.log('Missing translation for key: ' + key);
+		timerUn = setTimeout(async () => {
+			await missingLocale.update((n) => [...n, key].filter((v, i, a) => a.indexOf(v) === i));
+			console.log('Missing translation' , get(missingLocale));
 		}, 500);
 	}
 	return text ?? key;

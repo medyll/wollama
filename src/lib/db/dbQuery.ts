@@ -1,4 +1,4 @@
-import type { ChatType, MessageType } from '$types/db';
+import type { ChatType, MessageType, PromptType } from '$types/db';
 import type { OllamaResponseType } from '$types/ollama';
 import { chatUtils } from '$lib/tools/chatUtils';
 import { dbase } from './dbSchema';
@@ -69,5 +69,28 @@ export class idbQuery {
 		if (!statsData.messageId) throw new Error('messageId is required');
 		const stats = chatUtils.getMessageStatsObject(statsData);
 		await dbase.messageStats.add(stats);
+	}
+
+	static async getPrompt(promptId: string) {
+		if (!promptId) throw new Error('promptId is required');
+		return await dbase.prompts.where('id').equals(promptId).first();
+	}
+
+	static async getPrompts() {
+		return await dbase.prompts.toArray();
+	}
+
+	static async insertPrompt(promptData: Partial<PromptType>) {
+		return await dbase.prompts.put(promptData as PromptType);
+	}
+
+	static async updatePrompt(id: number, promptData: Partial<PromptType>) {
+		if (!id) throw new Error('id is required');
+		return await dbase.prompts.update(id, promptData);
+	}
+
+	static async deletePrompt(promptId: number) {
+		if (!promptId) throw new Error('promptId is required');
+		return await dbase.prompts.delete(promptId);
 	}
 }

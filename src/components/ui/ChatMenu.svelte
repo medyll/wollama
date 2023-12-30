@@ -15,7 +15,7 @@
 </script>
 
 <div class="text-right soft-title">{$t('ui.myChats')}</div>
-<div class="chatZone">
+<div class="chatZone paper">
 	<div class="flex-1">
 		<List data={$chatMenuList ?? []} let:item>
 			<div>
@@ -47,10 +47,6 @@
 	}
 	.chatZone {
 		@apply flex flex-col gap-4;
-		@apply border rounded-lg p-2 py-4;
-		@apply border-neutral-600/10;
-		@apply bg-neutral-200/30 dark:bg-slate-600/30;
 		@apply shadow shadow-gray-400/70 dark:shadow-black/80;
-		@apply backdrop-opacity-90 backdrop-blur-3xl;
 	}
 </style>

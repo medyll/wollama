@@ -18,8 +18,8 @@
 		@apply bg-yellow-600;
 	}
 
-	.theme-primary-border{
-		@apply border-yellow-600/50
+	.theme-primary-border {
+		@apply border-yellow-600/50;
 	}
 
 	.theme-color-bg {
@@ -55,5 +55,13 @@
 		@apply dark:bg-gray-800 dark:text-gray-100;
 		@apply bg-gradient-to-b from-stone-200 to-gray-50 to-90%;
 		@apply dark:bg-gradient-to-b dark:from-gray-700 dark:to-gray-800 to-90%;
+	}
+
+
+	.paper {
+		@apply border rounded-lg p-2 py-4;
+		@apply border-neutral-600/10;
+		@apply bg-neutral-200/30 dark:bg-slate-600/30;
+		@apply backdrop-opacity-90 backdrop-blur-3xl;
 	}
 }

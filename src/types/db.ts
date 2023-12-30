@@ -52,3 +52,11 @@ export type MessageImageType = {
 	header: string;
 	base64: string;
 };
+
+
+export type PromptType = {
+	id: number;
+	dateCreation: Date;
+	content: string;
+	title: string;
+}

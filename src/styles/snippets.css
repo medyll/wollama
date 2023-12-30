@@ -1,74 +1,82 @@
-
-
 .flex-align-middle {
-    @apply flex items-center;
+	@apply flex items-center;
 }
 
-.flex-v { 
-    @apply flex flex-col;
+.flex-v {
+	@apply flex flex-col;
 }
-
-
 
 .inputSearch {
-    @apply w-full p-1 rounded-md border border-gray-700;
-    @apply text-gray-700 bg-gray-200;
-    @apply dark:bg-gray-900 dark:text-gray-100
+	@apply w-full p-1 rounded-md border border-gray-700;
+	@apply text-gray-700 bg-gray-200;
+	@apply dark:bg-gray-900 dark:text-gray-100;
 }
 .appButton {
-    @apply text-left px-1 flex items-center  rounded-md border border-gray-700;
-    @apply text-gray-700 bg-gray-200;
-    @apply dark:bg-gray-900/40 dark:text-gray-100
+	@apply text-left px-1 flex items-center  rounded-md border border-gray-700;
+	@apply text-gray-700 bg-gray-200;
+	@apply dark:bg-gray-900/40 dark:text-gray-100;
 }
 
 .borderButton {
-    @apply text-left px-1 py-1 rounded-md border flex items-center ;
-    @apply border-gray-700/30 dark:border-gray-300/20;
-    /* @apply text-gray-700 bg-gray-50 border-gray-300; */
-   /*  @apply dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700 */
+	@apply text-left px-1 py-1 rounded-md border flex items-center;
+	@apply border-gray-700/30 dark:border-gray-300/20;
+	/* @apply text-gray-700 bg-gray-50 border-gray-300; */
+	/*  @apply dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700 */
 }
 
-.inputTextarea {
-     @apply border overflow-hidden rounded-md  ;
-     @apply dark:bg-white;
-     @apply  text-gray-700  dark:text-gray-700;
-     @apply shadow shadow-gray-500/60 dark:shadow-black;
-}
-.iconButton{
-    aspect-ratio: 1/1;
+
+.iconButton {
+	aspect-ratio: 1/1;
 }
 
-input[type="text"],input[type="search"] {
-    @apply rounded-md p-2;
-    @apply  bg-white/80 dark:bg-white/10 ;
-    @apply  text-gray-700 dark:text-gray-100;
-    @apply   border border-gray-400/60  hover:border-gray-400/90;
+input[type='text'],
+input[type='search'],
+textarea {
+	@apply rounded-md p-2;
+	@apply bg-white/80 dark:bg-white/10;
+	@apply text-gray-700 dark:text-gray-100;
+	@apply border border-gray-400/60  hover:border-gray-400/90;
+}
+
+button {
+	&.btn {
+		@apply inline-flex items-center justify-center border border-transparent rounded-md shadow-sm text-base font-medium;
+		@apply px-4 py-2;
+		@apply text-gray-800 bg-slate-100 hover:bg-indigo-700;
+	}
+	:active {
+	}
+}
+
+textarea {
+	color: inherit;
+	@apply block w-full border-gray-300 rounded-md shadow-sm;
+	@apply focus:ring-indigo-500 focus:border-indigo-500;
+	@apply dark:bg-gray-800 dark:text-gray-100;
 }
 
 button:disabled {
-    opacity: 0.5;
+	opacity: 0.5;
 }
 
 select {
-    @apply rounded-md p-2;
-    @apply  bg-white/80 dark:bg-white/10 ;
-    @apply  text-gray-700 dark:text-gray-100;
-    @apply   border border-gray-400/60  hover:border-gray-400/90;
-    &.naked{
-        @apply  border-none bg-transparent;
-    
-    }
+	@apply rounded-md p-2;
+	@apply bg-white/80 dark:bg-white/10;
+	@apply text-gray-700 dark:text-gray-100;
+	@apply border border-gray-400/60  hover:border-gray-400/90;
+	&.naked {
+		@apply border-none bg-transparent;
+	}
 }
 select option {
-    @apply  bg-white/80 dark:bg-black p-1 cursor-pointer  ;
-    @apply  text-gray-700 dark:text-gray-100; 
+	@apply bg-white/80 dark:bg-black p-1 cursor-pointer;
+	@apply text-gray-700 dark:text-gray-100;
 }
-
 
 .iconify {
 	display: inline-block;
-    opacity:0.7;
-    font-size: 1.1em; 
+	opacity: 0.7;
+	font-size: 1.1em;
 	&.sm {
 		font-size: 1.1em;
 	}
@@ -81,14 +89,13 @@ select option {
 	&.xl {
 		font-size: 3.8em;
 	}
-    &.spin {
-        animation: spin 1s linear infinite;
-    }
+	&.spin {
+		animation: spin 1s linear infinite;
+	}
 }
 
 hr {
-	margin                          : 1em 0;
-	border                          : 1px solid top;
-	@apply border-indigo-500/30 dark:border-white/20
+	margin: 1em 0;
+	border: 1px solid top;
+	@apply border-indigo-500/30 dark:border-white/20;
 }
- 
