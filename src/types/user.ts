@@ -7,7 +7,7 @@ export type UserType = {
 	gravatarEmail: string;
 	avatarImg: string;
 	color: string;
-	created_at: string;
+	createdAt: string;
 	updated_at: string;
 	settings: SettingsType;
 };

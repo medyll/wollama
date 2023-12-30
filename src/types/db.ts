@@ -8,7 +8,7 @@ export type ChatType = {
 	chatId: string;
 	title: string;
 	models: string[];
-	dateCreation: Date;
+	createdAt: Date;
 	dateLastMessage: Date;
 	context: number[] /** @deprecated find in ollamaBody */;
 	ollamaBody: Partial<OllamaApiBody>;
@@ -26,7 +26,7 @@ export type MessageType = {
 	chatId: string;
 	messageId: string;
 	content: string;
-	dateCreation: Date;
+	createdAt: Date;
 	images?: MessageImageType;
 	status: 'idle' | 'done' | 'sent' | 'streaming' | 'error';
 	context: number[];
@@ -56,7 +56,7 @@ export type MessageImageType = {
 
 export type PromptType = {
 	id: number;
-	dateCreation: Date;
+	createdAt: Date;
 	content: string;
 	title: string;
 }

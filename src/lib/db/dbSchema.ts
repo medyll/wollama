@@ -18,13 +18,13 @@ export class DataBase extends Dexie {
 	constructor() {
 		super('woolama');
 
-		this.version(1.1).stores({
-			chat: '&chatId, dateCreation, dateLastMessage',
-			messages: '&messageId, chatId, dateCreation',
+		this.version(1.3).stores({
+			chat: '&chatId, createdAt, dateLastMessage',
+			messages: '&messageId, chatId, createdAt',
 			messageStats: '&messageId, create_at',
 			settings: '++id',
-			prompts: '++id, dateCreation',
-			user: '++id, created_at, email',
+			prompts: '++id, createdAt',
+			user: '++id, createdAt, email',
 		});
 	}
 

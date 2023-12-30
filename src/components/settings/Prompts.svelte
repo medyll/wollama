@@ -24,7 +24,7 @@
 		const prompt: Partial<PromptType> = {
 			title: title.value,
 			content: content.value,
-			dateCreation: new Date()
+			createdAt: new Date()
 		};
 
 		await idbQuery.insertPrompt(prompt);

@@ -62,7 +62,7 @@ export class idbQuery {
 
 	static getMessages(chatId: string) {
 		if (!chatId) throw new Error('chatId is required');
-		return dbase.messages.where('chatId').equals(chatId).sortBy('dateCreation');
+		return dbase.messages.where('chatId').equals(chatId).sortBy('createdAt');
 	}
 
 	static async insertMessageStats(statsData: Partial<OllamaResponseType>) {

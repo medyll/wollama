@@ -17,7 +17,7 @@ export type OllamaResponseType = {
 	response: string;
 	done: boolean;
 	context: number[];
-	created_at: string;
+	createdAt: string;
 	eval_count: number;
 	eval_duration: number;
 	load_duration: number;

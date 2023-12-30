@@ -19,7 +19,7 @@ type GroupItem = {
 
 function sortList(list: ChatType[]): ChatType[] {
 	return list.sort(
-		(a, b) => new Date(b.dateCreation).getTime() - new Date(a.dateCreation).getTime()
+		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 	);
 }
 
@@ -105,8 +105,8 @@ function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, mo
 		// loop chats
 		for (const item of sortedList) {
 			if (
-				new Date(item.dateCreation).getTime() >= week.start &&
-				new Date(item.dateCreation).getTime() <= week.end
+				new Date(item.createdAt).getTime() >= week.start &&
+				new Date(item.createdAt).getTime() <= week.end
 			) {
 				if (!groups.byMonth[idx]) groups.byMonth[idx] = [];
 				group.items.push(item);
@@ -121,8 +121,8 @@ function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, mo
 		// loop chats
 		for (const item of sortedList) {
 			if (
-				new Date(item.dateCreation).getTime() >= month.start &&
-				new Date(item.dateCreation).getTime() <= month.end
+				new Date(item.createdAt).getTime() >= month.start &&
+				new Date(item.createdAt).getTime() <= month.end
 			) {
 				if (!groups.byMonth[idx]) groups.byMonth[idx] = [];
 				group.items.push(item);
@@ -154,7 +154,7 @@ export const chatMenuList = derived([ui, chatList], ([$ui, $chatList]) => {
 	const regex = new RegExp($ui.searchString, 'i');
 	const list = ($chatList ?? []).filter((x) => regex.test(x?.title));
 
-	const options = { fieldName: 'dateCreation' };
+	const options = { fieldName: 'createdAt' };
 
 	const chatGrouper = new ChatDataGrouper($chatList ?? [], options);
 

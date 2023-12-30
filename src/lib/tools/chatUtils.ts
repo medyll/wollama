@@ -36,7 +36,7 @@ export class chatUtils {
 	static getMessageDataObject(message: Partial<MessageType>): MessageType {
 		return {
 			messageId: crypto.randomUUID(),
-			dateCreation: new Date(),
+			createdAt: new Date(),
 			edit: false,
 			editedContent: '',
 			content: message.content,
@@ -51,7 +51,7 @@ export class chatUtils {
 			chatId: crypto.randomUUID(),
 			title: 'New Chat',
 			models: [get(settings).defaultModel], 
-			dateCreation: new Date(),
+			createdAt: new Date(),
 			dateLastMessage: new Date(),
 			context: [],
 			...chatData

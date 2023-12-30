@@ -99,7 +99,7 @@
 			<div class="soft-title">{message?.model ?? ''}</div>
 			<div class="flex-1"></div>
 			<div class="soft-title">{message?.status != 'done' ? message?.status : ''}</div>
-			<div class="soft-title">{format(new Date(message?.dateCreation), 'dd MMMM y hh:mm')}</div>
+			<div class="soft-title">{format(new Date(message?.createdAt), 'dd MMMM y hh:mm')}</div>
 		</div>
 		<div class="px-2 w-full flex-1 relative overflow-hidden theme-border p-4 py-4 rounded-md">
 			{#if message.images}

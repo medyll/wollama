@@ -18,7 +18,7 @@ export class ChatDataGrouper<T = ChatType> {
 	currentYear: number;
 	currentMonth: number;
 
-	constructor(data: T[], opt: { fieldName: keyof T } = { fieldName: 'dateCreation' }) {
+	constructor(data: T[], opt: { fieldName: keyof T } = { fieldName: 'createdAt' }) {
 		this.data = data;
 		this.fieldName = opt.fieldName;
 		const now = new Date();
@@ -167,7 +167,7 @@ const chatData: ChatType[] = [
 	// Insérez ici vos éléments ChatDataType
 ];
 
-const options = { fieldName: 'dateCreation' };
+const options = { fieldName: 'createdAt' };
 const chatGrouper = new ChatDataGrouper(chatData, options);
 
 /* console.log('Groupes par jour :');
