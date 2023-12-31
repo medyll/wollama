@@ -31,7 +31,7 @@
 		</div>
 		<hr />
 		<div class=" ">
-			<div class="container">
+			<div class="application-container">
 				<slot />
 			</div>
 		</div>

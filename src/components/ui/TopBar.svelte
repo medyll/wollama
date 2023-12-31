@@ -24,13 +24,13 @@
 	};
 </script>
 
-<div class="   p-2 flex-align-middle px-2 gap-4 top-0 mt-0 pr-4 left-4 z-50">
-	<div class="flex-1 text-center soft-title relative">
+<div class="application-topBar">
+	<div class="flex-1 text-center soft-title">
 		{#await chat then value}
 			{value?.title ?? ''}
 		{/await}
 	</div>
-	<button class="flex-align-middle gap-2" on:click={openCloseConfig}>
+	<button class="btn" on:click={openCloseConfig}>
 		{#if showConfigClose}
 			<Icon icon="mdi:close-circle" class="text-blue lg " style="font-size:1.6em;color:red" />
 		{/if}

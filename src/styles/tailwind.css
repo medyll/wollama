@@ -1,8 +1,6 @@
 @tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-@layer components {
+@layer base {
 	:root {
 		--theme-primary: rgb(59 130 246);
 
@@ -29,39 +27,13 @@
 		@apply text-gray-700 dark:text-gray-100;
 		@apply bg-gray-50 dark:bg-gray-800;
 	}
-	.theme-bg {
+
+	&&.theme-bg {
 		@apply text-gray-700 bg-gray-50;
 		@apply dark:bg-gray-800 dark:text-gray-100;
 	}
-	.theme-bg-dark {
+	&&.theme-bg-dark {
 		@apply text-gray-700 bg-gray-200;
 		@apply dark:bg-gray-900 dark:text-gray-100;
-	}
-
-	.theme-border {
-		@apply border border-gray-400/60  dark:border-gray-700/90;
-	}
-
-	.soft-title {
-		@apply text-gray-500 dark:text-gray-100/50;
-	}
-
-	.container {
-		@apply relative   lg:max-w-[55rem] xl:max-w-[65] 2xl:max-w-[75rem] 3xl:max-w-[100rem];
-	}
-
-	.application {
-		@apply text-gray-700 bg-gray-50;
-		@apply dark:bg-gray-800 dark:text-gray-100;
-		@apply bg-gradient-to-b from-stone-200 to-gray-50 to-90%;
-		@apply dark:bg-gradient-to-b dark:from-gray-700 dark:to-gray-800 to-90%;
-	}
-
-
-	.paper {
-		@apply border rounded-lg p-2 py-4;
-		@apply border-neutral-600/10;
-		@apply bg-neutral-200/30 dark:bg-slate-600/30;
-		@apply backdrop-opacity-90 backdrop-blur-3xl;
 	}
 }

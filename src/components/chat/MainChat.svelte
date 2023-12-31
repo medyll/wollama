@@ -150,7 +150,7 @@
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
 <div class="h-full w-full">
-	<div class="container flex-v h-full mx-auto">
+	<div class="application-container flex-v h-full mx-auto">
 		<DashBoard>
 			<ChatInfo>
 				<Model bind:activeModels={$prompter.models} />

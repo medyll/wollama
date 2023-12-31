@@ -5,9 +5,11 @@
 	import TopBar from '$components/ui/TopBar.svelte';
 	import Sidebar from '$components/ui/Sidebar.svelte';
 	import { settings, showSettings } from '$lib/stores/settings';
-	import '../styles/app.css';
+	import '../styles/css-properties.css';
 	import '../styles/tailwind.css';
+	import '../styles/app.css';
 	import '../styles/snippets.css';
+	import '../styles/skin.css';
 	import { engine } from '$lib/tools/engine';
 	import { onMount } from 'svelte';
 	import { idbQuery } from '$lib/db/dbQuery';
@@ -21,7 +23,6 @@
 	import Opening from '$components/Opening.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
 	import { ApiCall } from '$lib/db/apiCall';
- 
 
 	// load models into store
 	async function loadModels(models: Record<string, any>[]) {
@@ -54,7 +55,7 @@
 
 	$: if (browser && $page.params.id) {
 		idbQuery.getChat($page.params.id).then((chat) => {
-			if (chat) { 
+			if (chat) {
 				ui.setActiveChatId($page.params.id);
 			} else {
 				engine.goto('/');
@@ -63,7 +64,6 @@
 	} else {
 		ui.setActiveChatId();
 	}
- 
 </script>
 
 <svelte:head>
@@ -71,15 +71,13 @@
 </svelte:head>
 
 <Opening>
-	<div class="application flex w-full h-full overflow-hidden">
+	<div class="application">
 		<Notifications />
 		<MenuMobile />
-		<div class="h-full flex-shrink overflow-hidden z-30 hidden w-[280px] md:block">
-			<Sidebar />
-		</div>
-		<div class="flex-1 flex-col flex relative overflow-hidden z-0">
+		<Sidebar />
+		<div class="application-content">
 			<TopBar />
-			<main class="relative h-full w-full overflow-auto transition-width">
+			<main class="application-main">
 				<slot />
 			</main>
 		</div>

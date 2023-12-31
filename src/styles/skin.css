@@ -1,0 +1,126 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+	.theme-gradient-from {
+		background-color: var(--theme-gradient-from);
+	}
+	.theme-gradient-to {
+		background-color: var(--theme-gradient-to);
+	}
+	.main-gradient {
+		background-image: linear-gradient(
+			to bottom,
+			var(--theme-gradient-from),
+			var(--theme-gradient-to) 90%
+		);
+	}
+
+	.theme-border {
+		border-color: var(--theme-border-color);
+		border-width: 1px;
+	}
+
+    
+
+
+	.soft-title {
+		color: var(--theme-soft-title-text-color);
+	}
+	.paper {
+		@apply theme-border;
+		@apply p-2 py-4;
+		@apply rounded-lg;
+		@apply backdrop-opacity-90 backdrop-blur-3xl;
+		border-color: var(--theme-paper-border-color);
+		background-color: var(--theme-paper-bg-color);
+		box-shadow: var(--theme-shadow);
+	}
+}
+
+@layer components {
+	/* scope gui */
+	.application {
+		@apply flex w-full h-full overflow-hidden;
+		@apply text-gray-700 bg-gray-50;
+		@apply dark:bg-gray-800 dark:text-gray-100;
+
+		@apply main-gradient;
+        
+		.application-sideBar {
+			@apply h-full flex-shrink overflow-hidden z-30 hidden w-[280px] md:block;
+
+			.application-sideBar-title {
+				@apply text-right soft-title;
+			}
+
+			.application-sideBar-content {
+				@apply max-h-full overflow-y-auto;
+				@apply shadow shadow-gray-400/70 dark:shadow-black/80;
+			}
+		}
+
+		.application-container {
+			@apply flex-1 flex flex-col;
+			@apply relative lg:max-w-[55rem] xl:max-w-[65] 2xl:max-w-[75rem] 3xl:max-w-[100rem];
+		}
+
+		.application-content {
+			@apply flex-1 flex-col flex relative overflow-hidden z-0;
+
+			.application-topBar {
+				@apply flex items-center z-50;
+				@apply top-0 left-4;
+				@apply p-2 px-2 gap-4 mt-0 pr-4;
+			}
+
+			.application-main {
+				@apply relative h-full w-full overflow-auto;
+			}
+		}
+	}
+}
+
+@layer components {
+	/* inputs */
+	.application {
+		/* button,
+		input[type='button'], */
+		input[type='search'],
+		input[type='submit'],
+		input[type='reset'],
+		input[type='text'],
+		textarea {
+			@apply inline-flex items-center gap-2 p-2;
+			@apply rounded-md;
+
+			border: 1px solid var(--theme-input-border-color);
+
+			background: var(--theme-input-bg-color);
+
+			&:hover {
+				border-color: var(--theme-input-border-color);
+			}
+			&:active,
+			&:focus {
+				border-color: var(--theme-input-border-color);
+			}
+			[disabled] {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+		}
+
+		textarea {
+			@apply border border-gray-400/60 hover:border-gray-400/90;
+			@apply block w-full border-gray-300 rounded-md shadow-sm;
+			@apply bg-white/80 dark:bg-white/10;
+			@apply text-gray-700 dark:text-gray-100;
+			@apply dark:bg-gray-800 dark:text-gray-100;
+			&:active,
+			&:focus {
+				/* @apply input-focus; */
+			}
+		}
+	}
+}

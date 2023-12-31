@@ -1,0 +1,64 @@
+@tailwind base;
+
+@layer base {
+	:root,
+	:root.light {
+		/** border */
+		--theme-border-color: rgba(203, 213, 224, 0.6); /* colors.gray.400/60 */
+		--theme-border-color-focus: rgba(160, 174, 192, 0.7); /* colors.gray.500/70 */
+
+		/** gradient */
+		--theme-gradient-from: rgb(229, 231, 235); /* colors.gray.200 */
+		--theme-gradient-to: rgb(243, 244, 246); /* colors.gray.100 */
+
+		/** input  */
+		--theme-input-bg-color: rgb(243, 244, 246); /* colors.gray.100 */
+		--theme-input-border-color: rgba(203, 213, 224, 0.6); /* colors.gray.400/60 */
+		--theme-input-shadow-hover: rgba(0, 0, 0, 0.1); /* Exemple, à ajuster */
+		--theme-input-text-color: rgb(31, 41, 55); /* colors.gray.800 */
+
+		/** paper */
+		--theme-paper-bg-color: rgba(224, 231, 255, 0.3); /* colors.neutral.200/30 */
+		--theme-paper-border-color: rgba(160, 174, 192, 0.6); /* colors.gray.500/60 */
+
+		/** shadow */
+		--theme-shadow-color: rgba(160, 174, 192, 0.7); /* colors.gray.500/70 */
+		--theme-shadow: 0 1px 3px 0 var(--theme-shadow-color), 0 1px 2px -1px var(--theme-shadow-color);
+		--theme-shadow-color-hover: rgba(17, 24, 39, 0.9); /* Exemple, à ajuster */
+
+		/** canvas */
+		--theme-text-color: rgb(31, 41, 55); /* colors.gray.800 */
+		--theme-bg-color: rgb(249, 250, 251); /* colors.gray.50 */
+		--theme-soft-title-text-color: rgb(107, 114, 128); /* colors.gray.500 */
+	}
+
+	:root.dark {
+		/** border */
+		--theme-border-color: rgba(55, 65, 81, 0.9); /* colors.gray.700 */
+		--theme-border-color-focus: rgba(31, 41, 55, 0.7); /* colors.gray.800 */
+
+		/** gradient */
+		--theme-gradient-from: rgb(31, 41, 55); /* colors.gray.800 */
+		--theme-gradient-to: rgb(17, 24, 39); /* colors.gray.900 */
+
+		/** input */
+		--theme-input-bg-color: rgb(17, 24, 39); /* colors.gray.900 */
+		--theme-input-border-color: rgba(255, 255, 255, 0.1); /* colors.white/10 */
+		--theme-input-text-color: rgb(243, 244, 246); /* colors.gray.100 */
+		--theme-input-shadow-hover: rgba(0, 0, 0, 0.1); /* Exemple, à ajuster */
+
+		/** paper */
+		--theme-paper-bg-color: rgba(71, 85, 105, 0.3); /* colors.slate.600/30 */
+		--theme-paper-border-color: rgba(59, 130, 246, 0.9); /* colors.blue.600/90 */
+
+		/** shadow */
+		--theme-shadow-color: rgba(0, 0, 0, 0.8); /* colors.black/80 */
+		--theme-shadow: 0 1px 3px 0 var(--theme-shadow-color), 0 1px 2px -1px var(--theme-shadow-color);
+		--theme-shadow-color-hover: rgba(17, 24, 39, 0.9); /* Exemple, à ajuster */
+
+		/** canvas */
+		--theme-soft-title-text-color: rgba(243, 244, 246, 0.5); /* colors.gray.100/50 */
+		--theme-text-color: rgb(243, 244, 246); /* colors.gray.100 */
+		--theme-bg-color: rgb(31, 41, 55); /* colors.gray.800 */
+	}
+}

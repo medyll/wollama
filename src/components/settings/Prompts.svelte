@@ -39,7 +39,7 @@
 	bind:this={element}
 	use:clickAway
 	on:clickAway={() => ui.showHidePromptMenu(false)}
-	class="promptZone flex-col flex"
+	class="promptZone flex-col flex theme-bg theme-border"
 >
 	<div class="flex-1">
 		{#if mode == 'list'}
@@ -123,6 +123,6 @@
 
 <style style="postcss">
 	.promptZone {
-		@apply fixed z-30 bottom-24 theme-bg p-4 theme-border shadow-md rounded-md;
+		@apply fixed z-30 bottom-24  p-4 shadow-md rounded-md;
 	}
 </style>

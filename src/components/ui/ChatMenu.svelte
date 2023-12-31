@@ -20,8 +20,8 @@
 	};
 </script>
 
-<div class="text-right soft-title">{$t('ui.myChats')}</div>
-<div class="chatZone paper">
+<div class="application-sideBar-title">{$t('ui.myChats')}</div>
+<div class="application-sideBar-content paper">
 	<div class="flex-1">
 		<List data={$chatMenuList ?? []} let:item>
 			<div>
@@ -39,7 +39,7 @@
 			</div>
 		</List>
 		{#if Object.keys($chatMenuList)?.length == 0}
-			<div class="flex flex-col gap-2 text-center  text-neutral-500 dark:text-neutral-400">
+			<div class="flex flex-col gap-2 text-center text-neutral-500 dark:text-neutral-400">
 				<span class="text-2xl">{$t('ui.noChats')}</span>
 				<!-- <button title={$t('ui.newChat')} on:click={createChat} class="">
 					<Icon icon="mdi:chat-plus-outline" class="md" />
@@ -49,14 +49,3 @@
 		{/if}
 	</div>
 </div>
-
-<style lang="postcss">
-	.chatZone {
-		max-height: 100%;
-		overflow: auto;
-	}
-	.chatZone {
-		@apply flex flex-col gap-4;
-		@apply shadow shadow-gray-400/70 dark:shadow-black/80;
-	}
-</style>
