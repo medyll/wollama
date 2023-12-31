@@ -24,7 +24,6 @@
 	/*  @apply dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700 */
 }
 
-
 .iconButton {
 	aspect-ratio: 1/1;
 }
@@ -91,6 +90,11 @@ select option {
 	}
 	&.spin {
 		animation: spin 1s linear infinite;
+	}
+	svg {
+		> path {
+			color: inherit;
+		}
 	}
 }
 

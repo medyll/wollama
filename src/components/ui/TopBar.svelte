@@ -6,36 +6,38 @@
 	import { engine } from '$lib/tools/engine';
 	import { dbase } from '$lib/db/dbSchema';
 	import { idbQuery } from '$lib/db/dbQuery';
+	import { page } from '$app/stores';
 
 	new Date().getSeconds();
 
 	$: chat = idbQuery.getChat($ui.activeChatId);
 
-	const createChat = async () => {
-		ui.setActiveChatId();
-		engine.goto('/');
+	$: showConfigClose = $page.route.id?.includes('/configuration');
+
+	const openCloseConfig = async () => {
+		if ($page.route.id?.includes('/configuration')) {
+			ui.setActiveChatId();
+			engine.goto('/');
+		} else {
+			engine.goto('/configuration');
+		}
 	};
 </script>
 
-<div class="sticky  flex-align-middle px-2 gap-2   top-0 mt-0 right-4 left-4 z-50">
-	<!-- <div class="hidden md:block absolute border theme-border theme-bg rounded-full gap-2 p-2 mt-72"> 
-		<button title={$t('ui.newChat')} on:click={createChat} class="  iconButton">
-			<Icon icon="mdi:chat-plus-outline" class="lg"/>
-		</button>
-	</div> -->
+<div class="   p-2 flex-align-middle px-2 gap-4 top-0 mt-0 pr-4 left-4 z-50">
 	<div class="flex-1 text-center soft-title relative">
 		{#await chat then value}
 			{value?.title ?? ''}
 		{/await}
 	</div>
-	<button on:click={()=>{engine.goto('/configuration')}}>configure ollama</button>
+	<button class="flex-align-middle gap-2" on:click={openCloseConfig}>
+		{#if showConfigClose}
+			<Icon icon="mdi:close-circle" class="text-blue lg " style="font-size:1.6em;color:red" />
+		{/if}
+		{$t('settings.configureOllama')}
+	</button>
 	<StatusBar />
-	<button
-		on:click={() => {
-			engine.goto('/signing');
-		}}
-		title={$t('ui.userProfile')}
-	>
+	<button title={$t('ui.userProfile')}>
 		<Icon icon="mdi:account-circle-outline" style="font-size:1.6em" />
 	</button>
 	<button title={$t('ui.settings')} class="borderButton" on:click={() => ui.showHideSettings()}>
