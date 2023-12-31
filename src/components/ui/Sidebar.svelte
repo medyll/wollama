@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { getTimeTitle, chatMenuList } from '$lib/tools/chatMenuList.js';
-	import ChatButton from '$components/chat/input/ChatButton.svelte';
 	import Icon from '@iconify/svelte';
 	import { t } from '$lib/stores/i18n.js';
 
@@ -8,7 +6,7 @@
 	import ChatList from '$components/ui/ChatMenu.svelte';
 	import { engine } from '$lib/tools/engine';
 
-		const createChat = async () => {
+	const createChat = async () => {
 		ui.setActiveChatId();
 		engine.goto('/');
 	};
@@ -28,11 +26,9 @@
 			<div
 				class="hidden md:block absolute border theme-border theme-bg rounded-full gap-2 p-2 right-0"
 			>
-				
-				<button title={$t('ui.newChat')} on:click={ createChat} class="  iconButton">
+				<button title={$t('ui.newChat')} on:click={createChat} class="  iconButton">
 					<Icon icon="mdi:chat-plus-outline" class="lg" />
-				</button><!-- <a href="/" class="underline" on:click={createChat}>{$t('ui.newChat')}</a>
-		<br /> -->
+				</button>
 			</div>
 		</div>
 	</div>

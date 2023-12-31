@@ -14,7 +14,9 @@ export default {
 			lastWeek: 'la semaine dernière',
 			retryInSeconds: 'réessayer dans {{seconds}} secondes',
 			noChats: 'aucun chat',
-			startondate: 'date de début'
+			startondate: 'date de début',
+			use_model: 'utiliser le modèle',
+			promptCenter: 'centre de l\'invite',
 		},
 		settings: {
 			auth: 'authentification',
@@ -34,6 +36,8 @@ export default {
 			model_delete: 'supprimer le modèle',
 			default_model: 'entrer le modèle par défaut',
 			request_mode: 'simple',
+			resetAll: 'réinitialiser tout',
+			delete_model: 'supprimer le modèle',
 			modules: {
 				infos: 'infos',
 				addons: 'extensions',

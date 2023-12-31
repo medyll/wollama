@@ -14,7 +14,9 @@ export default {
 			lastWeek: 'settimana scorsa',
 			retryInSeconds: 'riprova in {{seconds}} secondi',
 			noChats: 'nessuna chat',
-			startondate: 'data di inizio'
+			startondate: 'data di inizio',
+			use_model: 'usa modello',
+			promptCenter: 'centro del prompt'
 		},
 		settings: {
 			auth: 'autenticazione',
@@ -34,6 +36,8 @@ export default {
 			model_delete: 'elimina modello',
 			default_model: 'inserisci modello predefinito',
 			request_mode: 'semplice',
+			resetAll: 'resetta tutto',
+			delete_model: 'elimina modello',
 			modules: {
 				infos: 'informazioni',
 				addons: 'componenti aggiuntivi',

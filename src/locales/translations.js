@@ -3,6 +3,8 @@ import es from "./es";
 import fr from "./fr";
 import it from "./it";
 
+
+
 export default {
 	en: {
 		ui: {
@@ -19,7 +21,9 @@ export default {
 			lastWeek: 'last week',
 			retryInSeconds: 'retry in {{seconds}} seconds',
 			noChats: 'no chats',
-			startondate: 'date'
+			startondate: 'date',
+			use_model: 'use model',
+			promptCenter: 'prompt center'
 		},
 		settings: {
 			auth: 'authentication',
@@ -39,6 +43,8 @@ export default {
 			model_delete: 'delete model',
 			default_model: 'enter default model',
 			request_mode: 'plain',
+			resetAll: 'reset all',
+			delete_model: 'delete model',
 			modules: {
 				infos: 'infos',
 				addons: 'addons',

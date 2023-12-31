@@ -14,7 +14,8 @@ export default {
 			lastWeek: 'la semana pasada',
 			retryInSeconds: 'reintentar en {{seconds}} segundos',
 			noChats: 'sin chats',
-			startondate: 'fecha de inicio'
+			startondate: 'fecha de inicio',
+			use_model: 'usar modelo',
 		},
 		settings: {
 			auth: 'autenticación',
@@ -32,6 +33,7 @@ export default {
 			pull_model: 'introducir un nombre de modelo para descargar',
 			enter_model: 'introducir un nombre de modelo para descargar',
 			model_delete: 'eliminar modelo',
+			delete_model: 'eliminar modelo',
 			default_model: 'introducir modelo por defecto',
 			request_mode: 'simple',
 			modules: {
@@ -40,12 +42,16 @@ export default {
 				models: 'modelos',
 				advanced: 'avanzado',
 				general: 'general'
-			}
+			},
+			resetAll: 'restablecer todo',
 		},
 		status: {
 			connecting: 'conectando',
 			error: 'error',
 			connected: 'conectado'
-		}
-	}, 
+		},
+		prompt: {
+			promptCenter: 'centro del prompt',
+		},
+	},
 };
