@@ -1,9 +1,7 @@
-import de from "./de";
-import es from "./es";
-import fr from "./fr";
-import it from "./it";
-
-
+import de from './de';
+import es from './es';
+import fr from './fr';
+import it from './it';
 
 export default {
 	en: {
@@ -45,6 +43,9 @@ export default {
 			request_mode: 'plain',
 			resetAll: 'reset all',
 			delete_model: 'delete model',
+			configureOllama: 'configure Ollama',
+			resetOllamaOptions: 'reset Ollama options',
+			delete_model_message: 'are you sure you want to delete this model?',
 			modules: {
 				infos: 'infos',
 				addons: 'addons',
@@ -57,10 +58,15 @@ export default {
 			connecting: 'connecting',
 			error: 'error',
 			connected: 'connected'
+		},
+		prompt: {
+			systemPrompt: 'system prompt',
+			promptCenter: 'prompt center',
+			createPrompt: 'create prompt'
 		}
-	}, 
+	},
 	fr: fr.fr,
 	de: de.de,
-	es:  es.es,
+	es: es.es,
 	it: it.it
 };

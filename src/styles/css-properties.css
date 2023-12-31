@@ -43,13 +43,13 @@
 
 		/** input */
 		--theme-input-bg-color: rgb(17, 24, 39); /* colors.gray.900 */
-		--theme-input-border-color: rgba(255, 255, 255, 0.1); /* colors.white/10 */
+		--theme-input-border-color: rgba(255, 255, 255, 0.2); /* colors.white/10 */
 		--theme-input-text-color: rgb(243, 244, 246); /* colors.gray.100 */
 		--theme-input-shadow-hover: rgba(0, 0, 0, 0.1); /* Exemple, à ajuster */
 
 		/** paper */
 		--theme-paper-bg-color: rgba(71, 85, 105, 0.3); /* colors.slate.600/30 */
-		--theme-paper-border-color: rgba(59, 130, 246, 0.9); /* colors.blue.600/90 */
+		--theme-paper-border-color: rgba(55, 65, 81, 0.7); /* colors.blue.600/90 */
 
 		/** shadow */
 		--theme-shadow-color: rgba(0, 0, 0, 0.8); /* colors.black/80 */
