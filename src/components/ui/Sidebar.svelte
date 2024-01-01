@@ -25,6 +25,7 @@
 				</div>
 			</div>
 		</div>
+		<absolute atre >hello !!</absolute>
 		<input type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
 		<hr class="ml-auto w-24" />
 		<ChatList />

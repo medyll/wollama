@@ -1,5 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/kit/vite';
+// import @medyll/htmlu
+import { htmluPreprocess } from '@medyll/htmlu';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -16,7 +18,6 @@ const config = {
 		}
 	},
 
-	preprocess: vitePreprocess()
+	preprocess: [vitePreprocess(),htmluPreprocess()]
 };
-
 export default config;
