@@ -12,18 +12,18 @@ function notifierStateStore() {
 	const store = writable<NotificationsType>([]);
 
 	return {
-		subscribe: store.subscribe,
-		set: store.set,
-		update: store.update,
-		notify(status: NotifyStatus = 'info', message: string, nId?: any) {
-			const id = nId ?? crypto.randomUUID();
-			store.set({ ...get(store), [id]: { id, status, message } });
-		},
 		delete(id: string) {
 			const ne = get(store);
 			delete ne[id];
 			store.set(ne);
-		}
+		},
+		notify(status: NotifyStatus = 'info', message: string, nId?: any) {
+			const id = nId ?? crypto.randomUUID();
+			store.set({ ...get(store), [id]: { id, message, status } });
+		},
+		set: store.set,
+		subscribe: store.subscribe,
+		update: store.update
 	};
 }
 

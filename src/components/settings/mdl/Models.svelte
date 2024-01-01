@@ -17,7 +17,7 @@
 	function pullModel() {
 		if (addModel.trim() == '') return;
 
-		ApiCall.pullModel(addModel, (res) => { 
+		ApiCall.pullModel(addModel, (res) => {
 			$pullModelState = res;
 			pullStatus = res?.status ?? res?.error;
 			if (res.digest) {
@@ -36,11 +36,7 @@
 			})
 			.catch((e) => {
 				console.log(e);
-				notifierState.notify(
-					'error',
-					e?.error ?? $t('settings.delete_model_error'),
-					'delete-model'
-				);
+				notifierState.notify('error', e?.error ?? $t('settings.delete_model_error'), 'delete-model');
 			});
 	}
 </script>
@@ -62,13 +58,7 @@
 	<form name="pull-form" on:submit|preventDefault={(e) => pullModel} />
 	<progress hidden={progress === 0} class="w-full" value={progress} max={progressMax}></progress>
 	<div class="flex gap-2">
-		<input
-			bind:value={addModel}
-			placeholder={$t('settings.enter_model')}
-			type="text"
-			class="w-full"
-			form="pull-form"
-		/>
+		<input bind:value={addModel} placeholder={$t('settings.enter_model')} type="text" class="w-full" form="pull-form" />
 		<button disabled={addModel.trim() == ''} form="pull-form" on:click={pullModel}>
 			<Icon icon="mdi:download" />
 		</button>

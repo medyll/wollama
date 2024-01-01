@@ -9,10 +9,10 @@ type ConnectionStoreType = {
 
 export function connectionStore() {
 	const { subscribe, set, update } = writable<ConnectionStoreType>({
-		connectionStatus: 'connecting',
+		connectionRemainingSeconds: 0,
 		connectionRetryCount: 0,
 		connectionRetryTimeout: 0,
-		connectionRemainingSeconds: 0
+		connectionStatus: 'connecting'
 	} as ConnectionStoreType);
 
 	let currentStore = {} as ConnectionStoreType;
@@ -22,9 +22,9 @@ export function connectionStore() {
 
 	subscribe((state) => {
 		if (state.connectionStatus == 'connecting' && state.connectionRemainingSeconds != 0) {
-            start = 0; // reset timer
-            update((n) => ({ ...n, connectionRemainingSeconds: 0 }));
-        }
+			start = 0; // reset timer
+			update((n) => ({ ...n, connectionRemainingSeconds: 0 }));
+		}
 		if (state.connectionStatus == 'error') {
 			if (state.connectionRetryTimeout != state.connectionRetryCount * 4000) {
 				update((n) => ({ ...n, connectionRetryTimeout: n.connectionRetryCount * 4000 }));
@@ -43,15 +43,13 @@ export function connectionStore() {
 	});
 
 	return {
-		subscribe,
-		set,
-		update,
-		setKey: (key: keyof ConnectionStoreType, value: any) => update((state) => ({ ...state, [key]: value })),
 		get: (key: keyof ConnectionStoreType) => currentStore[key],
-		setConnectionStatus: (status: ConnectionStoreType['connectionStatus']) =>
-			update((state) => ({ ...state, connectionStatus: status })),
-		incrementConnectionRetryCount: () =>
-			update((state) => ({ ...state, connectionRetryCount: state.connectionRetryCount + 1 }))
+		incrementConnectionRetryCount: () => update((state) => ({ ...state, connectionRetryCount: state.connectionRetryCount + 1 })),
+		set,
+		setConnectionStatus: (status: ConnectionStoreType['connectionStatus']) => update((state) => ({ ...state, connectionStatus: status })),
+		setKey: (key: keyof ConnectionStoreType, value: any) => update((state) => ({ ...state, [key]: value })),
+		subscribe,
+		update
 	};
 }
 

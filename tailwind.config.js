@@ -2,16 +2,16 @@
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	darkMode: 'class',
+	plugins: [],
 	theme: {
+		extend: {},
 		screens: {
-			sm: '640px',
-			md: '768px',
-			lg: '1024px',
-			xl: '1280px',
 			'2xl': '1536px',
-			'3xl': '1920px'
-		},
-		extend: {}
-	},
-	plugins: []
+			'3xl': '1920px',
+			lg: '1024px',
+			md: '768px',
+			sm: '640px',
+			xl: '1280px'
+		}
+	}
 };

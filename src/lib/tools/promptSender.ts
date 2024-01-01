@@ -20,11 +20,11 @@ type ArgsType<T> = {
 	cbData: T /** data to merge with the callback data */;
 };
 
-export class PromptSender<T> { 
-	args: ArgsType<T>; 
+export class PromptSender<T> {
+	args: ArgsType<T>;
 	ollamaBody: OllamaApiBody;
 
-	constructor( ollamaBody: Partial<OllamaApiBody>, args: ArgsType<T>) { 
+	constructor(ollamaBody: Partial<OllamaApiBody>, args: ArgsType<T>) {
 		this.ollamaBody = ollamaBody as OllamaApiBody;
 		this.args = args;
 	}
@@ -32,15 +32,11 @@ export class PromptSender<T> {
 	async sendMessage() {
 		return new Promise(async (resolve, reject) => {
 			try {
-				await ApiCall.generate(
-					this.ollamaBody.prompt,
-					async (data) => this.args.cb({ ...this.args.cbData, data }),
-					{
-						...this.ollamaBody,
-						stream: true
-					}
-				);
-				resolve(true)
+				await ApiCall.generate(this.ollamaBody.prompt, async (data) => this.args.cb({ ...this.args.cbData, data }), {
+					...this.ollamaBody,
+					stream: true
+				});
+				resolve(true);
 			} catch (e) {
 				if (e.error) {
 					notifierState.notify('error', e.error);

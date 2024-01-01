@@ -45,11 +45,11 @@ const settingStore = () => {
 	}
 
 	return {
-		subscribe,
+		initSettings,
 		set,
-		update,
 		setSetting,
-		initSettings
+		subscribe,
+		update
 	};
 };
 

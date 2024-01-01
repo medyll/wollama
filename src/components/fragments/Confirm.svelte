@@ -2,7 +2,7 @@
 	import Icon from '@iconify/svelte';
 
 	export let validate: Function;
-	export let message: string|undefined = undefined;
+	export let message: string | undefined = undefined;
 
 	let status = 'default';
 </script>
@@ -15,10 +15,9 @@
 	{/if}
 	{#if status === 'show_confirm'}
 		<button
-			
 			on:click={() => {
 				validate();
-				status= 'default'
+				status = 'default';
 			}}
 		>
 			{message ?? ''}
@@ -29,7 +28,7 @@
 				status = 'default';
 			}}
 		>
-			<Icon icon="typcn:cancel" class="text-red-900 md"   />
+			<Icon icon="typcn:cancel" class="text-red-900 md" />
 		</button>
 	{/if}
 </div>

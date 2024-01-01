@@ -19,10 +19,10 @@ type UiStoreType = {
 };
 const defaultUiStoreOptions: UiStoreType = {
 	autoScroll: {},
-	showSettings: false,
-	showPrompt: false,
+	searchString: undefined,
 	showMenu: false,
-	searchString: undefined
+	showPrompt: false,
+	showSettings: false
 };
 
 const uiStore = () => {
@@ -52,15 +52,14 @@ const uiStore = () => {
 
 	return {
 		set,
-		update,
-		subscribe,
-		setAutoScroll,
 		setActiveChatId,
-		showHideSettings,
+		setAutoScroll,
+		setParameterValue: <T = UiStoreType>(key: keyof T, value: typeof key) => update((state) => ({ ...state, [key]: value })),
 		showHideMenu,
 		showHidePromptMenu,
-		setParameterValue: <T = UiStoreType>(key: keyof T, value: typeof key) =>
-			update((state) => ({ ...state, [key]: value }))
+		showHideSettings,
+		subscribe,
+		update
 	};
 };
 

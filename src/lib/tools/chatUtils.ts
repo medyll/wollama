@@ -1,7 +1,7 @@
 import type { ChatType } from '$types/db';
 import type { MessageType } from '$types/db';
 import { get } from 'svelte/store';
-import { ApiCall, } from '../db/apiCall';
+import { ApiCall } from '../db/apiCall';
 import { settings } from '$lib/stores/settings';
 import { idbQuery } from '$lib/db/dbQuery';
 import type { OllamaResponseType } from '$types/ollama';
@@ -11,7 +11,7 @@ export async function askOllama(prompt: string, model: string) {}
 export async function guessChatTitle(message: string): Promise<OllamaResponseType> {
 	const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, reply with only a few worlds, no more than six words. here is the content to resume shortly:  ${message}`;
 
-	return (await ApiCall.generate(prompt,()=>{}, {stream:false}));
+	return await ApiCall.generate(prompt, () => {}, { stream: false });
 }
 
 export class chatUtils {
@@ -27,7 +27,7 @@ export class chatUtils {
 					.join('\n');
 
 				const res = await guessChatTitle(resume);
-				
+
 				if (res?.response !== '') idbQuery.updateChat(chatId, { title: res.response });
 			}
 		}
@@ -35,25 +35,25 @@ export class chatUtils {
 
 	static getMessageDataObject(message: Partial<MessageType>): MessageType {
 		return {
-			messageId: crypto.randomUUID(),
+			content: message.content,
 			createdAt: new Date(),
+			data: [],
 			edit: false,
 			editedContent: '',
-			content: message.content,
+			messageId: crypto.randomUUID(),
 			role: message.role,
-			data: [],
 			...message
 		};
 	}
 
-	static getChatDataObject(chatData: ChatType= {} as ChatType): ChatType {
+	static getChatDataObject(chatData: ChatType = {} as ChatType): ChatType {
 		return {
 			chatId: crypto.randomUUID(),
-			title: 'New Chat',
-			models: [get(settings).defaultModel], 
+			context: [],
 			createdAt: new Date(),
 			dateLastMessage: new Date(),
-			context: [],
+			models: [get(settings).defaultModel],
+			title: 'New Chat',
 			...chatData
 		};
 	}

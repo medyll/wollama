@@ -15,13 +15,10 @@ function ollamaOptionStoreBuild() {
 	function init(values: Partial<OllamaOptionsType> = {}) {
 		if (browser) {
 			const storeOptions = JSON.parse(localStorage.getItem('ollamaOptions') ?? '{}');
-			const options: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce(
-				(acc: Partial<OllamaOptionsType>, key) => {
-					acc[key] = OllamaOptionsDefaults[key].default ?? null;
-					return acc;
-				},
-				{}
-			);
+			const options: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<OllamaOptionsType>, key) => {
+				acc[key] = OllamaOptionsDefaults[key].default ?? null;
+				return acc;
+			}, {});
 
 			store.set({ ...storeOptions, ...options, ...values });
 		}
@@ -35,28 +32,25 @@ function ollamaOptionStoreBuild() {
 	}
 
 	function resetAll() {
-		const options: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce(
-			(acc: Partial<OllamaOptionsType>, key) => {
-				acc[key] = OllamaOptionsDefaults[key].default ?? null;
-				return acc;
-			},
-			{}
-		);
+		const options: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<OllamaOptionsType>, key) => {
+			acc[key] = OllamaOptionsDefaults[key].default ?? null;
+			return acc;
+		}, {});
 		store.set(options);
 	}
 
 	return {
-		subscribe: store.subscribe,
-		set: store.set,
 		init,
-		resetParam,
 		resetAll,
+		resetParam,
+		set: store.set,
 		setOption: (key: keyof OllamaOptionsType, value: any) => {
 			store.update((n) => {
 				const newSettings = { ...n, [key]: value };
 				return newSettings;
 			});
-		}
+		},
+		subscribe: store.subscribe
 	};
 }
 

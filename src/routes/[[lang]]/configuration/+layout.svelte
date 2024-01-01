@@ -20,7 +20,7 @@
 			<div class="pl-4 flex-align-middle gap-8">
 				<Selector value={activeTab} values={tabs} let:item>
 					<button
-					class="text-lg"
+						class="text-lg"
 						on:click={() => {
 							engine.goto(`/configuration/${item}`);
 							activeTab = item;

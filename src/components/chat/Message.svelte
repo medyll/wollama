@@ -16,8 +16,8 @@
 
 	marked.use({
 		async: false,
-		pedantic: false,
-		gfm: true
+		gfm: true,
+		pedantic: false
 	});
 
 	function wrap(el, wrapper) {
@@ -42,18 +42,13 @@
 		const codeElements = doc.querySelectorAll('code');
 
 		codeElements.forEach(async (codeElement) => {
-			const lang = codeElement.classList?.[0]
-				? codeElement.classList[0].replace('language-', '').trim()
-				: undefined;
+			const lang = codeElement.classList?.[0] ? codeElement.classList[0].replace('language-', '').trim() : undefined;
 			if (!lang) return;
 			const wrapper = document.createElement('div');
 			const toolbar = document.createElement('div');
 			const pre = document.createElement('pre');
 
-			if (
-				codeElement.parentElement?.tagName === 'PRE' &&
-				codeElement.parentElement.childNodes.length == 1
-			) {
+			if (codeElement.parentElement?.tagName === 'PRE' && codeElement.parentElement.childNodes.length == 1) {
 				codeElement.parentElement.replaceWith(codeElement);
 			}
 			wrapper.className = 'codeFormat';
@@ -83,18 +78,10 @@
 			</div>
 		</div>{/if}
 	<div class="flex flex-col w-full">
-		<div
-			class="flex-align-middle mb-1 p-1 gap-2 {message?.role == 'assistant'
-				? 'flex-row-reverse'
-				: ''}"
-		>
+		<div class="flex-align-middle mb-1 p-1 gap-2 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
 			<div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
 			<div class="soft-title">
-				{#if message?.status == 'streaming'}<Icon
-						style="font-size:1.6em"
-						icon="mdi:reload"
-						class="spin"
-					/>{/if}
+				{#if message?.status == 'streaming'}<Icon style="font-size:1.6em" icon="mdi:reload" class="spin" />{/if}
 			</div>
 			<div class="soft-title">{message?.model ?? ''}</div>
 			<div class="flex-1"></div>

@@ -20,11 +20,11 @@ export class DataBase extends Dexie {
 
 		this.version(1.3).stores({
 			chat: '&chatId, createdAt, dateLastMessage',
-			messages: '&messageId, chatId, createdAt',
 			messageStats: '&messageId, create_at',
-			settings: '++id',
+			messages: '&messageId, chatId, createdAt',
 			prompts: '++id, createdAt',
-			user: '++id, createdAt, email',
+			settings: '++id',
+			user: '++id, createdAt, email'
 		});
 	}
 

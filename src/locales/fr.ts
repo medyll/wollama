@@ -1,55 +1,55 @@
 export default {
 	fr: {
-		ui: {
-			settings: 'paramètres',
-			newChat: 'créer un nouveau chat',
-			myChats: 'mes chats',
-			userProfile: 'profil utilisateur',
-			signOut: 'se déconnecter',
-			aiCautionMessage: 'le lama peut avoir des hallucinations',
-			messageRole_user: 'utilisateur',
-			messageRole_assistant: 'assistant',
-			searchChats: 'rechercher des chats',
-			thisWeek: 'cette semaine',
-			lastWeek: 'la semaine dernière',
-			retryInSeconds: 'réessayer dans {{seconds}} secondes',
-			noChats: 'aucun chat',
-			startondate: 'date de début',
-			use_model: 'utiliser le modèle',
-			promptCenter: 'centre de l\'invite',
-		},
 		settings: {
 			auth: 'authentification',
-			lang: 'langue',
 			avatar: 'avatar',
 			avatar_email: 'email de gravatar',
-			voice_auto_stop: 'arrêt automatique de la voix',
-			title_auto: 'génération automatique du titre',
-			test_connection: 'tester la connexion',
-			system_prompt: 'invite de système',
-			server_url: 'URL du serveur Ollama',
-			theme: 'thème',
-			theme_light: 'clair',
-			theme_dark: 'sombre',
-			pull_model: 'entrer un nom de modèle à tirer',
+			lang: 'langue',
 			enter_model: 'entrer un nom de modèle à tirer',
-			model_delete: 'supprimer le modèle',
+			server_url: 'URL du serveur Ollama',
 			default_model: 'entrer le modèle par défaut',
-			request_mode: 'simple',
-			resetAll: 'réinitialiser tout',
+			system_prompt: 'invite de système',
+			model_delete: 'supprimer le modèle',
+			test_connection: 'tester la connexion',
 			delete_model: 'supprimer le modèle',
+			title_auto: 'génération automatique du titre',
 			modules: {
-				infos: 'infos',
 				addons: 'extensions',
-				models: 'modèles',
 				advanced: 'avancé',
-				general: 'général'
-			}
+				infos: 'infos',
+				general: 'général',
+				models: 'modèles'
+			},
+			voice_auto_stop: 'arrêt automatique de la voix',
+			pull_model: 'entrer un nom de modèle à tirer',
+			theme: 'thème',
+			request_mode: 'simple',
+			theme_dark: 'sombre',
+			resetAll: 'réinitialiser tout',
+			theme_light: 'clair'
 		},
 		status: {
+			connected: 'connecté',
 			connecting: 'connexion',
-			error: 'erreur',
-			connected: 'connecté'
+			error: 'erreur'
+		},
+		ui: {
+			aiCautionMessage: 'le lama peut avoir des hallucinations',
+			messageRole_assistant: 'assistant',
+			lastWeek: 'la semaine dernière',
+			myChats: 'mes chats',
+			messageRole_user: 'utilisateur',
+			newChat: 'créer un nouveau chat',
+			noChats: 'aucun chat',
+			settings: 'paramètres',
+			promptCenter: "centre de l'invite",
+			signOut: 'se déconnecter',
+			retryInSeconds: 'réessayer dans {{seconds}} secondes',
+			userProfile: 'profil utilisateur',
+			searchChats: 'rechercher des chats',
+			startondate: 'date de début',
+			thisWeek: 'cette semaine',
+			use_model: 'utiliser le modèle'
 		}
-	}, 
+	}
 };

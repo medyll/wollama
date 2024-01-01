@@ -13,29 +13,25 @@ export class ApiCall {
 		this.options = { ...this.options, ...options };
 	}
 
-	static async generate(
-		prompt: string,
-		hook?: (data: OllamaResponseType) => void,
-		apiBody?: Partial<OllamaApiBody>
-	) {
+	static async generate(prompt: string, hook?: (data: OllamaResponseType) => void, apiBody?: Partial<OllamaApiBody>) {
 		const config = get(settings);
 		const ollamaOptions = get(ollamaParams);
 
 		const defaultOptions = {
+			model: config?.defaultModel,
 			prompt,
 			system: config?.system_prompt,
-			model: config?.defaultModel,
 			...apiBody,
 			options: { ...ollamaOptions, ...apiBody?.options }
 		} as OllamaApiBody;
 
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
-			method: 'POST',
+			body: JSON.stringify(defaultOptions),
 			headers: {
 				'Content-Type': 'text/event-stream',
 				...getHeader()
 			},
-			body: JSON.stringify(defaultOptions)
+			method: 'POST'
 		});
 
 		if (!res.ok) {
@@ -64,11 +60,11 @@ export class ApiCall {
 
 	static async ping(url: string) {
 		return fetch(`${url}/api/tags`, {
-			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
 				...getHeader()
-			}
+			},
+			method: 'GET'
 		})
 			.then(async (res) => {
 				if (!res?.ok) throw await res.json();
@@ -86,11 +82,11 @@ export class ApiCall {
 		const config = get(settings);
 
 		return fetch(`${config.ollama_server}/api/tags`, {
-			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
 				...getHeader()
-			}
+			},
+			method: 'GET'
 		})
 			.then(async (res) => {
 				if (!res?.ok) throw await res.json();
@@ -107,12 +103,12 @@ export class ApiCall {
 	static async deleteModel(model: string) {
 		const config = get(settings);
 		return fetch(`${config.ollama_server}/api/delete`, {
-			method: 'DELETE',
+			body: JSON.stringify({ name: model }),
 			headers: {
 				'Content-Type': 'application/json',
 				...getHeader()
 			},
-			body: JSON.stringify({ name: model })
+			method: 'DELETE'
 		})
 			.then(async (res) => {
 				if (!res.ok) throw await res.json();
@@ -130,12 +126,12 @@ export class ApiCall {
 		const config = get(settings);
 
 		const res = await fetch(`${config.ollama_server}/api/pull`, {
-			method: 'POST',
+			body: JSON.stringify({ name: model }),
 			headers: {
 				'Content-Type': 'text/event-stream',
 				...getHeader()
 			},
-			body: JSON.stringify({ name: model })
+			method: 'POST'
 		})
 			.then(async (res) => {
 				return res;
@@ -154,10 +150,7 @@ export class ApiCall {
 		} */
 
 		if (response.body) {
-			const streamReader = response.body
-				.pipeThrough(new TextDecoderStream())
-				.pipeThrough(splitStream('\n'))
-				.getReader();
+			const streamReader = response.body.pipeThrough(new TextDecoderStream()).pipeThrough(splitStream('\n')).getReader();
 
 			while (true) {
 				const { value, done } = await streamReader.read();
@@ -176,14 +169,14 @@ export class ApiCall {
 function splitStream(separator: string) {
 	let buffer = '';
 	return new TransformStream({
+		flush(controller) {
+			if (buffer) controller.enqueue(buffer);
+		},
 		transform(chunk, controller) {
 			buffer += chunk;
 			const parts = buffer.split(separator);
 			parts.slice(0, -1).forEach((part) => controller.enqueue(part));
 			buffer = parts[parts.length - 1];
-		},
-		flush(controller) {
-			if (buffer) controller.enqueue(buffer);
 		}
 	});
 }

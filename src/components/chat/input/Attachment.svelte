@@ -15,11 +15,11 @@
 		reader.onload = (e) => {
 			if (e?.target?.result) {
 				imageFile = {
-					type: 'image',
-					name: image.name,
+					base64: e?.target?.result?.toString().split(',')[1],
 					dataUri: e?.target?.result?.toString(),
 					header: e?.target?.result?.toString().split(',')[0],
-					base64: e?.target?.result?.toString().split(',')[1]
+					name: image.name,
+					type: 'image'
 				};
 			}
 		};
@@ -38,11 +38,4 @@
 	<Icon icon="heroicons:paper-clip-solid" style="font-size:1.6em" />
 </button>
 
-<input
-	type="file"
-	{form}
-	accept=".jpg, .jpeg, .png"
-	hidden
-	on:change={(e) => onFileSelected(e)}
-	bind:this={fileinput}
-/>
+<input type="file" {form} accept=".jpg, .jpeg, .png" hidden on:change={(e) => onFileSelected(e)} bind:this={fileinput} />

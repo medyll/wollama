@@ -9,9 +9,7 @@ export const locales = Object.keys(translations);
 
 type ResolverPathType<T> = T extends object
 	? {
-			[K in keyof T]: T[K] extends null | undefined
-				? K & string
-				: `${K & string}${'' extends ResolverPathType<T[K]> ? '' : '.'}${ResolverPathType<T[K]>}`;
+			[K in keyof T]: T[K] extends null | undefined ? K & string : `${K & string}${'' extends ResolverPathType<T[K]> ? '' : '.'}${ResolverPathType<T[K]>}`;
 	  }[keyof T]
 	: '';
 
@@ -31,10 +29,10 @@ function doTranslate(locale: string = 'en', key: string, vars: Record<string, st
 		text = text.replace(regex, vars[k]);
 	});
 	if (!text) {
-		clearTimeout(timerUn)
+		clearTimeout(timerUn);
 		timerUn = setTimeout(async () => {
 			await missingLocale.update((n) => [...n, key].filter((v, i, a) => a.indexOf(v) === i));
-			console.log('Missing translation' , get(missingLocale));
+			console.log('Missing translation', get(missingLocale));
 		}, 500);
 	}
 	return text ?? key;

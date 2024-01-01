@@ -18,14 +18,14 @@
 		if (element)
 			setTimeout(() => {
 				element?.scrollIntoView({
-					block: 'end',
-					behavior: 'smooth'
+					behavior: 'smooth',
+					block: 'end'
 				});
 			}, 200);
 	}
 </script>
 
-<div class="cartouche"  bind:this={element} >
+<div class="cartouche" bind:this={element}>
 	<button class="cartoucheTitle flex-align-middle" on:click={openClose} type="button">
 		<div>
 			<Icon icon="ci:main-component" style="font-size:1.6em" />

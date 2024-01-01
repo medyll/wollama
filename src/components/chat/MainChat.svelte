@@ -29,36 +29,35 @@
 
 	$: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
-	$: disableSubmit =
-		$prompter.ollamaBody.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
+	$: disableSubmit = $prompter.ollamaBody.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
 	$: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
 	// add messages chat to db
 	async function createMessages(chat: ChatType, content: string, images?: MessageImageType) {
 		const ty = await idbQuery.insertMessage(chat.chatId, {
-			role: 'user',
-			status: 'done',
-			content,
 			chatId: chat.chatId,
-			images: images
+			content,
+			images: images,
+			role: 'user',
+			status: 'done'
 		});
 
 		const ay = await Promise.all([
 			...chat.models.map(
 				async (model) =>
 					await idbQuery.insertMessage(chat.chatId, {
-						role: 'assistant',
-						status: 'idle',
 						chatId: chat.chatId,
-						model
+						model,
+						role: 'assistant',
+						status: 'idle'
 					})
 			)
 		]);
 		// insert assistant message
 		return {
-			userData: ty,
-			assistantModelData: ay
+			assistantModelData: ay,
+			userData: ty
 		};
 	}
 
@@ -89,8 +88,8 @@
 				{
 					cb: onResponseMessage,
 					cbData: {
-						chatId: assistantMessage.chatId,
-						assistantData: assistantMessage
+						assistantData: assistantMessage,
+						chatId: assistantMessage.chatId
 					}
 				}
 			);
@@ -108,11 +107,7 @@
 		window.history.replaceState(history.state, '', `/chat/${chatSession.chatId}`);
 	}
 
-	async function onResponseMessage({
-		chatId,
-		assistantData: assistantMessage,
-		data
-	}: SenderCallback<CallbackDataType>) {
+	async function onResponseMessage({ chatId, assistantData: assistantMessage, data }: SenderCallback<CallbackDataType>) {
 		if (data.done) {
 			aiState.set('done');
 
@@ -164,27 +159,10 @@
 			<ChatOptions />
 			<div class="inputTextarea">
 				<Images />
-				<Input
-					on:keypress={keyPressHandler}
-					bind:value={$prompter.ollamaBody.prompt}
-					bind:requestStop={$aiState}
-					showCancel={$aiState == 'running'}
-					{placeholder}
-					form="prompt-form"
-				>
-					<Attachment
-						slot="start"
-						form="prompt-form"
-						bind:imageFile={$prompter.images}
-						disabled={false}
-					/>
+				<Input on:keypress={keyPressHandler} bind:value={$prompter.ollamaBody.prompt} bind:requestStop={$aiState} showCancel={$aiState == 'running'} {placeholder} form="prompt-form">
+					<Attachment slot="start" form="prompt-form" bind:imageFile={$prompter.images} disabled={false} />
 					<div slot="end" class="flex-align-middle">
-						<Speech
-							onEnd={submitHandler}
-							bind:prompt={$prompter.ollamaBody.prompt}
-							bind:voiceListening={$prompter.voiceListening}
-							disabled={disableSubmit}
-						/>
+						<Speech onEnd={submitHandler} bind:prompt={$prompter.ollamaBody.prompt} bind:voiceListening={$prompter.voiceListening} disabled={disableSubmit} />
 						<button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
 							<Icon icon="mdi:send" style="font-size:1.6em" />
 						</button>

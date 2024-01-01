@@ -18,7 +18,7 @@
 
 	function deleteCha1tHandler() {
 		idbQuery.deleteChat(chatId);
-		if($ui.activeChatId === chatId) {
+		if ($ui.activeChatId === chatId) {
 			ui.setActiveChatId(undefined);
 		}
 	}
@@ -29,7 +29,7 @@
 </script>
 
 <div class="flex relative w-full {active ? 'active' : ''}">
-	<button on:click class="overflow-hidden button ">
+	<button on:click class="overflow-hidden button">
 		<div class="w-6 text-left {active ? '  font-bold' : 'opacity-50'}">
 			<Icon icon={active ? 'carbon:chat-operational' : 'carbon:chat'} class="md  " />
 		</div>
@@ -46,12 +46,15 @@
 	</button>
 	{#if active}
 		<div class="flex-align-middle gap-2">
-			<button class="borderButton" on:click={() => {editChat=true}}>
+			<button
+				class="borderButton"
+				on:click={() => {
+					editChat = true;
+				}}
+			>
 				<Icon icon="mdi:edit" />
 			</button>
-			<Confirm
-				validate={deleteCha1tHandler}
-			>
+			<Confirm validate={deleteCha1tHandler}>
 				<Icon icon="mdi:delete" />
 			</Confirm>
 		</div>

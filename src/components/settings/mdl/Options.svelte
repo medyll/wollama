@@ -24,8 +24,7 @@
 		//
 	}
 
-		$: console.log($ollamaParams)
-
+	$: console.log($ollamaParams);
 </script>
 
 <div class="soft-title p-2 py-4">
@@ -53,7 +52,7 @@
 <div class="soft-title p-2 py-4">
 	{$t('settings.system_prompt')}
 </div>
-<InfoLine title={"prompt"} vertical>
+<InfoLine title={'prompt'} vertical>
 	<textarea bind:value={$settings.system_prompt} cols="4" class="w-full h-24 theme-bg p-2 rounded-md" />
 </InfoLine>
 <hr />
@@ -76,25 +75,11 @@
 		<div>
 			{#if OllamaOptionsDefaults?.[setting]?.max}
 				<div class="flex-align-middle gap-2">
-					<input
-						type="range"
-						min={OllamaOptionsDefaults?.[setting].min}
-						max={OllamaOptionsDefaults?.[setting].max}
-						step={OllamaOptionsDefaults?.[setting].max / 10}
-						bind:value={$ollamaParams[setting]}
-					/>
-					<input
-						class="w-16 text-center border-none theme-bg"
-						type="text"
-						bind:value={$ollamaParams[setting]}
-					/>
+					<input type="range" min={OllamaOptionsDefaults?.[setting].min} max={OllamaOptionsDefaults?.[setting].max} step={OllamaOptionsDefaults?.[setting].max / 10} bind:value={$ollamaParams[setting]} />
+					<input class="w-16 text-center border-none theme-bg" type="text" bind:value={$ollamaParams[setting]} />
 				</div>
 			{:else}
-				<input
-					class="w-16 text-center border-none theme-bg"
-					type="text"
-					bind:value={$ollamaParams[setting]}
-				/>
+				<input class="w-16 text-center border-none theme-bg" type="text" bind:value={$ollamaParams[setting]} />
 			{/if}
 		</div>
 		<div class="w-16">

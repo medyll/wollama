@@ -1,72 +1,73 @@
 import de from './de';
 import es from './es';
 import fr from './fr';
+
 import it from './it';
 
 export default {
+	de: de.de,
 	en: {
-		ui: {
-			settings: 'settings',
-			newChat: 'create new chat',
-			myChats: 'my chats',
-			userProfile: 'user profile',
-			signOut: 'sign out',
-			aiCautionMessage: 'the llama can have some hallucinations',
-			messageRole_user: 'user',
-			messageRole_assistant: 'assistant',
-			searchChats: 'search chats',
-			thisWeek: 'this week',
-			lastWeek: 'last week',
-			retryInSeconds: 'retry in {{seconds}} seconds',
-			noChats: 'no chats',
-			startondate: 'date',
-			use_model: 'use model',
-			promptCenter: 'prompt center'
+		prompt: {
+			createPrompt: 'create prompt',
+			promptCenter: 'prompt center',
+			systemPrompt: 'system prompt'
 		},
 		settings: {
 			auth: 'authentication',
-			lang: 'language',
 			avatar: 'avatar',
 			avatar_email: 'email from gravatar',
-			voice_auto_stop: 'auto stop voice',
-			title_auto: 'auto title generation',
-			test_connection: 'test connection',
-			system_prompt: 'system prompt',
+			lang: 'language',
 			server_url: 'Ollama server url',
-			theme: 'theme',
-			theme_light: 'light',
-			theme_dark: 'dark',
-			pull_model: 'enter a model name to pull',
+			system_prompt: 'system prompt',
 			enter_model: 'enter a model name to pull',
-			model_delete: 'delete model',
+			test_connection: 'test connection',
 			default_model: 'enter default model',
+			title_auto: 'auto title generation',
+			model_delete: 'delete model',
+			voice_auto_stop: 'auto stop voice',
+			delete_model: 'delete model',
+			theme: 'theme',
+			configureOllama: 'configure Ollama',
+			theme_dark: 'dark',
+			delete_model_message: 'are you sure you want to delete this model?',
+			theme_light: 'light',
+			modules: {
+				addons: 'addons',
+				advanced: 'advanced',
+				general: 'general',
+				infos: 'infos',
+				models: 'models'
+			},
+			pull_model: 'enter a model name to pull',
 			request_mode: 'plain',
 			resetAll: 'reset all',
-			delete_model: 'delete model',
-			configureOllama: 'configure Ollama',
-			resetOllamaOptions: 'reset Ollama options',
-			delete_model_message: 'are you sure you want to delete this model?',
-			modules: {
-				infos: 'infos',
-				addons: 'addons',
-				models: 'models',
-				advanced: 'advanced',
-				general: 'general'
-			}
+			resetOllamaOptions: 'reset Ollama options'
 		},
 		status: {
+			connected: 'connected',
 			connecting: 'connecting',
-			error: 'error',
-			connected: 'connected'
+			error: 'error'
 		},
-		prompt: {
-			systemPrompt: 'system prompt',
+		ui: {
+			aiCautionMessage: 'the llama can have some hallucinations',
+			myChats: 'my chats',
+			messageRole_assistant: 'assistant',
+			newChat: 'create new chat',
+			lastWeek: 'last week',
+			settings: 'settings',
+			messageRole_user: 'user',
+			signOut: 'sign out',
+			noChats: 'no chats',
+			userProfile: 'user profile',
 			promptCenter: 'prompt center',
-			createPrompt: 'create prompt'
+			retryInSeconds: 'retry in {{seconds}} seconds',
+			searchChats: 'search chats',
+			startondate: 'date',
+			thisWeek: 'this week',
+			use_model: 'use model'
 		}
 	},
-	fr: fr.fr,
-	de: de.de,
 	es: es.es,
+	fr: fr.fr,
 	it: it.it
 };

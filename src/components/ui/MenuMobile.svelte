@@ -1,4 +1,4 @@
-<script lang="ts"> 
+<script lang="ts">
 	import { ui } from '$lib/stores/ui';
 	import Icon from '@iconify/svelte';
 	import Sidebar from './Sidebar.svelte';
@@ -7,11 +7,8 @@
 
 <div class="md:hidden flex shadow md:w-full theme-bg-dark">
 	<div class="flex-v gap-4 px-4 py-4 theme-bg-dark">
-		<button
-			on:click={async () => ui.showHideMenu()}
-			class="  iconButton"
-		>
-			<Icon icon="mdi:menu-{$ui.showMenu? 'open':'close'}" class="md" />
+		<button on:click={async () => ui.showHideMenu()} class="  iconButton">
+			<Icon icon="mdi:menu-{$ui.showMenu ? 'open' : 'close'}" class="md" />
 		</button>
 		<hr />
 		<button

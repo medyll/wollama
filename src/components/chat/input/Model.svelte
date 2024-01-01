@@ -9,9 +9,7 @@
 	};
 
 	function addModelKey() {
-		const newModel = ($settings?.ollamaModels ?? []).filter(
-			(model) => !activeModels.includes(model.name)
-		)?.[0];
+		const newModel = ($settings?.ollamaModels ?? []).filter((model) => !activeModels.includes(model.name))?.[0];
 		activeModels = [...activeModels, newModel?.name ?? '...'];
 	}
 
@@ -25,10 +23,8 @@
 	{#each activeModels as modelKey, index (index)}
 		{@const showAdd = index === activeModels.length - 1}
 		{@const showRemove = index === 0}
-		{@const filteredOptions = ($settings?.ollamaModels ?? []).filter(
-			(model) => model.name === modelKey || !activeModels.includes(model.name)
-		)}
-		<div class="flex-align-middle gap-2   border-b">
+		{@const filteredOptions = ($settings?.ollamaModels ?? []).filter((model) => model.name === modelKey || !activeModels.includes(model.name))}
+		<div class="flex-align-middle gap-2 border-b">
 			<div class="flex-1">
 				<select class="naked inline w-32" on:change={changeHandler(index)}>
 					{#each filteredOptions as model}

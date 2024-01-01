@@ -16,17 +16,9 @@
 	<div class="flex-v h-full w-full gap-2 p-3">
 		<div class="flex-align-middle gap-2 py-2 relative">
 			<div class="flex-align-middle flex-1 gap-2">
-				<img
-					alt="logo"
-					class="iconify"
-					width="24"
-					src="/assets/svg/lama.svg"
-					style="transform: scaleX(-1);"
-				/>
+				<img alt="logo" class="iconify" width="24" src="/assets/svg/lama.svg" style="transform: scaleX(-1);" />
 				<div class="font-semibold text-xl">wOollama !</div>
-				<div
-					class="hidden md:block absolute border theme-border theme-bg rounded-full gap-2 p-2 right-0"
-				>
+				<div class="hidden md:block absolute border theme-border theme-bg rounded-full gap-2 p-2 right-0">
 					<button title={$t('ui.newChat')} on:click={createChat} class="  iconButton">
 						<Icon icon="mdi:chat-plus-outline" class="lg" />
 					</button>
@@ -38,5 +30,3 @@
 		<ChatList />
 	</div>
 </div>
-
- 

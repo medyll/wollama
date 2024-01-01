@@ -14,8 +14,8 @@
 		if (element && $ui.autoScroll?.[$ui.activeChatId])
 			setTimeout(() => {
 				element?.scrollIntoView({
-					block: 'end',
-					behavior: 'smooth'
+					behavior: 'smooth',
+					block: 'end'
 				});
 			}, 0);
 	}

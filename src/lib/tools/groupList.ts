@@ -42,7 +42,7 @@ export class ChatDataGrouper<T = ChatType> {
 		const groups: GroupList = {};
 
 		this.data.forEach((item) => {
-			const itemDate = new Date(item[this.fieldName]); 
+			const itemDate = new Date(item[this.fieldName]);
 
 			if (isThisWeek(itemDate)) {
 				const day = itemDate.getDate();
@@ -56,10 +56,10 @@ export class ChatDataGrouper<T = ChatType> {
 
 					groups[`D${day}`] = {
 						code: `D${day}`,
+						items: [],
 						name: itemDate.toLocaleString('default', { weekday: 'long' }),
 						order: day,
-						items: [],
-						period: { start: startDate, end: endDate }
+						period: { end: endDate, start: startDate }
 					};
 				}
 				// store item in the dedicated group
@@ -92,14 +92,14 @@ export class ChatDataGrouper<T = ChatType> {
 
 					groups[`W${weeks}`] = {
 						code: `W${weeks}`,
+						items: [],
 						name: this.getWeekGroupTitle(weeks),
 						order: weeks,
-						items: [],
-						period: { start: startDate, end: endDate }
+						period: { end: endDate, start: startDate }
 					};
 				}
-                // store item in the dedicated group
-                groups[`W${weeks}`].items.push(item);
+				// store item in the dedicated group
+				groups[`W${weeks}`].items.push(item);
 			}
 		});
 
@@ -127,10 +127,10 @@ export class ChatDataGrouper<T = ChatType> {
 					const endDate = new Date(itemYear, itemMonth, 0);
 					groups[`M${itemMonth}`] = {
 						code: `M${itemMonth}`,
+						items: [],
 						name: startDate.toLocaleString('default', { month: 'long' }),
 						order: itemMonth,
-						items: [],
-						period: { start: startDate, end: endDate }
+						period: { end: endDate, start: startDate }
 					};
 				}
 				// store item in the dedicated group
@@ -152,7 +152,7 @@ export class ChatDataGrouper<T = ChatType> {
 		this.data.forEach((item) => {
 			const itemDate = new Date(item[this.fieldName]);
 			const itemYear = itemDate.getFullYear();
- 
+
 			// if the item is older than 12 months, store it
 			if (itemDate > xMonthsAgo) {
 			}

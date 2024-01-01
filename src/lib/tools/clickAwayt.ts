@@ -1,7 +1,7 @@
-export function clickAway(element: HTMLElement) { 
+export function clickAway(element: HTMLElement) {
 	document.addEventListener('click', handleClick, true);
 
-	function handleClick(event: MouseEvent) { 
+	function handleClick(event: MouseEvent) {
 		if (!element?.contains(event.target as Node)) {
 			element.dispatchEvent(new CustomEvent<Node>('clickAway', {}));
 		}

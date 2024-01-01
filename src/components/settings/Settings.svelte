@@ -10,8 +10,8 @@
 	import { engine } from '$lib/tools/engine';
 
 	let settingList = {
-		general: General,
 		addons: Addons,
+		general: General,
 		infos: Infos
 	};
 </script>

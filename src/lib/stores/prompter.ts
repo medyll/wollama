@@ -15,19 +15,19 @@ export type PrompterType = {
 
 function prompterStore() {
 	const defaultPromptState = {
-		voiceListening: false,
-		isPrompting: false,
 		disabledPrompt: false,
-		options: { temperature: 0.5 },
+		isPrompting: false,
 		models: [get(settings).defaultModel],
 		ollamaBody: {
-			prompt: '',
-			model: '',
 			context: [],
-			options: { temperature: 0.5 },
+			format: 'plain',
 			images: [],
-			format: 'plain'
-		} as OllamaApiBody
+			model: '',
+			options: { temperature: 0.5 },
+			prompt: ''
+		} as OllamaApiBody,
+		options: { temperature: 0.5 },
+		voiceListening: false
 	};
 	const { subscribe, set, update } = writable<PrompterType>(defaultPromptState);
 
@@ -45,12 +45,12 @@ function prompterStore() {
 	});
 
 	return {
-		subscribe,
-		set,
-		update,
 		reset: () => {
 			set(defaultPromptState);
-		}
+		},
+		set,
+		subscribe,
+		update
 	};
 }
 

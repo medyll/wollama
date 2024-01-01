@@ -5,7 +5,6 @@ import { ApiCall } from '../db/apiCall';
 import { goto } from '$app/navigation';
 
 export class engine {
-
 	public static applyTheme(theme: string) {
 		const currentTheme = theme == 'light' ? 'dark' : 'light';
 
@@ -20,11 +19,7 @@ export class engine {
 		goto(`${prefix}${url}`);
 	}
 
-	public static resolveDotPath(
-		object: Record<string, any>,
-		path: string,
-		defaultValue?: any
-	): any | undefined {
+	public static resolveDotPath(object: Record<string, any>, path: string, defaultValue?: any): any | undefined {
 		return path.split('.').reduce((r, s) => (r ? r[s] : defaultValue), object) ?? undefined;
 	}
 
@@ -44,19 +39,13 @@ export class engine {
 				connectionChecker.setConnectionStatus('error');
 			})
 			.finally(() => {
-				if (
-					connectionChecker.get('connectionStatus') != 'connected' &&
-					connectionChecker.get('connectionRetryTimeout') != 0
-				) {
-					let ollamaCheckRetries = setTimeout(
-						() => this.checkOllamaEndPoints(fn),
-						connectionChecker.get('connectionRetryTimeout')
-					);
+				if (connectionChecker.get('connectionStatus') != 'connected' && connectionChecker.get('connectionRetryTimeout') != 0) {
+					const ollamaCheckRetries = setTimeout(() => this.checkOllamaEndPoints(fn), connectionChecker.get('connectionRetryTimeout'));
 				}
 			});
 
 		function getRetryTimeOut(retryCount: number, maxRetries?: number = 50) {
-			let retryInterval = retryCount * 1.5;
+			const retryInterval = retryCount * 1.5;
 			return retryCount > maxRetries ? 240000 : retryInterval * 1000;
 		}
 	}

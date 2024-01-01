@@ -1,57 +1,57 @@
 export default {
 	es: {
-		ui: {
-			settings: 'ajustes',
-			newChat: 'crear nuevo chat',
-			myChats: 'mis chats',
-			userProfile: 'perfil de usuario',
-			signOut: 'cerrar sesión',
-			aiCautionMessage: 'la llama puede tener algunas alucinaciones',
-			messageRole_user: 'usuario',
-			messageRole_assistant: 'asistente',
-			searchChats: 'buscar chats',
-			thisWeek: 'esta semana',
-			lastWeek: 'la semana pasada',
-			retryInSeconds: 'reintentar en {{seconds}} segundos',
-			noChats: 'sin chats',
-			startondate: 'fecha de inicio',
-			use_model: 'usar modelo',
+		prompt: {
+			promptCenter: 'centro del prompt'
 		},
 		settings: {
 			auth: 'autenticación',
-			lang: 'idioma',
 			avatar: 'avatar',
 			avatar_email: 'email de gravatar',
-			voice_auto_stop: 'parada automática de voz',
-			title_auto: 'generación automática de título',
-			test_connection: 'probar conexión',
-			system_prompt: 'prompt del sistema',
+			lang: 'idioma',
 			server_url: 'URL del servidor Ollama',
-			theme: 'tema',
-			theme_light: 'claro',
-			theme_dark: 'oscuro',
-			pull_model: 'introducir un nombre de modelo para descargar',
 			enter_model: 'introducir un nombre de modelo para descargar',
-			model_delete: 'eliminar modelo',
+			system_prompt: 'prompt del sistema',
 			delete_model: 'eliminar modelo',
+			test_connection: 'probar conexión',
 			default_model: 'introducir modelo por defecto',
-			request_mode: 'simple',
+			title_auto: 'generación automática de título',
+			model_delete: 'eliminar modelo',
+			voice_auto_stop: 'parada automática de voz',
 			modules: {
-				infos: 'información',
 				addons: 'complementos',
-				models: 'modelos',
 				advanced: 'avanzado',
-				general: 'general'
+				general: 'general',
+				infos: 'información',
+				models: 'modelos'
 			},
-			resetAll: 'restablecer todo',
+			theme: 'tema',
+			pull_model: 'introducir un nombre de modelo para descargar',
+			theme_dark: 'oscuro',
+			request_mode: 'simple',
+			theme_light: 'claro',
+			resetAll: 'restablecer todo'
 		},
 		status: {
+			connected: 'conectado',
 			connecting: 'conectando',
-			error: 'error',
-			connected: 'conectado'
+			error: 'error'
 		},
-		prompt: {
-			promptCenter: 'centro del prompt',
-		},
-	},
+		ui: {
+			aiCautionMessage: 'la llama puede tener algunas alucinaciones',
+			messageRole_assistant: 'asistente',
+			myChats: 'mis chats',
+			lastWeek: 'la semana pasada',
+			newChat: 'crear nuevo chat',
+			messageRole_user: 'usuario',
+			settings: 'ajustes',
+			noChats: 'sin chats',
+			signOut: 'cerrar sesión',
+			retryInSeconds: 'reintentar en {{seconds}} segundos',
+			userProfile: 'perfil de usuario',
+			searchChats: 'buscar chats',
+			startondate: 'fecha de inicio',
+			thisWeek: 'esta semana',
+			use_model: 'usar modelo'
+		}
+	}
 };

@@ -1,64 +1,168 @@
 @tailwind base;
+@tailwind utilities;
 
 @layer base {
+	:root {
+		--cssfabric-primary  : theme('colors.orange.800');
+		/* Bleu, par exemple */
+		--cssfabric-secondary: #28a745;
+		/* Vert, par exemple */
+		--cssfabric-tertiary : #28a745;
+		/* Vert, par exemple */
+	}
+
+	:root,
+	:root.light {
+		--cssfabric-theme-foreground: #ffffff;
+		--cssfabric-theme-background: #1a1a1a;
+	}
+
+	:root.dark {
+		--cssfabric-theme-foreground: #1a1a1a;
+		--cssfabric-theme-background: #ffffff;
+	}
+
+	:root {
+		/* Assombrir la couleur de premier plan par des étapes de 10% */
+		--cssfabric-foreground-darken-0  : color-mix(in srgb, --cssfabric-theme-foreground, black 0%);
+		--cssfabric-foreground-darken-10 : color-mix(in srgb, --cssfabric-theme-foreground, black 10%);
+		--cssfabric-foreground-darken-20 : color-mix(in srgb, --cssfabric-theme-foreground, black 20%);
+		--cssfabric-foreground-darken-30 : color-mix(in srgb, --cssfabric-theme-foreground, black 30%);
+		--cssfabric-foreground-darken-40 : color-mix(in srgb, --cssfabric-theme-foreground, black 40%);
+		--cssfabric-foreground-darken-50 : color-mix(in srgb, --cssfabric-theme-foreground, black 50%);
+		--cssfabric-foreground-darken-60 : color-mix(in srgb, --cssfabric-theme-foreground, black 60%);
+		--cssfabric-foreground-darken-70 : color-mix(in srgb, --cssfabric-theme-foreground, black 70%);
+		--cssfabric-foreground-darken-80 : color-mix(in srgb, --cssfabric-theme-foreground, black 80%);
+		--cssfabric-foreground-darken-90 : color-mix(in srgb, --cssfabric-theme-foreground, black 90%);
+		--cssfabric-foreground-darken-100: color-mix(in srgb, --cssfabric-theme-foreground, black 100%);
+
+		/* Générer des variantes de transparence pour la couleur de premier plan */
+		--cssfabric-foreground-opacity-0  : color-mix(in srgb, --cssfabric-theme-foreground, transparent 100%);
+		--cssfabric-foreground-opacity-10 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 90%);
+		--cssfabric-foreground-opacity-20 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 80%);
+		--cssfabric-foreground-opacity-30 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 70%);
+		--cssfabric-foreground-opacity-40 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 60%);
+		--cssfabric-foreground-opacity-50 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 50%);
+		--cssfabric-foreground-opacity-60 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 40%);
+		--cssfabric-foreground-opacity-70 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 30%);
+		--cssfabric-foreground-opacity-80 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 20%);
+		--cssfabric-foreground-opacity-90 : color-mix(in srgb, --cssfabric-theme-foreground, transparent 10%);
+		--cssfabric-foreground-opacity-100: color-mix(in srgb, --cssfabric-theme-foreground, transparent 0%);
+
+		/* Générer des variantes de transparence pour la couleur d'arrière-plan */
+		--cssfabric-bg-opacity-0  : color-mix(in srgb, --cssfabric-theme-background, transparent 100%);
+		--cssfabric-bg-opacity-10 : color-mix(in srgb, --cssfabric-theme-background, transparent 90%);
+		--cssfabric-bg-opacity-20 : color-mix(in srgb, --cssfabric-theme-background, transparent 80%);
+		--cssfabric-bg-opacity-30 : color-mix(in srgb, --cssfabric-theme-background, transparent 70%);
+		--cssfabric-bg-opacity-40 : color-mix(in srgb, --cssfabric-theme-background, transparent 60%);
+		--cssfabric-bg-opacity-50 : color-mix(in srgb, --cssfabric-theme-background, transparent 50%);
+		--cssfabric-bg-opacity-60 : color-mix(in srgb, --cssfabric-theme-background, transparent 40%);
+		--cssfabric-bg-opacity-70 : color-mix(in srgb, --cssfabric-theme-background, transparent 30%);
+		--cssfabric-bg-opacity-80 : color-mix(in srgb, --cssfabric-theme-background, transparent 20%);
+		--cssfabric-bg-opacity-90 : color-mix(in srgb, --cssfabric-theme-background, transparent 10%);
+		--cssfabric-bg-opacity-100: color-mix(in srgb, --cssfabric-theme-background, transparent 0%);
+
+		/* Couleurs de bordure */
+		--cssfabric-border-color      : var(--cssfabric-foreground-opacity-90);
+		--cssfabric-border-color-hover: color-mix(in srgb, var(--cssfabric-border-color), var(--cssfabric-secondary) 20%);
+
+		/* inputs */
+		--cssfabric-input-bg-color        : color-mix(in srgb, --cssfabric-theme-background, black 20% 80%);
+		/* Assombrir la couleur d'arrière-plan et ajouter de l'opacité pour les inputs */
+		--cssfabric-input-border-color    : var(--cssfabric-foreground-opacity-80);
+		/* Couleur de bordure des inputs */
+		--cssfabric-input-foreground-color: var(--cssfabric-foreground-color);
+		/* Couleur de texte des inputs */
+	}
+
 	:root,
 	:root.light {
 		/** border */
-		--theme-border-color: rgba(203, 213, 224, 0.6); /* colors.gray.400/60 */
-		--theme-border-color-focus: rgba(160, 174, 192, 0.7); /* colors.gray.500/70 */
+		--theme-border-color      : rgba(203, 213, 224, 0.6);
+		/* colors.gray.400/60 */
+		--theme-border-color-focus: rgba(160, 174, 192, 0.7);
+		/* colors.gray.500/70 */
 
 		/** gradient */
-		--theme-gradient-from: rgb(229, 231, 235); /* colors.gray.200 */
-		--theme-gradient-to: rgb(243, 244, 246); /* colors.gray.100 */
+		--theme-gradient-from: rgb(229, 231, 235);
+		/* colors.gray.200 */
+		--theme-gradient-to  : rgb(243, 244, 246);
+		/* colors.gray.100 */
 
 		/** input  */
-		--theme-input-bg-color: rgb(243, 244, 246); /* colors.gray.100 */
-		--theme-input-border-color: rgba(203, 213, 224, 0.6); /* colors.gray.400/60 */
-		--theme-input-shadow-hover: rgba(0, 0, 0, 0.1); /* Exemple, à ajuster */
-		--theme-input-text-color: rgb(31, 41, 55); /* colors.gray.800 */
+		--theme-input-bg-color    : rgb(243, 244, 246);
+		/* colors.gray.100 */
+		--theme-input-border-color: rgba(203, 213, 224, 0.6);
+		/* colors.gray.400/60 */
+		--theme-input-shadow-hover: rgba(0, 0, 0, 0.1);
+		/* Exemple, à ajuster */
+		--theme-input-text-color  : rgb(31, 41, 55);
+		/* colors.gray.800 */
 
 		/** paper */
-		--theme-paper-bg-color: rgba(224, 231, 255, 0.3); /* colors.neutral.200/30 */
-		--theme-paper-border-color: rgba(160, 174, 192, 0.6); /* colors.gray.500/60 */
+		--theme-paper-bg-color    : rgba(224, 231, 255, 0.3);
+		/* colors.neutral.200/30 */
+		--theme-paper-border-color: rgba(160, 174, 192, 0.6);
+		/* colors.gray.500/60 */
 
 		/** shadow */
-		--theme-shadow-color: rgba(160, 174, 192, 0.7); /* colors.gray.500/70 */
-		--theme-shadow: 0 1px 3px 0 var(--theme-shadow-color), 0 1px 2px -1px var(--theme-shadow-color);
-		--theme-shadow-color-hover: rgba(17, 24, 39, 0.9); /* Exemple, à ajuster */
+		--theme-shadow-color      : rgba(160, 174, 192, 0.7);
+		/* colors.gray.500/70 */
+		--theme-shadow            : 0 1px 3px 0 var(--theme-shadow-color), 0 1px 2px -1px var(--theme-shadow-color);
+		--theme-shadow-color-hover: rgba(17, 24, 39, 0.9);
+		/* Exemple, à ajuster */
 
 		/** canvas */
-		--theme-text-color: rgb(31, 41, 55); /* colors.gray.800 */
-		--theme-bg-color: rgb(249, 250, 251); /* colors.gray.50 */
-		--theme-soft-title-text-color: rgb(107, 114, 128); /* colors.gray.500 */
+		--theme-text-color           : rgb(31, 41, 55);
+		/* colors.gray.800 */
+		--theme-bg-color             : rgb(249, 250, 251);
+		/* colors.gray.50 */
+		--theme-soft-title-text-color: rgb(107, 114, 128);
+		/* colors.gray.500 */
 	}
 
 	:root.dark {
 		/** border */
-		--theme-border-color: rgba(55, 65, 81, 0.9); /* colors.gray.700 */
-		--theme-border-color-focus: rgba(31, 41, 55, 0.7); /* colors.gray.800 */
+		--theme-border-color      : color-mix(in srgb, theme(colors.gray.700), 50%);
+		/* colors.gray.700 */
+		--theme-border-color-focus: rgba(31, 41, 55, 0.7);
+		/* colors.gray.800 */
 
 		/** gradient */
-		--theme-gradient-from: rgb(31, 41, 55); /* colors.gray.800 */
-		--theme-gradient-to: rgb(17, 24, 39); /* colors.gray.900 */
+		--theme-gradient-from: rgb(31, 41, 55);
+		/* colors.gray.800 */
+		--theme-gradient-to  : rgb(17, 24, 39);
+		/* colors.gray.900 */
 
 		/** input */
-		--theme-input-bg-color: rgb(17, 24, 39); /* colors.gray.900 */
-		--theme-input-border-color: rgba(255, 255, 255, 0.2); /* colors.white/10 */
-		--theme-input-text-color: rgb(243, 244, 246); /* colors.gray.100 */
-		--theme-input-shadow-hover: rgba(0, 0, 0, 0.1); /* Exemple, à ajuster */
+		--theme-input-bg-color    : rgb(17, 24, 39);
+		/* colors.gray.900 */
+		--theme-input-border-color: rgba(255, 255, 255, 0.2);
+		/* colors.white/10 */
+		--theme-input-text-color  : rgb(243, 244, 246);
+		/* colors.gray.100 */
+		--theme-input-shadow-hover: rgba(0, 0, 0, 0.1);
+		/* Exemple, à ajuster */
 
 		/** paper */
-		--theme-paper-bg-color: rgba(71, 85, 105, 0.3); /* colors.slate.600/30 */
-		--theme-paper-border-color: rgba(55, 65, 81, 0.7); /* colors.blue.600/90 */
+		--theme-paper-bg-color    : rgba(71, 85, 105, 0.3);
+		/* colors.slate.600/30 */
+		--theme-paper-border-color: rgba(55, 65, 81, 0.7);
+		/* colors.blue.600/90 */
 
 		/** shadow */
-		--theme-shadow-color: rgba(0, 0, 0, 0.8); /* colors.black/80 */
-		--theme-shadow: 0 1px 3px 0 var(--theme-shadow-color), 0 1px 2px -1px var(--theme-shadow-color);
-		--theme-shadow-color-hover: rgba(17, 24, 39, 0.9); /* Exemple, à ajuster */
+		--theme-shadow-color      : rgba(0, 0, 0, 0.8);
+		/* colors.black/80 */
+		--theme-shadow            : 0 1px 3px 0 var(--theme-shadow-color), 0 1px 2px -1px var(--theme-shadow-color);
+		--theme-shadow-color-hover: rgba(17, 24, 39, 0.9);
+		/* Exemple, à ajuster */
 
 		/** canvas */
-		--theme-soft-title-text-color: rgba(243, 244, 246, 0.5); /* colors.gray.100/50 */
-		--theme-text-color: rgb(243, 244, 246); /* colors.gray.100 */
-		--theme-bg-color: rgb(31, 41, 55); /* colors.gray.800 */
+		--theme-soft-title-text-color: rgba(243, 244, 246, 0.5);
+		/* colors.gray.100/50 */
+		--theme-text-color           : rgb(243, 244, 246);
+		/* colors.gray.100 */
+		--theme-bg-color             : rgb(31, 41, 55);
+		/* colors.gray.800 */
 	}
 }

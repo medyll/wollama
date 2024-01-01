@@ -1,24 +1,19 @@
 /** @type { import("eslint").Linter.FlatConfig } */
 module.exports = {
-	root: true,
-	extends: [
-		'eslint:recommended',
-		'plugin:@typescript-eslint/recommended',
-		'plugin:svelte/recommended',
-		'prettier'
-	],
-	parser: '@typescript-eslint/parser',
-	plugins: ['@typescript-eslint'],
-	parserOptions: {
-		sourceType: 'module',
-		ecmaVersion: 2020,
-		extraFileExtensions: ['.svelte']
-	},
 	env: {
 		browser: true,
 		es2017: true,
 		node: true
 	},
+	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:svelte/recommended', 'prettier'],
+	root: true,
+	parser: '@typescript-eslint/parser',
+	parserOptions: {
+		sourceType: 'module',
+		ecmaVersion: 2020,
+		extraFileExtensions: ['.svelte', '.cjs']
+	},
+	plugins: ['@typescript-eslint', 'sort-keys-fix', 'align-assignments'],
 	overrides: [
 		{
 			files: ['*.svelte'],
@@ -28,7 +23,10 @@ module.exports = {
 			}
 		}
 	],
-	"rules": {
-        "object-shorthand": "off"
-    }
+	rules: {
+		'object-shorthand': 'on',
+		/* 'sort-keys': ['error', 'asc', { caseSensitive: false, natural: true }], */
+		'sort-keys-fix/sort-keys-fix': 'error',
+		'align-assignments/align-assignments': ['error', { requiresOnly: false }]
+	}
 };

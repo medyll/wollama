@@ -5,20 +5,21 @@
 	import { settings } from '$lib/stores/settings.js';
 	import translations from '../../../locales/translations';
 	import Selector from '$components/fragments/Selector.svelte';
-	import { engine } from '$lib/tools/engine';  
+	import { engine } from '$lib/tools/engine';
 
 	settings.subscribe((o) => {
-		// if($settings.theme != o.theme) 
-		engine.applyTheme(o.theme)
+		// if($settings.theme != o.theme)
+		engine.applyTheme(o.theme);
 	});
 </script>
 
 <InfoLine title={$t('settings.theme')}>
 	<div class="flex-align-middle gap-4">
-		<Selector values={['light','dark']} value={$settings.theme} let:item let:active>
+		<Selector values={['light', 'dark']} value={$settings.theme} let:item let:active>
 			<button on:click={() => settings.setSetting('theme', item)}>
-			<Icon icon="system-uicons:{item=='light' ? 'sun': 'moon'}" />
-			{item}</button>
+				<Icon icon="system-uicons:{item == 'light' ? 'sun' : 'moon'}" />
+				{item}</button
+			>
 		</Selector>
 	</div>
 </InfoLine>

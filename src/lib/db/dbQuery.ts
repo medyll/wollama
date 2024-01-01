@@ -31,13 +31,8 @@ export class idbQuery {
 		await dbase.chat.update(chatId, chatData);
 	}
 
-	static async initChat(
-		activeChatId?: string,
-		chatData: ChatType = {} as ChatType
-	): Promise<ChatType> {
-		return activeChatId && Boolean(await idbQuery.getChat(activeChatId as string))
-			? await idbQuery.getChat(activeChatId as string)
-			: await idbQuery.insertChat(chatData);
+	static async initChat(activeChatId?: string, chatData: ChatType = {} as ChatType): Promise<ChatType> {
+		return activeChatId && Boolean(await idbQuery.getChat(activeChatId as string)) ? await idbQuery.getChat(activeChatId as string) : await idbQuery.insertChat(chatData);
 	}
 
 	static async insertMessage(chatId: string, messageData: Partial<MessageType>) {

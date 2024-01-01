@@ -1,12 +1,15 @@
 import type { RequestHandler } from './$types';
 import { error, json } from '@sveltejs/kit';
- 
 
-export const GET: RequestHandler = async (req) => { 
+export const GET: RequestHandler = async (req) => {
+	const res = await req
+		.fetch(`http://127.0.0.1:11434/${req.params.api}`)
+		.then((res) => res.json())
+		.catch((err) => {
+			return error(err);
+		});
 
-	const res = await req.fetch(`http://127.0.0.1:11434/${req.params.api}`).then((res) => res.json()).catch((err) => {return   error(err)});
-
-	return json(res) 
+	return json(res);
 };
 
 export const POST: RequestHandler = async (req) => {
@@ -16,13 +19,13 @@ export const POST: RequestHandler = async (req) => {
     /api/create
     /api/show
     /api/copy
-    /api/pull */ 
+    /api/pull */
 
 	return req
 		.fetch(`http;//127.0.0.1:11434/${req.params.api}`, {
-			method: 'POST',
+			body: JSON.stringify(req),
 			headers: req.request.headers,
-			body: JSON.stringify(req)
+			method: 'POST'
 		})
 		.then((res) => {
 			return res.json();

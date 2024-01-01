@@ -9,20 +9,13 @@
 		background-color: var(--theme-gradient-to);
 	}
 	.main-gradient {
-		background-image: linear-gradient(
-			to bottom,
-			var(--theme-gradient-from),
-			var(--theme-gradient-to) 90%
-		);
+		background-image: linear-gradient(to bottom, var(--theme-gradient-from), var(--theme-gradient-to) 90%);
 	}
 
 	.theme-border {
 		border-color: var(--theme-border-color);
 		border-width: 1px;
 	}
-
-    
-
 
 	.soft-title {
 		color: var(--theme-soft-title-text-color);
@@ -46,7 +39,7 @@
 		@apply dark:bg-gray-800 dark:text-gray-100;
 
 		@apply main-gradient;
-        
+
 		.application-sideBar {
 			@apply h-full flex-shrink overflow-hidden z-30 hidden w-[280px] md:block;
 

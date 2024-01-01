@@ -11,7 +11,7 @@
 		class="modal"
 		on:click={() => {
 			ui.showHideSettings();
-		}} 
+		}}
 	>
 		<div
 			class="inModal w-[40rem]"
@@ -31,8 +31,8 @@
 		h-screen flex justify-center z-50 overflow-hidden overscroll-contain;
 	}
 	.inModal {
-		@apply m-auto rounded-xl max-w-full mx-2 bg-gradient-to-b ;
-		@apply  from-neutral-100 to-neutral-200;
-		@apply   dark:from-gray-800 dark:to-gray-900
+		@apply m-auto rounded-xl max-w-full mx-2 bg-gradient-to-b;
+		@apply from-neutral-100 to-neutral-200;
+		@apply dark:from-gray-800 dark:to-gray-900;
 	}
 </style>

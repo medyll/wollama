@@ -2,7 +2,6 @@
 	let className = '';
 	export let values: any = [];
 	export let value: any | undefined = undefined;
- 
 </script>
 
 {#each values as valueO}

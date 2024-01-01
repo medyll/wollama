@@ -7,8 +7,6 @@ import { liveQuery } from 'dexie';
 import { ui } from '$lib/stores/ui';
 import { ChatDataGrouper } from './groupList';
 
- 
-
 type GroupItem = {
 	code: string;
 	name: string;
@@ -18,9 +16,7 @@ type GroupItem = {
 };
 
 function sortList(list: ChatType[]): ChatType[] {
-	return list.sort(
-		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-	);
+	return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 const groups: {
@@ -29,10 +25,10 @@ const groups: {
 	byMonth: Record<string, ChatType[]>;
 	byYear: Record<string, ChatType[]>;
 } = {
-	last7Days: [],
-	last30Days: [],
 	byMonth: {},
-	byYear: {}
+	byYear: {},
+	last30Days: [],
+	last7Days: []
 };
 
 function getStartAndEndOfWeek(date: Date, firstDayOfWeek: any = 1): { start: Date; end: Date } {
@@ -41,7 +37,7 @@ function getStartAndEndOfWeek(date: Date, firstDayOfWeek: any = 1): { start: Dat
 	start.setHours(0, 0, 0, 0);
 	end.setHours(23, 59, 59, 999);
 
-	return { start, end };
+	return { end, start };
 }
 
 export function getTimeTitle(inputText: string) {
@@ -73,7 +69,7 @@ export function getTimeTitle(inputText: string) {
 	return 'Format invalide';
 }
 
-function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, monthGroupSize: 5 }) {
+function groupChatMessages(sortedList: ChatType[], args = { monthGroupSize: 5, weekGroupSize: 3 }) {
 	const firstDayOfWee = 1;
 	const now = new Date();
 	const finalGroupList: GroupItem[] = [];
@@ -87,7 +83,7 @@ function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, mo
 		const start = startOfWeek(date, { weekStartsOn: firstDayOfWee }).getTime();
 		const end = endOfWeek(date, { weekStartsOn: firstDayOfWee }).getTime();
 
-		return { start, end };
+		return { end, start };
 	});
 
 	const lastXMonths = [...Array(12)].map((a, i) => {
@@ -96,7 +92,7 @@ function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, mo
 		date.setMonth(date.getMonth() - i);
 		const start = startOfMonth(date).getTime();
 		const end = endOfMonth(date).getTime();
-		return { start, end };
+		return { end, start };
 	});
 
 	// loop weeks
@@ -104,10 +100,7 @@ function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, mo
 		const group = createGroupItem(`weeks${idx}ago`, `weeks ${idx} ago`, week, idx);
 		// loop chats
 		for (const item of sortedList) {
-			if (
-				new Date(item.createdAt).getTime() >= week.start &&
-				new Date(item.createdAt).getTime() <= week.end
-			) {
+			if (new Date(item.createdAt).getTime() >= week.start && new Date(item.createdAt).getTime() <= week.end) {
 				if (!groups.byMonth[idx]) groups.byMonth[idx] = [];
 				group.items.push(item);
 			}
@@ -120,10 +113,7 @@ function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, mo
 		const group = createGroupItem(`months${idx}ago`, `months ${idx} ago`, month, idx);
 		// loop chats
 		for (const item of sortedList) {
-			if (
-				new Date(item.createdAt).getTime() >= month.start &&
-				new Date(item.createdAt).getTime() <= month.end
-			) {
+			if (new Date(item.createdAt).getTime() >= month.start && new Date(item.createdAt).getTime() <= month.end) {
 				if (!groups.byMonth[idx]) groups.byMonth[idx] = [];
 				group.items.push(item);
 			}
@@ -133,18 +123,13 @@ function groupChatMessages(sortedList: ChatType[], args = { weekGroupSize: 3, mo
 
 	return finalGroupList;
 
-	function createGroupItem(
-		code: string,
-		name: string,
-		period: { start: string; end: string },
-		order?: number
-	) {
+	function createGroupItem(code: string, name: string, period: { start: string; end: string }, order?: number) {
 		return {
 			code,
+			items: [],
 			name,
 			order,
-			period,
-			items: []
+			period
 		};
 	}
 }
@@ -157,7 +142,6 @@ export const chatMenuList = derived([ui, chatList], ([$ui, $chatList]) => {
 	const options = { fieldName: 'createdAt' };
 
 	const chatGrouper = new ChatDataGrouper($chatList ?? [], options);
-
 
 	return groupChatMessages(sortList(list ?? []));
 });

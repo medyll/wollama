@@ -18,15 +18,7 @@
 <div class="relative flex-align-middle">
 	<div class="sides"><slot name="start" /></div>
 	<div class="w-full grow-wrap" data-replicated-value={value}>
-		<textarea
-			bind:this={element}
-			{disabled}
-			{form}
-			{placeholder}
-			bind:value
-			on:keypress
-			rows="1"
-		/>
+		<textarea bind:this={element} {disabled} {form} {placeholder} bind:value on:keypress rows="1" />
 	</div>
 	<div class="sides absolute h-full right-0">
 		{#if showCancel}
