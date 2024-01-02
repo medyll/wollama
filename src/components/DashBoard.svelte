@@ -8,7 +8,6 @@
 
 	export { className as class };
 </script>
-<flex>test flex</flex>
 <div class="flex-1 mb-32 px-8">
 	{#if !$ui.activeChatId}
 		<div class="h-full w-full flex flex-col">

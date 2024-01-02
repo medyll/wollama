@@ -76,10 +76,10 @@
 			{#if OllamaOptionsDefaults?.[setting]?.max}
 				<div class="flex-align-middle gap-2">
 					<input type="range" min={OllamaOptionsDefaults?.[setting].min} max={OllamaOptionsDefaults?.[setting].max} step={OllamaOptionsDefaults?.[setting].max / 10} bind:value={$ollamaParams[setting]} />
-					<input class="w-16 text-center border-none theme-bg" type="text" bind:value={$ollamaParams[setting]} />
+					<input class="w-16 text-center naked theme-bg" type="text" bind:value={$ollamaParams[setting]} />
 				</div>
 			{:else}
-				<input class="w-16 text-center border-none theme-bg" type="text" bind:value={$ollamaParams[setting]} />
+				<input class="w-16 text-center naked theme-bg" type="text" bind:value={$ollamaParams[setting]} />
 			{/if}
 		</div>
 		<div class="w-16">

@@ -174,12 +174,18 @@
 	</div>
 </div>
 
-<style lang="postcss">
+<style lang="postcss" global>
 	.inputTextarea {
-		@apply w-full md:max-w-4xl;
+		/* @apply w-full md:max-w-4xl;
 		@apply border overflow-hidden rounded-md self-center;
 		@apply bg-white dark:bg-white;
 		@apply text-gray-700  dark:text-gray-700;
-		@apply shadow shadow-gray-500/60 dark:shadow-black;
+		@apply shadow shadow-gray-500/60 dark:shadow-black; */
+		border-color: transparent;
+		border-width: 1px;
+		&:has(textarea:focus) {
+			border-color: var(--cfab-input-border-color-focus);
+			border-radius: 1em;
+		}
 	}
 </style>

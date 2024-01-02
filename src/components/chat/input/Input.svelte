@@ -31,11 +31,11 @@
 	</div>
 </div>
 
-<style lang="postcss">
-	textarea {
-		/* @apply bg-white text-black;
-		@apply w-full flex-1 block outline-none py-3 px-2 resize-none; */
-	}
+<style lang="postcss" global>
+	/* textarea {
+		@apply bg-white text-black;
+		@apply w-full flex-1 block outline-none py-3 px-2 resize-none;
+	} */
 	.sides {
 		@apply flex flex-row;
 	}
