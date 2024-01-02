@@ -26,16 +26,18 @@
 	};
 </script>
 
-<button
-	on:click={() => {
-		fileinput.click();
-	}}
-	type="button"
-	form="prompt-form"
-	class="mx-auto"
-	{disabled}
->
-	<Icon icon="heroicons:paper-clip-solid" style="font-size:1.6em" />
-</button>
+<div class="px-2">
+	<button
+		on:click={() => {
+			fileinput.click();
+		}}
+		type="button"
+		form="prompt-form"
+		class="mx-auto"
+		{disabled}
+	>
+		<Icon icon="heroicons:paper-clip-solid" style="font-size:1.6em" />
+	</button>
+</div>
 
 <input type="file" {form} accept=".jpg, .jpeg, .png" hidden on:change={(e) => onFileSelected(e)} bind:this={fileinput} />

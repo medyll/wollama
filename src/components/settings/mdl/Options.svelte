@@ -70,7 +70,7 @@
 	</div>
 </div>
 <List data={Object.keys(OllamaOptionsDefaults)} let:item={setting}>
-	<div class="flex-align-middle gap-2">
+	<div class="flex-align-middle gap-4 py-2">
 		<div title={ollamaOptionsInfo?.[setting]} class="flex-1">{setting}</div>
 		<div>
 			{#if OllamaOptionsDefaults?.[setting]?.max}
@@ -93,8 +93,3 @@
 	<hr />
 </List>
 
-<style>
-	.inputTiny {
-		width: 3rem;
-	}
-</style>

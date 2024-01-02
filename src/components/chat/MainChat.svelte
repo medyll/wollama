@@ -178,7 +178,7 @@
 	.inputTextarea {
 		@apply w-full md:max-w-4xl;
 		@apply border overflow-hidden rounded-md self-center;
-		@apply dark:bg-white;
+		@apply bg-white dark:bg-white;
 		@apply text-gray-700  dark:text-gray-700;
 		@apply shadow shadow-gray-500/60 dark:shadow-black;
 	}

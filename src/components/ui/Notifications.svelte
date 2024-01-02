@@ -14,7 +14,7 @@
 				<div class="soft-title">{notification.status}</div>
 			</div>
 			<div class="notification__close">
-				<button class="iconButton" on:click={() => notifierState.delete(notification.id)}>
+				<button class="aspect-square" on:click={() => notifierState.delete(notification.id)}>
 					<Icon icon="mdi:close" style="font-size:1.6em" />
 				</button>
 			</div>

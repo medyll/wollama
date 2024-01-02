@@ -7,7 +7,7 @@
 
 <div class="md:hidden flex shadow md:w-full theme-bg-dark">
 	<div class="flex-v gap-4 px-4 py-4 theme-bg-dark">
-		<button on:click={async () => ui.showHideMenu()} class="  iconButton">
+		<button on:click={async () => ui.showHideMenu()} class="aspect-square">
 			<Icon icon="mdi:menu-{$ui.showMenu ? 'open' : 'close'}" class="md" />
 		</button>
 		<hr />
@@ -17,7 +17,7 @@
 				ui.setActiveChatId();
 				engine.goto('/');
 			}}
-			class="  iconButton"
+			class="aspect-square"
 		>
 			<Icon icon="mdi:chat-plus-outline" class="md" />
 		</button>

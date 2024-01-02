@@ -88,7 +88,7 @@
 			<div class="soft-title">{message?.status != 'done' ? message?.status : ''}</div>
 			<div class="soft-title">{format(new Date(message?.createdAt), 'dd MMMM y hh:mm')}</div>
 		</div>
-		<div class="px-2 w-full flex-1 relative overflow-hidden theme-border p-4 py-4 rounded-md">
+		<div class="speech-bubble theme-border">
 			{#if message.images}
 				<img src={message.images.dataUri} alt="list" style="height:100px" />
 			{/if}
@@ -113,5 +113,8 @@
 <style lang="postcss">
 	.skeletonLine {
 		@apply h-2 bg-gray-200 dark:bg-gray-600 rounded-md col-span-2 mb-1 animate-pulse;
+	}
+	.speech-bubble {
+		@apply px-2 w-full flex-1 relative overflow-hidden  p-4 py-4 rounded-md;
 	}
 </style>

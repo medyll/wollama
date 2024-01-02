@@ -36,7 +36,7 @@
 		"@commitlint/cli": "^18.4.3",
 		"@commitlint/config-conventional": "^18.4.3",
 		"@iconify/svelte": "^3.1.4",
-		"@medyll/htmlu": "^0.0.18",
+		"@medyll/htmlu": "^0.1.3",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.27.4",
