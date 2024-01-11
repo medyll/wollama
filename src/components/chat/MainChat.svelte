@@ -62,7 +62,7 @@
 	}
 
 	async function sendPrompt(prompter: PrompterType) {
-		const { ollamaBody, images,promptData } = prompter; // clear reference
+		const { ollamaBody, images, promptData } = prompter; // clear reference
 
 		// retrieve or set a chat session
 		const chatSession = await idbQuery.initChat($ui.activeChatId, {
@@ -156,7 +156,7 @@
 			</List>
 			<Bottomer />
 		</DashBoard>
-		<div class="flex flex-col w-full y-b sticky margb-0 bottom-0 px-8">
+		<div class="chatZone">
 			<ChatOptions />
 			<div class="inputTextarea">
 				<Images />
@@ -170,12 +170,18 @@
 					</div>
 				</Input>
 			</div>
-			<div class="text-xs text-center theme-bg pb-1">{$t('ui.aiCautionMessage')}</div>
+			<div class="text-xs text-center theme-bg p-2">{$t('ui.aiCautionMessage')}</div>
 		</div>
 	</div>
 </div>
 
 <style lang="postcss" global>
+	.chatZone {
+		@apply flex flex-col w-full sticky mb-0 bottom-0 px-8;
+		background-image: var(--cfab-gradient);
+		background-size: 100vh 100vw;
+		background-position: bottom;
+	}
 	.inputTextarea {
 		/* @apply w-full md:max-w-4xl;
 		@apply border overflow-hidden rounded-md self-center;
