@@ -12,7 +12,7 @@
 
 <div class="h-full w-full overflow-hidden pl-8">
 	<div class="h-full w-full flex flex-col overflow-auto px-4">
-		<div class="sticky top-0 theme-bg z-10">
+		<div class="header">
 			<div class="p-8 text-lg">
 				<Icon icon="mdi:server-network" class="mr-2" />
 				{$t(`configuration.home`)}
@@ -37,3 +37,11 @@
 		</div>
 	</div>
 </div>
+<style lang="postcss">
+.header {
+		@apply sticky top-2 z-10;
+		background-image: var(--cfab-gradient);
+		background-size: 100vh 100vw;
+		background-position: top;
+	}
+</style>
