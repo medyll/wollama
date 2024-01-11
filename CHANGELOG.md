@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.8](https://github.com/medyll/wollama/compare/v0.0.7...v0.0.8) (2024-01-11)
+
+
+### Features
+
+* added prompts list ([2a9dff0](https://github.com/medyll/wollama/commit/2a9dff05a48145c6b0603dff5596db003bd885a6))
+* full multiple model support ([cbec6f1](https://github.com/medyll/wollama/commit/cbec6f15570f130d9f6045eba0f6ec5ba4c5a763))
+* you can now save multiple prompts ([0893c88](https://github.com/medyll/wollama/commit/0893c88c7ba52e1084ec50c7c65f6542391107cb))
+
+
+### Bug Fixes
+
+* deleteChatHandler and setActiveChatId ([378ca36](https://github.com/medyll/wollama/commit/378ca36bed4523e62d22278a498a1721ff378c2c))
+
 ### [0.0.7](https://github.com/medyll/wollama/compare/v0.0.6...v0.0.7) (2023-12-26)
 
 ### Features

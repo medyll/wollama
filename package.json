@@ -1,6 +1,6 @@
 {
 	"name": "wollama",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"author": "Medyll",
 	"description": "web ui for ollama",
 	"private": false,
