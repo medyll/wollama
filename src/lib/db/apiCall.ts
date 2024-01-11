@@ -46,15 +46,6 @@ export class ApiCall {
 				return out;
 			}
 		}
-
-		/* if (options?.stream) {
-			this.stream(res, hook);
-		} else {
-			if (!res.ok) throw await res.json();
-			const out = await res.json();
-
-			return out;
-		} */
 		return res;
 	}
 

@@ -143,6 +143,7 @@
 		input[type='search'],
 		input[type='submit'],
 		input[type='reset'],
+		input[type='number'],
 		input[type='text'],
 		select,
 		textarea {
