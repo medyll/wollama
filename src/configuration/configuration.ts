@@ -2,7 +2,7 @@ export const defaultOllamaSettings = {
 	num_ctx: undefined,
 	repeat_last_n: undefined,
 	repeat_penalty: undefined,
-	seed: 0,
+	seed: undefined,
 	temperature: 0.5,
 	top_k: undefined,
 	top_p: undefined
@@ -41,22 +41,22 @@ export const defaultSettings = {
 };
 
 export const OllamaOptionsDefaults = {
-	mirostat: { default: 0, max: 2, min: 0 },
-	mirostat_eta: { default: 0.1, max: 1, min: 0 },
-	mirostat_tau: { default: 5.0, max: 20, min: 0 },
-	num_ctx: { default: 2048, max: 10240, min: 0 },
-	num_gpu: { default: 1, max: undefined, min: 0 },
-	num_gqa: { default: 1, max: undefined, min: 0 },
-	repeat_penalty: { default: 1.1, max: 2, min: 0 },
-	num_predict: { default: 128, max: undefined, min: -2 },
-	seed: { default: 4, max: undefined, min: 0 },
-	num_thread: { default: 8, max: undefined, min: 0 },
+	mirostat: { default: undefined, max: 2, min: 0 },
+	mirostat_eta: { default: undefined, max: 1, min: 0 },
+	mirostat_tau: { default: undefined, max: 20, min: 0 },
+	num_ctx: { default: undefined, max: 10240, min: 0 },
+	num_gpu: { default: undefined, max: undefined, min: 0 },
+	num_gqa: { default: undefined, max: undefined, min: 0 },
+	repeat_penalty: { default: undefined, max: 2, min: 0 },
+	num_predict: { default: undefined, max: undefined, min: -2 },
+	seed: { default: undefined, max: undefined, min: 0 },
+	num_thread: { default: undefined, max: undefined, min: 0 },
 	temperature: { default: 0.5, max: 1, min: 0 },
-	repeat_last_n: { default: 64, max: undefined, min: 0 },
-	top_k: { default: 40, max: 200, min: 0 },
+	repeat_last_n: { default: undefined, max: undefined, min: 0 },
+	top_k: { default: undefined, max: 200, min: 0 },
 	stop: { default: ['STOP AI'], max: undefined, min: 0 },
-	top_p: { default: 0.9, min: 0, max: 1 },
-	tfs_z: { default: 1, max: undefined, min: 0 }
+	top_p: { default: undefined, min: 0, max: 1 },
+	tfs_z: { default: undefined, max: undefined, min: 0 }
 } as const;
 
 type OllamaOptionsType = {

@@ -11,7 +11,7 @@ export interface SettingsType {
 	defaultModel: string;
 	chatModelKeys?: string[];
 	authHeader: boolean;
-	system_prompt?: string;
+	system_prompt: string;
 	locale: string;
 	title_auto: boolean;
 	voice_auto_stop: boolean;

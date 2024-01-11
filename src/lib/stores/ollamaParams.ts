@@ -32,6 +32,7 @@ function ollamaOptionStoreBuild() {
 	}
 
 	function resetAll() {
+		localStorage.ollamaOptions = JSON.stringify({});
 		const options: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<OllamaOptionsType>, key) => {
 			acc[key] = OllamaOptionsDefaults[key].default ?? null;
 			return acc;

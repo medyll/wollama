@@ -26,9 +26,9 @@ export class chatUtils {
 					.map((message: MessageType) => message.content)
 					.join('\n');
 
-				const res = await guessChatTitle(resume);
+				/* const res = await guessChatTitle(resume);
 
-				if (res?.response !== '') idbQuery.updateChat(chatId, { title: res.response });
+				if (res?.response !== '') idbQuery.updateChat(chatId, { title: res.response }); */
 			}
 		}
 	}

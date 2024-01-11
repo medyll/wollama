@@ -1,4 +1,4 @@
-import type { OllamaApiBody, OllamaOptionsType, OllamaResponseType } from './ollama';
+import type { OllamaCompletionBody, OllamaOptionsType, OllamaResponseType } from './ollama';
 
 /**
  * Represents a chat.
@@ -11,7 +11,7 @@ export type ChatType = {
 	createdAt: Date;
 	dateLastMessage: Date;
 	context: number[] /** @deprecated find in ollamaBody */;
-	ollamaBody: Partial<OllamaApiBody>;
+	ollamaBody: Partial<OllamaCompletionBody>;
 };
 
 /**

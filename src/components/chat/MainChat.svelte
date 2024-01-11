@@ -10,7 +10,7 @@
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import ChatOptions from './ChatOptions.svelte';
-	import { PromptSender, type SenderCallback } from '$lib/tools/promptSender';
+	import type { SenderCallback } from '$lib/tools/promptSender';
 	import { idbQuery } from '$lib/db/dbQuery.js';
 	import { prompter, type PrompterType } from '$lib/stores/prompter';
 	import { aiState } from '$lib/stores';
@@ -21,10 +21,44 @@
 	import { liveQuery } from 'dexie';
 	import Bottomer from '$components/ui/Bottomer.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
+	import { ApiCall } from '$lib/db/apiCall';
 
 	type CallbackDataType = {
 		chatId: string;
 		assistantData: MessageType;
+	};
+
+	const model = {
+		border: {
+			root: { color: ['red', 'blue'] },
+			size: ['small', 'medium', 'large']
+		}
+	};
+
+	const results = {
+		border: {
+			color: { title: 'title' },
+			size: { title: 'title' }
+		},
+		'border-red': {
+			'border-color': 'red'
+		},
+		'border-blue': {
+			'border-color': 'blue'
+		},
+		'border-red-small': {
+			'border-color': 'red',
+			'border-size': 'small'
+		},
+		'border-blue-small': {
+			'border-color': 'blue',
+			'border-size': 'small'
+		},
+		'border-size-small': {
+			'border-size': 'small'
+		},
+		'border-size-medium': { 'border-size': 'medium' },
+		'border-size-large': { 'border-size': 'large' }
 	};
 
 	$: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
@@ -77,26 +111,32 @@
 		ollamaBody.system = promptData.content ?? '';
 		ollamaBody.context = chatSession.context ?? [];
 
+		// retrieve all previous sent messages
+		const previousMessages = (await idbQuery.getMessages(chatSession.chatId)).map((e) => e);
+
 		// create messages for chat session
 		const sessionMessages = await createMessages(chatSession, ollamaBody.prompt as string, images);
 
+		console.log(previousMessages);
 		// set ai state to running
 		aiState.set('running');
 		// create prompt sender for each model
 		sessionMessages.assistantModelData.forEach(async (assistantMessage) => {
-			const sender = new PromptSender<CallbackDataType>(
-				{ ...ollamaBody, model: assistantMessage.model },
-				{
-					cb: onResponseMessage,
-					cbData: {
+			// send prompt to ai
+			ApiCall.chat(
+				ollamaBody.prompt,
+				previousMessages,
+				async (data) =>
+					onResponseMessage({
 						assistantData: assistantMessage,
-						chatId: assistantMessage.chatId
-					}
+						chatId: assistantMessage.chatId,
+						data
+					}),
+				{
+					...ollamaBody,
+					stream: true
 				}
 			);
-
-			// send prompt to ai
-			sender.sendMessage();
 		});
 		// reset prompt
 		$prompter.ollamaBody.prompt = '';
@@ -122,7 +162,7 @@
 		} else {
 			const message = await idbQuery.getMessage(assistantMessage.messageId);
 			idbQuery.updateMessage(assistantMessage.messageId, {
-				content: (message?.content ?? '') + (data.response ?? ''),
+				content: (message?.content ?? '') + (data?.response ?? data?.message?.content ?? ''),
 				status: 'streaming'
 			});
 		}

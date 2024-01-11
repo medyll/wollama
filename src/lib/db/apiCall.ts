@@ -1,7 +1,7 @@
 import { aiState } from '$lib/stores';
 import { ollamaParams } from '$lib/stores/ollamaParams';
 import { settings } from '$lib/stores/settings';
-import type { OllamaApiBody as OllamaApiBody, OllamaResponseType } from '$types/ollama';
+import type { OllamaChatCompletionBody, OllamaChatCompletionBodyMessage as ChatCompletionMessage, OllamaCompletionBody as OllamaCompletionBody, OllamaResponseType } from '$types/ollama';
 import { get } from 'svelte/store';
 
 export class ApiCall {
@@ -13,7 +13,7 @@ export class ApiCall {
 		this.options = { ...this.options, ...options };
 	}
 
-	static async generate(prompt: string, hook?: (data: OllamaResponseType) => void, apiBody?: Partial<OllamaApiBody>) {
+	static async generate(prompt: string, hook?: (data: OllamaResponseType) => void, apiBody?: Partial<OllamaCompletionBody>) {
 		const config = get(settings);
 		const ollamaOptions = get(ollamaParams);
 
@@ -23,12 +23,49 @@ export class ApiCall {
 			system: config?.system_prompt,
 			...apiBody,
 			options: { ...ollamaOptions, ...apiBody?.options }
-		} as OllamaApiBody;
+		} as OllamaCompletionBody;
 
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			body: JSON.stringify(defaultOptions),
 			headers: {
 				'Content-Type': 'application/octet-stream',
+				...getHeader()
+			},
+			method: 'POST'
+		});
+
+		if (!res.ok) {
+			throw await res.json();
+		} else {
+			if (apiBody?.stream) {
+				this.stream(res, hook);
+			} else {
+				if (!res.ok) throw await res.json();
+				const out = await res.json();
+
+				return out;
+			}
+		}
+		return res;
+	}
+
+	static async chat(prompt: string, messages: ChatCompletionMessage[] = [], hook?: (data: OllamaResponseType) => void, apiBody?: Partial<OllamaChatCompletionBody>) {
+		const config = get(settings);
+		const ollamaOptions = get(ollamaParams);
+
+		const defaultOptions: OllamaChatCompletionBody = {
+			model: config?.defaultModel,
+			messages: [{ role: 'system', content: config.system_prompt }, ...messages, { role: 'user', content: prompt }],
+			format: apiBody?.format,
+			template: apiBody?.template,
+			stream: apiBody?.stream,
+			options: { ...ollamaOptions, ...apiBody?.options }
+		};
+
+		const res = await fetch(`${config.ollama_server}/api/chat`, {
+			body: JSON.stringify(defaultOptions),
+			headers: {
+				'Content-Type': 'text/event-stream',
 				...getHeader()
 			},
 			method: 'POST'

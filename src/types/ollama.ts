@@ -1,13 +1,28 @@
 // Type definitions for Ollama API
-export type OllamaApiBody = {
-	prompt: string;
-	stream?: boolean;
+export type OllamaCompletionBody = {
 	model: string;
-	context: number[];
-	options: OllamaOptionsType;
+	prompt: string;
 	images: string[];
 	format: 'json' | 'plain' | '' | string;
+	options: OllamaOptionsType;
 	system: string | null;
+	template: string | null;
+	context: number[];
+	stream?: boolean;
+	raw?: boolean;
+};
+export type OllamaChatCompletionBodyMessage = {
+	role: 'user' | 'system' | 'assistant';
+	content: string;
+	images?: string[];
+};
+export type OllamaChatCompletionBody = {
+	model: string;
+	messages: OllamaChatCompletionBodyMessage[];
+	format?: 'json' | 'plain' | '' | string;
+	options?: OllamaOptionsType;
+	template?: string | null;
+	stream?: boolean;
 };
 
 export type OllamaResponseType = {

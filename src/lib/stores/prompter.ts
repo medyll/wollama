@@ -1,5 +1,5 @@
 import type { MessageImageType, PromptType } from '$types/db';
-import type { OllamaApiBody, OllamaOptionsType } from '$types/ollama';
+import type { OllamaCompletionBody, OllamaOptionsType } from '$types/ollama';
 import { get, writable } from 'svelte/store';
 import { settings } from './settings';
 
@@ -11,7 +11,7 @@ export type PrompterType = {
 	images?: MessageImageType;
 	models: string[];
 	promptData: PromptType;
-	ollamaBody: OllamaApiBody;
+	ollamaBody: OllamaCompletionBody;
 };
 
 function prompterStore() {
@@ -26,7 +26,7 @@ function prompterStore() {
 			model: '',
 			options: { temperature: 0.5 },
 			prompt: ''
-		} as OllamaApiBody,
+		} as OllamaCompletionBody,
 		options: { temperature: 0.5 },
 		promptData: {},
 		voiceListening: false

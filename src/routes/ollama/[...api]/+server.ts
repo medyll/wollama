@@ -25,10 +25,12 @@ export const POST: RequestHandler = async (req) => {
 		return new Response(null, { status: response.status, body: await response.text() });
 	}
 
+	console.log(response.body);
+
 	return new Response(response.body, {
 		status: response.status,
 		headers: {
-			'Content-Type': 'application/octet-stream'
+			'Content-Type': 'text/event-stream'
 		}
 	});
 };
