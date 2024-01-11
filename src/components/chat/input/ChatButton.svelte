@@ -45,7 +45,7 @@
 		{/if}
 	</button>
 	{#if active}
-		<div class="flex-align-middle gap-2">
+		<div class="line-gap-2">
 			<button
 				class="borderButton"
 				on:click={() => {

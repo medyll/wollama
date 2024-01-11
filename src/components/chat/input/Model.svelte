@@ -19,12 +19,12 @@
 	}
 </script>
 
-<div class="flex-align-middle flex-wrap gap-2 sticky top-0">
+<div class="line-gap-2 flex-wrap sticky top-0">
 	{#each activeModels as modelKey, index (index)}
 		{@const showAdd = index === activeModels.length - 1}
 		{@const showRemove = index === 0}
 		{@const filteredOptions = ($settings?.ollamaModels ?? []).filter((model) => model.name === modelKey || !activeModels.includes(model.name))}
-		<div class="flex-align-middle gap-2 border-b">
+		<div class="line-gap-2 border-b">
 			<div class="flex-1">
 				<select class="naked inline w-32" on:change={changeHandler(index)}>
 					{#each filteredOptions as model}
@@ -32,7 +32,7 @@
 					{/each}
 				</select>
 			</div>
-			<div class="flex-align-middle gap-2">
+			<div class="line-gap-2">
 				<button
 					hidden={showRemove}
 					on:click={() => {

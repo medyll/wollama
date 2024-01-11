@@ -62,7 +62,7 @@
 	}
 
 	async function sendPrompt(prompter: PrompterType) {
-		const { ollamaBody, images } = prompter; // clear reference
+		const { ollamaBody, images,promptData } = prompter; // clear reference
 
 		// retrieve or set a chat session
 		const chatSession = await idbQuery.initChat($ui.activeChatId, {
@@ -74,6 +74,7 @@
 		ollamaBody.options = { ...$ollamaParams, ...ollamaBody.options };
 		ollamaBody.images = images?.base64 ? [images?.base64] : [];
 		ollamaBody.format = ollamaBody.format?.replace('plain', '');
+		ollamaBody.system = promptData.content ?? '';
 		ollamaBody.context = chatSession.context ?? [];
 
 		// create messages for chat session

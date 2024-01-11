@@ -70,11 +70,11 @@
 	</div>
 </div>
 <List data={Object.keys(OllamaOptionsDefaults)} let:item={setting}>
-	<div class="flex-align-middle gap-4 py-2">
+	<div class="line-gap-2 py-2">
 		<div title={ollamaOptionsInfo?.[setting]} class="flex-1">{setting}</div>
 		<div>
 			{#if OllamaOptionsDefaults?.[setting]?.max}
-				<div class="flex-align-middle gap-2">
+				<div class="line-gap-2">
 					<input type="range" min={OllamaOptionsDefaults?.[setting].min} max={OllamaOptionsDefaults?.[setting].max} step={OllamaOptionsDefaults?.[setting].max / 10} bind:value={$ollamaParams[setting]} />
 					<input class="w-16 text-center naked theme-bg" type="text" bind:value={$ollamaParams[setting]} />
 				</div>

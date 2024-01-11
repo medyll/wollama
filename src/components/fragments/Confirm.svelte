@@ -7,9 +7,16 @@
 	let status = 'default';
 </script>
 
-<div class="flex-align-middle gap-2">
+<div class="line-gap-2 w-full">
+	<slot name="initial" />
 	{#if status === 'default'}
-		<button class="" hidden={status !== 'default'} on:click={() => [(status = 'show_confirm')]}>
+		<button
+			class="line-gap-2"
+			hidden={status !== 'default'}
+			on:click={() => {
+				status = 'show_confirm';
+			}}
+		>
 			<slot />
 		</button>
 	{/if}
@@ -28,7 +35,15 @@
 				status = 'default';
 			}}
 		>
-			<Icon icon="typcn:cancel" class="text-red-900 md" />
+			<Icon icon="typcn:cancel" style="color: red" class="md fill-red-800 " />
 		</button>
 	{/if}
 </div>
+
+<style lang="postcss">
+	svg {
+		> path {
+			color: red !important;
+		}
+	}
+</style>

@@ -78,7 +78,7 @@
 			</div>
 		</div>{/if}
 	<div class="flex flex-col w-full">
-		<div class="flex-align-middle mb-1 p-1 gap-2 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
+		<div class="line-gap-2 mb-1 p-1 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
 			<div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
 			<div class="soft-title">
 				{#if message?.status == 'streaming'}<Icon style="font-size:1.6em" icon="mdi:reload" class="spin" />{/if}

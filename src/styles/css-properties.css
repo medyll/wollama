@@ -147,6 +147,7 @@
 	--cfab-bg-opacity-80: color-mix(in srgb, var(--cfab-bg), transparent 20%);
 	--cfab-bg-opacity-90: color-mix(in srgb, var(--cfab-bg), transparent 10%);
 	--cfab-bg-opacity-90: color-mix(in srgb, var(--cfab-bg), transparent 10%);
+	--cfab-bg-opacity-95: color-mix(in srgb, var(--cfab-bg), transparent 5%);
 	--cfab-bg-opacity-100: color-mix(in srgb, var(--cfab-bg), transparent 0%);
 }
 
