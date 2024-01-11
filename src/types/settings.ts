@@ -1,6 +1,8 @@
 import type { OllamaOptionsType } from '$types/ollama';
 
 export interface SettingsType {
+	id: number;
+	userId: number;
 	theme: string;
 	request_mode?: 'plain' | 'json';
 	ollama_server: string;

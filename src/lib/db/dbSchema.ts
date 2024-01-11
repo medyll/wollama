@@ -23,7 +23,7 @@ export class DataBase extends Dexie {
 			messageStats: '&messageId, create_at',
 			messages: '&messageId, chatId, createdAt',
 			prompts: '++id, createdAt',
-			settings: '++id',
+			settings: '++id,userId',
 			user: '++id, createdAt, email'
 		});
 	}
