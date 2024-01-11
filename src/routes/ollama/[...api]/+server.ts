@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';
-import { error, json } from '@sveltejs/kit';
+import { error, json, text } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async (req) => {
 	const res = await req
@@ -13,26 +13,48 @@ export const GET: RequestHandler = async (req) => {
 };
 
 export const POST: RequestHandler = async (req) => {
-	/* 
-	/api/generate
-    /api/chat
-    /api/create
-    /api/show
-    /api/copy
-    /api/pull */
+	const body = await req.request.json();
 
-	return req
-		.fetch(`http;//127.0.0.1:11434/${req.params.api}`, {
-			body: JSON.stringify(req),
-			headers: req.request.headers,
-			method: 'POST'
-		})
-		.then((res) => {
-			return res.json();
-		});
+	const response = await req.fetch(`http://127.0.0.1:11434/${req.params.api}`, {
+		body: JSON.stringify(body),
+		headers: req.request.headers,
+		method: 'POST'
+	});
+
+	if (!response.ok) {
+		return new Response(null, { status: response.status, body: await response.text() });
+	}
+
+	return new Response(response.body, {
+		status: response.status,
+		headers: {
+			'Content-Type': 'application/octet-stream'
+		}
+	});
 };
 
-export const DELETE: RequestHandler = async () => {
+export const DELETE: RequestHandler = async (req) => {
+	const body = await req.request.json();
 	// /api/delete
-	return new Response();
+	const response = await req.fetch(`http://127.0.0.1:11434/${req.params.api}`, {
+		body: JSON.stringify(body),
+		headers: req.request.headers,
+		method: 'POST'
+	});
+
+	if (!response.ok) {
+		return new Response(null, { status: response.status, body: await response.text() });
+	}
+
+	return new Response(response.body, {
+		status: response.status,
+		headers: {
+			'Content-Type': 'application/octet-stream'
+		}
+	});
 };
+
+/** @type {import('./$types').RequestHandler} */
+export async function fallback({ request }) {
+	return text(`I caught your ${request.method} request!`);
+}

@@ -28,7 +28,7 @@ export class ApiCall {
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			body: JSON.stringify(defaultOptions),
 			headers: {
-				'Content-Type': 'text/event-stream',
+				'Content-Type': 'application/octet-stream',
 				...getHeader()
 			},
 			method: 'POST'
