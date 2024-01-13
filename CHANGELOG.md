@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.9](https://github.com/medyll/wollama/compare/v0.0.8...v0.0.9) (2024-01-13)
+
+
+### Features
+
+* Update API endpoint and content type ([9a9ba7c](https://github.com/medyll/wollama/commit/9a9ba7c9258ceff66375803477859dacef0c8940))
+* Update Ollama options and catalog ([7e38abc](https://github.com/medyll/wollama/commit/7e38abcbf9f6e5c94142659060e6a4ceff279cdc))
+
+
+### Bug Fixes
+
+* Update white-space and overflow-wrap properties in Message.svelte and skin.css ([e78335b](https://github.com/medyll/wollama/commit/e78335b8e7aa1307fd781c29d2937903cfc83834))
+* variable type in settings.ts and ollamaParams.ts ([42a37fc](https://github.com/medyll/wollama/commit/42a37fc16a1f87fb73cae5349b0bedff06397ea7))
+
 ### [0.0.8](https://github.com/medyll/wollama/compare/v0.0.7...v0.0.8) (2024-01-11)
 
 
