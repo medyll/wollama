@@ -113,6 +113,8 @@
 <style lang="postcss">
 	.skeletonLine {
 		@apply h-2 bg-gray-200 dark:bg-gray-600 rounded-md col-span-2 mb-1 animate-pulse;
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
 	}
 	.speech-bubble {
 		@apply px-2 w-full flex-1 relative overflow-hidden  p-4 py-4 rounded-md;
