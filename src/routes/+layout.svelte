@@ -43,8 +43,7 @@
 		loadModels(models);
 		ollamaParams.init();
 		engine.checkOllamaEndPoints();
-		const users = await idbQuery.getUsers();
-		console.log(users);
+		const users = await idbQuery.getUsers(); 
 		if(!users.length) {
 			//engine.goto('/login');
 			idbQuery.insertUser({name: 'user' });
