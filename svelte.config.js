@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 // import @medyll/htmlu
 import { htmluSveltePreprocess } from '@medyll/htmlu';
@@ -6,11 +6,7 @@ import { htmluSveltePreprocess } from '@medyll/htmlu';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		adapter: adapter({
-			assets: 'build',
-			fallback: '200.html',
-			pages: 'build'
-		}),
+		adapter: adapter({ out: 'build' }),
 		alias: {
 			$components: './src/components',
 			$configuration: './src/configuration',

@@ -1,3 +1,5 @@
+import { PUBLIC_OLLAMA_SERVER_API, PUBLIC_WOLLAMA_API_URL } from '$env/static/public';
+
 export const defaultOllamaSettings = {
 	num_ctx: undefined,
 	repeat_last_n: undefined,
@@ -23,7 +25,7 @@ export const defaultSettings = {
 	avatar_email: '',
 	defaultModel: 'llama2-uncensored',
 	locale: 'fr',
-	ollama_server: import.meta.env.PUBLIC_OLLAMA_SERVER_API,
+	ollama_server: PUBLIC_OLLAMA_SERVER_API,
 	request_mode: 'plain',
 	sender: {
 		speechAutoSend: false,

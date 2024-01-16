@@ -17,6 +17,7 @@ function ollamaOptionStoreBuild() {
 			const storeOptions = JSON.parse(localStorage.getItem('ollamaOptions') ?? '{}');
 			const options: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<OllamaOptionsType>, key) => {
 				acc[key] = OllamaOptionsDefaults[key].default ?? null;
+				// console.log(key, acc[key]);
 				return acc;
 			}, {});
 
