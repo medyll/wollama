@@ -1,7 +1,7 @@
 import type { ChatType, MessageType, PromptType } from '$types/db';
 import type { OllamaResponseType } from '$types/ollama';
 import { chatUtils } from '$lib/tools/chatUtils';
-import { dbase } from './dbSchema';
+import { DataBase, dbase } from './dbSchema';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
 
@@ -132,4 +132,7 @@ export class idbQuery {
 		if (!id) throw new Error('id is required');
 		return await dbase.user.delete(id);
 	}
+
+	static async update(key: typeof dbase, values: any) {}
+	static async insert(key: keyof DataBase, values: any) {}
 }
