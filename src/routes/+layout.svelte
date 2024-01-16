@@ -43,7 +43,12 @@
 		loadModels(models);
 		ollamaParams.init();
 		engine.checkOllamaEndPoints();
-
+		const users = await idbQuery.getUsers();
+		console.log(users);
+		if(!users.length) {
+			//engine.goto('/login');
+			idbQuery.insertUser({name: 'user' });
+		}
 		connectionChecker.subscribe((state) => {
 			if (state.connectionStatus === 'error') {
 				notifierState.notify('error', 'state.connectionRetryTimeout', 'conn-status');
