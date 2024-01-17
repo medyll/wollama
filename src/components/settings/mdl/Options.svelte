@@ -9,6 +9,7 @@
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
+	import { Button } from '@medyll/slot-ui';
 
 	let ollama_server = $settings.ollama_server;
 
@@ -29,6 +30,7 @@
 <div class="soft-title p-2 py-4">
 	{$t('settings.server_url')}
 </div>
+
 <form
 	on:submit|preventDefault={(e) => {
 		setEndPoint(ollama_server);

@@ -81,7 +81,7 @@
 		<Sidebar />
 		<div class="application-content">
 			<TopBar />
-			<main class="application-main">
+			<main class="application-main"> 
 				<slot />
 			</main>
 		</div>
