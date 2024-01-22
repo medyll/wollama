@@ -9,7 +9,7 @@
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
-	import { Button } from '@medyll/slot-ui';
+	// import { Button } from '@medyll/slot-ui';
 
 	let ollama_server = $settings.ollama_server;
 

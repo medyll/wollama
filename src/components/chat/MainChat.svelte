@@ -22,45 +22,13 @@
 	import Bottomer from '$components/ui/Bottomer.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
 	import { ApiCall } from '$lib/db/apiCall';
+	import { connectionChecker } from '$lib/stores/connection';
 
 	type CallbackDataType = {
 		chatId: string;
 		assistantData: MessageType;
-	};
-
-	const model = {
-		border: {
-			root: { color: ['red', 'blue'] },
-			size: ['small', 'medium', 'large']
-		}
-	};
-
-	const results = {
-		border: {
-			color: { title: 'title' },
-			size: { title: 'title' }
-		},
-		'border-red': {
-			'border-color': 'red'
-		},
-		'border-blue': {
-			'border-color': 'blue'
-		},
-		'border-red-small': {
-			'border-color': 'red',
-			'border-size': 'small'
-		},
-		'border-blue-small': {
-			'border-color': 'blue',
-			'border-size': 'small'
-		},
-		'border-size-small': {
-			'border-size': 'small'
-		},
-		'border-size-medium': { 'border-size': 'medium' },
-		'border-size-large': { 'border-size': 'large' }
-	};
-
+	}; 
+	
 	$: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
 	$: disableSubmit = $prompter.ollamaBody.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
@@ -120,6 +88,7 @@
 		console.log(previousMessages);
 		// set ai state to running
 		aiState.set('running');
+		console.log(previousMessages);
 		// create prompt sender for each model
 		sessionMessages.assistantModelData.forEach(async (assistantMessage) => {
 			// send prompt to ai
@@ -200,7 +169,7 @@
 			<ChatOptions />
 			<div class="inputTextarea">
 				<Images />
-				<Input on:keypress={keyPressHandler} bind:value={$prompter.ollamaBody.prompt} bind:requestStop={$aiState} showCancel={$aiState == 'running'} {placeholder} form="prompt-form">
+				<Input disabled={$connectionChecker.connectionStatus!='connected'} on:keypress={keyPressHandler} bind:value={$prompter.ollamaBody.prompt} bind:requestStop={$aiState} showCancel={$aiState == 'running'} {placeholder} form="prompt-form">
 					<Attachment slot="start" form="prompt-form" bind:imageFile={$prompter.images} disabled={false} />
 					<div slot="end" class="flex-align-middle">
 						<Speech onEnd={submitHandler} bind:prompt={$prompter.ollamaBody.prompt} bind:voiceListening={$prompter.voiceListening} disabled={disableSubmit} />
@@ -223,11 +192,6 @@
 		background-position: bottom;
 	}
 	.inputTextarea {
-		/* @apply w-full md:max-w-4xl;
-		@apply border overflow-hidden rounded-md self-center;
-		@apply bg-white dark:bg-white;
-		@apply text-gray-700  dark:text-gray-700;
-		@apply shadow shadow-gray-500/60 dark:shadow-black; */
 		border-color: transparent;
 		border-width: 1px;
 		&:has(textarea:focus) {

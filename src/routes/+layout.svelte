@@ -45,17 +45,22 @@
 		engine.checkOllamaEndPoints();
 		const users = await idbQuery.getUsers(); 
 		if(!users.length) {
-			//engine.goto('/login');
 			idbQuery.insertUser({name: 'user' });
 		}
-		connectionChecker.subscribe((state) => {
+
+		connectionChecker.subscribe(async(state) => {
 			if (state.connectionStatus === 'error') {
 				notifierState.notify('error', 'state.connectionRetryTimeout', 'conn-status');
 			} else {
 				notifierState.delete('conn-status');
+				models = (await apiCall.listModels()) ?? [];
+				loadModels(models);
 			}
 		});
 	});
+
+	$: if($settings.ollamaModels){ 
+	}
 
 	$: if (browser && $page.params.id) {
 		idbQuery.getChat($page.params.id).then((chat) => {
@@ -81,7 +86,7 @@
 		<Sidebar />
 		<div class="application-content">
 			<TopBar />
-			<main class="application-main"> 
+			<main class="application-main">
 				<slot />
 			</main>
 		</div>
