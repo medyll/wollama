@@ -1,13 +1,13 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import type { MessageType } from '$types/db';
+	import type { DBMessage } from '$types/db';
 
 	import { marked } from 'marked';
 	import { t } from '$lib/stores/i18n';
 	import Skeleton from '$components/fragments/Skeleton.svelte';
 	import Prism from 'prismjs';
 	import { tick } from 'svelte';
-	export let message: MessageType;
+	export let message: DBMessage;
 	import 'prismjs/themes/prism-tomorrow.css';
 	import { format } from 'date-fns';
 

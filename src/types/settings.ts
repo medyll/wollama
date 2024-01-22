@@ -1,4 +1,4 @@
-import type { OllamaOptionsType } from '$types/ollama';
+import type { OllOptionsType } from '$types/ollama';
 
 export interface SettingsType {
 	id: number;

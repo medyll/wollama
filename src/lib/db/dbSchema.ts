@@ -1,16 +1,16 @@
 // db.js
 
 import Dexie, { type Table } from 'dexie';
-import type { ChatType, PromptType } from '$types/db';
-import type { MessageType } from '$types/db';
-import type { OllamaResponseType } from '$types/ollama';
+import type { DbChat, PromptType } from '$types/db';
+import type { DBMessage } from '$types/db';
+import type { OllResponseType } from '$types/ollama';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
 
 export class DataBase extends Dexie {
-	chat!: Table<ChatType>;
-	messages!: Table<MessageType>;
-	messageStats!: Table<OllamaResponseType>;
+	chat!: Table<DbChat>;
+	messages!: Table<DBMessage>;
+	messageStats!: Table<OllResponseType>;
 	settings!: Table<SettingsType>;
 	prompts!: Table<PromptType>;
 	user!: Table<UserType>;

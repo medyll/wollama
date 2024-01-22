@@ -3,7 +3,7 @@
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { settings } from '$lib/stores/settings.js';
-	import translations from '../../../locales/translations';
+	import {translations} from '../../../locales/translations';
 	import Selector from '$components/fragments/Selector.svelte';
 	import { engine } from '$lib/tools/engine';
 
@@ -13,6 +13,14 @@
 	});
 </script>
 
+<InfoLine title={$t('settings.lang')}>
+	<div class="flex-align-middle gap-4">
+		<Selector values={Object.keys(translations)} value={$settings.locale} let:item let:active>
+			<button on:click={() => settings.setSetting('locale', item)}>{item}</button>
+		</Selector>
+	</div>
+</InfoLine>
+<hr />
 <InfoLine title={$t('settings.theme')}>
 	<div class="flex-align-middle gap-4">
 		<Selector values={['light', 'dark']} value={$settings.theme} let:item let:active>
@@ -20,14 +28,6 @@
 				<Icon icon="system-uicons:{item == 'light' ? 'sun' : 'moon'}" />
 				{item}</button
 			>
-		</Selector>
-	</div>
-</InfoLine>
-<hr />
-<InfoLine title={$t('settings.lang')}>
-	<div class="flex-align-middle gap-4">
-		<Selector values={Object.keys(translations)} value={$settings.locale} let:item let:active>
-			<button on:click={() => settings.setSetting('locale', item)}>{item}</button>
 		</Selector>
 	</div>
 </InfoLine>

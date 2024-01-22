@@ -25,7 +25,7 @@ module.exports = {
 	],
 	rules: {
 		'object-shorthand': 'on',
-		/* 'sort-keys': ['error', 'asc', { caseSensitive: false, natural: true }], */
+		'sort-keys': ['error', 'asc', { caseSensitive: false, natural: true }],
 		'sort-keys-fix/sort-keys-fix': 'error',
 		'align-assignments/align-assignments': ['error', { requiresOnly: false }]
 	}

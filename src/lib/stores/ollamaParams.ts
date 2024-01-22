@@ -1,10 +1,10 @@
 import { browser } from '$app/environment';
 import { OllamaOptionsDefaults } from '$configuration/configuration';
-import type { OllamaOptionsType } from '$types/ollama';
+import type { OllOptionsType } from '$types/ollama';
 import { writable } from 'svelte/store';
 
 function ollamaOptionStoreBuild() {
-	const store = writable<OllamaOptionsType>({} as OllamaOptionsType);
+	const store = writable<OllOptionsType>({} as OllOptionsType);
 
 	store.subscribe((o) => {
 		if (browser) {
@@ -12,10 +12,10 @@ function ollamaOptionStoreBuild() {
 		}
 	});
 
-	function init(values: Partial<OllamaOptionsType> = {}) {
+	function init(values: Partial<OllOptionsType> = {}) {
 		if (browser) {
 			const storeOptions = JSON.parse(localStorage.getItem('ollamaOptions') ?? '{}');
-			const options: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<OllamaOptionsType>, key) => {
+			const options: OllOptionsType = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<OllOptionsType>, key) => {
 				acc[key] = OllamaOptionsDefaults[key].default ?? null;
 				// console.log(key, acc[key]);
 				return acc;
@@ -25,7 +25,7 @@ function ollamaOptionStoreBuild() {
 		}
 	}
 
-	function resetParam(param: keyof OllamaOptionsType) {
+	function resetParam(param: keyof OllOptionsType) {
 		store.update((n) => {
 			const newSettings = { ...n, [param]: OllamaOptionsDefaults[param].default ?? null };
 			return newSettings;
@@ -34,7 +34,7 @@ function ollamaOptionStoreBuild() {
 
 	function resetAll() {
 		localStorage.ollamaOptions = JSON.stringify({});
-		const options: OllamaOptionsType = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<OllamaOptionsType>, key) => {
+		const options: OllOptionsType = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<OllOptionsType>, key) => {
 			acc[key] = OllamaOptionsDefaults[key].default ?? null;
 			return acc;
 		}, {});
@@ -46,7 +46,7 @@ function ollamaOptionStoreBuild() {
 		resetAll,
 		resetParam,
 		set: store.set,
-		setOption: (key: keyof OllamaOptionsType, value: any) => {
+		setOption: (key: keyof OllOptionsType, value: any) => {
 			store.update((n) => {
 				const newSettings = { ...n, [key]: value };
 				return newSettings;

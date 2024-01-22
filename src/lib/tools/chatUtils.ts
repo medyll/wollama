@@ -1,17 +1,17 @@
-import type { ChatType } from '$types/db';
-import type { MessageType } from '$types/db';
+import type { DbChat } from '$types/db';
+import type { DBMessage } from '$types/db';
 import { get } from 'svelte/store';
-import { ApiCall } from '../db/apiCall';
+import { OllamaApi } from '../db/ollamaApi';
 import { settings } from '$lib/stores/settings';
 import { idbQuery } from '$lib/db/dbQuery';
-import type { OllamaResponseType } from '$types/ollama';
+import type { OllResponseType } from '$types/ollama';
 
 export async function askOllama(prompt: string, model: string) {}
 
-export async function guessChatTitle(message: string): Promise<OllamaResponseType> {
+export async function guessChatTitle(message: string): Promise<OllResponseType> {
 	const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, reply with only a few worlds, no more than six words. here is the content to resume shortly:  ${message}`;
 
-	return await ApiCall.generate(prompt, () => {}, { stream: false });
+	return await OllamaApi.generate(prompt, () => {}, { stream: false });
 }
 
 export class chatUtils {
@@ -23,7 +23,7 @@ export class chatUtils {
 			if (chatMessages.length > 1) {
 				const resume = chatMessages
 					.slice(0, 2)
-					.map((message: MessageType) => message.content)
+					.map((message: DBMessage) => message.content)
 					.join('\n');
 
 				/* const res = await guessChatTitle(resume);
@@ -33,7 +33,7 @@ export class chatUtils {
 		}
 	}
 
-	static getMessageDataObject(message: Partial<MessageType>): MessageType {
+	static getMessageDataObject(message: Partial<DBMessage>): DBMessage {
 		return {
 			content: message.content,
 			createdAt: new Date(),
@@ -46,7 +46,7 @@ export class chatUtils {
 		};
 	}
 
-	static getChatDataObject(chatData: ChatType = {} as ChatType): ChatType {
+	static getChatDataObject(chatData: DbChat = {} as DbChat): DbChat {
 		return {
 			chatId: crypto.randomUUID(),
 			context: [],
@@ -58,7 +58,7 @@ export class chatUtils {
 		};
 	}
 
-	static getMessageStatsObject(messageData: Partial<OllamaResponseType>): OllamaResponseType {
+	static getMessageStatsObject(messageData: Partial<OllResponseType>): OllResponseType {
 		return {
 			messageId: crypto.randomUUID(),
 			...messageData

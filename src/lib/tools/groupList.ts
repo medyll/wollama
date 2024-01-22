@@ -1,4 +1,4 @@
-import type { ChatType } from '$types/db';
+import type { DbChat } from '$types/db';
 import { startOfDay, endOfDay, isThisWeek, format } from 'date-fns';
 
 type Group<T = any> = {
@@ -11,7 +11,7 @@ type Group<T = any> = {
 
 type GroupList<T = any> = Record<string, Group<T>>;
 
-export class ChatDataGrouper<T = ChatType> {
+export class ChatDataGrouper<T = DbChat> {
 	data: T[];
 	fieldName: keyof T;
 
@@ -163,7 +163,7 @@ export class ChatDataGrouper<T = ChatType> {
 }
 
 // Exemple d'utilisation
-const chatData: ChatType[] = [
+const chatData: DbChat[] = [
 	// Insérez ici vos éléments ChatDataType
 ];
 

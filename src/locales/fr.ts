@@ -1,5 +1,8 @@
 export default {
 	fr: {
+		prompt: {
+			systemPrompt: 'invite de système'
+		},
 		settings: {
 			auth: 'authentification',
 			avatar: 'avatar',
@@ -26,7 +29,10 @@ export default {
 			request_mode: 'simple',
 			theme_dark: 'sombre',
 			resetAll: 'réinitialiser tout',
-			theme_light: 'clair'
+			theme_light: 'clair',
+			configureOllama: 'configurer Ollama',
+			delete_model_message: 'message de suppression du modèle',
+			resetOllamaOptions: 'réinitialiser les options Ollama'
 		},
 		status: {
 			connected: 'connecté',
@@ -49,7 +55,10 @@ export default {
 			searchChats: 'rechercher des chats',
 			startondate: 'date de début',
 			thisWeek: 'cette semaine',
-			use_model: 'utiliser le modèle'
+			use_model: 'utiliser le modèle',
+			configuration: {
+				home: 'accueil'
+			}
 		}
 	}
 };

@@ -4,7 +4,7 @@ import fr from './fr';
 
 import it from './it';
 
-export default {
+export const translations = {
 	de: de.de,
 	en: {
 		prompt: {
@@ -41,7 +41,7 @@ export default {
 			pull_model: 'enter a model name to pull',
 			request_mode: 'plain',
 			resetAll: 'reset all',
-			resetOllamaOptions: 'reset Ollama options'
+			resetOllamaOptions: 'reset Ollama options',
 		},
 		status: {
 			connected: 'connected',
@@ -70,4 +70,5 @@ export default {
 	es: es.es,
 	fr: fr.fr,
 	it: it.it
-};
+} 
+

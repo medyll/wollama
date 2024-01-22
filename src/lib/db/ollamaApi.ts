@@ -1,10 +1,11 @@
 import { aiState } from '$lib/stores';
 import { ollamaParams } from '$lib/stores/ollamaParams';
 import { settings } from '$lib/stores/settings';
-import type { OllamaChatCompletionBody, OllamaChatCompletionBodyMessage as ChatCompletionMessage, OllamaCompletionBody as OllamaCompletionBody, OllamaResponseType } from '$types/ollama';
+import type { MessageImageType } from '$types/db';
+import type { OllChatCompletionBody, OllChatMessage as ChatCompletionMessage, OllCompletionBody as OllCompletionBody, OllResponseType } from '$types/ollama';
 import { get } from 'svelte/store';
 
-export class ApiCall {
+export class OllamaApi {
 	private options = {
 		model: 'llama2-uncensored'
 	};
@@ -13,7 +14,7 @@ export class ApiCall {
 		this.options = { ...this.options, ...options };
 	}
 
-	static async generate(prompt: string, hook?: (data: OllamaResponseType) => void, apiBody?: Partial<OllamaCompletionBody>) {
+	static async generate(prompt: string, hook?: (data: OllResponseType) => void, apiBody?: Partial<OllCompletionBody>) {
 		const config = get(settings);
 		const ollamaOptions = get(ollamaParams);
 
@@ -23,7 +24,7 @@ export class ApiCall {
 			system: config?.system_prompt,
 			...apiBody,
 			options: { ...ollamaOptions, ...apiBody?.options }
-		} as OllamaCompletionBody;
+		} as OllCompletionBody;
 
 		const res = await fetch(`${config.ollama_server}/api/generate`, {
 			body: JSON.stringify(defaultOptions),
@@ -49,13 +50,13 @@ export class ApiCall {
 		return res;
 	}
 
-	static async chat(prompt: string, messages: ChatCompletionMessage[] = [], hook?: (data: OllamaResponseType) => void, apiBody?: Partial<OllamaChatCompletionBody>) {
+	static async chat(message: ChatCompletionMessage, messages: ChatCompletionMessage[] = [], hook?: (data: OllResponseType) => void, apiBody?: Partial<OllChatCompletionBody>) {
 		const config = get(settings);
 		const ollamaOptions = get(ollamaParams);
 
-		const defaultOptions: OllamaChatCompletionBody = {
+		const defaultOptions: OllChatCompletionBody = {
 			model: config?.defaultModel,
-			messages: [{ role: 'system', content: config.system_prompt }, ...messages, { role: 'user', content: prompt }],
+			messages: [{ role: 'system', prompt: config.system_prompt }, ...messages, message],
 			format: apiBody?.format,
 			template: apiBody?.template,
 			stream: apiBody?.stream,
@@ -72,6 +73,7 @@ export class ApiCall {
 		});
 
 		if (!res.ok) {
+			console.log(defaultOptions);
 			throw await res.json();
 		} else {
 			if (apiBody?.stream) {
@@ -173,7 +175,7 @@ export class ApiCall {
 		this.stream(res, hook);
 	}
 
-	static async stream(response: Response, hook?: (data: OllamaResponseType) => void) {
+	static async stream(response: Response, hook?: (data: OllResponseType) => void) {
 		/* for await (const chunk of response.body) { 
 		} */
 
@@ -185,7 +187,7 @@ export class ApiCall {
 
 				if (Boolean(done) || get(aiState) == 'request_stop') break;
 				if (value) {
-					const data: OllamaResponseType = JSON.parse(value);
+					const data: OllResponseType = JSON.parse(value);
 
 					if (hook) hook(data);
 				}

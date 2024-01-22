@@ -2,7 +2,7 @@
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { idbQuery } from '$lib/db/dbQuery';
 	import { ui } from '$lib/stores/ui';
-	import type { ChatType } from '$types/db';
+	import type { DbChat } from '$types/db';
 	import Icon from '@iconify/svelte';
 	import { liveQuery } from 'dexie';
 

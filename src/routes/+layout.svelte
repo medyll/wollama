@@ -22,7 +22,7 @@
 	import { connectionChecker } from '$lib/stores/connection';
 	import Opening from '$components/Opening.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
-	import { ApiCall } from '$lib/db/apiCall';
+	import { OllamaApi } from '$lib/db/ollamaApi';
 
 	// load models into store
 	async function loadModels(models: Record<string, any>[]) {
@@ -33,7 +33,7 @@
 
 	onMount(async () => {
 		settings.initSettings();
-		const apiCall = new ApiCall();
+		const apiCall = new OllamaApi();
 		let models = [];
 		try {
 			models = (await apiCall.listModels()) ?? [];

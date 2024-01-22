@@ -3,7 +3,7 @@
 	import { settings } from '$lib/stores/settings';
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
-	import { ApiCall } from '$lib/db/apiCall';
+	import { OllamaApi } from '$lib/db/ollamaApi';
 	import { pullModelState } from '$lib/stores';
 	import List from '$components/fragments/List.svelte';
 	import Confirm from '$components/fragments/Confirm.svelte';
@@ -17,7 +17,7 @@
 	function pullModel() {
 		if (addModel.trim() == '') return;
 
-		ApiCall.pullModel(addModel, (res) => {
+		OllamaApi.pullModel(addModel, (res) => {
 			$pullModelState = res;
 			pullStatus = res?.status ?? res?.error;
 			if (res.digest) {
@@ -28,7 +28,7 @@
 	}
 
 	function deleteModel(model: string) {
-		ApiCall.deleteModel(model.trim())
+		OllamaApi.deleteModel(model.trim())
 			.then(async () => {
 				notifierState.notify('success', $t('settings.delete_model_success'), 'delete-model');
 				let models = (await ollamaFetcher.listModels()) ?? [];

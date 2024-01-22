@@ -1,9 +1,9 @@
-import type { OllamaCompletionBody, OllamaOptionsType, OllamaResponseType } from './ollama';
+import type { OllCompletionBody, OllOptionsType, OllResponseType } from './ollama';
 
 /**
  * Represents a chat.
  */
-export type ChatType = {
+export type DbChat = {
 	id: string;
 	chatId: string;
 	title: string;
@@ -11,17 +11,20 @@ export type ChatType = {
 	createdAt: Date;
 	dateLastMessage: Date;
 	context: number[] /** @deprecated find in ollamaBody */;
-	ollamaBody: Partial<OllamaCompletionBody>;
+	ollamaBody: Partial<OllCompletionBody>;
 };
 
 /**
- * Represents a list of chats.
+ * Represents a chat list type.
  */
 export interface ChatListType {
-	[key: string]: ChatType;
+	[key: string]: DbChat;
 }
 
-export type MessageType = {
+/**
+ * Represents a message.
+ */
+export type DBMessage = {
 	id: string;
 	chatId: string;
 	messageId: string;
@@ -41,8 +44,8 @@ export type MessageType = {
 	  }
 );
 
-export type MessageListType = {
-	[key: string]: MessageType;
+export type DbMessageListType = {
+	[key: string]: DBMessage;
 };
 
 export type MessageImageType = {

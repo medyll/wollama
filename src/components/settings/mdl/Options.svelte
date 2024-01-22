@@ -4,7 +4,7 @@
 	import { OllamaOptionsDefaults, ollamaOptionsCatalog, ollamaOptionsInfo } from '$configuration/configuration';
 	import List from '$components/fragments/List.svelte';
 	import Icon from '@iconify/svelte';
-	import { ApiCall } from '$lib/db/apiCall';
+	import { OllamaApi } from '$lib/db/ollamaApi';
 	import { notifierState } from '$lib/stores/notifications';
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { ollamaParams } from '$lib/stores/ollamaParams';
@@ -14,7 +14,7 @@
 	let ollama_server = $settings.ollama_server;
 
 	function setEndPoint(url: string) {
-		ApiCall.ping(url)
+		OllamaApi.ping(url)
 			.then((res) => {
 				notifierState.notify('success', $t('settings.server_url_success'), 'server-url');
 				settings.setSetting('ollama_server', url);
