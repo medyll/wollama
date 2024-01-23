@@ -1,7 +1,7 @@
 import { idbQuery } from '$lib/db/dbQuery';
 import { OllamaApi } from '$lib/db/ollamaApi';
 import type { DBMessage, PromptType } from '$types/db';
-import type { OllChatMessage, OllApiChat, OllOptionsType, OllResponseType, OllApiGenerate } from '$types/ollama';
+import type { OllChatMessage, OllApiChat, OllOptionsType, OllResponseType, OllApiGenerate, OllamaFormat } from '$types/ollama';
 import { engine } from './engine';
 
 export type PromptSenderType = {
@@ -10,7 +10,7 @@ export type PromptSenderType = {
     models: string[];
     images?: string[];
     options: OllOptionsType;
-    format: 'json' | 'plain' | '' | string;
+    format: OllamaFormat;
 };
 
 export type SenderCallback<T> = {
@@ -41,16 +41,13 @@ export class PromptMaker {
     /**
      * Creates an instance of PromptSender.
      * @param chatId - The ID of the chat.
-     * @param body - The chat body.
+     * @param apiChatParams - The chat apiChatParams | body.
      */
-    constructor(chatId: string, body = {} as PromptMaker['apiChatParams']) {
+    constructor(chatId: string, apiChatParams = {} as PromptMaker['apiChatParams']) {
         this.chatId = chatId;
-        // depending off chatSessionType
-        if (this.chatSessionType == 'chat') {
-            this.apiChatParams = body as OllApiChat;
-            // retrieve all previous sent messages
-            this.setPreviousMessages();
-        }
+        this.apiChatParams = apiChatParams as OllApiChat;
+        // retrieve all previous sent messages
+        this.setPreviousMessages();
     }
 
     /**
@@ -107,7 +104,7 @@ export class PromptMaker {
         if (this.chatSessionType == 'chat') {
             // send chat user message
             const previousMessages = await this.setPreviousMessages();
-            console.log(previousMessages);
+
             OllamaApi.chat(userMessage, previousMessages, this.apiChatParams, async (data) => {
                 this.onResponseMessageStream({
                     assistantMessage: this.assistantMessage,

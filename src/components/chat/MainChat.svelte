@@ -11,17 +11,17 @@
     import ChatOptions from './ChatOptions.svelte';
     import { PromptMaker } from '$lib/tools/promptSender.js';
     import { idbQuery } from '$lib/db/dbQuery.js';
-    import { prompter, type PrompterType } from '$lib/stores/prompter';
+    import { ollamaBodyStore, prompter, type PrompterType } from '$lib/stores/prompter';
     import { aiState } from '$lib/stores';
     import Message from '$components/chat/Message.svelte';
     import DashBoard from '$components/DashBoard.svelte';
     import Images from './input/Images.svelte';
     import List from '$components/fragments/List.svelte';
     import { liveQuery } from 'dexie';
-    import Bottomer from '$components/ui/Bottomer.svelte';
-    import { ollamaParams } from '$lib/stores/ollamaParams';
+    import Bottomer from '$components/ui/Bottomer.svelte'; 
     import { connectionChecker } from '$lib/stores/connection';
     import { ChatApiSession } from '$lib/tools/chatApiSession';
+    import type { OllApiChat } from '$types/ollama';
 
     $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
@@ -29,31 +29,28 @@
 
     $: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
-    async function sendPrompt(prompter: PrompterType) {
-        const { ollamaPayload, images, promptSystem, prompt } = { ...prompter };
+    async function sendPrompt(prompter: PrompterType, ollamaBody: OllApiChat) {
+        //
+        const { images, promptSystem } = { ...prompter };
 
         // init chatSession
         const chatSession = new ChatApiSession($ui.activeChatId);
         await chatSession.initChatSession({
             models: prompter.models,
-            ollamaBody: prompter.ollamaPayload,
+            ollamaBody,
         });
         // prompt system, context : usage differs on chatSessionType
         chatSession.setOptions({ systemPrompt: promptSystem, context: chatSession.chat.context ?? [] });
         //
-        await chatSession.createSessionMessages(prompt as string, images);
+        await chatSession.createSessionMessages(prompter.prompt as string, images);
 
         // set active chat
         ui.setActiveChatId(chatSession.chat.chatId);
 
-        // superize default options
-        ollamaPayload.options = { ...$ollamaParams, ...ollamaPayload.options };
-        ollamaPayload.format = ollamaPayload.format?.replace('plain', '');
-
         // set ai state to running
         aiState.set('running');
         //
-        const sender = new PromptMaker(chatSession.chat.chatId, ollamaPayload);
+        const sender = new PromptMaker(chatSession.chat.chatId, ollamaBody);
         // prompt system, context : usage differs on chatSessionType
         sender.setOptions(chatSession.options);
 
@@ -85,7 +82,7 @@
     }
 
     function submitHandler() {
-        sendPrompt($prompter);
+        sendPrompt($prompter,$ollamaBodyStore);
     }
 
     function keyPressHandler(e: KeyboardEvent) {

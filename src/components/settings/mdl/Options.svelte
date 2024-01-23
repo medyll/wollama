@@ -7,7 +7,7 @@
 	import { OllamaApi } from '$lib/db/ollamaApi';
 	import { notifierState } from '$lib/stores/notifications';
 	import Confirm from '$components/fragments/Confirm.svelte';
-	import { ollamaParams } from '$lib/stores/ollamaParams';
+	import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
 	// import { Button } from '@medyll/slot-ui';
 
@@ -62,7 +62,7 @@
 	<div>
 		<Confirm
 			validate={() => {
-				ollamaParams.resetAll();
+				ollamaApiMainOptionsParams.resetAll();
 			}}
 			message={$t('settings.resetOllamaOptions')}
 		>
@@ -76,15 +76,15 @@
 		<div>
 			{#if OllamaOptionsDefaults?.[setting]?.max}
 				<div class="line-gap-2">
-					<input type="range" min={OllamaOptionsDefaults?.[setting].min} max={OllamaOptionsDefaults?.[setting].max} step={OllamaOptionsDefaults?.[setting].max / 10} bind:value={$ollamaParams[setting]} />
-					<input class="w-16 text-center naked theme-bg" type="number" bind:value={$ollamaParams[setting]} />
+					<input type="range" min={OllamaOptionsDefaults?.[setting].min} max={OllamaOptionsDefaults?.[setting].max} step={OllamaOptionsDefaults?.[setting].max / 10} bind:value={$ollamaApiMainOptionsParams[setting]} />
+					<input class="w-16 text-center naked theme-bg" type="number" bind:value={$ollamaApiMainOptionsParams[setting]} />
 				</div>
 			{:else}
 			{#if ollamaOptionsCatalog?.[setting].type=='number'}
-				<input class="w-16 text-center naked theme-bg" type="number" bind:value={$ollamaParams[setting]} />
+				<input class="w-16 text-center naked theme-bg" type="number" bind:value={$ollamaApiMainOptionsParams[setting]} />
 
 			{:else}
-				<input class="w-16 text-center naked theme-bg" type="text" bind:value={$ollamaParams[setting]} />
+				<input class="w-16 text-center naked theme-bg" type="text" bind:value={$ollamaApiMainOptionsParams[setting]} />
 
 			{/if}
 			{/if}
@@ -92,7 +92,7 @@
 		<div class="w-16">
 			<button
 				on:click={() => {
-					ollamaParams.resetParam(setting);
+					ollamaApiMainOptionsParams.resetParam(setting);
 				}}>reset</button
 			>
 		</div>

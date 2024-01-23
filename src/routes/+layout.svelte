@@ -21,7 +21,7 @@
 	import { notifierState } from '$lib/stores/notifications';
 	import { connectionChecker } from '$lib/stores/connection';
 	import Opening from '$components/Opening.svelte';
-	import { ollamaParams } from '$lib/stores/ollamaParams';
+	import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 	import { OllamaApi } from '$lib/db/ollamaApi';
 
 	// load models into store
@@ -41,7 +41,7 @@
 			console.log(e);
 		}
 		loadModels(models);
-		ollamaParams.init();
+		ollamaApiMainOptionsParams.init();
 		engine.checkOllamaEndPoints();
 		const users = await idbQuery.getUsers(); 
 		if(!users.length) {

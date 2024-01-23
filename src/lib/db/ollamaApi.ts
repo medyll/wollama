@@ -1,5 +1,5 @@
 import { aiState } from '$lib/stores';
-import { ollamaParams } from '$lib/stores/ollamaParams';
+import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 import { settings } from '$lib/stores/settings';
 import type { OllChatMessage as ChatCompletionMessage, OllApiChat as OllApiChat, OllApiGenerate, OllResponseType } from '$types/ollama';
 import { get } from 'svelte/store';
@@ -22,7 +22,7 @@ export class OllamaApi {
      */
     static async generate(prompt: string, apiBody?: Partial<OllApiGenerate>, hook?: (data: OllResponseType) => void) {
         const config = get(settings);
-        const ollamaOptions = get(ollamaParams);
+        const ollamaOptions = get(ollamaApiMainOptionsParams);
 
         const defaultOptions = {
             model: config?.defaultModel,
@@ -59,21 +59,23 @@ export class OllamaApi {
     static async chat(
         message: ChatCompletionMessage,
         messages: ChatCompletionMessage[] = [],
-        apiParams: Partial<OllApiChat>,
+        ollApiParams: Partial<OllApiChat>,
         hook?: (data: OllResponseType) => void
     ) {
         const config = get(settings);
-        const ollamaOptions = get(ollamaParams);
+        // default params
+        const ollamaOptions = get(ollamaApiMainOptionsParams);
+
         const defaultOptions: OllApiChat = {
             model: config?.defaultModel,
             messages: [{ role: 'system', prompt: config.system_prompt }, ...messages, message],
-            format: apiParams?.format,
-            template: apiParams?.template ?? null,
-            stream: apiParams?.stream ?? true,
-            options: { ...ollamaOptions, ...apiParams?.options },
+            format: ollApiParams?.format,
+            template: ollApiParams?.template ?? null,
+            stream: ollApiParams?.stream ?? true,
+            //...ollApiParams,
+            options: { ...ollamaOptions, ...ollApiParams?.options },
         };
 
-        console.log(defaultOptions);
         const res = await fetch(`${config.ollama_server}/api/chat`, {
             body: JSON.stringify(defaultOptions),
             headers: {
