@@ -1,62 +1,61 @@
 <script lang="ts">
-	import { prompter } from '$lib/stores/prompter';
-	import { settings } from '$lib/stores/settings';
-	import Icon from '@iconify/svelte';
-	import Selector from '$components/fragments/Selector.svelte';
-	import Prompts from '$components/settings/prompts/Prompts.svelte';
-	import { t } from '$lib/stores/i18n';
-	import { ui } from '$lib/stores/ui';
+    import { prompter } from '$lib/stores/prompter';
+    import { settings } from '$lib/stores/settings';
+    import Icon from '@iconify/svelte';
+    import Selector from '$components/fragments/Selector.svelte';
+    import Prompts from '$components/settings/prompts/Prompts.svelte';
+    import { t } from '$lib/stores/i18n';
+    import { ui } from '$lib/stores/ui';
 
-	$: component = $ui.showPrompt ? Prompts : undefined;
+    $: component = $ui.showPrompt ? Prompts : undefined;
 
-	function setTemperature(temperature: number) {
-		$prompter.options.temperature = temperature;
-	}
-	function setRequestMode(format: 'json' | 'plain' | unknown) {
-		$prompter.ollamaPayload.format = format as 'json' | 'plain';
-	}
+    function setTemperature(temperature: number) {
+        if ($prompter?.ollamaPayload?.options?.temperature) $prompter.ollamaPayload.options.temperature = temperature;
+    }
+    function setRequestMode(format: 'json' | 'plain' | unknown) {
+        if ($prompter?.ollamaPayload?.format) $prompter.ollamaPayload.format = format as 'json' | 'plain';
+    }
 </script>
 
 <div class="p-1 flex-align-middle theme-bg rounded-md pb-2">
-		<svelte:component bind:activePrompt={$prompter.promptSystem} this={component} />
-	<div class="flex-1 text-center relative">
-		<button on:click={() => ui.showHidePromptMenu()}>
-		{$prompter.promptSystem.title ?? $t('prompt.systemPrompt')}
-		</button>
-		
-	</div>
-	<div class="flex justify-center gauge relative">
-		<div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
-		{#each Object.keys($settings.temperatures ?? {}) as temperature}
-			{@const active = $prompter.options.temperature == $settings.temperatures[temperature]}
-			<button
-				on:click={() => {
-					setTemperature($settings.temperatures[temperature]);
-				}}
-				class:active
-				class="button-temp">{temperature}</button
-			>
-		{/each}
-	</div>
-	<div class="line-gap-2 flex-1 justify-center">
-		<Icon icon="charm:binary" class="sm" />
-		<Selector values={['json', 'plain']} value={$prompter.ollamaPayload.format} let:item>
-			<button on:click={() => setRequestMode(item)}>{item}</button>
-		</Selector>
-	</div>
+    <svelte:component this={component} bind:activePrompt={$prompter.promptSystem} />
+    <div class="flex-1 text-center relative">
+        <button on:click={() => ui.showHidePromptMenu()}>
+            {$prompter.promptSystem.title ?? $t('prompt.systemPrompt')}
+        </button>
+    </div>
+    <div class="flex justify-center gauge relative">
+        <div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
+        {#each Object.keys($settings.temperatures ?? {}) as temperature}
+            {@const active = $prompter?.ollamaPayload?.options?.temperature == $settings.temperatures[temperature]}
+            <button
+                on:click={() => {
+                    setTemperature($settings.temperatures[temperature]);
+                }}
+                class:active
+                class="button-temp">{temperature}</button
+            >
+        {/each}
+    </div>
+    <div class="line-gap-2 flex-1 justify-center">
+        <Icon icon="charm:binary" class="sm" />
+        <Selector values={['json', 'plain']} value={$prompter.ollamaPayload.format} let:item>
+            <button on:click={() => setRequestMode(item)}>{item}</button>
+        </Selector>
+    </div>
 </div>
 
 <style lang="postcss">
-	.gauge {
-		@apply p-1  shadow shadow-gray-400 dark:shadow-black/80 rounded-md dark:bg-white/5;
-	}
-	.button-temp {
-		@apply rounded-md;
-		@apply p-1 px-2;
-		@apply opacity-50;
-		&.active {
-			@apply opacity-100 bg-gradient-to-tl from-gray-600 to-gray-800 shadow shadow-gray-950;
-			@apply text-white;
-		}
-	}
+    .gauge {
+        @apply p-1  shadow shadow-gray-400 dark:shadow-black/80 rounded-md dark:bg-white/5;
+    }
+    .button-temp {
+        @apply rounded-md;
+        @apply p-1 px-2;
+        @apply opacity-50;
+        &.active {
+            @apply opacity-100 bg-gradient-to-tl from-gray-600 to-gray-800 shadow shadow-gray-950;
+            @apply text-white;
+        }
+    }
 </style>

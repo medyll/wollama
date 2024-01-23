@@ -7,7 +7,6 @@ export type PrompterType = {
     disabledPrompt: boolean;
     isPrompting: boolean;
     voiceListening: boolean;
-    options: OllOptionsType;
     images?: MessageImageType;
     models: string[];
     promptSystem: PromptType;
@@ -30,7 +29,6 @@ function prompterStore() {
             options: { temperature: 0.5 },
             raw: false,
         } as Partial<OllApiChat>,
-        options: { temperature: 0.5 },
         promptSystem: {} as PromptType,
         voiceListening: false,
     } satisfies PrompterType;

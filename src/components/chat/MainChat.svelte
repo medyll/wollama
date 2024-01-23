@@ -33,7 +33,7 @@
         const { ollamaPayload, images, promptSystem, prompt } = { ...prompter };
 
         // init chatSession
-        const chatSession = new ChatApiSession($ui.activeChatId );
+        const chatSession = new ChatApiSession($ui.activeChatId);
         await chatSession.initChatSession({
             models: prompter.models,
             ollamaBody: prompter.ollamaPayload,
@@ -46,14 +46,14 @@
         // set active chat
         ui.setActiveChatId(chatSession.chat.chatId);
 
-        // set default options
+        // superize default options
         ollamaPayload.options = { ...$ollamaParams, ...ollamaPayload.options };
         ollamaPayload.format = ollamaPayload.format?.replace('plain', '');
 
         // set ai state to running
         aiState.set('running');
         //
-        const sender = new PromptMaker(chatSession.chat.chatId,   ollamaPayload);
+        const sender = new PromptMaker(chatSession.chat.chatId, ollamaPayload);
         // prompt system, context : usage differs on chatSessionType
         sender.setOptions(chatSession.options);
 
