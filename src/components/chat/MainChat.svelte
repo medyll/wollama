@@ -21,7 +21,7 @@
     import Bottomer from '$components/ui/Bottomer.svelte';
     import { ollamaParams } from '$lib/stores/ollamaParams';
     import { connectionChecker } from '$lib/stores/connection';
-    import { ChatSession } from '$lib/tools/chatSession';
+    import { ChatApiSession } from '$lib/tools/chatApiSession';
 
     $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
@@ -33,7 +33,7 @@
         const { ollamaPayload, images, promptSystem, prompt } = { ...prompter };
 
         // init chatSession
-        const chatSession = new ChatSession($ui.activeChatId, 'chat');
+        const chatSession = new ChatApiSession($ui.activeChatId );
         await chatSession.initChatSession({
             models: prompter.models,
             ollamaBody: prompter.ollamaPayload,
@@ -41,10 +41,8 @@
         // prompt system, context : usage differs on chatSessionType
         chatSession.setOptions({ systemPrompt: promptSystem, context: chatSession.chat.context ?? [] });
         //
-        await chatSession.setUserMessage(prompt as string, images);
-        await chatSession.createAssistantMessage();
+        await chatSession.createSessionMessages(prompt as string, images);
 
-console.log(chatSession)
         // set active chat
         ui.setActiveChatId(chatSession.chat.chatId);
 
@@ -55,7 +53,7 @@ console.log(chatSession)
         // set ai state to running
         aiState.set('running');
         //
-        const sender = new PromptMaker(chatSession.chat.chatId, 'chat', ollamaPayload);
+        const sender = new PromptMaker(chatSession.chat.chatId,   ollamaPayload);
         // prompt system, context : usage differs on chatSessionType
         sender.setOptions(chatSession.options);
 
@@ -63,14 +61,13 @@ console.log(chatSession)
         sender.onStream = ({ assistantMessage, data }) => {
             chatSession.onMessageStream(assistantMessage, data);
             aiState.set('running');
-            //
-            chatUtils.checkTitle(assistantMessage.chatId);
             // set auto-scroll to false
             ui.setAutoScroll(assistantMessage.chatId, false);
         };
         sender.onEnd = ({ assistantMessage, data }) => {
             chatSession.onMessageDone(assistantMessage, data);
             aiState.set('done');
+            chatUtils.checkTitle(assistantMessage.chatId);
         };
         // Send prompt to api per assistant.message
         await chatSession.assistantsDbMessages.forEach(async (assistantMessage) => {

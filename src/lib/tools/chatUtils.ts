@@ -20,7 +20,7 @@ export class chatUtils {
         const chatMessages = await idbQuery.getMessages(chatId);
 
         if (!chat?.title || chat?.title === 'New Chat') {
-            if (chatMessages.length > 2) {
+            if (chatMessages.length > 2 && chatMessages.length < 4) {
                 const resume = chatMessages
                     .slice(0, 2)
                     .map((message: DBMessage) => message.content)

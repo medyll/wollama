@@ -5,20 +5,18 @@ import { engine } from './engine';
 
 /**
  * Represents a class that manages a chat session.
- * uses api/generate or api/chat depending of chatSessionType
- * @class ChatSession
+ * using api/chat endpoint
+ * @class ChatApiSession
  * @property {DbChat} chat - The chat object.
  * @property {DBMessage[]} assistantsDbMessages - The assistant messages.
  * @property {DBMessage} userDbMessage - The user message.
  * @property {OllChatMessage} userChatMessage - The user message formatted for sending.
- * @property {ChatSession['chatSessionType']} chatSessionType - The type of chat session for the api call.
  */
-export class ChatSession {
+export class ChatApiSession {
     public chat!: DbChat;
     public assistantsDbMessages!: DBMessage[];
     public userDbMessage!: DBMessage;
     public userChatMessage!: OllChatMessage;
-    public chatSessionType: 'generate' | 'chat' = 'chat';
     public options: {
         systemPrompt?: PromptType;
         context?: number[];
@@ -31,9 +29,8 @@ export class ChatSession {
      * @param chatId The ID of the chat.
      * @param chatSessionType The type of chat session for the api call.
      */
-    constructor(chatId: string | undefined, chatSessionType: ChatSession['chatSessionType'] | undefined = 'chat') {
+    constructor(chatId: string | undefined) {
         this.chatId = chatId;
-        this.chatSessionType = chatSessionType ?? this.chatSessionType;
     }
 
     /**
@@ -45,19 +42,16 @@ export class ChatSession {
         this.chat = await idbQuery.initChat(this.chatId, chatData as DbChat);
     }
 
-    public async setOptions(options: ChatSession['options']): Promise<any> {
+    public async setOptions(options: ChatApiSession['options']): Promise<any> {
         this.options = options;
-
-        if (this.chatSessionType === 'chat') {
-            await this.setApiChatOptions(options);
-        }
+        await this.setApiChatOptions(options);
     }
 
     /**
      * Options setter for mode api/chat
      * @param options  - The chat options to set.
      */
-    private async setApiChatOptions(options: ChatSession['options']) {
+    private async setApiChatOptions(options: ChatApiSession['options']) {
         if (this.chatSessionType !== 'chat') return;
         if (options?.systemPrompt?.content) {
             // the system prompt can change during the chat session
@@ -78,13 +72,22 @@ export class ChatSession {
     }
 
     /**
+     *
+     * @param content  - The content of the message.
+     * @param images MessageImageType - Optional images to be attached to the message.
+     */
+    public async createSessionMessages(content: string, images?: MessageImageType) {
+        await this.createUserMessage(content, images);
+        await this.createAssistantMessage();
+    }
+    /**
      * Creates a user message in the chat session.
      *
      * @param content - The content of the message.
      * @param images - Optional images to be attached to the message.
      * @returns A Promise that resolves to the created user message.
      */
-    public async setUserMessage(content: string, images?: MessageImageType) {
+    private async createUserMessage(content: string, images?: MessageImageType) {
         this.userDbMessage = await idbQuery.insertMessage(this.chat.chatId, {
             chatId: this.chat.chatId,
             content,
@@ -100,6 +103,22 @@ export class ChatSession {
             role: 'role',
             'images.base64': 'images',
         });
+    }
+
+    private async createAssistantMessage() {
+        this.assistantsDbMessages = await Promise.all([
+            ...this.chat.models.map(
+                async (model) =>
+                    await idbQuery.insertMessage(this.chat.chatId, {
+                        chatId: this.chat.chatId,
+                        model,
+                        role: 'assistant',
+                        status: 'idle',
+                    })
+            ),
+        ]);
+
+        return this.assistantsDbMessages;
     }
 
     /**
@@ -122,21 +141,5 @@ export class ChatSession {
      */
     public async onMessageStream(assistantMessage: DBMessage, data: OllResponseType) {
         idbQuery.updateMessageStream(assistantMessage.messageId, data);
-    }
-
-    public async createAssistantMessage() {
-        this.assistantsDbMessages = await Promise.all([
-            ...this.chat.models.map(
-                async (model) =>
-                    await idbQuery.insertMessage(this.chat.chatId, {
-                        chatId: this.chat.chatId,
-                        model,
-                        role: 'assistant',
-                        status: 'idle',
-                    })
-            ),
-        ]);
-
-        return this.assistantsDbMessages;
     }
 }

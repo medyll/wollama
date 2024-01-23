@@ -1,9 +1,21 @@
 // Type definitions for Ollama API
+
+export enum OllamaFormat {
+    JSON = 'json',
+    PLAIN = 'plain',
+}
+// OllChatMessage
+enum OllChatMessageRole {
+    USER = 'user',
+    SYSTEM = 'system',
+    ASSISTANT = 'assistant',
+}
+
 export type OllApiGenerate = {
     model: string;
     prompt: string;
     images: string[];
-    format: 'json' | 'plain' | '' | string;
+    format: keyof typeof OllamaFormat | '' | string;
     options: OllOptionsType;
     system: string | null;
     template: string | null;
@@ -15,14 +27,14 @@ export type OllApiGenerate = {
 export type OllApiChat = {
     model: string;
     messages: OllChatMessage[];
-    format?: 'json' | 'plain' | '' | string;
+    format?: keyof typeof OllamaFormat | '' | string;
     options: OllOptionsType;
     template: string | null;
     stream?: boolean;
 };
 
 export type OllChatMessage = {
-    role: 'user' | 'system' | 'assistant';
+    role: keyof typeof OllChatMessageRole;
     prompt: string;
     images?: string[];
 };

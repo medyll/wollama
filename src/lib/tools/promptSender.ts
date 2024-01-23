@@ -32,7 +32,6 @@ export class PromptMaker {
     public chatSessionType: 'generate' | 'chat' = 'chat';
     //
     private apiChatParams!: OllApiChat;
-    private apiGenerateParams!: OllApiGenerate;
     //
     private options!: {
         systemPrompt?: PromptType;
@@ -44,17 +43,13 @@ export class PromptMaker {
      * @param chatId - The ID of the chat.
      * @param body - The chat body.
      */
-    constructor(chatId: string, chatSessionType: PromptMaker['chatSessionType'], body: OllApiChat | OllApiGenerate = {} as OllApiChat | OllApiGenerate) {
+    constructor(chatId: string, body: OllApiChat = {} as OllApiChat) {
         this.chatId = chatId;
-        this.chatSessionType = chatSessionType;
         // depending off chatSessionType
         if (this.chatSessionType == 'chat') {
             this.apiChatParams = body as OllApiChat;
             // retrieve all previous sent messages
             this.setPreviousMessages();
-        }
-        if (this.chatSessionType == 'generate') {
-            this.apiGenerateParams = body as OllApiGenerate;
         }
     }
 

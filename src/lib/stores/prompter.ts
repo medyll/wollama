@@ -11,10 +11,10 @@ export type PrompterType = {
     images?: MessageImageType;
     models: string[];
     promptSystem: PromptType;
-    ollamaPayload: Partial<OllApiChat> | Partial<OllApiGenerate>;
+    ollamaPayload: Partial<OllApiChat>;
     //
     prompt: string;
-};
+} & Partial<OllApiChat>;
 
 function prompterStore() {
     const defaultPromptState = {
