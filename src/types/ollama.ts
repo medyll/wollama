@@ -1,5 +1,5 @@
 // Type definitions for Ollama API
-export type OllCompletionBody = {
+export type OllApiGenerate = {
     model: string;
     prompt: string;
     images: string[];
@@ -11,18 +11,20 @@ export type OllCompletionBody = {
     stream?: boolean;
     raw?: boolean;
 };
+
+export type OllApiChat = {
+    model: string;
+    messages: OllChatMessage[];
+    format?: 'json' | 'plain' | '' | string;
+    options: OllOptionsType;
+    template: string | null;
+    stream?: boolean;
+};
+
 export type OllChatMessage = {
     role: 'user' | 'system' | 'assistant';
     prompt: string;
     images?: string[];
-};
-export type OllChatCompletionBody = {
-    model: string;
-    messages: OllChatMessage[];
-    format?: 'json' | 'plain' | '' | string;
-    options?: OllOptionsType;
-    template?: string | null;
-    stream?: boolean;
 };
 
 export type OllResponseType = {

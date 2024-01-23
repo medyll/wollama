@@ -9,7 +9,7 @@
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
     import ChatOptions from './ChatOptions.svelte';
-    import { PromptSender } from '$lib/tools/promptSender.js';
+    import { PromptMaker } from '$lib/tools/promptSender.js';
     import { idbQuery } from '$lib/db/dbQuery.js';
     import { prompter, type PrompterType } from '$lib/stores/prompter';
     import { aiState } from '$lib/stores';
@@ -25,35 +25,41 @@
 
     $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
-    $: disableSubmit = $prompter.ollamaBody.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
+    $: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
     $: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
     async function sendPrompt(prompter: PrompterType) {
-        const { ollamaBody, images, promptData } = { ...prompter }; // clear reference
+        const { ollamaPayload, images, promptSystem, prompt } = { ...prompter };
 
         // init chatSession
-        const chatSession = new ChatSession($ui.activeChatId);
-        await chatSession.setChatData({
+        const chatSession = new ChatSession($ui.activeChatId, 'chat');
+        await chatSession.initChatSession({
             models: prompter.models,
-            ollamaBody: prompter.ollamaBody,
+            ollamaBody: prompter.ollamaPayload,
         });
-        // 
-        await chatSession.createUserMessages(ollamaBody.prompt as string, images);
+        // prompt system, context : usage differs on chatSessionType
+        chatSession.setOptions({ systemPrompt: promptSystem, context: chatSession.chat.context ?? [] });
+        //
+        await chatSession.setUserMessage(prompt as string, images);
+        await chatSession.createAssistantMessage();
+
+console.log(chatSession)
         // set active chat
         ui.setActiveChatId(chatSession.chat.chatId);
 
         // set default options
-        ollamaBody.options = { ...$ollamaParams, ...ollamaBody.options };
-        ollamaBody.format = ollamaBody.format?.replace('plain', '');
-        ollamaBody.system = promptData.content ?? '';
-        ollamaBody.context = chatSession.chat.context ?? [];
+        ollamaPayload.options = { ...$ollamaParams, ...ollamaPayload.options };
+        ollamaPayload.format = ollamaPayload.format?.replace('plain', '');
 
         // set ai state to running
         aiState.set('running');
         //
-        const sender = new PromptSender(chatSession.chat.chatId, ollamaBody);
-		// listen to sender stream
+        const sender = new PromptMaker(chatSession.chat.chatId, 'chat', ollamaPayload);
+        // prompt system, context : usage differs on chatSessionType
+        sender.setOptions(chatSession.options);
+
+        // listen to sender stream
         sender.onStream = ({ assistantMessage, data }) => {
             chatSession.onMessageStream(assistantMessage, data);
             aiState.set('running');
@@ -66,14 +72,14 @@
             chatSession.onMessageDone(assistantMessage, data);
             aiState.set('done');
         };
-        // create prompt sender for each model
-        await chatSession.assistants.forEach(async (assistantMessage) => {
+        // Send prompt to api per assistant.message
+        await chatSession.assistantsDbMessages.forEach(async (assistantMessage) => {
             sender.setRoleAssistant(assistantMessage);
-            sender.sendChatMessage(chatSession.userMessage);
+            sender.sendChatMessage(chatSession.userChatMessage);
         });
 
         // reset prompt
-        $prompter.ollamaBody.prompt = '';
+        $prompter.prompt = '';
         $prompter.images = undefined;
         // set auto-scroll to true
         ui.setAutoScroll(chatSession.chat.chatId, true);
@@ -102,7 +108,7 @@
             <ChatInfo>
                 <Model bind:activeModels={$prompter.models} />
             </ChatInfo>
-            <List class="flex-v w-full gap-4" data={($messages?? [])} let:item={message}>
+            <List class="flex flex-col w-full gap-4" data={$messages ?? []} let:item={message}>
                 <Message {message} />
             </List>
             <Bottomer />
@@ -114,7 +120,7 @@
                 <Input
                     disabled={$connectionChecker.connectionStatus != 'connected'}
                     on:keypress={keyPressHandler}
-                    bind:value={$prompter.ollamaBody.prompt}
+                    bind:value={$prompter.prompt}
                     bind:requestStop={$aiState}
                     showCancel={$aiState == 'running'}
                     {placeholder}
@@ -122,12 +128,7 @@
                 >
                     <Attachment slot="start" form="prompt-form" bind:imageFile={$prompter.images} disabled={false} />
                     <div slot="end" class="flex-align-middle">
-                        <Speech
-                            onEnd={submitHandler}
-                            bind:prompt={$prompter.ollamaBody.prompt}
-                            bind:voiceListening={$prompter.voiceListening}
-                            disabled={disableSubmit}
-                        />
+                        <Speech onEnd={submitHandler} bind:prompt={$prompter.prompt} bind:voiceListening={$prompter.voiceListening} disabled={disableSubmit} />
                         <button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
                             <Icon icon="mdi:send" style="font-size:1.6em" />
                         </button>

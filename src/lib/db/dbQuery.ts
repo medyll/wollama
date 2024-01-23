@@ -1,7 +1,7 @@
 import type { DbChat, DBMessage, PromptType } from '$types/db';
 import type { OllResponseType } from '$types/ollama';
 import { chatUtils } from '$lib/tools/chatUtils';
-import { DataBase, dbase } from './dbSchema';
+import { dbase } from './dbSchema';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
 
@@ -32,7 +32,7 @@ export class idbQuery {
         return { ...newChat, ...chatData };
     }
 
-    static async deleteChat(chatId?: string): Promise<number> {
+    static async deleteChat(chatId?: string): Promise<string> {
         if (!chatId) throw new Error('chatId is required');
         await dbase.chat.delete(chatId);
         return chatId;
@@ -45,9 +45,13 @@ export class idbQuery {
     }
 
     static async initChat(activeChatId?: string, chatData: DbChat = {} as DbChat): Promise<DbChat> {
+        if (Boolean(await idbQuery.getChat(activeChatId as string))) {
+            await idbQuery.updateChat(activeChatId as string, chatData);
+        }
+
         return activeChatId && Boolean(await idbQuery.getChat(activeChatId as string))
-            ? await idbQuery.getChat(activeChatId as string)
-            : await idbQuery.insertChat(chatData);
+            ? ((await idbQuery.getChat(activeChatId as string)) as DbChat)
+            : ((await idbQuery.insertChat(chatData)) as DbChat);
     }
 
     /* Message */

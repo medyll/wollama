@@ -1,5 +1,5 @@
 import type { MessageImageType, PromptType } from '$types/db';
-import type { OllCompletionBody, OllOptionsType } from '$types/ollama';
+import type { OllApiChat, OllApiGenerate, OllOptionsType } from '$types/ollama';
 import { get, writable } from 'svelte/store';
 import { settings } from './settings';
 
@@ -10,8 +10,10 @@ export type PrompterType = {
     options: OllOptionsType;
     images?: MessageImageType;
     models: string[];
-    promptData: PromptType;
-    ollamaBody: Partial<OllCompletionBody>;
+    promptSystem: PromptType;
+    ollamaPayload: Partial<OllApiChat> | Partial<OllApiGenerate>;
+    //
+    prompt: string;
 };
 
 function prompterStore() {
@@ -19,20 +21,20 @@ function prompterStore() {
         disabledPrompt: false,
         isPrompting: false,
         models: [get(settings).defaultModel],
-        ollamaBody: {
+        prompt: '',
+        ollamaPayload: {
             model: '',
-            prompt: '',
             context: [],
             format: 'plain',
             images: [],
             options: { temperature: 0.5 },
             raw: false,
-        } as Partial<OllCompletionBody>,
+        } as Partial<OllApiChat>,
         options: { temperature: 0.5 },
-        promptData: {},
+        promptSystem: {} as PromptType,
         voiceListening: false,
-    };
-    const { subscribe, set, update } = writable<Partial<PrompterType>>(defaultPromptState);
+    } satisfies PrompterType;
+    const { subscribe, set, update } = writable<PrompterType>(defaultPromptState);
 
     let promptTimer: NodeJS.Timeout;
 

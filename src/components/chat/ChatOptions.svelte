@@ -13,15 +13,15 @@
 		$prompter.options.temperature = temperature;
 	}
 	function setRequestMode(format: 'json' | 'plain' | unknown) {
-		$prompter.ollamaBody.format = format as 'json' | 'plain';
+		$prompter.ollamaPayload.format = format as 'json' | 'plain';
 	}
 </script>
 
 <div class="p-1 flex-align-middle theme-bg rounded-md pb-2">
-		<svelte:component bind:activePrompt={$prompter.promptData} this={component} />
+		<svelte:component bind:activePrompt={$prompter.promptSystem} this={component} />
 	<div class="flex-1 text-center relative">
 		<button on:click={() => ui.showHidePromptMenu()}>
-		{$prompter.promptData.title ?? $t('prompt.systemPrompt')}
+		{$prompter.promptSystem.title ?? $t('prompt.systemPrompt')}
 		</button>
 		
 	</div>
@@ -40,7 +40,7 @@
 	</div>
 	<div class="line-gap-2 flex-1 justify-center">
 		<Icon icon="charm:binary" class="sm" />
-		<Selector values={['json', 'plain']} value={$prompter.ollamaBody.format} let:item>
+		<Selector values={['json', 'plain']} value={$prompter.ollamaPayload.format} let:item>
 			<button on:click={() => setRequestMode(item)}>{item}</button>
 		</Selector>
 	</div>
