@@ -23,6 +23,7 @@
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllApiChat } from '$types/ollama';
 
+ 
     $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
     $: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
