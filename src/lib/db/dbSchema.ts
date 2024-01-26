@@ -8,27 +8,27 @@ import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
 
 export class DataBase extends Dexie {
-	chat!: Table<DbChat>;
-	messages!: Table<DBMessage>;
-	messageStats!: Table<OllResponseType>;
-	settings!: Table<SettingsType>;
-	prompts!: Table<PromptType>;
-	user!: Table<UserType>;
+    chat!: Table<DbChat>;
+    messages!: Table<DBMessage>;
+    messageStats!: Table<OllResponseType>;
+    settings!: Table<SettingsType>;
+    prompts!: Table<PromptType>;
+    user!: Table<UserType>;
 
-	constructor() {
-		super('woolama');
+    constructor() {
+        super('woolama');
 
-		this.version(1.3).stores({
-			chat: '&chatId, createdAt, dateLastMessage',
-			messageStats: '&messageId, create_at',
-			messages: '&messageId, chatId, createdAt',
-			prompts: '++id, createdAt',
-			settings: '++id,userId',
-			user: '++id, createdAt, email'
-		});
-	}
+        this.version(1.4).stores({
+            chat: '&chatId, createdAt, dateLastMessage',
+            messageStats: '&messageId, create_at',
+            messages: '&messageId, chatId, createdAt',
+            prompts: '++id, createdAt',
+            settings: '++id,userId',
+            user: '++id, createdAt, email',
+        });
+    }
 
-	init() {}
+    init() {}
 }
 
 export const dbase = new DataBase();

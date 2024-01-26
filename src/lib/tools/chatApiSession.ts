@@ -53,7 +53,7 @@ export class ChatApiSession {
      */
     private async setApiChatOptions(options: ChatApiSession['options']) {
         if (this.chatSessionType !== 'chat') return;
-        if (options?.systemPrompt?.content) {
+        if (options?.systemPrompt?.content?.length) {
             // the system prompt can change during the chat session
             const messages = await idbQuery.getMessages(this.chat.chatId);
             const lastSystemMessage = messages.reverse().find((e) => e.role === 'system');
