@@ -38,10 +38,11 @@
         const chatSession = new ChatApiSession($ui.activeChatId);
         await chatSession.initChatSession({
             models: prompter.models,
+            systemPrompt: promptSystem,
             ollamaBody,
         });
         // prompt system, context : usage differs on chatSessionType
-        chatSession.setOptions({ systemPrompt: promptSystem, context: chatSession.chat.context ?? [] });
+        chatSession.setOptions({ context: chatSession.chat.context ?? [] }); //  systemPrompt: promptSystem,
         //
         await chatSession.createSessionMessages(prompter.prompt as string, images);
 
@@ -57,6 +58,7 @@
 
         // listen to sender stream
         sender.onStream = ({ assistantMessage, data }) => {
+            // console.log('onStream', assistantMessage, data);
             chatSession.onMessageStream(assistantMessage, data);
             aiState.set('running');
             // set auto-scroll to false
@@ -67,10 +69,11 @@
             aiState.set('done');
             chatUtils.checkTitle(assistantMessage.chatId);
         };
+
         // Send prompt to api per assistant.message
         await chatSession.assistantsDbMessages.forEach(async (assistantMessage) => {
             sender.setRoleAssistant(assistantMessage);
-            sender.sendChatMessage(chatSession.userChatMessage);
+            sender.sendChatMessage(chatSession.userChatMessage,chatSession.previousMessages);
         });
 
         // reset prompt

@@ -1,6 +1,6 @@
 import { idbQuery } from '$lib/db/dbQuery';
 import type { DBMessage, DbChat, MessageImageType, PromptType } from '$types/db';
-import type { OllChatMessage, OllResponseType } from '$types/ollama';
+import { OllChatMessageRole, type OllChatMessage, type OllResponseType } from '$types/ollama';
 import { engine } from './engine';
 
 /**
@@ -23,6 +23,7 @@ export class ChatApiSession {
     } = {};
 
     private chatId!: DbChat['chatId'] | undefined;
+    public previousMessages: DBMessage[] = [];
 
     /**
      * Creates a new ChatSession instance.
@@ -48,27 +49,28 @@ export class ChatApiSession {
     }
 
     /**
+     * Sets the previous messages for the chat.
+     * transforms the array of DbMessages to an array of OllChatMessage
+     * @returns A promise that resolves when the previous messages are set.
+     */
+    private async setPreviousMessages(): Promise<Partial<DBMessage>[]> {
+        await idbQuery.getMessages(this.chat.chatId).then(
+            (chatList) =>
+                (this.previousMessages = chatList.map((e) => ({
+                    content: e.content,
+                    role: e.role,
+                    images: e?.images?.base64,
+                })))
+        );
+        return this.previousMessages;
+    }
+
+    /**
      * Options setter for mode api/chat
      * @param options  - The chat options to set.
      */
     private async setApiChatOptions(options: ChatApiSession['options']) {
         if (this.chatSessionType !== 'chat') return;
-        if (options?.systemPrompt?.content?.length) {
-            // the system prompt can change during the chat session
-            const messages = await idbQuery.getMessages(this.chat.chatId);
-            const lastSystemMessage = messages.reverse().find((e) => e.role === 'system');
-            // find the last message of type 'system'
-            if (lastSystemMessage?.content != options?.systemPrompt?.content) {
-                // if the last system message is different from the new one
-                await idbQuery.insertMessage(this.chat.chatId, {
-                    chatId: this.chat.chatId,
-                    prompt: options.systemPrompt.content,
-                    content: options.systemPrompt.content,
-                    role: 'system',
-                    status: 'done',
-                });
-            }
-        }
     }
 
     /**
@@ -79,6 +81,7 @@ export class ChatApiSession {
     public async createSessionMessages(content: string, images?: MessageImageType) {
         await this.createUserMessage(content, images);
         await this.createAssistantMessage();
+        await this.setPreviousMessages();
     }
     /**
      * Creates a user message in the chat session.
@@ -98,11 +101,11 @@ export class ChatApiSession {
             model: this.chat.models[0],
         });
         // format message for chat send
-        this.userChatMessage = engine.translateKeys<DBMessage, OllChatMessage>(this.userDbMessage, {
-            content: 'prompt',
-            role: 'role',
-            'images.base64': 'images',
-        });
+        this.userChatMessage = {
+            prompt: content,
+            role: OllChatMessageRole.USER,
+            images: images?.base64 ? [images?.base64] : undefined,
+        };
     }
 
     private async createAssistantMessage() {

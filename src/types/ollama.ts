@@ -8,7 +8,7 @@ export enum OllamaFormatKeys {
 export type OllamaFormat = keyof typeof OllamaFormatKeys | '' | string;
 
 // OllChatMessage
-enum OllChatMessageRole {
+export enum OllChatMessageRole {
     USER = 'user',
     SYSTEM = 'system',
     ASSISTANT = 'assistant',

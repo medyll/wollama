@@ -68,7 +68,7 @@ export class OllamaApi {
 
         const defaultOptions: OllApiChat = {
             model: config?.defaultModel,
-            messages: [{ role: 'system', prompt: config.system_prompt }, ...messages, message],
+            messages: [...messages, message], // { role: 'system', prompt: config.system_prompt }
             format: ollApiParams?.format,
             template: ollApiParams?.template ?? null,
             stream: ollApiParams?.stream ?? true,

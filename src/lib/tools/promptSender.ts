@@ -46,8 +46,6 @@ export class PromptMaker {
     constructor(chatId: string, apiChatParams = {} as PromptMaker['apiChatParams']) {
         this.chatId = chatId;
         this.apiChatParams = apiChatParams as OllApiChat;
-        // retrieve all previous sent messages
-        this.setPreviousMessages();
     }
 
     /**
@@ -63,30 +61,6 @@ export class PromptMaker {
     onEnd!: (args: SenderCallback<CallbackDataType>) => void;
 
     /**
-     * Sets the previous messages for the chat.
-     * transforms the array of DbMessages to an array of OllChatMessage
-     * @returns A promise that resolves when the previous messages are set.
-     */
-    private async setPreviousMessages(): Promise<DBMessage[]> {
-        await idbQuery.getMessages(this.chatId).then(
-            (chatList) =>
-                (this.previousMessages = chatList.map((e) =>
-                    engine.translateKeys<DBMessage, OllChatMessage>(
-                        e,
-                        {
-                            content: 'prompt',
-                            role: 'role',
-                            'images.base64': 'images',
-                        },
-                        false
-                    )
-                ))
-        );
-
-        return this.previousMessages;
-    }
-
-    /**
      * Sets the assistant message for the chat.
      * @param message - The assistant message.
      */
@@ -100,11 +74,9 @@ export class PromptMaker {
      * Sends a chat message and play a callback
      * @param userMessage - The user message to send.
      */
-    async sendChatMessage(userMessage: OllChatMessage): Promise<void> {
+    async sendChatMessage(userMessage: OllChatMessage, previousMessages): Promise<void> {
         if (this.chatSessionType == 'chat') {
             // send chat user message
-            const previousMessages = await this.setPreviousMessages();
-
             OllamaApi.chat(userMessage, previousMessages, this.apiChatParams, async (data) => {
                 this.onResponseMessageStream({
                     assistantMessage: this.assistantMessage,
