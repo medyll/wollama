@@ -18,12 +18,11 @@
     import Images from './input/Images.svelte';
     import List from '$components/fragments/List.svelte';
     import { liveQuery } from 'dexie';
-    import Bottomer from '$components/ui/Bottomer.svelte'; 
+    import Bottomer from '$components/ui/Bottomer.svelte';
     import { connectionChecker } from '$lib/stores/connection';
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllApiChat } from '$types/ollama';
 
- 
     $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
     $: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
@@ -41,8 +40,6 @@
             systemPrompt: promptSystem,
             ollamaBody,
         });
-        // prompt system, context : usage differs on chatSessionType
-        chatSession.setOptions({ context: chatSession.chat.context ?? [] }); //  systemPrompt: promptSystem,
         //
         await chatSession.createSessionMessages(prompter.prompt as string, images);
 
@@ -52,13 +49,10 @@
         // set ai state to running
         aiState.set('running');
         //
-        const sender = new PromptMaker(chatSession.chat.chatId, ollamaBody);
-        // prompt system, context : usage differs on chatSessionType
-        sender.setOptions(chatSession.options);
+        const sender = new PromptMaker(ollamaBody);
 
         // listen to sender stream
-        sender.onStream = ({ assistantMessage, data }) => {
-            // console.log('onStream', assistantMessage, data);
+        sender.onStream = ({ assistantMessage, data }) => { 
             chatSession.onMessageStream(assistantMessage, data);
             aiState.set('running');
             // set auto-scroll to false
@@ -73,7 +67,7 @@
         // Send prompt to api per assistant.message
         await chatSession.assistantsDbMessages.forEach(async (assistantMessage) => {
             sender.setRoleAssistant(assistantMessage);
-            sender.sendChatMessage(chatSession.userChatMessage,chatSession.previousMessages);
+            sender.sendChatMessage(chatSession.userChatMessage, chatSession.previousMessages);
         });
 
         // reset prompt
@@ -86,7 +80,7 @@
     }
 
     function submitHandler() {
-        sendPrompt($prompter,$ollamaBodyStore);
+        sendPrompt($prompter, $ollamaBodyStore);
     }
 
     function keyPressHandler(e: KeyboardEvent) {

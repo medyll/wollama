@@ -1,7 +1,6 @@
 import { idbQuery } from '$lib/db/dbQuery';
 import type { DBMessage, DbChat, MessageImageType, PromptType } from '$types/db';
 import { OllChatMessageRole, type OllChatMessage, type OllResponseType } from '$types/ollama';
-import { engine } from './engine';
 
 /**
  * Represents a class that manages a chat session.
@@ -43,11 +42,6 @@ export class ChatApiSession {
         this.chat = await idbQuery.initChat(this.chatId, chatData as DbChat);
     }
 
-    public async setOptions(options: ChatApiSession['options']): Promise<any> {
-        this.options = options;
-        await this.setApiChatOptions(options);
-    }
-
     /**
      * Sets the previous messages for the chat.
      * transforms the array of DbMessages to an array of OllChatMessage
@@ -63,14 +57,6 @@ export class ChatApiSession {
                 })))
         );
         return this.previousMessages;
-    }
-
-    /**
-     * Options setter for mode api/chat
-     * @param options  - The chat options to set.
-     */
-    private async setApiChatOptions(options: ChatApiSession['options']) {
-        if (this.chatSessionType !== 'chat') return;
     }
 
     /**
@@ -94,7 +80,7 @@ export class ChatApiSession {
         this.userDbMessage = await idbQuery.insertMessage(this.chat.chatId, {
             chatId: this.chat.chatId,
             content,
-            images: images,
+            images,
             role: 'user',
             status: 'done',
             //
