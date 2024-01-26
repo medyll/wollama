@@ -59,6 +59,7 @@ export class OllamaApi {
     static async chat(
         message: ChatCompletionMessage,
         messages: ChatCompletionMessage[] = [],
+        systemPrompt: string | null = null,
         ollApiParams: Partial<OllApiChat>,
         hook?: (data: OllResponseType) => void
     ) {
@@ -66,6 +67,10 @@ export class OllamaApi {
         // default params
         const ollamaOptions = get(ollamaApiMainOptionsParams);
 
+        if (systemPrompt ?? config?.system_prompt) {
+            let system = { role: 'system', content: systemPrompt ?? config?.system_prompt };
+            messages = [system, ...messages] as ChatCompletionMessage[];
+        }
         const defaultOptions: OllApiChat = {
             model: config?.defaultModel,
             messages: [...messages, message], // { role: 'system', prompt: config.system_prompt }

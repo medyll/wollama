@@ -23,18 +23,28 @@
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllApiChat } from '$types/ollama';
 
+    let chatSession: ChatApiSession;
+
     $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
     $: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
     $: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
+    $: if ($ui.activeChatId)
+        idbQuery.getChat($ui.activeChatId).then((chat) => {
+            if (chat && chat?.systemPrompt?.content != $prompter?.promptSystem?.content) {
+                $prompter.promptSystem = chat.systemPrompt
+            }
+        });
+
+
     async function sendPrompt(prompter: PrompterType, ollamaBody: OllApiChat) {
         //
         const { images, promptSystem } = { ...prompter };
 
         // init chatSession
-        const chatSession = new ChatApiSession($ui.activeChatId);
+        chatSession = new ChatApiSession($ui.activeChatId);
         await chatSession.initChatSession({
             models: prompter.models,
             systemPrompt: promptSystem,
@@ -52,7 +62,7 @@
         const sender = new PromptMaker(ollamaBody);
 
         // listen to sender stream
-        sender.onStream = ({ assistantMessage, data }) => { 
+        sender.onStream = ({ assistantMessage, data }) => {
             chatSession.onMessageStream(assistantMessage, data);
             aiState.set('running');
             // set auto-scroll to false
@@ -67,7 +77,7 @@
         // Send prompt to api per assistant.message
         await chatSession.assistantsDbMessages.forEach(async (assistantMessage) => {
             sender.setRoleAssistant(assistantMessage);
-            sender.sendChatMessage(chatSession.userChatMessage, chatSession.previousMessages);
+            sender.sendChatMessage(chatSession.userChatMessage, chatSession.previousMessages, promptSystem.content);
         });
 
         // reset prompt

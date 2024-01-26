@@ -62,9 +62,9 @@ export class PromptMaker {
      * Sends a chat message and play a callback
      * @param userMessage - The user message to send.
      */
-    async sendChatMessage(userMessage: OllChatMessage, previousMessages): Promise<void> {
+    async sendChatMessage(userMessage: OllChatMessage, previousMessages, systemPrompt?: string): Promise<void> {
         // send chat user message
-        return OllamaApi.chat(userMessage, previousMessages, this.apiChatParams, async (data) => {
+        return OllamaApi.chat(userMessage, previousMessages, systemPrompt, this.apiChatParams, async (data) => {
             this.onResponseMessageStream({
                 assistantMessage: this.assistantMessage,
                 data,
