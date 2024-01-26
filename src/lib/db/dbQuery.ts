@@ -35,6 +35,8 @@ export class idbQuery {
     static async deleteChat(chatId?: string): Promise<string> {
         if (!chatId) throw new Error('chatId is required');
         await dbase.chat.delete(chatId);
+        const messages = await idbQuery.getMessages(chatId);
+        dbase.messages.bulkDelete(messages.map((e) => e.messageId));
         return chatId;
     }
 
