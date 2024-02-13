@@ -44,6 +44,7 @@ export class idbQuery {
         if (!chatId) throw new Error('chatId is required');
 
         await dbase.chat.update(chatId, chatData);
+        return { chatId, ...chatData };
     }
 
     static async initChat(activeChatId?: string, chatData: DbChat = {} as DbChat): Promise<DbChat> {

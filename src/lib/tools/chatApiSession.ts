@@ -40,6 +40,12 @@ export class ChatApiSession {
      */
     public async initChatSession(chatData: Partial<DbChat> = {} as DbChat) {
         this.chat = await idbQuery.initChat(this.chatId, chatData as DbChat);
+        this.chatId = this.chat.chatId;
+    }
+
+    public async updateChatSession(chatData: Partial<DbChat> = {} as DbChat) {
+        this.chat = await idbQuery.updateChat(this.chatId, chatData as DbChat);
+        this.chatId = this.chat.chatId;
     }
 
     /**

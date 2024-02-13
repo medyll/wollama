@@ -23,7 +23,7 @@
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllApiChat } from '$types/ollama';
 
-    let chatSession: ChatApiSession;
+    let chatSession: ChatApiSession = new ChatApiSession(undefined);
 
     $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
@@ -31,30 +31,21 @@
 
     $: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
-    $: if ($ui.activeChatId)
+    $: if ($ui.activeChatId) {
         idbQuery.getChat($ui.activeChatId).then((chat) => {
             if (chat && chat?.systemPrompt?.content != $prompter?.promptSystem?.content) {
-                $prompter.promptSystem = chat.systemPrompt
+                $prompter.promptSystem = chat.systemPrompt;
+            }
+            if (chat && chat.ollamaBody) {
             }
         });
+    }
 
-
-    async function sendPrompt(prompter: PrompterType, ollamaBody: OllApiChat) {
+    async function sendPrompt(prompter: PrompterType, ollamaBody: OllApiChat, chatSession: ChatApiSession) {
         //
         const { images, promptSystem } = { ...prompter };
-
-        // init chatSession
-        chatSession = new ChatApiSession($ui.activeChatId);
-        await chatSession.initChatSession({
-            models: prompter.models,
-            systemPrompt: promptSystem,
-            ollamaBody,
-        });
         //
         await chatSession.createSessionMessages(prompter.prompt as string, images);
-
-        // set active chat
-        ui.setActiveChatId(chatSession.chat.chatId);
 
         // set ai state to running
         aiState.set('running');
@@ -85,12 +76,22 @@
         $prompter.images = undefined;
         // set auto-scroll to true
         ui.setAutoScroll(chatSession.chat.chatId, true);
-        // relocation without navigation
-        window.history.replaceState(history.state, '', `/chat/${chatSession.chat.chatId}`);
     }
 
-    function submitHandler() {
-        sendPrompt($prompter, $ollamaBodyStore);
+    async function submitHandler() {
+        if (!$ui.activeChatId) {
+            await chatSession.initChatSession();
+            // set active chat
+            ui.setActiveChatId(chatSession.chat.chatId);
+            // relocation without navigation
+            window.history.replaceState(history.state, '', `/chat/${chatSession.chat.chatId}`);
+        }
+        await chatSession.updateChatSession({
+            models: $prompter.models,
+            systemPrompt: $prompter.promptSystem,
+            $ollamaBodyStore,
+        });
+        sendPrompt($prompter, $ollamaBodyStore, chatSession);
     }
 
     function keyPressHandler(e: KeyboardEvent) {
