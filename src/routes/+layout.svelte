@@ -47,7 +47,7 @@
 		if(!users.length) {
 			idbQuery.insertUser({name: 'user' });
 		}
-
+		/* 
 		connectionChecker.subscribe(async(state) => {
 			if (state.connectionStatus === 'error') {
 				notifierState.notify('error', 'state.connectionRetryTimeout', 'conn-status');
@@ -56,7 +56,7 @@
 				models = (await apiCall.listModels()) ?? [];
 				loadModels(models);
 			}
-		});
+		}); */
 	});
 
 	$: if($settings.ollamaModels){ 
