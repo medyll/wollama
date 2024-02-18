@@ -5,7 +5,7 @@
 	import { engine } from '$lib/tools/engine';
 </script>
 
-<div class="md:hidden flex shadow md:w-full theme-bg-dark">
+<div class="lg:hidden flex shadow lg:w-full theme-bg-dark">
 	<div class="flex-v gap-4 px-4 py-4 theme-bg-dark">
 		<button on:click={async () => ui.showHideMenu()} class="aspect-square">
 			<Icon icon="mdi:menu-{$ui.showMenu ? 'open' : 'close'}" class="md" />
@@ -24,7 +24,7 @@
 	</div>
 </div>
 {#if $ui.showMenu}
-	<div class="md:hidden fixed right-0 left-14 flex-1 theme-bg z-50 h-full shadow">
+	<div class="lg:hidden fixed right-0 left-14 flex-1 theme-bg z-50 h-full shadow">
 		<div class="  mr-2 theme-bg h-full"><Sidebar /></div>
 	</div>
 {/if}
