@@ -30,17 +30,9 @@
 			{value?.title ?? ''}
 		{/await}
 	</div>
-	<button class="btn" on:click={openCloseConfig}>
-		{#if showConfigClose}
-			<Icon icon="mdi:close-circle" class="text-blue lg " style="font-size:1.6em;color:red" />
-		{/if}
-		{$t('settings.configureOllama')}
-	</button>
+	
 	<StatusBar />
 	<button title={$t('ui.userProfile')}>
 		<Icon icon="mdi:account-circle-outline" style="font-size:1.6em" />
-	</button>
-	<button title={$t('ui.settings')} class="borderButton" on:click={() => ui.showHideSettings()}>
-		<Icon icon="mdi:cog-outline" style="font-size:1.6em" />
 	</button>
 </div>

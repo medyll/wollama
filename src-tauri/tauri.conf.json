@@ -10,12 +10,14 @@
     },
     "windows": [
       {
-        "decorations": true,
+        "decorations": false,
         "fullscreen": false,
         "height": 600,
         "resizable": true,
         "title": "wollama",
-        "width": 800
+        "width": 800,
+        "visible": true,
+        "label": "main"
       }
     ]
   },

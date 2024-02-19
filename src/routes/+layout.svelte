@@ -10,6 +10,7 @@
 	import '../styles/app.css';
 	import '../styles/snippets.css';
 	import '../styles/skin.css';
+	import '@unocss/reset/tailwind.css'
 	import { engine } from '$lib/tools/engine';
 	import { onMount } from 'svelte';
 	import { idbQuery } from '$lib/db/dbQuery';
@@ -23,7 +24,7 @@
 	import Opening from '$components/Opening.svelte';
 	import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 	import { OllamaApi } from '$lib/db/ollamaApi';
-
+	import { invoke } from '@tauri-apps/api/tauri'
 	// load models into store
 	async function loadModels(models: Record<string, any>[]) {
 		settings.setSetting('ollamaModels', [...models]);
@@ -40,6 +41,14 @@
 		} catch (e) {
 			console.log(e);
 		}
+
+		try {
+			invoke('close_splashscreen')
+		} catch (e) {
+			console.log(e);
+			
+		}
+		
 		loadModels(models);
 		ollamaApiMainOptionsParams.init();
 		engine.checkOllamaEndPoints();

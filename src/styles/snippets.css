@@ -29,3 +29,12 @@
 }
 
 
+column {
+	@apply flex ;
+}
+row {
+	@apply flex flex-col ;
+}
+full {
+	@apply flex-1
+}

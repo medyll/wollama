@@ -87,6 +87,7 @@
 			overflow: hidden;
 			z-index: 30;
 			flex-shrink: 1;
+			border-right: 1px solid var(--cfab-input-border-color);
 		}
 		.application-sideBar-title {
 			color: var(--cfab-soft-title-text-color);
