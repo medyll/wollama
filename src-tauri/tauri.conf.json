@@ -14,12 +14,14 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "wollama",
+        "title": "wollama chat",
         "width": 800,
         "visible": true,
-        "label": "main"
+        "label": "main",
+        "transparent": false
       }
-    ]
+    ],
+    "withGlobalTauri": true
   },
   "build": {
     "beforeBuildCommand": "npm run build",

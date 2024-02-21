@@ -8,7 +8,7 @@
 :root,
 :root.light {
 	--cfab-foreground: #1a1a1a;
-	--cfab-bg: #f1f1f1;
+	--cfab-bg: rgb(241, 241, 241, 0.2);
 
 	/** paper */
 	--cfab-paper-bg-color: var(--cfab-bg-darken-10);
@@ -29,8 +29,8 @@
 
 :root {
 	/* Assombrir --cfab-primary */
-	--cfab-primary-darken-0: color-mix(in srgb, var(--cfab-primary), black 0%);
-	--cfab-primary-darken-10: color-mix(in srgb, var(--cfab-primary), black 10%);
+	--cfab-primary-darken-0: color-mix(in srgb, var(--cfab-primary), #999 0%);
+	--cfab-primary-darken-10: color-mix(in srgb, var(--cfab-primary), #999 10%);
 	--cfab-primary-darken-20: color-mix(in srgb, var(--cfab-primary), black 20%);
 	--cfab-primary-darken-30: color-mix(in srgb, var(--cfab-primary), black 30%);
 	--cfab-primary-darken-40: color-mix(in srgb, var(--cfab-primary), black 40%);
@@ -111,7 +111,7 @@
 :root {
 	/** darkens --cfab-bg */
 	--cfab-bg-darken-0: color-mix(in srgb, var(--cfab-bg), black 0%);
-	--cfab-bg-darken-10: color-mix(in srgb, var(--cfab-bg), black 10%);
+	--cfab-bg-darken-10: color-mix(in srgb, var(--cfab-bg), #ededed 10%);
 	--cfab-bg-darken-20: color-mix(in srgb, var(--cfab-bg), black 20%);
 	--cfab-bg-darken-30: color-mix(in srgb, var(--cfab-bg), black 30%);
 	--cfab-bg-darken-40: color-mix(in srgb, var(--cfab-bg), black 40%);

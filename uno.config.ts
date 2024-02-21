@@ -1,16 +1,6 @@
 // uno.config.ts
-import { defineConfig } from 'unocss';
-import presetTagify from '@unocss/preset-tagify';
-import presetAttributify from '@unocss/preset-attributify';
+import { defineConfig, presetWind, presetTagify, presetAttributify } from 'unocss';
 
 export default defineConfig({
-    presets: [
-        presetAttributify({
-            /* preset options */
-        }),
-        presetTagify({
-            /* options */
-        }),
-        // ...other presets
-    ],
+    presets: [presetAttributify({}), presetTagify({}), presetWind()],
 });

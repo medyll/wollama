@@ -6,7 +6,7 @@
 </script>
 
 <div class="lg:hidden flex shadow lg:w-full theme-bg-dark">
-	<div class="flex-v gap-4 px-4 py-4 theme-bg-dark">
+	<div class="flex-v gap-4 px-4 py-2 theme-bg-dark">
 		<button on:click={async () => ui.showHideMenu()} class="aspect-square">
 			<Icon icon="mdi:menu-{$ui.showMenu ? 'open' : 'close'}" class="md" />
 		</button>

@@ -22,9 +22,9 @@
 	<div>
 		<progress hidden={progress === 0} class="w-full" value={completed ?? 0} max={total ?? 0}></progress>
 	</div>
-	<div>
+	<!-- <div>
 		{$t(`status.${$connectionChecker.connectionStatus}`)}
-	</div>
+	</div> -->
 	<div><Icon {icon} class="md" /></div>
 	<div>
 		{#if printCountDown}

@@ -1,6 +1,6 @@
 
-use tauri::{Manager,  WebviewWindow};
-
+use tauri::{Manager};
+use window_vibrancy::{apply_blur, apply_vibrancy, NSVisualEffectMaterial};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -8,11 +8,18 @@ pub fn run() {
     .setup(|app| {
       let window = app.get_webview_window("main").unwrap();
 
+      /* #[cfg(target_os = "macos")]
+      apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
+        .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+
+      #[cfg(target_os = "windows")]
+            apply_mica(&window, dark)
+              .expect("Unsupported platform! 'apply_mica' is only supported on Windows"); */
+            
       Ok(())
     })
-        .invoke_handler(tauri::generate_handler![close_splashscreen])
-        .run(tauri::generate_context!())
-        .expect("failed to run app");
+    .run(tauri::generate_context!())
+    .expect("failed to run app");
 }
 
 
@@ -26,17 +33,6 @@ async fn close_splashscreen(window: tauri::WebviewWindow) {
   window.get_webview_window("main").unwrap().show().unwrap();
 } 
 
-
-/* .setup(|app| {
-      let window = app.get_webview_window("main").unwrap();
-      #[cfg(target_os = "macos")]
-apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None).expect("Unsupported platform!");
-
-#[cfg(target_os = "windows")]
-apply_blur(&window, Some((18, 18, 18, 125))).expect("Unsupported platform");
-
- Ok(())
-    }) */
 
 
     
