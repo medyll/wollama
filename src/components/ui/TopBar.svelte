@@ -25,17 +25,17 @@
     };
 </script>
 
-<div class="application-topBar">
+<div  data-tauri-drag-region class="titlebar application-topBar"  >
     <full />
     <div class="text-center soft-title">
         {#await chat then value}
             {value?.title ?? ''}
         {/await}
     </div>
-
+<input value="red" class="input" />
     <StatusBar />
     <full />
-    <div data-tauri-drag-region class="titlebar">
+    <div>
         <button on:click={()=>{appWindow.minimize}} class="titlebar-button" id="titlebar-minimize">
             <Icon icon="fluent-mdl2:chrome-minimize" alt="minimize" />
         </button>
@@ -51,7 +51,6 @@
 
 <style lang="postcss">
     .titlebar {
-        height: 34px;
         user-select: none;
         display: flex;
         justify-content: flex-end;
@@ -59,8 +58,7 @@
         left: 0;
         right: 0;
         z-index: 9000;
-        gap: 0;
-        position:absolute;
+        gap: 0; 
 
         button {
             display: inline-flex;

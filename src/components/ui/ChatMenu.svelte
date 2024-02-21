@@ -20,7 +20,7 @@
     };
 </script>
 
-<List class="flex flex-col flex-v gap-2" data={$chatMenuList ?? []} let:item>
+<List  class="flex flex-col flex-v gap-2" data={$chatMenuList ?? []} let:item>
     <div class="font-bold whitespace-nowrap text-ellipsis soft-title">
         {$t(getTimeTitle(item.code))}
     </div>
@@ -90,7 +90,7 @@
         }
     }
 
-    li.listItemTitle {
+    .listItemTitle {
         position: sticky;
         margin-top: 0px !important;
         top: 0px;
@@ -110,7 +110,7 @@
         z-index: 1;
     }
 
-    li.listItem {
+    .listItem {
         @include data-hover;
         @include data-selected;
         @include ui-density-presets;

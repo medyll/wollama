@@ -45,8 +45,10 @@
     </div>
     <hr class="ml-auto w-24" />
     <div class="application-sideBar-title px-3">{$t('ui.myChats')}</div>
-    <div class="application-sideBar-content paper flex-1 w-full">
-        <ChatList />
+    <div class="application-sideBar-content  flex-1 w-full">
+        <ChatList >
+        what
+        </ChatList>
     </div>
     <column>
         <button class="btn" on:click={openCloseConfig}>

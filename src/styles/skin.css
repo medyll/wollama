@@ -78,21 +78,21 @@
     .application {
         color: var(--cfab-foreground);
         /* background-color: var(--cfab-input-background-color); */
-		background-image: var(--cfab-gradient);
+        background-image: var(--cfab-gradient);
         display: flex;
         width: 100%;
         height: 100%;
         overflow: hidden;
 
         .application-sideBar {
-            @apply hidden w-[280px] lg:block;
-            @apply flex flex-col;
-            gap:1rem;
+            @apply hidden w-[280px] lg:block h-full;
+            @apply flex flex-col flex-shrink;
+            @apply overflow-hidden;
+            @apply shadow-lg;
+            gap: 1rem;
             height: 100%;
             transition: width 0.2s ease-in-out;
-            overflow: hidden;
             z-index: 30;
-            flex-shrink: 1;
             border-right: 1px solid var(--cfab-input-border-color);
         }
         .application-sideBar-title {
@@ -115,6 +115,7 @@
     }
 
     .application-content {
+        user-select: none;
         display: flex;
         flex-direction: column;
         flex: 1;
@@ -130,6 +131,8 @@
             left: 1rem;
             gap: 1rem;
             margin-top: 0px;
+            height: 34px;
+            z-index: 9000;
         }
 
         .application-main {

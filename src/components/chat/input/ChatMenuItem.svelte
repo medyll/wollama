@@ -69,17 +69,19 @@
     .active {
         @apply font-bold; 
 		@apply shadow-sm;
+            border-radius: 4px;
+		 background-color: rgba(255, 255, 255, 0.1);
     }
 
     .active {
         .listItemChip {
             position: absolute;
-            height: 75%;
+            height: 55%;
             width: 4px;
-            background-color: blue;
+            background-color: #005fb8;
             border-radius: 8px;
             left: 2px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid 005fb8;
         }
     }
 </style>
