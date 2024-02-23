@@ -18,7 +18,9 @@
         "width": 800,
         "visible": true,
         "label": "main",
-        "transparent": false
+        "transparent": true,
+        "shadow": true,
+        "visibleOnAllWorkspaces": true
       }
     ],
     "withGlobalTauri": true

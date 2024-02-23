@@ -9,7 +9,18 @@ import type { OllResponseType } from '$types/ollama';
 export async function askOllama(prompt: string, model: string) {}
 
 export async function guessChatTitle(message: string): Promise<OllResponseType> {
-    const prompt = `Generate a very short title for this content, excluding the term 'title.', never write title. Then, reply with only a few worlds, no more than six words. here is the content to resume shortly:  ${message}`;
+    const prompt = `You are an automated system. 
+    Your role is to Generate a very short title from chat conversations. 
+    The title will resume the topic, the subject or the category of the conversation.
+    create the  title a human friendly way.
+    create the title with the category and general topic of the conversation.
+    The created title should be very short.The title should not be too long.
+    Don't   write the word title. 
+    Don't say hello, only return the created title. don't talk, don't say things like "sure, here is the stuff".
+    Don not put the title in quotes or double quotes.    
+    Reply with not less then 2 words and no more than five words, it's mandatory
+    Here is the conversation to resume very shortly, not less then 2 words and no more than five words :
+    ${message}`;
 
     return await OllamaApi.generate(prompt, { stream: false }, () => {});
 }
@@ -19,18 +30,19 @@ export class chatUtils {
         const chat = await idbQuery.getChat(chatId);
         const chatMessages = await idbQuery.getMessages(chatId);
 
-        if (!chat?.title || chat?.title === 'New Chat') {
-            if (chatMessages.length > 2 && chatMessages.length < 4) {
-                const resume = chatMessages
-                    .slice(0, 2)
-                    .map((message: DBMessage) => message.content)
-                    .join('\n');
+        //if (!chat?.title || chat?.title === 'New Chat') {
+        //if (chatMessages.length > 2 && chatMessages.length < 4) {
+        const resume = chatMessages
+            .slice(0, 6)
+            .map((message: DBMessage) => message.content)
+            .join('\n\n\n-------\n\n\n');
 
-                const res = await guessChatTitle(resume);
+        const res = await guessChatTitle(resume);
+        console.log(res);
 
-                if (res?.response !== '') idbQuery.updateChat(chatId, { title: res.response });
-            }
-        }
+        if (res?.response !== '') idbQuery.updateChat(chatId, { title: res.response });
+        //}
+        // }
     }
 
     static getMessageDataObject(message: Partial<DBMessage>): DBMessage {

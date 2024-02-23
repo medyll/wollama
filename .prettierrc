@@ -15,5 +15,7 @@
 			}
 		}
 	],
-	"singleAttributePerLine": false
+	"singleAttributePerLine": false,
+	"bracketSameLine": true,
+	"jsxBracketSameLine": true
 }

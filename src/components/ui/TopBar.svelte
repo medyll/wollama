@@ -7,7 +7,9 @@
     import { dbase } from '$lib/db/dbSchema';
     import { idbQuery } from '$lib/db/dbQuery';
     import { page } from '$app/stores';
-    import { appWindow } from '@tauri-apps/api/window';
+
+import { Window , getCurrent} from '@tauri-apps/api/window';
+import { Webview } from '@tauri-apps/api/webview';
 
     new Date().getSeconds();
 
@@ -25,28 +27,44 @@
     };
 </script>
 
-<div  data-tauri-drag-region class="titlebar application-topBar"  >
+<div data-tauri-drag-region class="titlebar application-topBar">
     <full />
     <div class="text-center soft-title">
         {#await chat then value}
             {value?.title ?? ''}
         {/await}
     </div>
-<input value="red" class="input" />
-    <StatusBar />
+    <!-- <input  type="text"  class="input tight" /> -->
     <full />
-    <div>
-        <button on:click={()=>{appWindow.minimize}} class="titlebar-button" id="titlebar-minimize">
+    <StatusBar /> 
+        <button
+            on:click={() => {
+                getCurrent().minimize();
+            }}
+            class="titlebar-button"
+            id="titlebar-minimize"
+        >
             <Icon icon="fluent-mdl2:chrome-minimize" alt="minimize" />
         </button>
-        <button on:click={()=>{appWindow.toggleMaximize}} class="titlebar-button" id="titlebar-maximize">
+        <button
+            on:click={() => {
+                getCurrent().toggleMaximize();
+            }}
+            class="titlebar-button"
+            id="titlebar-maximize"
+        >
             <Icon icon="fluent-mdl2:chrome-restore" alt="restore" />
             <!-- <img src="https://api.iconify.design/mdi:window-maximize.svg" alt="maximize" /> -->
         </button>
-        <button on:click={()=>{appWindow.close}} class="titlebar-button titlebar-button-close" id="titlebar-close">
+        <button
+            on:click={() => {
+                getCurrent().close() 
+                            }}
+            class="titlebar-button titlebar-button-close"
+            id="titlebar-close"
+        >
             <Icon icon="fluent-mdl2:chrome-close" alt="close" />
-        </button>
-    </div>
+        </button> 
 </div>
 
 <style lang="postcss">
@@ -58,15 +76,15 @@
         left: 0;
         right: 0;
         z-index: 9000;
-        gap: 0; 
-
+        gap: 0;
+        position: relative;
         button {
             display: inline-flex;
             justify-content: center;
             align-items: center;
             width: 45px;
             height: 100%;
-                transition: all 0.2s;
+            transition: all 0.2s;
 
             &:hover {
                 background: #ededed;

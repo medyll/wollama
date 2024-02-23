@@ -1,4 +1,5 @@
 <script lang="ts">
+    import 'virtual:uno.css';
     import { page } from '$app/stores';
     import Settings from '$components/settings/Settings.svelte';
     import Modal from '$components/ui/Modal.svelte';
@@ -23,7 +24,7 @@
     import { connectionChecker } from '$lib/stores/connection';
     import Opening from '$components/Opening.svelte';
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-    import { OllamaApi } from '$lib/db/ollamaApi';
+    import { OllamaApi } from '$lib/db/ollamaApi'; 
 
     // load models into store
     async function loadModels(models: Record<string, any>[]) {
@@ -65,6 +66,7 @@
                 loadModels(models);
             }
         });
+
     });
 
     $: if ($settings.ollamaModels) {
@@ -81,12 +83,13 @@
     } else {
         ui.setActiveChatId();
     }
+
+
 </script>
 
 <svelte:head>
     <title>wOOllama !</title>
 </svelte:head>
-
 
 <Opening>
     <div class="application">

@@ -22,11 +22,8 @@
 
     .paper {
         @apply backdrop-opacity-10 backdrop-blur-3xl;
-        border-radius: 0.5rem;
-        padding: 1rem 0.5rem;
         border-color: var(--cfab-paper-border-color);
         background-color: var(--cfab-paper-bg-color);
-
         backdrop-filter: blur(3px);
     }
 
@@ -85,23 +82,25 @@
         overflow: hidden;
 
         .application-sideBar {
-            @apply hidden w-[280px] lg:block h-full;
-            @apply flex flex-col flex-shrink;
+            @apply hidden lg:w-[280px] lg:flex h-full;
+            @apply  flex-col flex-shrink;
             @apply overflow-hidden;
             @apply shadow-lg;
-            gap: 1rem;
+            gap: 0.5rem;
             height: 100%;
-            transition: width 0.2s ease-in-out;
+            transition: width 0.1s ease-in-out;
             z-index: 30;
             border-right: 1px solid var(--cfab-input-border-color);
+            background-color: var(--cfab-paper-bg-color);
         }
         .application-sideBar-title {
+            @apply flex items-center justify-end;
             color: var(--cfab-soft-title-text-color);
             text-align: right;
         }
 
         .application-sideBar-content {
-            max-height: 100%;
+            @apply px-2 flex-1 w-full;
             overflow-y: auto;
         }
     }
@@ -166,7 +165,7 @@
             background: var(--cfab-input-bg-color);
             color: var(--cfab-input-foreground-color);
 
-            transition: all 0.3s ease-in-out;
+            transition: all 0.2s ease-in-out;
 
             white-space: pre-wrap;
             overflow-wrap: break-word;
@@ -174,7 +173,9 @@
             &.naked {
                 border-color: transparent;
             }
-
+            &.tight {
+               padding:0.25rem
+            }
             &:hover {
                 border-color: var(--cfab-input-border-color-focus);
                 box-shadow: var(--cfab-shadow);
