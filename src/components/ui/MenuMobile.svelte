@@ -24,7 +24,7 @@
 	</div>
 </div>
 {#if $ui.showMenu}
-	<div class="lg:hidden fixed right-0 left-14 flex-1 theme-bg z-50 h-full shadow">
+	<div class="lg:hidden fixed right-0 left-14 flex-1 theme-bg z-300 h-full shadow">
 		<div class="  mr-2 theme-bg h-full"><Sidebar /></div>
 	</div>
 {/if}

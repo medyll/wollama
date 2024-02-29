@@ -8,7 +8,7 @@
 :root,
 :root.light {
 	--cfab-foreground: #1a1a1a;
-	--cfab-bg: rgb(241, 241, 241, 1);
+	--cfab-bg: rgb(255, 255, 255, 1);
 
 	/** paper */
 	--cfab-paper-bg-color: var(--cfab-bg-darken-10);
@@ -154,7 +154,7 @@
 /** gradients */
 :root {
 	--cfab-gradient-from: var(--cfab-bg);
-	--cfab-gradient-to: var(--cfab-bg-lighten-5);
+	--cfab-gradient-to: var(--cfab-bg-darken-20);
 	--cfab-gradient: linear-gradient(to bottom, var(--cfab-gradient-from), var(--cfab-gradient-to) 90%);
 }
 

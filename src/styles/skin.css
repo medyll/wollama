@@ -2,7 +2,13 @@
 @tailwind utilities;
 @tailwind base;
 
+
+ 
+
 @layer base {
+
+
+
     .theme-gradient-from {
         background-color: var(--cfab-gradient-from);
     }
@@ -74,8 +80,8 @@
     /* scope gui */
     .application {
         color: var(--cfab-foreground);
-        /* background-color: var(--cfab-input-background-color); */
-        background-image: var(--cfab-gradient);
+        background-color: var(--cfab-bg);
+        /* background-image: var(--cfab-gradient); */
         display: flex;
         width: 100%;
         height: 100%;
@@ -83,7 +89,7 @@
 
         .application-sideBar {
             @apply hidden lg:w-[280px] lg:flex h-full;
-            @apply  flex-col flex-shrink;
+            @apply flex-col flex-shrink;
             @apply overflow-hidden;
             @apply shadow-lg;
             gap: 0.5rem;
@@ -92,6 +98,7 @@
             z-index: 30;
             border-right: 1px solid var(--cfab-input-border-color);
             background-color: var(--cfab-paper-bg-color);
+            background-image: var(--cfab-gradient);
         }
         .application-sideBar-title {
             @apply flex items-center justify-end;
@@ -174,7 +181,7 @@
                 border-color: transparent;
             }
             &.tight {
-               padding:0.25rem
+                padding: 0.25rem;
             }
             &:hover {
                 border-color: var(--cfab-input-border-color-focus);

@@ -31,8 +31,8 @@
 
 <div class="application-sideBar">
     <div class="line-gap-2 px-2" style="height:34px;">
-        <img alt="logo" class="iconify" width="24" src="/assets/svg/lama.svg" style="transform: scaleX(-1)" />
-        <div class="font-semibold text-xl">wOollama !</div>
+        <img alt="logo" class="iconify" width="16" src="/assets/svg/lama.svg" style="transform: scaleX(-1)" />
+        <div class="text-md">wOollama !</div>
         <full />
     </div>
     <div class="px-2 w-full">
@@ -40,23 +40,19 @@
     </div>
     <hr class="ml-auto w-24" />
     <div class="application-sideBar-title">
-        {$t('ui.myChats')}
+        {$t('ui.newChat')}
         <div class="hidden md:flex theme-bg">
             <button style="height:35px;width:35px" title={$t('ui.newChat')} on:click={createChat}>
                 <Icon icon="mdi:chat-plus-outline" class="md" alt={$t('ui.newChat')} />
             </button>
         </div>
     </div>
+    <hr class="ml-auto w-24" />
     <div class="application-sideBar-content">
         <ChatList />
     </div>
+    <hr class="ml-auto w-24" />
     <column>
-        <button class="btn" on:click={openCloseConfig}>
-            {#if showConfigClose}
-                <Icon icon="mdi:close-circle" class="text-blue lg " style="font-size:1.6em;color:red" />
-            {/if}
-            {$t('settings.configureOllama')}
-        </button>
         <full />
         <button title={$t('ui.settings')} class="p2" on:click={() => openSettings()}>
             {$t('ui.settings')} <Icon icon="mdi:cog-outline" style="font-size:1.6em" /> 

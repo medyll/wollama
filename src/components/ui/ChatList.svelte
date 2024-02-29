@@ -38,11 +38,4 @@
 				</button>
 				<a href="/" class="underline" on:click={createChat}>{$t('ui.newChat')}</a> -->
     </div>
-{/if}
-<style>
-    :global(:root) {
-        --theme-color-primary: red;
-        --theme-color-background-alpha: #cccccc;
-        --radius-tiny : 4px;
-    }
-</style>
+{/if} 

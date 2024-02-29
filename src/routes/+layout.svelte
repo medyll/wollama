@@ -24,7 +24,7 @@
     import { connectionChecker } from '$lib/stores/connection';
     import Opening from '$components/Opening.svelte';
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-    import { OllamaApi } from '$lib/db/ollamaApi'; 
+    import { OllamaApi } from '$lib/db/ollamaApi';
 
     // load models into store
     async function loadModels(models: Record<string, any>[]) {
@@ -66,7 +66,6 @@
                 loadModels(models);
             }
         });
-
     });
 
     $: if ($settings.ollamaModels) {
@@ -83,8 +82,6 @@
     } else {
         ui.setActiveChatId();
     }
-
-
 </script>
 
 <svelte:head>
@@ -112,4 +109,12 @@
     :global(svg) {
         color: var(--cfab-icon-color);
     }
+    :global(:root) {
+        --theme-color-foreground-alpha-high: var(--cfab-paper-border-color);
+        --theme-color-background: var(--cfab-bg);
+        --theme-color-primary: var(--cfab-primary);
+        --theme-color-background-alpha: #cccccc;
+        --radius-tiny : 4px;
+    } 
+
 </style>

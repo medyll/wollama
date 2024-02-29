@@ -9,15 +9,16 @@ import type { OllResponseType } from '$types/ollama';
 export async function askOllama(prompt: string, model: string) {}
 
 export async function guessChatTitle(message: string): Promise<OllResponseType> {
-    const prompt = `You are an automated system. 
+    const prompt = `You are an automated system. Not a chat agent. You don't drive conversations, but obey orders.
     Your role is to Generate a very short title from chat conversations. 
     The title will resume the topic, the subject or the category of the conversation.
     create the  title a human friendly way.
     create the title with the category and general topic of the conversation.
     The created title should be very short.The title should not be too long.
-    Don't   write the word title. 
+    Don't   write the word title. Don't say thank you.
     Don't say hello, only return the created title. don't talk, don't say things like "sure, here is the stuff".
     Don not put the title in quotes or double quotes.    
+    Do not explain the task or the program.
     Reply with not less then 2 words and no more than five words, it's mandatory
     Here is the conversation to resume very shortly, not less then 2 words and no more than five words :
     ${message}`;
