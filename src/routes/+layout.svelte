@@ -24,7 +24,7 @@
     import { connectionChecker } from '$lib/stores/connection';
     import Opening from '$components/Opening.svelte';
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-    import { OllamaApi } from '$lib/db/ollamaApi';
+    import { OllamaApi, ollamaConfig } from '$lib/db/ollamaApi';
 
     // load models into store
     async function loadModels(models: Record<string, any>[]) {
@@ -35,10 +35,14 @@
 
     onMount(async () => {
         settings.initSettings();
+        ollamaConfig.options.ollama_endpoint= $settings.ollama_server;
+
         const apiCall = new OllamaApi();
-        let models = [];
+        let models: { models: Record<string, any>[] } = { models: [{}] };
+
         try {
-            models = (await apiCall.listModels()) ?? [];
+            models = (await apiCall.tags()) ?? {};
+            loadModels(models.models);
         } catch (e) {
             console.log(e);
         }
@@ -49,9 +53,9 @@
             console.log(e);
         }
 
-        loadModels(models);
+        //
         ollamaApiMainOptionsParams.init();
-        engine.checkOllamaEndPoints();
+        // engine.checkOllamaEndPoints();
         const users = await idbQuery.getUsers();
         if (!users.length) {
             idbQuery.insertUser({ name: 'user' });
@@ -62,8 +66,8 @@
                 notifierState.notify('error', 'state.connectionRetryTimeout', 'conn-status');
             } else {
                 notifierState.delete('conn-status');
-                models = (await apiCall.listModels()) ?? [];
-                loadModels(models);
+                /* models = (await apiCall.tags()) ?? {};
+               loadModels(models.models); */
             }
         });
     });
@@ -114,7 +118,6 @@
         --theme-color-background: var(--cfab-bg);
         --theme-color-primary: var(--cfab-primary);
         --theme-color-background-alpha: #cccccc;
-        --radius-tiny : 4px;
-    } 
-
+        --radius-tiny: 4px;
+    }
 </style>

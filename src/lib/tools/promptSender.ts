@@ -1,18 +1,20 @@
 import { OllamaApi } from '$lib/db/ollamaApi';
+import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
+import { settings } from '$lib/stores/settings';
 import type { DBMessage } from '$types/db';
-import type { OllChatMessage, OllApiChat, OllOptionsType, OllResponseType, OllamaFormat } from '$types/ollama';
-
+import { type OllamaChatMessage, type OllamaChat, type OllamaOptions, type OllamaResponse, type OllamaFormat, OllamaChatMessageRole } from '$types/ollama';
+import { get } from 'svelte/store';
 export type PromptSenderType = {
     prompt: string;
     context: number[];
     models: string[];
     images?: string[];
-    options: OllOptionsType;
+    options: OllamaOptions;
     format: OllamaFormat;
 };
 
 export type SenderCallback<T> = {
-    data: OllResponseType;
+    data: OllamaResponse;
 } & T;
 
 type CallbackDataType = {
@@ -27,7 +29,7 @@ export class PromptMaker {
     private assistantMessage!: DBMessage;
     public chatSessionType: 'generate' | 'chat' = 'chat';
     //
-    private apiChatParams!: Partial<OllApiChat>;
+    private apiChatParams!: Partial<OllamaChat>;
 
     /**
      * Creates an instance of PromptSender.
@@ -35,7 +37,7 @@ export class PromptMaker {
      * @param apiChatParams - The chat apiChatParams | body.
      */
     constructor(apiChatParams = {} as PromptMaker['apiChatParams']) {
-        this.apiChatParams = apiChatParams as OllApiChat;
+        this.apiChatParams = apiChatParams as OllamaChat;
     }
 
     /**
@@ -62,14 +64,30 @@ export class PromptMaker {
      * Sends a chat message and play a callback
      * @param userMessage - The user message to send.
      */
-    async sendChatMessage(userMessage: OllChatMessage, previousMessages, systemPrompt?: string): Promise<void> {
+    async sendChatMessage(userMessage: OllamaChatMessage, previousMessages: any, systemPrompt?: string): Promise<void> {
+        const config = get(settings);
+        const ollamaOptions = get(ollamaApiMainOptionsParams);
+
+        let system = null;
+        if (systemPrompt ?? config?.system_prompt) {
+            system = { role: OllamaChatMessageRole.ASSISTANT, content: systemPrompt ?? config?.system_prompt };
+        }
         // send chat user message
-        return OllamaApi.chat(userMessage, previousMessages, systemPrompt, this.apiChatParams, async (data) => {
-            this.onResponseMessageStream({
-                assistantMessage: this.assistantMessage,
-                data,
-            });
-        });
+        return OllamaApi.chat(
+            {
+                messages: [system, ...previousMessages, userMessage],
+                model: config?.defaultModel,
+                stream: true,
+                ...this.apiChatParams,
+                options: { ...ollamaOptions, ...this.apiChatParams?.options },
+            } as OllamaChat,
+            async (data) => {
+                this.onResponseMessageStream({
+                    assistantMessage: this.assistantMessage,
+                    data,
+                });
+            }
+        );
     }
 
     /**

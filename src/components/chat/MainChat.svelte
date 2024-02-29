@@ -21,7 +21,7 @@
     import Bottomer from '$components/ui/Bottomer.svelte';
     import { connectionChecker } from '$lib/stores/connection';
     import { ChatApiSession } from '$lib/tools/chatApiSession';
-    import type { OllApiChat } from '$types/ollama';
+    import type { OllamaChat } from '$types/ollama';
 
     let chatSession: ChatApiSession = new ChatApiSession(undefined);
 
@@ -41,7 +41,7 @@
         });
     }
 
-    async function sendPrompt(prompter: PrompterType, ollamaBody: OllApiChat, chatSession: ChatApiSession) {
+    async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
         //
         const { images, promptSystem } = { ...prompter };
         //

@@ -17,7 +17,7 @@
 	function pullModel() {
 		if (addModel.trim() == '') return;
 
-		OllamaApi.pullModel(addModel, (res) => {
+		OllamaApi.pull(addModel, (res) => {
 			$pullModelState = res;
 			pullStatus = res?.status ?? res?.error;
 			if (res.digest) {
@@ -28,7 +28,7 @@
 	}
 
 	function deleteModel(model: string) {
-		OllamaApi.deleteModel(model.trim())
+		OllamaApi.delete(model.trim())
 			.then(async () => {
 				notifierState.notify('success', $t('settings.delete_model_success'), 'delete-model');
 				let models = (await ollamaFetcher.listModels()) ?? [];

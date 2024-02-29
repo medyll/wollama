@@ -104,6 +104,7 @@
 		"langchain": "^0.0.200",
 		"marked": "^11.0.0",
 		"marked-highlight": "^2.0.9",
+		"ollama": "^0.4.9",
 		"ollama-node": "^0.1.27",
 		"prismjs": "^1.29.0",
 		"svelte-loading-skeleton": "^1.0.1",

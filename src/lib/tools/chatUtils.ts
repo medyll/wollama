@@ -4,11 +4,15 @@ import { get } from 'svelte/store';
 import { OllamaApi } from '../db/ollamaApi';
 import { settings } from '$lib/stores/settings';
 import { idbQuery } from '$lib/db/dbQuery';
-import type { OllResponseType } from '$types/ollama';
+import type { OllApiGenerate, OllamaResponse } from '$types/ollama';
+import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 
 export async function askOllama(prompt: string, model: string) {}
 
-export async function guessChatTitle(message: string): Promise<OllResponseType> {
+export async function guessChatTitle(message: string): Promise<OllamaResponse> {
+    const config = get(settings);
+    const ollamaOptions = get(ollamaApiMainOptionsParams);
+    //
     const prompt = `You are an automated system. Not a chat agent. You don't drive conversations, but obey orders.
     Your role is to Generate a very short title from chat conversations. 
     The title will resume the topic, the subject or the category of the conversation.
@@ -23,7 +27,15 @@ export async function guessChatTitle(message: string): Promise<OllResponseType> 
     Here is the conversation to resume very shortly, not less then 2 words and no more than five words :
     ${message}`;
 
-    return await OllamaApi.generate(prompt, { stream: false }, () => {});
+    const defaultOptions = {
+        model: config?.defaultModel,
+        system: config?.system_prompt,
+        prompt,
+        stream: false,
+        options: { ...ollamaOptions },
+    } as OllApiGenerate;
+
+    return await OllamaApi.generate(defaultOptions, () => {});
 }
 
 export class chatUtils {
@@ -71,7 +83,7 @@ export class chatUtils {
         };
     }
 
-    static getMessageStatsObject(messageData: Partial<OllResponseType>): OllResponseType {
+    static getMessageStatsObject(messageData: Partial<OllamaResponse>): OllamaResponse {
         return {
             messageId: crypto.randomUUID(),
             ...messageData,

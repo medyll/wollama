@@ -3,14 +3,14 @@
 import Dexie, { type Table } from 'dexie';
 import type { DbChat, PromptType } from '$types/db';
 import type { DBMessage } from '$types/db';
-import type { OllResponseType } from '$types/ollama';
+import type { OllamaResponse } from '$types/ollama';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
 
 export class DataBase extends Dexie {
     chat!: Table<DbChat>;
     messages!: Table<DBMessage>;
-    messageStats!: Table<OllResponseType>;
+    messageStats!: Table<OllamaResponse>;
     settings!: Table<SettingsType>;
     prompts!: Table<PromptType>;
     user!: Table<UserType>;

@@ -1,5 +1,5 @@
 import type { MessageImageType, PromptType } from '$types/db';
-import type { OllApiChat, OllOptionsType } from '$types/ollama';
+import type { OllamaChat, OllamaOptions } from '$types/ollama';
 import { derived, get, writable } from 'svelte/store';
 import { settings } from './settings';
 import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
@@ -17,11 +17,11 @@ export type PrompterType = {
 };
 
 function PAYLOAD() {
-    const apiChatStore = writable<OllApiChat>({} as OllApiChat);
+    const apiChatStore = writable<OllamaChat>({} as OllamaChat);
 
     return {
         set: apiChatStore.set,
-        setValue: (key: keyof OllApiChat, value: any) => {
+        setValue: (key: keyof OllamaChat, value: any) => {
             apiChatStore.update((n) => {
                 const newSettings = { ...n, [key]: value };
                 return newSettings;
@@ -34,11 +34,11 @@ function PAYLOAD() {
 export const ollamaPayloadStore = PAYLOAD();
 
 function PAYLOAD_OPTIONS() {
-    const optionsStore = writable<OllOptionsType>({ temperature: 0.5 });
+    const optionsStore = writable<OllamaOptions>({ temperature: 0.5 });
 
     return {
         set: optionsStore.set,
-        setValue: (key: keyof OllOptionsType, value: any) => {
+        setValue: (key: keyof OllamaOptions, value: any) => {
             optionsStore.update((n) => {
                 const newSettings = { ...n, [key]: value };
                 return newSettings;

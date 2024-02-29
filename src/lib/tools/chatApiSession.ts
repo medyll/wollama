@@ -1,6 +1,6 @@
 import { idbQuery } from '$lib/db/dbQuery';
 import type { DBMessage, DbChat, MessageImageType, PromptType } from '$types/db';
-import { OllChatMessageRole, type OllChatMessage, type OllResponseType } from '$types/ollama';
+import { OllamaChatMessageRole, type OllamaChatMessage, type OllamaResponse } from '$types/ollama';
 
 /**
  * Represents a class that manages a chat session.
@@ -15,7 +15,7 @@ export class ChatApiSession {
     public chat!: DbChat;
     public assistantsDbMessages!: DBMessage[];
     public userDbMessage!: DBMessage;
-    public userChatMessage!: OllChatMessage;
+    public userChatMessage!: OllamaChatMessage;
     public options: {
         systemPrompt?: PromptType;
         context?: number[];
@@ -71,9 +71,9 @@ export class ChatApiSession {
      * @param images MessageImageType - Optional images to be attached to the message.
      */
     public async createSessionMessages(content: string, images?: MessageImageType) {
+        await this.setPreviousMessages();
         await this.createUserMessage(content, images);
         await this.createAssistantMessage();
-        await this.setPreviousMessages();
     }
     /**
      * Creates a user message in the chat session.
@@ -94,8 +94,8 @@ export class ChatApiSession {
         });
         // format message for chat send
         this.userChatMessage = {
-            prompt: content,
-            role: OllChatMessageRole.USER,
+            content: content,
+            role: OllamaChatMessageRole.USER,
             images: images?.base64 ? [images?.base64] : undefined,
         };
     }
@@ -121,7 +121,7 @@ export class ChatApiSession {
      * @param assistantMessage - The assistant message object.
      * @param data - The response data from the assistant.
      */
-    public async onMessageDone(assistantMessage: DBMessage, data: OllResponseType) {
+    public async onMessageDone(assistantMessage: DBMessage, data: OllamaResponse) {
         await Promise.all([
             idbQuery.updateChat(this.chat.chatId, { context: data.context }),
             idbQuery.updateMessage(assistantMessage.messageId, { status: 'done' }),
@@ -134,7 +134,7 @@ export class ChatApiSession {
      * @param assistantMessage - The message object received from the assistant.
      * @param data - The response data received from the assistant.
      */
-    public async onMessageStream(assistantMessage: DBMessage, data: OllResponseType) {
+    public async onMessageStream(assistantMessage: DBMessage, data: OllamaResponse) {
         idbQuery.updateMessageStream(assistantMessage.messageId, data);
     }
 }

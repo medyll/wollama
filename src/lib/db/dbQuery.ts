@@ -1,5 +1,5 @@
 import type { DbChat, DBMessage, PromptType } from '$types/db';
-import type { OllResponseType } from '$types/ollama';
+import type { OllamaResponse } from '$types/ollama';
 import { chatUtils } from '$lib/tools/chatUtils';
 import { dbase } from './dbSchema';
 import type { SettingsType } from '$types/settings';
@@ -74,7 +74,7 @@ export class idbQuery {
         await dbase.messages.update(messageId, { messageId, ...messageData });
     }
 
-    static async updateMessageStream(messageId: string, data: Partial<OllResponseType>) {
+    static async updateMessageStream(messageId: string, data: Partial<OllamaResponse>) {
         if (!messageId) throw new Error('messageId is required');
         const message = await idbQuery.getMessage(messageId);
         await idbQuery.updateMessage(messageId, {
@@ -97,7 +97,7 @@ export class idbQuery {
             .then((messages) => messages.map((e) => e));
     }
     /* MessageStats */
-    static async insertMessageStats(statsData: Partial<OllResponseType>) {
+    static async insertMessageStats(statsData: Partial<OllamaResponse>) {
         if (!statsData.messageId) throw new Error('messageId is required');
         const stats = chatUtils.getMessageStatsObject(statsData);
         await dbase.messageStats.add(stats);

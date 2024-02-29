@@ -7,8 +7,7 @@ export enum OllamaFormatKeys {
 
 export type OllamaFormat = keyof typeof OllamaFormatKeys | '' | string;
 
-// OllChatMessage
-export enum OllChatMessageRole {
+export enum OllamaChatMessageRole {
     USER = 'user',
     SYSTEM = 'system',
     ASSISTANT = 'assistant',
@@ -19,30 +18,30 @@ export type OllApiGenerate = {
     prompt: string;
     images: string[];
     format: OllamaFormat;
-    options: OllOptionsType;
     system: string | null;
     template: string | null;
     context: number[];
     stream?: boolean;
     raw?: boolean;
+    options: OllamaOptions;
 };
 
-export type OllApiChat = {
+export type OllamaChat = {
     model: string;
-    messages: OllChatMessage[];
+    messages: OllamaChatMessage[];
     format?: OllamaFormat;
-    options: OllOptionsType;
-    template: string | null;
+    options: OllamaOptions;
+    template?: string | null;
     stream?: boolean;
 };
 
-export type OllChatMessage = {
-    role: keyof typeof OllChatMessageRole;
-    prompt: string;
+export type OllamaChatMessage = {
+    role: OllamaChatMessageRole;
+    content: string;
     images?: string[];
 };
 
-export type OllResponseType = {
+export type OllamaResponse = {
     messageId: string;
     model: string;
     create_at: string;
@@ -63,7 +62,7 @@ export type OllResponseType = {
     };
 };
 
-export type OllOptionsType = {
+export type OllamaOptions = {
     seed?: number;
     temperature?: number;
     repeat_penalty?: number;

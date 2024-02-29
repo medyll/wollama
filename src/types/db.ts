@@ -1,4 +1,4 @@
-import type { OllApiChat, OllOptionsType, OllResponseType } from './ollama';
+import type { OllamaChat, OllamaOptions, OllamaResponse } from './ollama';
 
 /**
  * Represents a chat.
@@ -12,7 +12,7 @@ export type DbChat = {
     dateLastMessage: Date;
     systemPrompt: PromptType;
     /** @deprecated find in ollamaBody */ context: number[];
-    ollamaBody: Partial<OllApiChat>;
+    ollamaBody: Partial<OllamaChat>;
 };
 
 /**
