@@ -59,12 +59,10 @@ export class engine {
     }
 
     public static async checkOllamaEndPoints(fn: () => any = () => {}) {
-        const ollama_fetch = new OllamaApi();
-
         connectionChecker.setConnectionStatus('connecting');
+        const models = (await OllamaApi.tags()) ?? {};
 
-        await ollama_fetch
-            .tags()
+        await OllamaApi.tags()
             .then(() => {
                 connectionChecker.setConnectionStatus('connected');
                 connectionChecker.setKey('connectionRetryCount', 0);

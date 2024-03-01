@@ -24,7 +24,7 @@
     import { connectionChecker } from '$lib/stores/connection';
     import Opening from '$components/Opening.svelte';
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-    import { OllamaApi, ollamaConfig } from '$lib/db/ollamaApi';
+    import { OllamaApi, ollamaApiConfig } from '$lib/db/ollamaApi';
 
     // load models into store
     async function loadModels(models: Record<string, any>[]) {
@@ -35,13 +35,13 @@
 
     onMount(async () => {
         settings.initSettings();
-        ollamaConfig.options.ollama_endpoint= $settings.ollama_server;
 
-        const apiCall = new OllamaApi();
+        ollamaApiConfig.setOptions({ ollama_endpoint: $settings.ollama_server });
+
         let models: { models: Record<string, any>[] } = { models: [{}] };
 
         try {
-            models = (await apiCall.tags()) ?? {};
+            models = (await OllamaApi.tags()) ?? {};
             loadModels(models.models);
         } catch (e) {
             console.log(e);
@@ -55,7 +55,8 @@
 
         //
         ollamaApiMainOptionsParams.init();
-        // engine.checkOllamaEndPoints();
+        engine.checkOllamaEndPoints();
+        
         const users = await idbQuery.getUsers();
         if (!users.length) {
             idbQuery.insertUser({ name: 'user' });
@@ -66,8 +67,8 @@
                 notifierState.notify('error', 'state.connectionRetryTimeout', 'conn-status');
             } else {
                 notifierState.delete('conn-status');
-                /* models = (await apiCall.tags()) ?? {};
-               loadModels(models.models); */
+                models = (await OllamaApi.tags()) ?? {};
+                loadModels(models.models);
             }
         });
     });

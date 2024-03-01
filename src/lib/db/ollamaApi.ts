@@ -1,42 +1,38 @@
-import { aiState } from '$lib/stores';
-import { type OllamaChat, type OllApiGenerate, type OllamaResponse } from '$types/ollama';
-import { get } from 'svelte/store';
+import { type OllamaChat, type OllApiGenerate, type OllamaResponse, type OllamaPush, type OllamaCreate } from '$types/ollama';
 
-class OllamaConfig {
-    options: {
-        model: string;
-        ollama_endpoint: string;
-        headers: Record<string, string> | undefined;
-    } = {
-        model: 'llama2-uncensored',
-        ollama_endpoint: 'http://localhost:11434',
-        headers: undefined,
-    };
+class OllamaApiConfig {
+    model: string = 'llama2-uncensored';
+    ollama_endpoint: string = 'http://localhost:11434';
+    headers: Record<string, string> | undefined = undefined;
 
-    setOptions(options: OllamaConfig['options']) {
-        this.options = { ...this.options, ...options };
-    }
-
-    setHeaders(headers: Record<string, string>) {
-        this.options.headers = { ...(this.options.headers || {}), ...headers };
+    setOptions(options: { model?: string; ollama_endpoint?: string; headers?: Record<string, string> | undefined }) {
+        if (options.model) this.model = options.model;
+        if (options.ollama_endpoint) this.ollama_endpoint = options.ollama_endpoint;
+        if (options.headers) this.headers = options.headers;
     }
 }
 
-export const ollamaConfig = new OllamaConfig();
+export const ollamaApiConfig = new OllamaApiConfig();
 
-export class OllamaApi {
+export class OllamaApiCore {
+    private config: OllamaApiConfig;
+    constructor() {
+        this.config = new OllamaApiConfig();
+    }
+
     /**
      * Send chat request using the Ollama generate API.
      * @param generateRequest The generate request object.
      * @param hook An optional callback function to handle the response data.
      * @returns The generated data or the response object if the request fails.
      */
-    static async generate(generateRequest: OllApiGenerate, hook?: (data: OllamaResponse) => void) {
-        const res = await OllamaApiFetch.fetch('POST', `api/generate`, JSON.stringify(generateRequest));
+    async generate(generateRequest: OllApiGenerate, hook?: (data: OllamaResponse) => void) {
+        const ollamaFetch = new OllamaApiFetch();
+        const res = await ollamaFetch.fetch('POST', `api/generate`, JSON.stringify(generateRequest));
 
         if (res.ok) {
             if (generateRequest?.stream) {
-                OllamaApiFetch.stream(res, hook);
+                ollamaFetch.stream(res, hook);
             } else {
                 const out = await res.json();
 
@@ -54,12 +50,13 @@ export class OllamaApi {
      * @param hook - Optional callback function to handle the response data.
      * @returns A Promise that resolves to the response data from the Ollama API.
      */
-    static async chat(chatRequest: OllamaChat, hook?: (data: OllamaResponse) => void) {
-        const res = await OllamaApiFetch.fetch('POST', `api/chat`, JSON.stringify(chatRequest));
+    async chat(chatRequest: OllamaChat, hook?: (data: OllamaResponse) => void) {
+        const ollamaFetch = new OllamaApiFetch();
+        const res = await ollamaFetch.fetch('POST', `api/chat`, JSON.stringify(chatRequest));
 
         if (res.ok) {
             if (chatRequest?.stream) {
-                OllamaApiFetch.stream(res, hook);
+                ollamaFetch.stream(res, hook);
             } else {
                 const out = await res.json();
 
@@ -69,7 +66,7 @@ export class OllamaApi {
         return res;
     }
 
-    static async ping(url: string) {
+    async ping(url: string) {
         return fetch(`${url}/api/tags`, {
             headers: {
                 'Content-Type': 'application/json',
@@ -89,37 +86,55 @@ export class OllamaApi {
     }
 
     async tags(): Promise<{ models: Record<string, any>[] }> {
-        return OllamaApiFetch.fetch('GET', `api/tags`).then((res) => res);
+        const ollamaFetch = new OllamaApiFetch();
+        return ollamaFetch.fetch('GET', `api/tags`).then((res) => res);
     }
 
     /** Get the list of models from the Ollama API. */
-    static async delete(model: string) {
-        return OllamaApiFetch.fetch('DELETE', `api/delete`, JSON.stringify({ name: model }));
+    async delete(model: string) {
+        const ollamaFetch = new OllamaApiFetch();
+        return ollamaFetch.fetch('DELETE', `api/delete`, JSON.stringify({ name: model }));
     }
 
-    static async pull(model: string, hook: (args: any) => void) {
-        const res = await OllamaApiFetch.fetch('POST', `api/pull`, JSON.stringify({ name: model }));
-        OllamaApiFetch.stream(res, hook);
+    async create(create: OllamaCreate, hook: (args: any) => void) {
+        const ollamaFetch = new OllamaApiFetch();
+        const res = await ollamaFetch.fetch('POST', `api/pull`, JSON.stringify(create));
+        ollamaFetch.stream(res, hook);
+    }
+
+    async pull(model: string, hook: (args: any) => void) {
+        const ollamaFetch = new OllamaApiFetch();
+        const res = await ollamaFetch.fetch('POST', `api/pull`, JSON.stringify({ name: model }));
+        ollamaFetch.stream(res, hook);
+    }
+
+    async push(push: OllamaPush, hook: (args: any) => void) {
+        const ollamaFetch = new OllamaApiFetch();
+        const res = await ollamaFetch.fetch('POST', `api/pull`, JSON.stringify(push));
+        ollamaFetch.stream(res, hook);
     }
 }
 
+export const OllamaApi = new OllamaApiCore();
 class OllamaApiFetch {
-    static jj = ollamaConfig;
+    config = ollamaApiConfig;
+    requestStop = false;
 
-    static fetch = async (method: 'GET' | 'POST' | 'DELETE', url: string, body?: string): Promise<any> => {
+    constructor() {}
+
+    fetch = async (method: 'GET' | 'POST' | 'DELETE', url: string, body?: string): Promise<any> => {
         let headers = {
             'Content-Type': 'application/json',
             Accept: 'application/json',
         };
 
-        return fetch(`${this.jj.options.ollama_endpoint}/${url}`, {
+        return fetch(`${this.config.ollama_endpoint}/${url}`, {
             headers,
             method,
             body,
-            mode: 'no-cors',
+            // mode: 'no-cors',
         })
             .then(async (res) => {
-                console.log('res', res);
                 if (!res?.ok) throw await res.json();
                 const contentType = res.headers.get('Content-Type');
 
@@ -132,14 +147,15 @@ class OllamaApiFetch {
                 throw error;
             });
     };
-    static async stream(response: Response, hook?: (data: OllamaResponse) => void) {
+
+    async stream(response: Response, hook?: (data: OllamaResponse) => void) {
         if (response?.body && response?.ok) {
             const streamReader = response.body.pipeThrough(new TextDecoderStream()).pipeThrough(this.splitStream('\n')).getReader();
 
             while (true) {
                 const { value, done } = await streamReader.read();
 
-                if (Boolean(done) || get(aiState) == 'request_stop') break;
+                if (Boolean(done) || this.requestStop) break;
                 if (value) {
                     const data: OllamaResponse = JSON.parse(value);
 
@@ -148,7 +164,7 @@ class OllamaApiFetch {
             }
         }
     }
-    private static splitStream(separator: string) {
+    private splitStream(separator: string) {
         let buffer = '';
         return new TransformStream({
             flush(controller) {

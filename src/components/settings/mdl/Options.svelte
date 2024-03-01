@@ -8,7 +8,6 @@
 	import { notifierState } from '$lib/stores/notifications';
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-	import InfoLine from '$components/fragments/InfoLine.svelte'; 
 
 	let ollama_server = $settings.ollama_server;
 

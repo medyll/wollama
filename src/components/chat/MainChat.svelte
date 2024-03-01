@@ -22,8 +22,11 @@
     import { connectionChecker } from '$lib/stores/connection';
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllamaChat } from '$types/ollama';
+    import { settings } from '$lib/stores/settings';
 
     let chatSession: ChatApiSession = new ChatApiSession(undefined);
+    let model: string[] = [$settings.defaultModel]
+    let activeModels: string[] = [$settings.defaultModel]
 
     $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
@@ -102,6 +105,8 @@
             submitHandler();
         }
     }
+
+    $: console.log(activeModels)
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />

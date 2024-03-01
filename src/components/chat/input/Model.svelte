@@ -14,9 +14,10 @@
 	}
 
 	function removeModelKey(index: number) {
-		console.log(index);
 		activeModels = activeModels.filter((_, i) => i !== index);
 	}
+
+	$: console.log(activeModels)
 </script>
 
 <div class="line-gap-2 flex-wrap sticky top-0">

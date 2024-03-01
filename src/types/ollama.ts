@@ -80,3 +80,16 @@ export type OllamaOptions = {
     tfs_z?: number;
     num_predict?: number;
 };
+
+export type OllamaCreate = {
+    model: string;
+    path: string;
+    modelfile: string;
+    stream: boolean;
+};
+
+export type OllamaPush = {
+    model: string;
+    stream: boolean;
+    insecure: boolean;
+};

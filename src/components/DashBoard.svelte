@@ -3,6 +3,7 @@
 	import Icon from '@iconify/svelte';
 	import Model from './chat/input/Model.svelte';
 	import { t } from '$lib/stores/i18n';
+    import { prompter } from '$lib/stores/prompter';
 
 	let className = '';
 
@@ -16,8 +17,8 @@
 				<Icon icon="fluent-emoji-high-contrast:llama" style="font-size:10em" />
 			</div>
 			<div class="flex-col self-center text-center p-4">
-				<div class="soft-title">{$t('ui.use_model')}</div>
-				<Model />
+				<div class="soft-title p-2">{$t('ui.use_model')}</div>
+				<Model bind:activeModels={$prompter.models} />
 			</div>
 			<div class="flex-1"></div>
 		</div>
