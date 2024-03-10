@@ -7,10 +7,12 @@
 	import Selector from '$components/fragments/Selector.svelte';
 	import { engine } from '$lib/tools/engine';
 
+	import {Switch} from "@medyll/slot-ui"
 	settings.subscribe((o) => {
 		// if($settings.theme != o.theme)
 		engine.applyTheme(o.theme);
 	});
+
 </script>
 
 <InfoLine title={$t('settings.lang')}>
@@ -33,7 +35,7 @@
 </InfoLine>
 <hr />
 <InfoLine title={$t('settings.auth')}>
-	<button on:click={() => settings.setSetting('authHeader', !$settings.authHeader)}>
-		{$settings.authHeader}
-	</button>
+	<Switch onChange={()=>{
+		settings.setSetting('authHeader', !$settings.authHeader)
+	}} checked={$settings.authHeader}  />  
 </InfoLine>

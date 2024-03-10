@@ -87,6 +87,7 @@
 		"@capacitor/core": "^5.5.1",
 		"@medyll/htmludom": "file:../../app-node/htmludom",
 		"@medyll/slot-ui": "file:../../app-node/slot-ui",
+		"@medyll/slotui": "file:C:/Users/Mydde/AppData/Roaming/npm/node_modules/@medyll/slotui",
 		"@sveltejs/adapter-node": "^2.0.0",
 		"@tauri-apps/api": "^2.0.0-beta.2",
 		"@tauri-apps/plugin-dialog": "^2.0.0-beta.0",

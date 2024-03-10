@@ -4,6 +4,47 @@
 	--cfab-tertiary: #28a745;
 
 }
+:root {
+    --sld-color-primary: var(--cfab-primary);
+    --sld-color-secondary:var(--cfab-secondary);
+    --sld-color-tertiary:var(--cfab-tertiary);
+
+    --sld-color-foreground: #333333;
+    --sld-color-background: #ffffff;
+    --sld-color-paper: #f1f1f1;
+
+    --sld-color-primary-alpha-low: color-mix(in srgb, var(--sld-color-primary), transparent 50%);
+    --sld-color-secondary-alpha-mid: color-mix(in srgb, var(--sld-color-secondary), transparent 50%);
+    --sld-color-tertiary-alpha-mid: color-mix(in srgb, var(--sld-color-tertiary), transparent 50%);
+
+    --sld-color-background-alpha-low: color-mix(in srgb, var(--sld-color-background), transparent 10%);
+    --sld-color-background-alpha-mid: color-mix(in srgb, var(--sld-color-background), transparent 50%);
+    --sld-color-background-alpha-high: color-mix(in srgb, var(--sld-color-background), transparent 90%);
+
+    --sld-color-foreground-alpha-low: color-mix(in srgb, var(--sld-color-foreground), transparent 10%);
+    --sld-color-foreground-alpha-mid: color-mix(in srgb, var(--sld-color-foreground), transparent 50%);
+    --sld-color-foreground-alpha-high: color-mix(in srgb, var(--sld-color-foreground), transparent 90%);
+
+    --sld-color-border: color-mix(in srgb, var(--sld-color-foreground), transparent 70%);
+
+    --sld-theme-gap-tiny: 1.5rem;
+
+    --sld-hover-background-color: var(--sld-color-secondary-alpha-mid);
+    --sld-hover-border-color: var(--sld-color-foreground-alpha-high);
+    --sld-hover-shadow: var(--box-shad-3);
+
+    --sld-selected-background-color: var(--sld-color-primary-alpha-high);
+    --sld-selected-border-color: var(--sld-color-primary);
+    --sld-selected-shadow: var(--box-shad-4);
+}
+:root.dark,
+:root[data-theme="dark"] {
+    --sld-color-foreground: #ffffff;
+    --sld-color-background: #27323a;
+    --sld-color-paper: #3a3b3b;
+
+    --sld-color-border: color-mix(in srgb, var(--sld-color-foreground), transparent 60%);
+}
 
 :root,
 :root.light {
@@ -25,6 +66,7 @@
 	--cfab-paper-border-color: var(--cfab-foreground-opacity-40);
 	/** icon */
 	--cfab-icon-color:  var(--cfab-primary-lighten-60);
+	
 }
 
 :root {

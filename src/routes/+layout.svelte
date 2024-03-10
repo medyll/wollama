@@ -33,6 +33,7 @@
         if ($settings.defaultModel) $activeModels.push($settings.defaultModel);
     }
 
+
     onMount(async () => {
         settings.initSettings();
 
@@ -43,12 +44,6 @@
         try {
             models = (await OllamaApi.tags()) ?? {};
             loadModels(models.models);
-        } catch (e) {
-            console.log(e);
-        }
-
-        try {
-            // invoke('close_splashscreen');
         } catch (e) {
             console.log(e);
         }
