@@ -22,7 +22,7 @@
     import { connectionChecker } from '$lib/stores/connection';
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllamaChat } from '$types/ollama';
-    import { settings } from '$lib/stores/settings';
+    import { settings } from '$lib/stores/settings.svelte';
 
     let chatSession: ChatApiSession = new ChatApiSession(undefined);
     let model: string[] = [$settings.defaultModel]

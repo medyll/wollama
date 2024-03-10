@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { List, ListItem } from '@medyll/slot-ui';
+    import { List, ListItem, ListTitle } from '@medyll/slot-ui';
     import { getTimeTitle, chatMenuList } from '$lib/tools/chatMenuList.js';
     import ChatMenuItem from '$components/ui/ChatMenuItem.svelte';
     import { t } from '$lib/stores/i18n';
@@ -15,10 +15,10 @@
 </script>
 
 <List selectorField="code" data={$chatMenuList ?? []} let:item>
-    <ListItem class="soft-title" >
+    <ListTitle class="soft-title" >
     {$t(getTimeTitle(item.data.code))}
-    </ListItem>
-    <List density="tight"  data={item?.data?.items ?? []} let:item={chat}>
+    </ListTitle>
+    <List density="tight" style="width:100%;"  data={item?.data?.items ?? []} let:item={chat}>
         <ListItem selected={chat.data.chatId === $ui.activeChatId} data={chat.data}>
             <ChatMenuItem  
                 chatId={chat.data.chatId}

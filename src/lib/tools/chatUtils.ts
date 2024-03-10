@@ -2,7 +2,7 @@ import type { DbChat } from '$types/db';
 import type { DBMessage } from '$types/db';
 import { get } from 'svelte/store';
 import { OllamaApi } from '../db/ollamaApi';
-import { settings } from '$lib/stores/settings';
+import { settings } from '$lib/stores/settings.svelte';
 import { idbQuery } from '$lib/db/dbQuery';
 import type { OllApiGenerate, OllamaResponse } from '$types/ollama';
 import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';

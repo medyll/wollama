@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
-	import { settings } from '$lib/stores/settings';
+	import { settings } from '$lib/stores/settings.svelte';
 </script>
 
 <InfoLine title={$t('settings.title_auto')}>

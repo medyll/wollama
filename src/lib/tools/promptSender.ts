@@ -1,6 +1,6 @@
 import { OllamaApi } from '$lib/db/ollamaApi';
 import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-import { settings } from '$lib/stores/settings';
+import { settings } from '$lib/stores/settings.svelte';
 import type { DBMessage } from '$types/db';
 import { type OllamaChatMessage, type OllamaChat, type OllamaOptions, type OllamaResponse, type OllamaFormat, OllamaChatMessageRole } from '$types/ollama';
 import { get } from 'svelte/store';

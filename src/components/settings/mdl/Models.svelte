@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n';
-	import { settings } from '$lib/stores/settings';
+	import { settings } from '$lib/stores/settings.svelte';
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { OllamaApi } from '$lib/db/ollamaApi';

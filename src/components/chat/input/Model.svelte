@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { settings } from '$lib/stores/settings.js';
+	import { settings } from '$lib/stores/settings.svelte';
 	import Icon from '@iconify/svelte';
 
 	export let activeModels: string[] = $settings.defaultModel ? [$settings.defaultModel] : [];

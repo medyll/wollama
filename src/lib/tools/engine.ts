@@ -1,5 +1,5 @@
 import { connectionChecker } from '$lib/stores/connection';
-import { settings } from '$lib/stores/settings';
+import { settings } from '$lib/stores/settings.svelte';
 import { get } from 'svelte/store';
 import { OllamaApi } from '../db/ollamaApi';
 import { goto } from '$app/navigation';

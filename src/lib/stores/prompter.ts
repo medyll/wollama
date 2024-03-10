@@ -1,7 +1,7 @@
 import type { MessageImageType, PromptType } from '$types/db';
 import type { OllamaChat, OllamaOptions } from '$types/ollama';
 import { derived, get, writable } from 'svelte/store';
-import { settings } from './settings';
+import { settings } from '$lib/stores/settings.svelte';
 import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 
 export type PrompterType = {

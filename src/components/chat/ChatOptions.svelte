@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ollamaPayloadOptions, ollamaPayloadStore, prompter } from '$lib/stores/prompter';
-    import { settings } from '$lib/stores/settings';
+    import { settings } from '$lib/stores/settings.svelte';
     import Icon from '@iconify/svelte';
     import Selector from '$components/fragments/Selector.svelte';
     import Prompts from '$components/settings/prompts/Prompts.svelte';

@@ -5,7 +5,7 @@
     import Modal from '$components/ui/Modal.svelte';
     import TopBar from '$components/ui/TopBar.svelte';
     import Sidebar from '$components/ui/Sidebar.svelte';
-    import { settings, showSettings } from '$lib/stores/settings';
+    import { settings, showSettings } from '$lib/stores/settings.svelte';
     import '../styles/css-properties.css';
     import '../styles/tailwind.css';
     import '../styles/app.css';

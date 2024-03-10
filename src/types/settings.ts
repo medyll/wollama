@@ -1,5 +1,3 @@
-import type { OllamaOptions } from '$types/ollama';
-
 export interface SettingsType {
     id: number;
     userId: number;

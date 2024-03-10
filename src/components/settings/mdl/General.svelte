@@ -2,7 +2,7 @@
 	import { t } from '$lib/stores/i18n';
 	import Icon from '@iconify/svelte';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
-	import { settings } from '$lib/stores/settings.js';
+	import { settings } from '$lib/stores/settings.svelte';
 	import {translations} from '../../../locales/translations';
 	import Selector from '$components/fragments/Selector.svelte';
 	import { engine } from '$lib/tools/engine';
