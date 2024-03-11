@@ -76,6 +76,7 @@
 		"svelte": "^5.0.0-next.73",
 		"svelte-check": "^3.6.0",
 		"tailwindcss": "^3.3.6",
+		"ts-node": "^10.9.2",
 		"tslib": "^2.4.1",
 		"typescript": "^5.3.2",
 		"unocss": "^0.58.5",
@@ -93,8 +94,10 @@
 		"@tauri-apps/plugin-dialog": "^2.0.0-beta.0",
 		"@tauri-apps/plugin-window-state": "^2.0.0-beta.0",
 		"@types/dom-speech-recognition": "^0.0.4",
+		"@types/jsdom": "^21.1.6",
 		"@types/marked": "^6.0.0",
 		"@unocss/reset": "^0.58.5",
+		"cheerio": "^1.0.0-rc.12",
 		"date-fns": "^2.30.0",
 		"dexie": "^4.0.1-beta.5",
 		"fs-extra": "^11.2.0",
@@ -102,6 +105,7 @@
 		"hljs": "^6.2.3",
 		"i18n": "^0.15.1",
 		"idb": "^8.0.0",
+		"jsdom": "^24.0.0",
 		"langchain": "^0.0.200",
 		"marked": "^11.0.0",
 		"marked-highlight": "^2.0.9",
@@ -110,7 +114,6 @@
 		"prismjs": "^1.29.0",
 		"svelte-loading-skeleton": "^1.0.1",
 		"svelte-notifications": "^0.9.98",
-		"ts-deepmerge": "^7.0.0",
-		"ts-node": "^10.9.1"
+		"ts-deepmerge": "^7.0.0"
 	}
 }

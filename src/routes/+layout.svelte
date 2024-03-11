@@ -26,6 +26,8 @@
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
     import { OllamaApi, ollamaApiConfig } from '$lib/db/ollamaApi';
 
+    import '$lib/playground.js';
+
     // load models into store
     async function loadModels(models: Record<string, any>[]) {
         settings.setSetting('ollamaModels', [...models]);
@@ -81,19 +83,33 @@
     } else {
         ui.setActiveChatId();
     }
+ 
 </script>
 
 <svelte:head>
     <title>wOOllama !</title>
 </svelte:head>
 
-<row>
-    <column></column>
-    <row><logo /><titre></titre><full /></row>
-    <row><input /></row>
-    <sep />
-    <row><h3 /></row>
-</row>
+
+{#snippet sideBar()}
+    {#snippet sideBar_vendor()}
+        <h vendor />
+    {/snippet}
+    {#snippet sideBar_search()}
+        <row search>
+            <search />
+        </row>
+    {/snippet}
+    {#snippet sideBar_chatMenuList()}
+        <column :nav chatMenuList>
+                <row> <h /></row>
+                <row><button /></row>
+            </column>
+    {/snippet}
+{/snippet}
+
+
+{@render sideBar() }
 <Opening>
     <div class="application">
         <Notifications />
