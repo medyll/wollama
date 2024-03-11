@@ -1,7 +1,7 @@
 export interface SettingsType {
-    id: number;
-    userId: number;
-    theme: string;
+    id?: number;
+    userId?: number;
+    theme?: string;
     request_mode?: 'plain' | 'json';
     ollama_server: string;
     ollamaModels?: string[]; // by api

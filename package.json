@@ -110,6 +110,7 @@
 		"prismjs": "^1.29.0",
 		"svelte-loading-skeleton": "^1.0.1",
 		"svelte-notifications": "^0.9.98",
+		"ts-deepmerge": "^7.0.0",
 		"ts-node": "^10.9.1"
 	}
 }

@@ -33,7 +33,6 @@
         if ($settings.defaultModel) $activeModels.push($settings.defaultModel);
     }
 
-
     onMount(async () => {
         settings.initSettings();
 
@@ -51,7 +50,7 @@
         //
         ollamaApiMainOptionsParams.init();
         engine.checkOllamaEndPoints();
-        
+
         const users = await idbQuery.getUsers();
         if (!users.length) {
             idbQuery.insertUser({ name: 'user' });
@@ -88,6 +87,13 @@
     <title>wOOllama !</title>
 </svelte:head>
 
+<row>
+    <column></column>
+    <row><logo /><titre></titre><full /></row>
+    <row><input /></row>
+    <sep />
+    <row><h3 /></row>
+</row>
 <Opening>
     <div class="application">
         <Notifications />
