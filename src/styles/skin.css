@@ -153,8 +153,6 @@
 @layer components {
     /* inputs */
     .application {
-        /* button,
-		input[type='button'], */
         input[type='search'],
         input[type='submit'],
         input[type='reset'],
@@ -217,7 +215,7 @@
     input[type='button'] {
         &.btn {
             @apply rounded-md border border-gray-700;
-            @apply text-gray-700 bg-gray-200;
+            @apply text-gray-700 bg-gray-100;
             @apply dark:bg-gray-900/40 dark:text-gray-100;
             @apply flex place-items-center;
             padding-left: 0.5rem;

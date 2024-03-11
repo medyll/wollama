@@ -210,8 +210,7 @@
 /* inputs */
 :root {
 	--cfab-input-foreground-color: var(--cfab-foreground);
-	--cfab-input-bg-color: var(--cfab-foreground-opacity-5);
-	--cfab-input-bg-color-focus: var(--cfab-bg-darken-40);
+	--cfab-input-bg-color: var(--sld-color-background);
 	--cfab-input-border-color: var(--cfab-foreground-opacity-20);
 	--cfab-input-border-color-focus: var(--cfab-primary-opacity-60);
 	--cfab-input-shadow-hover: rgba(0, 0, 0, 0.1);

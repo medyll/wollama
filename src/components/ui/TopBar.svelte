@@ -8,8 +8,7 @@
     import { idbQuery } from '$lib/db/dbQuery';
     import { page } from '$app/stores';
 
-import { Window , getCurrent} from '@tauri-apps/api/window';
-import { Webview } from '@tauri-apps/api/webview';
+import {  getCurrent} from '@tauri-apps/api/window';
 
     new Date().getSeconds();
 

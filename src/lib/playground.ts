@@ -62,3 +62,14 @@ printElementHierarchy(root);
 
 const hierarchy = buildElementHierarchy(root);
 console.log(hierarchy);
+
+{
+    container: {
+        Sidebar: {
+            chatMenuList: {
+                chatMenuListGroup: {
+                }
+            }
+        }
+    }
+}

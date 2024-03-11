@@ -1,32 +1,6 @@
 @tailwind base;
 
 @layer base {
-	:root {
-		--theme-primary: rgb(59 130 246);
-
-		--theme-bg-top: rgb(239 246 255);
-		--theme-bg-dark: rgb(31 41 55);
-	}
-
-	.theme-primary-color {
-		@apply text-yellow-600;
-	}
-
-	.theme-primary-bg {
-		@apply bg-yellow-600;
-	}
-
-	.theme-primary-border {
-		@apply border-yellow-600/50;
-	}
-
-	.theme-color-bg {
-		@apply bg-blue-50 dark:bg-gray-800;
-	}
-	.theme-font-color {
-		@apply text-gray-700 dark:text-gray-100;
-		@apply bg-gray-50 dark:bg-gray-800;
-	}
 
 	&&.theme-bg {
 		@apply text-gray-700 bg-gray-50;
