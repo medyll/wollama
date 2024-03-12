@@ -1,34 +1,35 @@
 <script lang="ts">
-    import { ollamaPayloadOptions, ollamaPayloadStore, prompter } from '$lib/stores/prompter';
+    import {  ollamaPayloadStore } from '$lib/stores/prompter';
     import { settings } from '$lib/stores/settings.svelte';
     import Icon from '@iconify/svelte';
     import Selector from '$components/fragments/Selector.svelte';
     import Prompts from '$components/settings/prompts/Prompts.svelte';
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
+    import { chatParams } from '$lib/states/chat.svelte';
 
     $: component = $ui.showPrompt ? Prompts : undefined;
 
     function setTemperature(temperature: number) {
-        ollamaPayloadOptions.setValue('temperature', temperature); 
+        chatParams.temperature = temperature;
     }
 
-    function setRequestMode(format: 'json' | 'plain' | unknown) {
-        ollamaPayloadStore.setValue('format', format);
+    function setRequestMode(format: 'json' | 'plain' ) {
+        chatParams.format = format;
     }
 </script>
 
 <div class="p-1 flex-align-middle theme-bg rounded-md pb-2">
-    <svelte:component this={component} bind:activePrompt={$prompter.promptSystem} />
+    <svelte:component this={component} bind:activePrompt={chatParams.promptSystem} />
     <div class="flex-1 text-center relative">
         <button on:click={() => ui.showHidePromptMenu()}>
-            {$prompter.promptSystem.title ?? $t('prompt.systemPrompt')}
+            {chatParams.promptSystem.title ?? $t('prompt.systemPrompt')}
         </button>
     </div>
     <div class="flex justify-center gauge relative">
         <div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
         {#each Object.keys($settings.temperatures ?? {}) as temperature}
-            {@const active = $ollamaPayloadOptions?.temperature == $settings.temperatures[temperature]}
+            {@const active = chatParams?.temperature == $settings.temperatures[temperature]}
             <button
                 on:click={() => {
                     setTemperature($settings.temperatures[temperature]);
@@ -40,7 +41,7 @@
     </div>
     <div class="line-gap-2 flex-1 justify-center"> 
         <Icon icon="charm:binary" class="sm" />
-        <Selector values={['json', 'plain']} value={$ollamaPayloadStore.format} let:item>
+        <Selector values={['json', 'plain']} value={chatParams.format} let:item>
             <button on:click={() => setRequestMode(item)}>{item}</button>
         </Selector>
     </div>

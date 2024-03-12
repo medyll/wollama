@@ -1,3 +1,5 @@
+<svelte:options accessors runes />
+
 <script lang="ts">
     import Speech from '$components/chat/input/Speech.svelte';
     import Model from '$components/chat/input/Model.svelte';
@@ -23,27 +25,21 @@
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllamaChat } from '$types/ollama';
     import { settings } from '$lib/stores/settings.svelte';
+    import { options } from 'marked';
+    import { chatParams, chatSession } from '$lib/states/chat.svelte';
 
-    let chatSession: ChatApiSession = new ChatApiSession(undefined);
-    let model: string[] = [$settings.defaultModel]
-    let activeModels: string[] = [$settings.defaultModel]
+    let chatApiSession: ChatApiSession = new ChatApiSession(undefined);
+    let activeModels: string[] = [$settings.defaultModel];
 
-    $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
+    let placeholder: string = $derived(chatParams.voiceListening ? 'Listening...' : 'Message to ai');
 
-    $: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
+    // $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
-    $: messages = liveQuery(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
+    let disableSubmit: boolean = $derived($prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running');
+    // $: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
-    $: if ($ui.activeChatId) {
-        idbQuery.getChat($ui.activeChatId).then((chat) => {
-            if (chat && chat?.systemPrompt?.content != $prompter?.promptSystem?.content) {
-                $prompter.promptSystem = chat.systemPrompt;
-            }
-            if (chat && chat.ollamaBody) {
-            }
-        });
-    }
-
+    let messages = $derived.by(() => (chatSession.chatId ? idbQuery.getMessages(chatSession.chatId).then((ezq)=>ezq) : []));
+    $inspect(messages);
     async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
         //
         const { images, promptSystem } = { ...prompter };
@@ -75,6 +71,9 @@
         });
 
         // reset prompt
+        chatParams.prompt = '';
+        chatParams.images = undefined;
+
         $prompter.prompt = '';
         $prompter.images = undefined;
         // set auto-scroll to true
@@ -83,22 +82,23 @@
 
     async function submitHandler() {
         if (!$ui.activeChatId) {
-            await chatSession.initChatSession();
+            await chatApiSession.initChatSession();
             // set active chat
-            ui.setActiveChatId(chatSession.chat.chatId);
+            ui.setActiveChatId(chatApiSession.chat.chatId);
             // relocation without navigation
-            window.history.replaceState(history.state, '', `/chat/${chatSession.chat.chatId}`);
+            window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`);
         }
-        await chatSession.updateChatSession({
+        await chatApiSession.updateChatSession({
             models: $prompter.models,
             systemPrompt: $prompter.promptSystem,
             $ollamaBodyStore,
         });
-        sendPrompt($prompter, $ollamaBodyStore, chatSession);
+        sendPrompt($prompter, $ollamaBodyStore, chatApiSession);
     }
 
     function keyPressHandler(e: KeyboardEvent) {
         $prompter.isPrompting = true;
+        chatParams.isPrompting = true;
 
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -106,7 +106,7 @@
         }
     }
 
-    $: console.log(activeModels)
+    $inspect($ui.activeChatId);
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
@@ -114,9 +114,9 @@
     <div class="application-container flex-v h-full mx-auto">
         <DashBoard>
             <ChatInfo>
-                <Model bind:activeModels={$prompter.models} />
+                <Model bind:activeModels={chatParams.models} />
             </ChatInfo>
-            <List class="flex flex-col w-full gap-4" data={$messages ?? []} let:item={message}>
+            <List class="flex flex-col w-full gap-4" data={messages ?? []} let:item={message}>
                 <Message {message} />
             </List>
             <Bottomer />
@@ -128,15 +128,14 @@
                 <Input
                     disabled={$connectionChecker.connectionStatus != 'connected'}
                     on:keypress={keyPressHandler}
-                    bind:value={$prompter.prompt}
+                    bind:value={chatParams.prompt}
                     bind:requestStop={$aiState}
                     showCancel={$aiState == 'running'}
                     {placeholder}
-                    form="prompt-form"
-                >
-                    <Attachment slot="start" form="prompt-form" bind:imageFile={$prompter.images} disabled={false} />
+                    form="prompt-form">
+                    <Attachment slot="start" form="prompt-form" bind:imageFile={chatParams.images} disabled={false} />
                     <div slot="end" class="flex-align-middle">
-                        <Speech onEnd={submitHandler} bind:prompt={$prompter.prompt} bind:voiceListening={$prompter.voiceListening} disabled={disableSubmit} />
+                        <Speech onEnd={submitHandler} bind:prompt={chatParams.prompt} bind:voiceListening={chatParams.voiceListening} disabled={disableSubmit} />
                         <button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
                             <Icon icon="mdi:send" style="font-size:1.6em" />
                         </button>
@@ -151,7 +150,7 @@
 <style lang="postcss" global>
     .chatZone {
         @apply flex flex-col w-full sticky mb-0 bottom-0 px-8;
-       /*  background-image: var(--cfab-gradient);
+        /*  background-image: var(--cfab-gradient);
         background-size: 100vh 100vw;
         background-position: bottom; */
     }

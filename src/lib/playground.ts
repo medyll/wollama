@@ -24,8 +24,6 @@ function snipe(tagName: string, attr: string) {
 	{/snippet}`; */
 
     const tpl = `{@render ${tagName}(${attr ?? ''})}`;
-
-    console.log(tpl);
 }
 
 function printElementHierarchy(element: cheerio.Element, indent = '') {
@@ -33,7 +31,6 @@ function printElementHierarchy(element: cheerio.Element, indent = '') {
         $(element)
             .children()
             .each((index, child) => {
-                console.log($(child).prop('tagName'));
                 printElementHierarchy(child, indent + '  ');
             });
     }
@@ -61,7 +58,6 @@ const root = $('row')[0];
 printElementHierarchy(root);
 
 const hierarchy = buildElementHierarchy(root);
-console.log(hierarchy);
 
 {
     container: {

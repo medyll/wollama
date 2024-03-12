@@ -88,7 +88,7 @@ export class idbQuery {
         return await dbase.messages.where('messageId').equals(messageId).first();
     }
 
-    static getMessages(chatId: string) {
+    static async getMessages(chatId: string) {
         if (!chatId) throw new Error('chatId is required');
         return dbase.messages
             .where('chatId')
