@@ -40,9 +40,9 @@
     </div>
     <hr class="ml-auto w-24" />
     <div class="application-sideBar-title">
-        {$t('ui.newChat')}
-        <div class="hidden md:flex theme-bg">
-            <button style="height:35px;width:35px" title={$t('ui.newChat')} on:click={createChat}>
+        <div class="hidden md:flex gap-4">
+            <button title={$t('ui.newChat')} on:click={createChat}>
+            {$t('ui.newChat')}
                 <Icon icon="mdi:chat-plus-outline" class="md" alt={$t('ui.newChat')} />
             </button>
         </div>

@@ -8,7 +8,7 @@
     import { idbQuery } from '$lib/db/dbQuery';
     import { page } from '$app/stores';
 
-import {  getCurrent} from '@tauri-apps/api/window';
+    import { getCurrent } from '@tauri-apps/api/window';
 
     new Date().getSeconds();
 
@@ -28,21 +28,20 @@ import {  getCurrent} from '@tauri-apps/api/window';
 
 <div data-tauri-drag-region class="titlebar application-topBar">
     <full />
-    <div class="text-center soft-title">
+    <div class="text-center soft-title truncate" style="max-width:420px">
         {#await chat then value}
             {value?.title ?? ''}
         {/await}
     </div>
-    <!-- <input  type="text"  class="input tight" /> -->
     <full />
-    <StatusBar /> 
+    <StatusBar />
+    {#if typeof window.__currentWindow !== 'undefined'}
         <button
             on:click={() => {
                 getCurrent().minimize();
             }}
             class="titlebar-button"
-            id="titlebar-minimize"
-        >
+            id="titlebar-minimize">
             <Icon icon="fluent-mdl2:chrome-minimize" alt="minimize" />
         </button>
         <button
@@ -50,20 +49,18 @@ import {  getCurrent} from '@tauri-apps/api/window';
                 getCurrent().toggleMaximize();
             }}
             class="titlebar-button"
-            id="titlebar-maximize"
-        >
+            id="titlebar-maximize">
             <Icon icon="fluent-mdl2:chrome-restore" alt="restore" />
-            <!-- <img src="https://api.iconify.design/mdi:window-maximize.svg" alt="maximize" /> -->
         </button>
         <button
             on:click={() => {
-                getCurrent().close() 
-                            }}
+                getCurrent().close();
+            }}
             class="titlebar-button titlebar-button-close"
-            id="titlebar-close"
-        >
+            id="titlebar-close">
             <Icon icon="fluent-mdl2:chrome-close" alt="close" />
-        </button> 
+        </button>
+    {/if}
 </div>
 
 <style lang="postcss">

@@ -151,9 +151,9 @@
 <style lang="postcss" global>
     .chatZone {
         @apply flex flex-col w-full sticky mb-0 bottom-0 px-8;
-        background-image: var(--cfab-gradient);
+       /*  background-image: var(--cfab-gradient);
         background-size: 100vh 100vw;
-        background-position: bottom;
+        background-position: bottom; */
     }
     .inputTextarea {
         border-color: transparent;

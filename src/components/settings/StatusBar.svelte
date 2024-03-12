@@ -11,6 +11,7 @@
 	let progress: number = total && completed ? completed - total : 0;
 
 	$: icon = $connectionChecker.connectionStatus === 'connected' ? 'uil:wifi' : 'uil:wifi-slash';
+	$: color = $connectionChecker.connectionStatus === 'connected' ? 'green' : 'red';
 
 	connectionChecker.subscribe((n) => {
 		printCountDown = ['error'].includes(n.connectionStatus) ? true : false;
@@ -25,7 +26,7 @@
 	<!-- <div>
 		{$t(`status.${$connectionChecker.connectionStatus}`)}
 	</div> -->
-	<div><Icon {icon} class="md" /></div>
+	<div><Icon {icon} class="md" color={color}  /></div>
 	<div>
 		{#if printCountDown}
 			{$t('ui.retryInSeconds', { seconds: $connectionChecker.connectionRemainingSeconds })}
