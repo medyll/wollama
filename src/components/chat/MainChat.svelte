@@ -18,16 +18,25 @@
     import Message from '$components/chat/Message.svelte';
     import DashBoard from '$components/DashBoard.svelte';
     import Images from './input/Images.svelte';
-    import List from '$components/fragments/List.svelte';
-    import { liveQuery } from 'dexie';
+    import List from '$components/fragments/List.svelte'; 
     import Bottomer from '$components/ui/Bottomer.svelte';
     import { connectionChecker } from '$lib/stores/connection';
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllamaChat } from '$types/ollama';
-    import { settings } from '$lib/stores/settings.svelte';
-    import { options } from 'marked';
-    import { chatParams, chatSession } from '$lib/states/chat.svelte';
+    import { settings } from '$lib/stores/settings.svelte'; 
+    import { chatParams, chatSession } from '$lib/states/chat.svelte'; 
+    import {  idbqModel } from '$lib/db/dbSchema';
+    import { idbqBase, stateIdbql } from '@medyll/idbql';
+    import type { DbChat } from '$types/db';
+    
 
+    const idbq = idbqBase<typeof idbqModel>(idbqModel, 6);
+    const dbases = idbq('woolama_chatte');
+    let dbstate = stateIdbql({}, dbases);
+    let chat = dbstate.onCollection<DbChat>('chat');
+
+
+ $inspect(chat)
     let chatApiSession: ChatApiSession = new ChatApiSession(undefined);
     let activeModels: string[] = [$settings.defaultModel];
 
@@ -38,8 +47,12 @@
     let disableSubmit: boolean = $derived($prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running');
     // $: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
+
+    //const idbq = idbqBase('chat');
     let messages = $derived.by(() => (chatSession.chatId ? idbQuery.getMessages(chatSession.chatId).then((ezq)=>ezq) : []));
-    $inspect(messages);
+    
+
+   
     async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
         //
         const { images, promptSystem } = { ...prompter };
@@ -106,7 +119,6 @@
         }
     }
 
-    $inspect($ui.activeChatId);
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
