@@ -54,14 +54,14 @@ export class ChatApiSession {
      * @returns A promise that resolves when the previous messages are set.
      */
     private async setPreviousMessages(): Promise<Partial<DBMessage>[]> {
-        await idbQuery.getMessages(this.chat.chatId).then(
-            (chatList) =>
-                (this.previousMessages = chatList.map((e) => ({
-                    content: e.content,
-                    role: e.role,
-                    images: e?.images?.base64,
-                })))
-        );
+        const chatList = idbQuery.getMessages(this.chat.chatId);
+
+        this.previousMessages = chatList.map((e) => ({
+            content: e.content,
+            role: e.role,
+            images: e?.images?.base64,
+        }));
+
         return this.previousMessages;
     }
 

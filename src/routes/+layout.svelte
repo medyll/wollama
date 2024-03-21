@@ -73,13 +73,12 @@
     }
 
     $: if (browser && $page.params.id) {
-        idbQuery.getChat($page.params.id).then((chat) => {
+        const chat = idbQuery.getChat($page.params.id)
             if (chat) {
                 ui.setActiveChatId($page.params.id);
             } else {
                 engine.goto('/');
             }
-        });
     } else {
         ui.setActiveChatId();
     }

@@ -1,36 +1,9 @@
-// db.js
-
-import Dexie, { type Table } from 'dexie';
 import type { DbChat, PromptType } from '$types/db';
 import type { DBMessage } from '$types/db';
 import type { OllamaResponse } from '$types/ollama';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
-
-import { stateIdbql, idbqBase } from '@medyll/idbql';
-export class DataBase extends Dexie {
-    chat!: Table<DbChat>;
-    messages!: Table<DBMessage>;
-    messageStats!: Table<OllamaResponse>;
-    settings!: Table<SettingsType>;
-    prompts!: Table<PromptType>;
-    user!: Table<UserType>;
-
-    constructor() {
-        super('woolama');
-
-        this.version(1.4).stores({
-            chat: '&chatId, createdAt, dateLastMessage',
-            messageStats: '&messageId, create_at',
-            messages: '&messageId, chatId, createdAt',
-            prompts: '++id, createdAt',
-            settings: '++id,userId',
-            user: '++id, createdAt, email',
-        });
-    }
-
-    init() {}
-}
+import { createIdbqDb } from '@medyll/idbql';
 
 export const idbqModel = {
     chat: {
@@ -59,15 +32,5 @@ export const idbqModel = {
     },
 } as const;
 
-export const dbase = new DataBase();
-
-// export const dbases = idbq('woolama_chatte');
-
-/* let chat = dbstate.onCollection<DbChat>('chat');
-let messages = dbstate.onCollection<DBMessage>('messages');
-let messageStats = dbstate.onCollection<OllamaResponse>('messageStats');
-let prompts = dbstate.onCollection<PromptType>('prompts');
-let settings = dbstate.onCollection<SettingsType>('settings');
-let user = dbstate.onCollection<UserType>('user'); */
-
-/* export const idbqState = { chat, messages, messageStats, prompts, settings, user }; */
+const idbqStore = createIdbqDb<typeof idbqModel>(idbqModel, 200);
+export const { idbql, idbqlState, idbDatabase } = idbqStore.create('woolama');

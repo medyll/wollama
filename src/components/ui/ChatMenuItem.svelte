@@ -1,3 +1,5 @@
+<svelte:options runes accessors />
+
 <script lang="ts">
     import Confirm from '$components/fragments/Confirm.svelte';
     import { idbQuery } from '$lib/db/dbQuery';
@@ -5,23 +7,23 @@
     import { ui } from '$lib/stores/ui';
     import Icon from '@iconify/svelte';
     import { Button, Menu, Popper, MenuItem } from '@medyll/slot-ui';
-    import { liveQuery } from 'dexie';
 
     import { chatUtils } from '$lib/tools/chatUtils';
 
-    import type { DbChat } from '$types/db';
-    export let chatId: string;
-    //export let chat: DbChat;
-    export let selected: boolean;
+    import { idbqlState } from '$lib/db/dbSchema';
 
-    $: chat = liveQuery(() => {
-        if (chatId) return idbQuery.getChat(chatId);
-    });
+
+    const  {
+        chatId  = '',
+        selected  = false,
+    } = $props()
+
+    let chat = $derived(idbQuery.getChat(chatId));
 
     let editChat: boolean = false;
     let isOpen: boolean = false;
-    let title = $chat?.title;
-    $: title = $chat?.title;
+    let title = chat?.title;
+   // $: title = chat?.title;
 
     function deleteCha1tHandler() {
         idbQuery.deleteChat(chatId);
@@ -43,7 +45,7 @@
     }
 
     function guess() {
-        chatUtils.checkTitle($chat.chatId);
+        chatUtils.checkTitle(chat.chatId);
     }
 
     function onSubmit(event: Event) {
@@ -52,8 +54,9 @@
         toggleEdit(false);
         idbQuery.updateChat(chatId, { title: title.value });
     }
-
-    function keypressClose(event: KeyboardEvent) {}
+ 
+    $inspect(idbQuery.getChat(chatId));
+ 
 </script>
 
 <div class="line-gap-2">
@@ -73,7 +76,7 @@
         </button>
     {:else}
         <button on:click class="w-full whitespace-nowrap overflow-hidden text-left text-ellipsis">
-            {$chat?.title}
+            {chat?.title}
         </button>
     {/if}
     {#if selected && !editChat}

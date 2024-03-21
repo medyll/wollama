@@ -3,8 +3,7 @@
     import Icon from '@iconify/svelte';
     import StatusBar from '../settings/StatusBar.svelte';
     import { ui } from '$lib/stores/ui';
-    import { engine } from '$lib/tools/engine';
-    import { dbase } from '$lib/db/dbSchema';
+    import { engine } from '$lib/tools/engine'; 
     import { idbQuery } from '$lib/db/dbQuery';
     import { page } from '$app/stores';
 

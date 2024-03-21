@@ -86,7 +86,7 @@
 	"dependencies": {
 		"@capacitor/core": "^5.7.3",
 		"@medyll/htmludom": "^0.11.0",
-		"@medyll/idbql": "^3.1.4",
+		"@medyll/idbql": "^3.2.2",
 		"@medyll/slot-ui": "file:../../app-node/slot-ui",
 		"@medyll/slotui": "file:C:/Users/Mydde/AppData/Roaming/npm/node_modules/@medyll/slotui",
 		"@sveltejs/adapter-node": "^5.0.1",
@@ -99,7 +99,6 @@
 		"@unocss/reset": "^0.58.6",
 		"cheerio": "^1.0.0-rc.12",
 		"date-fns": "^3.6.0",
-		"dexie": "^4.0.1-beta.5",
 		"fs-extra": "^11.2.0",
 		"highlight.js": "^11.9.0",
 		"hljs": "^6.2.3",

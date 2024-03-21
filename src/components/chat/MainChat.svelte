@@ -7,6 +7,7 @@
     import Icon from '@iconify/svelte';
     import Input from './input/Input.svelte';
     import Attachment from './input/Attachment.svelte';
+    import { page } from '$app/stores';
     import ChatInfo from './ChatInfo.svelte';
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
@@ -24,20 +25,15 @@
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllamaChat } from '$types/ollama';
     import { settings } from '$lib/stores/settings.svelte'; 
-    import { chatParams, chatSession } from '$lib/states/chat.svelte'; 
-    import {  idbqModel } from '$lib/db/dbSchema';
-    import { idbqBase, stateIdbql } from '@medyll/idbql';
-    import type { DbChat } from '$types/db';
+    import { chatParams, chatSession } from '$lib/states/chat.svelte';    
+    import { idbqlState, idbql } from '$lib/db/dbSchema';
     
-
-    const idbq = idbqBase<typeof idbqModel>(idbqModel, 6);
-    const dbases = idbq('woolama_chatte');
-    let dbstate = stateIdbql({}, dbases);
-    let chat = dbstate.onCollection<DbChat>('chat');
-
-
- $inspect(chat)
-    let chatApiSession: ChatApiSession = new ChatApiSession(undefined);
+    $effect(() => {
+         $inspect(idbqlState.chat.where({chatId:{eq:('red')}}))  
+    });
+   
+ 
+    let chatApiSession: ChatApiSession = new ChatApiSession($ui.activeChatId);
     let activeModels: string[] = [$settings.defaultModel];
 
     let placeholder: string = $derived(chatParams.voiceListening ? 'Listening...' : 'Message to ai');
@@ -45,15 +41,10 @@
     // $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
 
     let disableSubmit: boolean = $derived($prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running');
-    // $: disableSubmit = $prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running';
 
-
-    //const idbq = idbqBase('chat');
-    let messages = $derived.by(() => (chatSession.chatId ? idbQuery.getMessages(chatSession.chatId).then((ezq)=>ezq) : []));
+    let messages = $derived(idbQuery.getMessages($page?.params?.id ));
     
-
-   
-    async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
+     async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
         //
         const { images, promptSystem } = { ...prompter };
         //
@@ -94,6 +85,7 @@
     }
 
     async function submitHandler() {
+        console.log($ui.activeChatId)
         if (!$ui.activeChatId) {
             await chatApiSession.initChatSession();
             // set active chat
