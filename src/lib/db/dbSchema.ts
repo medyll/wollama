@@ -32,5 +32,5 @@ export const idbqModel = {
     },
 } as const;
 
-const idbqStore = createIdbqDb<typeof idbqModel>(idbqModel, 200);
+const idbqStore = createIdbqDb<typeof idbqModel>(idbqModel, 1);
 export const { idbql, idbqlState, idbDatabase } = idbqStore.create('woolama');

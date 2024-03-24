@@ -20,8 +20,8 @@
 
     let chat = $derived(idbQuery.getChat(chatId));
 
-    let editChat: boolean = false;
-    let isOpen: boolean = false;
+    let editChat: boolean = $state(false);
+    let isOpen: boolean = $state(false);
     let title = chat?.title;
    // $: title = chat?.title;
 
@@ -54,8 +54,7 @@
         toggleEdit(false);
         idbQuery.updateChat(chatId, { title: title.value });
     }
- 
-    $inspect(idbQuery.getChat(chatId));
+  
  
 </script>
 
@@ -81,7 +80,7 @@
     {/if}
     {#if selected && !editChat}
         <Popper bind:isOpen position="BC" autoClose class="w-48">
-            <Button link slot="popperHolder" icon="mdi:ellipsis-vertical" height="auto" on:click={togglePopper} />
+            <Button link slot="popperHolder" icon="mdi:ellipsis-vertical" height="auto" onclick={()=>{togglePopper()}} />
             <Menu class="w-full">
                 <MenuItem
                     icon="mdi:edit"

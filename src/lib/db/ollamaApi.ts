@@ -1,8 +1,8 @@
 import { type OllamaChat, type OllApiGenerate, type OllamaResponse, type OllamaPush, type OllamaCreate } from '$types/ollama';
 
 class OllamaApiConfig {
-    model: string = 'llama2-uncensored';
-    ollama_endpoint: string = 'http://localhost:11434';
+    model: string = 'llama2';
+    ollama_endpoint: string = 'http://127.0.0.1:11434';
     headers: Record<string, string> | undefined = undefined;
 
     setOptions(options: { model?: string; ollama_endpoint?: string; headers?: Record<string, string> | undefined }) {

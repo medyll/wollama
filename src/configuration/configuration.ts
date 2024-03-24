@@ -24,7 +24,7 @@ export const ollamaOptionsRanges = {
 export const defaultSettings: SettingsType = {
     authHeader: false,
     avatar_email: '',
-    defaultModel: 'llama2-uncensored',
+    defaultModel: 'llama2',
     locale: 'fr',
     ollama_server: PUBLIC_OLLAMA_SERVER_API,
     request_mode: 'plain',

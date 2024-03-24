@@ -26,7 +26,7 @@
     import type { OllamaChat } from '$types/ollama';
     import { settings } from '$lib/stores/settings.svelte'; 
     import { chatParams, chatSession } from '$lib/states/chat.svelte';    
-    import { idbqlState, idbql } from '$lib/db/dbSchema';
+    import { idbqlState } from '$lib/db/dbSchema';
     
     $effect(() => {
          $inspect(idbqlState.chat.where({chatId:{eq:('red')}}))  
@@ -114,7 +114,7 @@
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
-<div class="h-full w-full">
+<div class="h-full w-full">{$ui.activeChatId}
     <div class="application-container flex-v h-full mx-auto">
         <DashBoard>
             <ChatInfo>

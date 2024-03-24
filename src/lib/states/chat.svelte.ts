@@ -66,5 +66,5 @@ export let chatGenerated = (): OllApiGenerate => {
         },
     });
 
-    return derive;
+    return derive as OllApiGenerate;
 };
