@@ -28,6 +28,8 @@
 
     import '$lib/playground.js';
 
+    let {children,  } = $props();
+
     // load models into store
     async function loadModels(models: Record<string, any>[]) {
         settings.setSetting('ollamaModels', [...models]);
@@ -69,10 +71,10 @@
         });
     });
 
-    $: if ($settings.ollamaModels) {
-    }
-
-    $: if (browser && $page.params.id) {
+   /*  $: if ($settings.ollamaModels) {
+    } */
+    $effect(()=>{
+        if (browser && $page.params.id) {
         const chat = idbQuery.getChat($page.params.id)
             if (chat) {
                 ui.setActiveChatId($page.params.id);
@@ -82,6 +84,9 @@
     } else {
         ui.setActiveChatId();
     }
+    })
+
+    
  
 </script>
 
@@ -117,7 +122,7 @@
         <div class="application-content">
             <TopBar />
             <main class="application-main">
-                <slot />
+               {@render children?.()}
             </main>
         </div>
         <Modal show={$showSettings}>

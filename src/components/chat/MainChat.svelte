@@ -19,20 +19,19 @@
     import Message from '$components/chat/Message.svelte';
     import DashBoard from '$components/DashBoard.svelte';
     import Images from './input/Images.svelte';
-    import List from '$components/fragments/List.svelte'; 
+    import List from '$components/fragments/List.svelte';
     import Bottomer from '$components/ui/Bottomer.svelte';
     import { connectionChecker } from '$lib/stores/connection';
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import type { OllamaChat } from '$types/ollama';
-    import { settings } from '$lib/stores/settings.svelte'; 
-    import { chatParams, chatSession } from '$lib/states/chat.svelte';    
+    import { settings } from '$lib/stores/settings.svelte';
+    import { chatParams, chatSession } from '$lib/states/chat.svelte';
     import { idbqlState } from '$lib/db/dbSchema';
-    
+
     $effect(() => {
-         $inspect(idbqlState.chat.where({chatId:{eq:('red')}}))  
+       // $inspect(idbqlState.chat.where({ chatId: { eq: 'red' } }));
     });
-   
- 
+
     let chatApiSession: ChatApiSession = new ChatApiSession($ui.activeChatId);
     let activeModels: string[] = [$settings.defaultModel];
 
@@ -42,13 +41,18 @@
 
     let disableSubmit: boolean = $derived($prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running');
 
-    let messages = $derived(idbQuery.getMessages($page?.params?.id ));
-    
-     async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
+    let messages = $derived.by(()=> $ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []);
+
+   //  $inspect({messages});
+
+
+    async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
         //
         const { images, promptSystem } = { ...prompter };
         //
-        await chatSession.createSessionMessages(prompter.prompt as string, images);
+
+        await chatSession.createSessionMessages(chatParams.prompt as string, images);
+
 
         // set ai state to running
         aiState.set('running');
@@ -57,52 +61,59 @@
 
         // listen to sender stream
         sender.onStream = ({ assistantMessage, data }) => {
+          
             chatSession.onMessageStream(assistantMessage, data);
             aiState.set('running');
             // set auto-scroll to false
             ui.setAutoScroll(assistantMessage.chatId, false);
         };
         sender.onEnd = ({ assistantMessage, data }) => {
+         
             chatSession.onMessageDone(assistantMessage, data);
             aiState.set('done');
             chatUtils.checkTitle(assistantMessage.chatId);
         };
 
         // Send prompt to api per assistant.message
-        await chatSession.assistantsDbMessages.forEach(async (assistantMessage) => {
-            sender.setRoleAssistant(assistantMessage);
+        await chatSession.assistantsDbMessages.forEach(async (assistantDbMessage) => { 
+            sender.setRoleAssistant(assistantDbMessage);
             sender.sendChatMessage(chatSession.userChatMessage, chatSession.previousMessages, promptSystem.content);
         });
 
         // reset prompt
-        chatParams.prompt = '';
+        //chatParams.prompt = '';
         chatParams.images = undefined;
 
-        $prompter.prompt = '';
-        $prompter.images = undefined;
+        // $prompter.prompt = '';
+        chatParams.prompt = '';
+        chatParams.images = undefined;
+        //$prompter.images = undefined;
         // set auto-scroll to true
         ui.setAutoScroll(chatSession.chat.chatId, true);
     }
 
     async function submitHandler() {
-        console.log($ui.activeChatId)
         if (!$ui.activeChatId) {
-            await chatApiSession.initChatSession();
+            await chatApiSession.initChatSession({
+                 models: [...chatParams.models]
+            });
             // set active chat
             ui.setActiveChatId(chatApiSession.chat.chatId);
             // relocation without navigation
             window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`);
         }
+     
         await chatApiSession.updateChatSession({
-            models: $prompter.models,
-            systemPrompt: $prompter.promptSystem,
-            $ollamaBodyStore,
+            models: [...chatParams.models],
+            systemPrompt: {...chatParams.promptSystem}, 
+            ollamaBody : $ollamaBodyStore,
         });
+ 
         sendPrompt($prompter, $ollamaBodyStore, chatApiSession);
     }
 
     function keyPressHandler(e: KeyboardEvent) {
-        $prompter.isPrompting = true;
+     
         chatParams.isPrompting = true;
 
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -111,15 +122,18 @@
         }
     }
 
+  
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
-<div class="h-full w-full">{$ui.activeChatId}
+<div class="h-full w-full"> 
     <div class="application-container flex-v h-full mx-auto">
         <DashBoard>
-            <ChatInfo>
+            <!-- <ChatInfo>
                 <Model bind:activeModels={chatParams.models} />
-            </ChatInfo>
+            </ChatInfo> -->
+            <!-- <Model bind:activeModels={chatParams.models} /> -->
+            <!-- <Model bind:activeModels={chatParams.models} /> -->
             <List class="flex flex-col w-full gap-4" data={messages ?? []} let:item={message}>
                 <Message {message} />
             </List>
@@ -131,7 +145,7 @@
                 <Images />
                 <Input
                     disabled={$connectionChecker.connectionStatus != 'connected'}
-                    on:keypress={keyPressHandler}
+                    onkeypress={keyPressHandler}
                     bind:value={chatParams.prompt}
                     bind:requestStop={$aiState}
                     showCancel={$aiState == 'running'}
@@ -139,7 +153,11 @@
                     form="prompt-form">
                     <Attachment slot="start" form="prompt-form" bind:imageFile={chatParams.images} disabled={false} />
                     <div slot="end" class="flex-align-middle">
-                        <Speech onEnd={submitHandler} bind:prompt={chatParams.prompt} bind:voiceListening={chatParams.voiceListening} disabled={disableSubmit} />
+                        <Speech
+                            onEnd={submitHandler}
+                            bind:prompt={chatParams.prompt}
+                            bind:voiceListening={chatParams.voiceListening}
+                            disabled={disableSubmit} />
                         <button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
                             <Icon icon="mdi:send" style="font-size:1.6em" />
                         </button>

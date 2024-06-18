@@ -29,9 +29,10 @@
 <div class="flex w-full settings p-4 px-8">
     <div class="flex flex-col gap-4 w-348">
         <div class="soft-title">{$t(`settings.general`)}</div>
+        <Options />
         <Looper data={Object.keys(settingGen)} let:item={setting} let:idx>
-            <Cartouche  classes={{ content: 'px-4' }} iconProps={{ icon: 'mdi:wrench' }} primary={$t(`settings.modules.${setting}`)}>
-                <svelte:component this={settingGen[setting]} />
+            <Cartouche   classes={{ content: 'px-4' }} iconProps={{ icon: 'mdi:wrench' }} primary={$t(`settings.modules.${setting}`)}>
+                <svelte:component this={settingGen[setting]} />sssss
             </Cartouche>
         </Looper>
         <div class="soft-title">{$t(`settings.ollama`)}</div>

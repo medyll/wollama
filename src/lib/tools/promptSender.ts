@@ -18,7 +18,8 @@ export type SenderCallback<T> = {
 } & T;
 
 type CallbackDataType = {
-    assistantMessage: DBMessage;
+    /** @deprecated */
+    assistantMessage?: DBMessage;
 };
 
 /**
@@ -75,7 +76,7 @@ export class PromptMaker {
         // send chat user message
         return OllamaApi.chat(
             {
-                messages: [system, ...previousMessages, userMessage],
+                messages: [system, ...previousMessages, userMessage].filter((m) => m),
                 model: config?.defaultModel,
                 stream: true,
                 ...this.apiChatParams,
@@ -83,7 +84,6 @@ export class PromptMaker {
             } as OllamaChat,
             async (data) => {
                 this.onResponseMessageStream({
-                    assistantMessage: this.assistantMessage,
                     data,
                 });
             }
@@ -94,11 +94,11 @@ export class PromptMaker {
      * Handles the response message stream.
      * @param args - The callback data containing the response and assistant message.
      */
-    private async onResponseMessageStream({ assistantMessage, data }: SenderCallback<CallbackDataType>): Promise<void> {
+    private async onResponseMessageStream({ data }: SenderCallback<CallbackDataType>): Promise<void> {
         if (data.done) {
-            this.onEnd({ data, assistantMessage });
+            this.onEnd({ data, assistantMessage: this.assistantMessage });
         } else {
-            this.onStream({ data, assistantMessage });
+            this.onStream({ data, assistantMessage: this.assistantMessage });
         }
     }
 }

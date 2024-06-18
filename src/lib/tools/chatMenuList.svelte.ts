@@ -35,6 +35,7 @@ function getStartAndEndOfWeek(date: Date, firstDayOfWeek: any = 1): { start: Dat
 }
 
 export function getTimeTitle(inputText: string) {
+    if (!inputText) return 'Format invalide';
     const match = inputText.match(/(weeks|months)(\d+)/);
 
     if (match) {

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { List, ListItem, ListTitle } from '@medyll/slot-ui';
-    import { getTimeTitle, groupChatMessages, groupMessages,   } from '$lib/tools/chatMenuList.svelte.js';
+    import { MenuList, MenuListItem, ListTitle } from '@medyll/slot-ui';
+    import { getTimeTitle, groupChatMessages, groupMessages } from '$lib/tools/chatMenuList.svelte.js';
     import ChatMenuItem from '$components/ui/ChatMenuItem.svelte';
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
@@ -13,24 +13,30 @@
         engine.goto(`/chat/${id}`);
     };
 
-    let chatMenuList = $derived(groupMessages( idbqlState.chat.getAll()));
+    let chatMenuList = $derived(groupMessages(idbqlState.chat.getAll()));
+ 
 </script>
 
-<List selectorField="code" data={chatMenuList ?? []} let:item>
-    <ListTitle class="soft-title">
-        {$t(getTimeTitle(item.data.code))}
-    </ListTitle>
-    <List density="tight" style="width:100%;" data={item?.data?.items ?? []} let:item={chat}>
-        <ListItem selected={chat.data.chatId === $ui.activeChatId} data={chat.data}>
-            <ChatMenuItem
-                chatId={chat.data.chatId}
-                selected={chat.data.chatId === $ui.activeChatId}
-                on:click={() => {
-                    loadChat(chat.data.chatId);
-                }} />
-        </ListItem>
-    </List>
-</List>
+<MenuList selectorField="code" data={chatMenuList ?? []}>
+    {#snippet children({ item, itemIndex })}
+        <ListTitle class="soft-title">
+            {itemIndex}
+            {$t(getTimeTitle(item?.code))}
+        </ListTitle>
+        <MenuList density="tight" style="width:100%;" data={item?.items ?? []}>
+            {#snippet children({ item })} 
+                <MenuListItem selected={item.chatId === $ui.activeChatId} data={item}>
+                    <ChatMenuItem
+                        chatId={item.chatId}
+                        selected={item.chatId === $ui.activeChatId}
+                        on:click={() => {
+                            loadChat(item.chatId);
+                        }} />
+                </MenuListItem>
+            {/snippet}
+        </MenuList>
+    {/snippet}
+</MenuList>
 {#if Object.keys(chatMenuList)?.length == 0}
     <div class="flex flex-col gap-2 text-center text-neutral-500 dark:text-neutral-400">
         <span class="text-2xl">{$t('ui.noChats')}</span>

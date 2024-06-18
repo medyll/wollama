@@ -52,8 +52,9 @@ export class OllamaApiCore {
      */
     async chat(chatRequest: OllamaChat, hook?: (data: OllamaResponse) => void) {
         const ollamaFetch = new OllamaApiFetch();
-        const res = await ollamaFetch.fetch('POST', `api/chat`, JSON.stringify(chatRequest));
 
+        const res = await ollamaFetch.fetch('POST', `api/chat`, JSON.stringify(chatRequest));
+        console.log({ res });
         if (res.ok) {
             if (chatRequest?.stream) {
                 ollamaFetch.stream(res, hook);
@@ -70,6 +71,7 @@ export class OllamaApiCore {
         return fetch(`${url}/api/tags`, {
             headers: {
                 'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
             },
             method: 'GET',
         })
@@ -125,7 +127,6 @@ class OllamaApiFetch {
     fetch = async (method: 'GET' | 'POST' | 'DELETE', url: string, body?: string): Promise<any> => {
         let headers = {
             'Content-Type': 'application/json',
-            Accept: 'application/json',
         };
 
         return fetch(`${this.config.ollama_endpoint}/${url}`, {
@@ -136,9 +137,10 @@ class OllamaApiFetch {
         })
             .then(async (res) => {
                 if (!res?.ok) throw await res.json();
-                const contentType = res.headers.get('Content-Type');
+                // const contentType = res.headers.get('Content-Type');
 
-                return contentType?.includes('stream') ? res : await res.json();
+                // return contentType?.includes('stream') ? res : await res.json();
+                return res.body instanceof ReadableStream ? res : await res.json();
             })
             .then(async (res) => {
                 return res;

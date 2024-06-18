@@ -1,5 +1,4 @@
-<script lang="ts">
-    import {  ollamaPayloadStore } from '$lib/stores/prompter';
+<script lang="ts"> 
     import { settings } from '$lib/stores/settings.svelte';
     import Icon from '@iconify/svelte';
     import Selector from '$components/fragments/Selector.svelte';
@@ -7,6 +6,7 @@
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
     import { chatParams } from '$lib/states/chat.svelte';
+    import Model from './input/Model.svelte';
 
     $: component = $ui.showPrompt ? Prompts : undefined;
 
@@ -25,6 +25,9 @@
         <button on:click={() => ui.showHidePromptMenu()}>
             {chatParams.promptSystem.title ?? $t('prompt.systemPrompt')}
         </button>
+    </div>
+    <div>
+    <Model bind:activeModels={chatParams.models} />
     </div>
     <div class="flex justify-center gauge relative">
         <div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>

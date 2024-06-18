@@ -39,7 +39,6 @@ export class idbQuery {
     }
 
     static async initChat(activeChatId?: string, chatData: DbChat = {} as DbChat): Promise<DbChat> {
-        console.log('initChat', activeChatId, chatData);
         if (Boolean(await idbQuery.getChat(activeChatId as string))) {
             await idbQuery.updateChat(activeChatId as string, chatData);
         }
@@ -54,7 +53,7 @@ export class idbQuery {
     static async insertMessage(chatId: string, messageData: Partial<DBMessage>): Promise<DBMessage> {
         if (!chatId) throw new Error('chatId is required');
         const message = chatUtils.getMessageDataObject({ chatId, ...messageData });
-
+        console.log('insertMessage', message);
         await idbqlState.messages.add(message);
 
         return message;
@@ -62,15 +61,18 @@ export class idbQuery {
 
     static async updateMessage(messageId: string, messageData: Partial<DBMessage>) {
         if (!messageId) throw new Error('messageId is required');
-
+        //console.log('updateMessage', messageId);
         await idbqlState.messages.update(messageId, { messageId, ...messageData });
     }
 
     static async updateMessageStream(messageId: string, data: Partial<OllamaResponse>) {
+        //console.log('updateMessageStream', messageId);
         if (!messageId) throw new Error('messageId is required');
         const message = await idbQuery.getMessage(messageId);
+        let content = (message?.content ?? '') + (data?.message?.content ?? data?.response ?? '');
         await idbQuery.updateMessage(messageId, {
-            content: (message?.content ?? '') + (data?.response ?? data?.message?.content ?? ''),
+            messageId,
+            content: content,
             status: 'streaming',
         });
     }

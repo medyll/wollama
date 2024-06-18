@@ -28,6 +28,7 @@ export interface ChatListType {
 export type DBMessage = {
     id: string;
     chatId: string;
+    /** @deprecated */
     messageId: string;
     content: string;
     createdAt: Date;
@@ -35,7 +36,6 @@ export type DBMessage = {
     status: 'idle' | 'done' | 'sent' | 'streaming' | 'error';
     context: number[];
     model: string;
-    role: 'system' | 'user';
 } & (
     | {
           role: 'system';

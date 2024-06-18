@@ -25,7 +25,10 @@ export let chatSession: ChatSession = $state({
     context: [],
 });
 
-export let chatParams: ChatGenerate = $state({
+let chatParamsState = createChatParams();
+export let chatParams = chatParamsState.chatParams;
+
+/* export let chatParams: ChatGenerate = $state({
     disabledPrompt: false,
     isPrompting: false,
     images: undefined,
@@ -36,7 +39,7 @@ export let chatParams: ChatGenerate = $state({
     models: [],
     prompt: '',
     template: '',
-});
+}); */
 
 export let chatChat = (): OllamaChat => {
     let derive = $derived({
@@ -68,3 +71,24 @@ export let chatGenerated = (): OllApiGenerate => {
 
     return derive as OllApiGenerate;
 };
+
+export function createChatParams() {
+    let _chatParams = $state<ChatGenerate>({
+        disabledPrompt: false,
+        isPrompting: false,
+        images: undefined,
+        promptSystem: {} as PromptType,
+        voiceListening: false,
+        temperature: 0.5,
+        format: undefined,
+        models: [],
+        prompt: '',
+        template: '',
+    });
+
+    return {
+        get chatParams() {
+            return _chatParams;
+        },
+    };
+}

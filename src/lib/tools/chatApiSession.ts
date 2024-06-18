@@ -1,6 +1,7 @@
 import { idbQuery } from '$lib/db/dbQuery';
 import type { DBMessage, DbChat, MessageImageType, PromptType } from '$types/db';
 import { OllamaChatMessageRole, type OllamaChatMessage, type OllamaResponse } from '$types/ollama';
+import { chatUtils } from './chatUtils';
 
 /**
  * Represents a class that manages a chat session.
@@ -44,7 +45,7 @@ export class ChatApiSession {
     }
 
     public async updateChatSession(chatData: Partial<DbChat> = {} as DbChat) {
-        this.chat = await idbQuery.updateChat(this.chatId, chatData as DbChat);
+        this.chat = await idbQuery.updateChat(this.chatId, { ...chatData } as DbChat);
         this.chatId = this.chat.chatId;
     }
 
@@ -83,15 +84,18 @@ export class ChatApiSession {
      * @returns A Promise that resolves to the created user message.
      */
     private async createUserMessage(content: string, images?: MessageImageType) {
-        this.userDbMessage = await idbQuery.insertMessage(this.chat.chatId, {
-            chatId: this.chat.chatId,
-            content,
-            images,
-            role: 'user',
-            status: 'done',
-            //
-            model: this.chat.models[0],
-        });
+        this.userDbMessage = await idbQuery.insertMessage(
+            this.chat.chatId,
+            chatUtils.getMessageDataObject({
+                chatId: this.chat.chatId,
+                content,
+                images,
+                role: 'user',
+                status: 'done',
+                //
+                model: this.chat.models[0],
+            })
+        );
         // format message for chat send
         this.userChatMessage = {
             content: content,
@@ -104,12 +108,15 @@ export class ChatApiSession {
         this.assistantsDbMessages = await Promise.all([
             ...this.chat.models.map(
                 async (model) =>
-                    await idbQuery.insertMessage(this.chat.chatId, {
-                        chatId: this.chat.chatId,
-                        model,
-                        role: 'assistant',
-                        status: 'idle',
-                    })
+                    await idbQuery.insertMessage(
+                        this.chat.chatId,
+                        chatUtils.getMessageDataObject({
+                            chatId: this.chat.chatId,
+                            model,
+                            role: 'assistant',
+                            status: 'idle',
+                        })
+                    )
             ),
         ]);
 
@@ -122,10 +129,11 @@ export class ChatApiSession {
      * @param data - The response data from the assistant.
      */
     public async onMessageDone(assistantMessage: DBMessage, data: OllamaResponse) {
+        console.log('done', assistantMessage.messageId, data);
         await Promise.all([
             idbQuery.updateChat(this.chat.chatId, { context: data.context }),
-            idbQuery.updateMessage(assistantMessage.messageId, { status: 'done' }),
-            idbQuery.insertMessageStats({ ...data, messageId: assistantMessage.messageId }),
+            idbQuery.updateMessage(assistantMessage.id, { status: 'done' }),
+            // idbQuery.insertMessageStats({ ...data, messageId: assistantMessage.messageId }),
         ]);
     }
 

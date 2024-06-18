@@ -72,8 +72,8 @@
 
 	$: dd = message?.createdAt.getTime().toString();
 	$: order = `order: ${dd};`;
+ 
 </script>
-
 <div style={order} class="{place}   relative flex w-auto gap-1 elative overflow-hidden mb-1">
     {#if message.role == 'user'}<div class="p-1">
             <div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
@@ -81,6 +81,9 @@
             </div>
         </div>
     {/if}
+    <div>
+    
+{message?.id}</div>
     <div class="flex flex-col w-full">
         <div class="line-gap-2 mb-1 p-1 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
             <div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
@@ -98,11 +101,12 @@
                 <img src={message.images.dataUri} alt="list" style="height:100px" />
             {/if}
             {#if message?.role == 'assistant'}
-                {#if message.status == 'idle'}
+            {@html message.content}
+                <!-- {#if message.status == 'idle'}
                     <Skeleton class="h-full" />
                 {:else if ['streaming', 'done'].includes(message.status)}
                     {@html assistantCode}
-                {/if}
+                {/if} -->
             {:else if message?.role == 'user'}
                 {@html message?.content}
             {/if}
