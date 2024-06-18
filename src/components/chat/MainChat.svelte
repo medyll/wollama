@@ -29,11 +29,10 @@
     import { idbqlState } from '$lib/db/dbSchema';
 
     $effect(() => {
-       // $inspect(idbqlState.chat.where({ chatId: { eq: 'red' } }));
+        // $inspect(idbqlState.chat.where({ chatId: { eq: 'red' } }));
     });
 
     let chatApiSession: ChatApiSession = new ChatApiSession($ui.activeChatId);
-    let activeModels: string[] = [$settings.defaultModel];
 
     let placeholder: string = $derived(chatParams.voiceListening ? 'Listening...' : 'Message to ai');
 
@@ -41,55 +40,73 @@
 
     let disableSubmit: boolean = $derived($prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running');
 
-    let messages = $derived.by(()=> $ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []);
+    let messages = $derived.by(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
 
-   //  $inspect({messages});
-
+    //  $inspect({messages});
 
     async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
         //
         const { images, promptSystem } = { ...prompter };
         //
 
-        await chatSession.createSessionMessages(chatParams.prompt as string, images);
+        // await chatSession.createSessionMessages(chatParams.prompt as string, images);
 
+        aiState.set('running');
         // loop on chatParams.models
-        chatParams.models.forEach((model:string) => {
+        chatParams.models.forEach(async (model: string) => {
             // take userMessage
+            //  chatSession get unique userDbMessage with model;
+            const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images, model });
+            const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images, model });
             //  chatSession create assistantsDbMessage with model;
-            //  chatSession create userDbMessage with model;
+            const assistantDbMessage = await chatSession.createAssistantMessage(model);
             // get ollamaBody
+            const sender = new PromptMaker(ollamaBody);
             // declare stream listeners
-            // send 
-
+            sender.onStream = ({ assistantMessage, data }) => {
+                chatSession.onMessageStream(userDbMessage, data);
+                // set auto-scroll to false
+                ui.setAutoScroll(assistantMessage.chatId, false);
+            };
+            sender.onEnd = ({ assistantMessage, data }) => {
+                chatSession.onMessageDone(userDbMessage, data);
+                aiState.set('done');
+                chatUtils.checkTitle(userDbMessage.chatId);
+            };
+            // send
+            sender.setRoleAssistant(assistantDbMessage);
+            sender.sendChatMessage({
+                // chatSession.userChatMessage, chatSession.previousMessages, promptSystem.content
+                model,
+                userMessage: userChatMessage,
+                previousMessages: chatSession.previousMessages,
+                prompt: promptSystem.content,
+                apiChatParams: ollamaBody,
+                target: assistantDbMessage
+            });
         });
         // set ai state to running
-        aiState.set('running');
+        //aiState.set('running');
         //
-        const sender = new PromptMaker(ollamaBody);
+        //const sender = new PromptMaker(ollamaBody);
 
         // listen to sender stream
-        sender.onStream = ({ assistantMessage, data }) => {
-          
+        /* sender.onStream = ({ assistantMessage, data }) => {
             chatSession.onMessageStream(assistantMessage, data);
-            aiState.set('running');
-            // set auto-scroll to false
+            aiState.set('running'); 
             ui.setAutoScroll(assistantMessage.chatId, false);
         };
         sender.onEnd = ({ assistantMessage, data }) => {
-         
             chatSession.onMessageDone(assistantMessage, data);
             aiState.set('done');
             chatUtils.checkTitle(assistantMessage.chatId);
-        };
+        }; */
 
         // Send prompt to api per assistant.message
-        await chatSession.assistantsDbMessages.forEach(async (assistantDbMessage) => { 
-            // const sender = new PromptMaker(ollamaBody);
-            // 
+        /* await chatSession.assistantsDbMessages.forEach(async (assistantDbMessage) => { 
             sender.setRoleAssistant(assistantDbMessage);
             sender.sendChatMessage(chatSession.userChatMessage, chatSession.previousMessages, promptSystem.content);
-        });
+        }); */
 
         // reset prompt
         //chatParams.prompt = '';
@@ -106,25 +123,24 @@
     async function submitHandler() {
         if (!$ui.activeChatId) {
             await chatApiSession.initChatSession({
-                 models: [...chatParams.models]
+                models: [...chatParams.models],
             });
             // set active chat
             ui.setActiveChatId(chatApiSession.chat.chatId);
             // relocation without navigation
             window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`);
         }
-     
+
         await chatApiSession.updateChatSession({
             models: [...chatParams.models],
-            systemPrompt: {...chatParams.promptSystem}, 
-            ollamaBody : $ollamaBodyStore,
+            systemPrompt: { ...chatParams.promptSystem },
+            ollamaBody: $ollamaBodyStore,
         });
- 
+
         sendPrompt($prompter, $ollamaBodyStore, chatApiSession);
     }
 
     function keyPressHandler(e: KeyboardEvent) {
-     
         chatParams.isPrompting = true;
 
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -132,12 +148,10 @@
             submitHandler();
         }
     }
-
-  
 </script>
 
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
-<div class="h-full w-full"> 
+<div class="h-full w-full">
     <div class="application-container flex-v h-full mx-auto">
         <DashBoard>
             <!-- <ChatInfo>

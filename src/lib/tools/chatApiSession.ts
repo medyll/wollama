@@ -73,8 +73,8 @@ export class ChatApiSession {
      */
     public async createSessionMessages(content: string, images?: MessageImageType) {
         await this.setPreviousMessages();
-        await this.createUserMessage(content, images);
-        await this.createAssistantMessage();
+        await this.createUserDbMessage(content, images);
+        await this.createAssistantMessages();
     }
     /**
      * Creates a user message in the chat session.
@@ -83,7 +83,7 @@ export class ChatApiSession {
      * @param images - Optional images to be attached to the message.
      * @returns A Promise that resolves to the created user message.
      */
-    private async createUserMessage(content: string, images?: MessageImageType) {
+    async createUserDbMessage({ content, images, model }: { model?: string; content: string; images?: MessageImageType }) {
         this.userDbMessage = await idbQuery.insertMessage(
             this.chat.chatId,
             chatUtils.getMessageDataObject({
@@ -93,18 +93,38 @@ export class ChatApiSession {
                 role: 'user',
                 status: 'done',
                 //
-                model: this.chat.models[0],
+                model: model ?? this.chat.models[0],
             })
         );
+
+        return this.userDbMessage;
+    }
+
+    async createUserChatMessage({ content, images, model }: { model?: string; content: string; images?: MessageImageType }) {
         // format message for chat send
         this.userChatMessage = {
             content: content,
             role: OllamaChatMessageRole.USER,
             images: images?.base64 ? [images?.base64] : undefined,
         };
+
+        return this.userChatMessage;
     }
 
-    private async createAssistantMessage() {
+    async createAssistantMessage(model: string) {
+        const assistantsDbMessages = await idbQuery.insertMessage(
+            this.chat.chatId,
+            chatUtils.getMessageDataObject({
+                chatId: this.chat.chatId,
+                model,
+                role: 'assistant',
+                status: 'idle',
+            })
+        );
+
+        return assistantsDbMessages;
+    }
+    private async createAssistantMessages() {
         this.assistantsDbMessages = await Promise.all([
             ...this.chat.models.map(
                 async (model) =>
@@ -143,6 +163,6 @@ export class ChatApiSession {
      * @param data - The response data received from the assistant.
      */
     public async onMessageStream(assistantMessage: DBMessage, data: OllamaResponse) {
-        idbQuery.updateMessageStream(assistantMessage.messageId, data);
+        idbQuery.updateMessageStream(assistantMessage.id, data);
     }
 }

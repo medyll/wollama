@@ -64,8 +64,23 @@ export class PromptMaker {
     /**
      * Sends a chat message and play a callback
      * @param userMessage - The user message to send.
+     * userMessage: OllamaChatMessage, previousMessages: any, systemPrompt?: string
      */
-    async sendChatMessage(userMessage: OllamaChatMessage, previousMessages: any, systemPrompt?: string): Promise<void> {
+    async sendChatMessage({
+        userMessage,
+        previousMessages,
+        systemPrompt,
+        apiChatParams,
+        model,
+        target,
+    }: {
+        userMessage: OllamaChatMessage;
+        previousMessages: any;
+        systemPrompt?: string;
+        apiChatParams?: Partial<OllamaChat>;
+        model?: string;
+        target?: DBMessage;
+    }): Promise<void> {
         const config = get(settings);
         const ollamaOptions = get(ollamaApiMainOptionsParams);
 
@@ -77,10 +92,10 @@ export class PromptMaker {
         return OllamaApi.chat(
             {
                 messages: [system, ...previousMessages, userMessage].filter((m) => m),
-                model: config?.defaultModel,
+                model: model ?? config?.defaultModel,
                 stream: true,
-                ...this.apiChatParams,
-                options: { ...ollamaOptions, ...this.apiChatParams?.options },
+                ...apiChatParams,
+                options: { ...ollamaOptions, ...apiChatParams?.options },
             } as OllamaChat,
             async (data) => {
                 this.onResponseMessageStream({
