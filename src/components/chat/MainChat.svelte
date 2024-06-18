@@ -53,7 +53,16 @@
 
         await chatSession.createSessionMessages(chatParams.prompt as string, images);
 
+        // loop on chatParams.models
+        chatParams.models.forEach((model:string) => {
+            // take userMessage
+            //  chatSession create assistantsDbMessage with model;
+            //  chatSession create userDbMessage with model;
+            // get ollamaBody
+            // declare stream listeners
+            // send 
 
+        });
         // set ai state to running
         aiState.set('running');
         //
@@ -76,6 +85,8 @@
 
         // Send prompt to api per assistant.message
         await chatSession.assistantsDbMessages.forEach(async (assistantDbMessage) => { 
+            // const sender = new PromptMaker(ollamaBody);
+            // 
             sender.setRoleAssistant(assistantDbMessage);
             sender.sendChatMessage(chatSession.userChatMessage, chatSession.previousMessages, promptSystem.content);
         });
