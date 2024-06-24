@@ -6,7 +6,7 @@
     import { chatParams, } from '$lib/states/chat.svelte';
     import type { Snippet } from 'svelte';
 
-    let { children }:{ children:Snippet} = $props();
+    let { children,home }:{ children:Snippet,home?: Snippet} = $props();
  
  
 </script>
@@ -22,6 +22,7 @@
                 <div class="soft-title p-2">{$t('ui.use_model')}</div>
                 <Model bind:activeModels={chatParams.models} />
             </div>
+        {@render home?.()}
             <div class="flex-1"></div>
         </div>
     {:else} 

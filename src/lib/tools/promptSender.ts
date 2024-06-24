@@ -13,14 +13,10 @@ export type PromptSenderType = {
     format: OllamaFormat;
 };
 
-export type SenderCallback<T> = {
+export type SenderCallback<T = any> = {
     data: OllamaResponse;
+    target: DBMessage;
 } & T;
-
-type CallbackDataType = {
-    /** @deprecated */
-    assistantMessage?: DBMessage;
-};
 
 /**
  * Represents a class that sends prompts and receives responses in a chat.
@@ -45,13 +41,13 @@ export class PromptMaker {
      * Event handler for receiving a response stream.
      * @param args - The callback data containing the response and assistant message.
      */
-    onStream!: (args: SenderCallback<CallbackDataType>) => void;
+    onStream!: (args: { data: OllamaResponse; target: DBMessage }) => void;
 
     /**
      * Event handler for the end of the response stream.
      * @param args - The callback data containing the response and assistant message.
      */
-    onEnd!: (args: SenderCallback<CallbackDataType>) => void;
+    onEnd!: (args: SenderCallback) => void;
 
     /**
      * Sets the assistant message for the chat.
@@ -70,16 +66,16 @@ export class PromptMaker {
         userMessage,
         previousMessages,
         systemPrompt,
-        apiChatParams,
+        ollamaChatBody,
         model,
         target,
     }: {
         userMessage: OllamaChatMessage;
         previousMessages: any;
         systemPrompt?: string;
-        apiChatParams?: Partial<OllamaChat>;
+        ollamaChatBody?: Partial<OllamaChat>;
         model?: string;
-        target?: DBMessage;
+        target: DBMessage;
     }): Promise<void> {
         const config = get(settings);
         const ollamaOptions = get(ollamaApiMainOptionsParams);
@@ -94,12 +90,13 @@ export class PromptMaker {
                 messages: [system, ...previousMessages, userMessage].filter((m) => m),
                 model: model ?? config?.defaultModel,
                 stream: true,
-                ...apiChatParams,
-                options: { ...ollamaOptions, ...apiChatParams?.options },
+                ...ollamaChatBody,
+                options: { ...ollamaOptions, ...ollamaChatBody?.options },
             } as OllamaChat,
-            async (data) => {
+            async (data: OllamaResponse) => {
                 this.onResponseMessageStream({
                     data,
+                    target,
                 });
             }
         );
@@ -109,11 +106,11 @@ export class PromptMaker {
      * Handles the response message stream.
      * @param args - The callback data containing the response and assistant message.
      */
-    private async onResponseMessageStream({ data }: SenderCallback<CallbackDataType>): Promise<void> {
+    private async onResponseMessageStream({ data, target }: SenderCallback): Promise<void> {
         if (data.done) {
-            this.onEnd({ data, assistantMessage: this.assistantMessage });
+            this.onEnd({ data, target });
         } else {
-            this.onStream({ data, assistantMessage: this.assistantMessage });
+            this.onStream({ data, target });
         }
     }
 }

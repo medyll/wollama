@@ -26,12 +26,13 @@
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
     import { OllamaApi, ollamaApiConfig } from '$lib/db/ollamaApi';
 
-    import '$lib/playground.js';
+    import '$lib/playground.js';    
 
     let {children,  } = $props();
 
     // load models into store
     async function loadModels(models: Record<string, any>[]) {
+        if(!models) return
         settings.setSetting('ollamaModels', [...models]);
         if (!$settings.defaultModel) settings.setSetting('defaultModel', models[0].name);
         if ($settings.defaultModel) $activeModels.push($settings.defaultModel);
@@ -74,7 +75,7 @@
    /*  $: if ($settings.ollamaModels) {
     } */
     $effect(()=>{
-        if (browser && $page.params.id) {
+        if (browser && $page.params.id && $page.params.id!=$ui.activeChatId) {
         const chat = idbQuery.getChat($page.params.id)
             if (chat) {
                 ui.setActiveChatId($page.params.id);
@@ -82,7 +83,7 @@
                 engine.goto('/');
             }
     } else {
-        ui.setActiveChatId();
+        //ui.setActiveChatId();
     }
     })
 

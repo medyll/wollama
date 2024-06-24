@@ -36,77 +36,50 @@
 
     let placeholder: string = $derived(chatParams.voiceListening ? 'Listening...' : 'Message to ai');
 
-    // $: placeholder = $prompter.voiceListening ? 'Listening...' : 'Message to ai';
-
     let disableSubmit: boolean = $derived($prompter.prompt.trim() == '' || $prompter.isPrompting || $aiState == 'running');
 
-    let messages = $derived.by(() => ($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []));
+    let messages = $derived($ui.activeChatId ? idbQuery.getMessages($ui.activeChatId) : []);
 
-    //  $inspect({messages});
-
-    async function sendPrompt(prompter: PrompterType, ollamaBody: OllamaChat, chatSession: ChatApiSession) {
+    async function sendPrompt(prompter: PrompterType, ollamaChatBody: OllamaChat, chatSession: ChatApiSession) {
         //
         const { images, promptSystem } = { ...prompter };
         //
 
-        // await chatSession.createSessionMessages(chatParams.prompt as string, images);
-
         aiState.set('running');
+        //  chatSession get unique userDbMessage with model;
+        const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images, model: chatParams.models[0] });
+        const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images, model: chatParams.models[0] });
+        const previousMessages = chatSession.previousMessages;
+        const systemPrompt = promptSystem.content;
         // loop on chatParams.models
+
         chatParams.models.forEach(async (model: string) => {
-            // take userMessage
-            //  chatSession get unique userDbMessage with model;
-            const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images, model });
-            const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images, model });
-            //  chatSession create assistantsDbMessage with model;
+            // chatSession create assistantsDbMessage with concerned model;
             const assistantDbMessage = await chatSession.createAssistantMessage(model);
             // get ollamaBody
-            const sender = new PromptMaker(ollamaBody);
+            const sender = new PromptMaker(ollamaChatBody);
             // declare stream listeners
-            sender.onStream = ({ assistantMessage, data }) => {
-                chatSession.onMessageStream(userDbMessage, data);
+            sender.onStream = ({ target, data }) => {
+                chatSession.onMessageStream(target, data);
                 // set auto-scroll to false
-                ui.setAutoScroll(assistantMessage.chatId, false);
+                ui.setAutoScroll(target.chatId, false);
             };
-            sender.onEnd = ({ assistantMessage, data }) => {
-                chatSession.onMessageDone(userDbMessage, data);
+            sender.onEnd = ({ data }) => {
+                chatSession.onMessageDone(assistantDbMessage, data);
                 aiState.set('done');
                 chatUtils.checkTitle(userDbMessage.chatId);
             };
             // send
             sender.setRoleAssistant(assistantDbMessage);
             sender.sendChatMessage({
-                // chatSession.userChatMessage, chatSession.previousMessages, promptSystem.content
                 model,
+                previousMessages,
+                ollamaChatBody,
+                systemPrompt,
                 userMessage: userChatMessage,
-                previousMessages: chatSession.previousMessages,
-                prompt: promptSystem.content,
-                apiChatParams: ollamaBody,
-                target: assistantDbMessage
+                target: assistantDbMessage,
             });
         });
-        // set ai state to running
-        //aiState.set('running');
-        //
-        //const sender = new PromptMaker(ollamaBody);
-
-        // listen to sender stream
-        /* sender.onStream = ({ assistantMessage, data }) => {
-            chatSession.onMessageStream(assistantMessage, data);
-            aiState.set('running'); 
-            ui.setAutoScroll(assistantMessage.chatId, false);
-        };
-        sender.onEnd = ({ assistantMessage, data }) => {
-            chatSession.onMessageDone(assistantMessage, data);
-            aiState.set('done');
-            chatUtils.checkTitle(assistantMessage.chatId);
-        }; */
-
-        // Send prompt to api per assistant.message
-        /* await chatSession.assistantsDbMessages.forEach(async (assistantDbMessage) => { 
-            sender.setRoleAssistant(assistantDbMessage);
-            sender.sendChatMessage(chatSession.userChatMessage, chatSession.previousMessages, promptSystem.content);
-        }); */
 
         // reset prompt
         //chatParams.prompt = '';
@@ -115,7 +88,7 @@
         // $prompter.prompt = '';
         chatParams.prompt = '';
         chatParams.images = undefined;
-        //$prompter.images = undefined;
+
         // set auto-scroll to true
         ui.setAutoScroll(chatSession.chat.chatId, true);
     }
@@ -150,47 +123,49 @@
     }
 </script>
 
+{#snippet input()}
+    <div class="chatZone">
+        <ChatOptions />
+        <div class="inputTextarea">
+            <Images />
+            <Input
+                disabled={$connectionChecker.connectionStatus != 'connected'}
+                onkeypress={keyPressHandler}
+                bind:value={chatParams.prompt}
+                bind:requestStop={$aiState}
+                showCancel={$aiState == 'running'}
+                {placeholder}
+                form="prompt-form">
+                <Attachment slot="start" form="prompt-form" bind:imageFile={chatParams.images} disabled={false} />
+                <div slot="end" class="flex-align-middle">
+                    <Speech onEnd={submitHandler} bind:prompt={chatParams.prompt} bind:voiceListening={chatParams.voiceListening} disabled={disableSubmit} />
+                    <button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
+                        <Icon icon="mdi:send" style="font-size:1.6em" />
+                    </button>
+                </div>
+            </Input>
+        </div>
+        <div class="text-xs text-center theme-bg p-2">{$t('ui.aiCautionMessage')}</div>
+    </div>
+{/snippet}
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
 <div class="h-full w-full">
     <div class="application-container flex-v h-full mx-auto">
         <DashBoard>
+            {#snippet home()}
+                {@render input()}
+            {/snippet}
             <!-- <ChatInfo>
                 <Model bind:activeModels={chatParams.models} />
             </ChatInfo> -->
             <!-- <Model bind:activeModels={chatParams.models} /> -->
             <!-- <Model bind:activeModels={chatParams.models} /> -->
             <List class="flex flex-col w-full gap-4" data={messages ?? []} let:item={message}>
-                <Message {message} />
+                <Message messageId={message.messageId} />
             </List>
+            {@render input()}
             <Bottomer />
         </DashBoard>
-        <div class="chatZone">
-            <ChatOptions />
-            <div class="inputTextarea">
-                <Images />
-                <Input
-                    disabled={$connectionChecker.connectionStatus != 'connected'}
-                    onkeypress={keyPressHandler}
-                    bind:value={chatParams.prompt}
-                    bind:requestStop={$aiState}
-                    showCancel={$aiState == 'running'}
-                    {placeholder}
-                    form="prompt-form">
-                    <Attachment slot="start" form="prompt-form" bind:imageFile={chatParams.images} disabled={false} />
-                    <div slot="end" class="flex-align-middle">
-                        <Speech
-                            onEnd={submitHandler}
-                            bind:prompt={chatParams.prompt}
-                            bind:voiceListening={chatParams.voiceListening}
-                            disabled={disableSubmit} />
-                        <button class="px-2" type="submit" form="prompt-form" disabled={disableSubmit}>
-                            <Icon icon="mdi:send" style="font-size:1.6em" />
-                        </button>
-                    </div>
-                </Input>
-            </div>
-            <div class="text-xs text-center theme-bg p-2">{$t('ui.aiCautionMessage')}</div>
-        </div>
     </div>
 </div>
 

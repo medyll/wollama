@@ -122,6 +122,8 @@ export class ChatApiSession {
             })
         );
 
+        console.log('created :', assistantsDbMessages);
+
         return assistantsDbMessages;
     }
     private async createAssistantMessages() {
@@ -152,7 +154,7 @@ export class ChatApiSession {
         console.log('done', assistantMessage.messageId, data);
         await Promise.all([
             idbQuery.updateChat(this.chat.chatId, { context: data.context }),
-            idbQuery.updateMessage(assistantMessage.id, { status: 'done' }),
+            idbQuery.updateMessage(assistantMessage.messageId, { status: 'done' }),
             // idbQuery.insertMessageStats({ ...data, messageId: assistantMessage.messageId }),
         ]);
     }
@@ -163,6 +165,6 @@ export class ChatApiSession {
      * @param data - The response data received from the assistant.
      */
     public async onMessageStream(assistantMessage: DBMessage, data: OllamaResponse) {
-        idbQuery.updateMessageStream(assistantMessage.id, data);
+        idbQuery.updateMessageStream(assistantMessage.messageId, data);
     }
 }

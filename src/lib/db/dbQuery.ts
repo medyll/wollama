@@ -69,17 +69,21 @@ export class idbQuery {
         //console.log('updateMessageStream', messageId);
         if (!messageId) throw new Error('messageId is required');
         const message = await idbQuery.getMessage(messageId);
+
         let content = (message?.content ?? '') + (data?.message?.content ?? data?.response ?? '');
-        await idbQuery.updateMessage(messageId, {
-            messageId,
-            content: content,
-            status: 'streaming',
-        });
+        console.log('stream', message?.content, data?.message?.content);
+        if (content)
+            await idbQuery.updateMessage(messageId, {
+                messageId,
+                content,
+                status: 'streaming',
+            });
     }
 
-    static async getMessage(messageId: string) {
+    static getMessage(messageId: string) {
         if (!messageId) throw new Error('messageId is required');
         return idbqlState.messages.where({ messageId: { eq: messageId } })[0];
+        // return   idbqlState.messages.get(messageId);
     }
 
     static getMessages(chatId: string) {
