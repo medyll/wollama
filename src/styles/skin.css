@@ -88,7 +88,7 @@
         overflow: hidden;
 
         .application-sideBar {
-            @apply hidden lg:w-[280px] lg:flex h-full;
+            @apply hidden lg:w-[80px] lg:flex h-full;
             @apply flex-col flex-shrink;
             @apply overflow-hidden;
             @apply shadow-lg;

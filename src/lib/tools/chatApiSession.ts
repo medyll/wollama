@@ -84,6 +84,21 @@ export class ChatApiSession {
      * @returns A Promise that resolves to the created user message.
      */
     async createUserDbMessage({ content, images, model }: { model?: string; content: string; images?: MessageImageType }) {
+        const urlRegex = /https?:\/\/[^\s]+/g;
+        const urs = content.match(urlRegex);
+        let urls: DBMessage['urls'] = [];
+
+        if (urs) {
+            for (const url of urs) {
+                // Téléchargez le contenu de l'URL
+                const urlContent = ''; //await fetchUrlContent(url);
+                // Ajoutez le contenu téléchargé au message
+                content += `\n\nContent from ${url}:\n\n${urlContent}`;
+                urls.push({ url, image: '', order: 0, title: 'Web page' });
+
+                console.log('red');
+            }
+        }
         this.userDbMessage = await idbQuery.insertMessage(
             this.chat.chatId,
             chatUtils.getMessageDataObject({
@@ -92,12 +107,17 @@ export class ChatApiSession {
                 images,
                 role: 'user',
                 status: 'done',
+                urls,
                 //
                 model: model ?? this.chat.models[0],
             })
         );
 
         return this.userDbMessage;
+    }
+
+    async updateUserDbMessage(dBMessage: DBMessage) {
+        await idbQuery.updateMessage(dBMessage.messageId, dBMessage);
     }
 
     async createUserChatMessage({ content, images, model }: { model?: string; content: string; images?: MessageImageType }) {

@@ -7,6 +7,7 @@ export type DbChat = {
     id: string;
     chatId: string;
     title: string;
+    description: string;
     models: string[];
     createdAt: Date;
     dateLastMessage: Date;
@@ -36,6 +37,7 @@ export type DBMessage = {
     status: 'idle' | 'done' | 'sent' | 'streaming' | 'error';
     context: number[];
     model: string;
+    urls?: { url: string; image?: string; order: number; title?: string }[];
 } & (
     | {
           role: 'system';

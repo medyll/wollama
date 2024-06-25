@@ -1,14 +1,11 @@
 <svelte:options accessors runes />
 
 <script lang="ts">
-    import Speech from '$components/chat/input/Speech.svelte';
-    import Model from '$components/chat/input/Model.svelte';
+    import Speech from '$components/chat/input/Speech.svelte'; 
     import { chatUtils } from '$lib/tools/chatUtils';
     import Icon from '@iconify/svelte';
     import Input from './input/Input.svelte';
-    import Attachment from './input/Attachment.svelte';
-    import { page } from '$app/stores';
-    import ChatInfo from './ChatInfo.svelte';
+    import Attachment from './input/Attachment.svelte'; 
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
     import ChatOptions from './ChatOptions.svelte';
@@ -19,14 +16,11 @@
     import Message from '$components/chat/Message.svelte';
     import DashBoard from '$components/DashBoard.svelte';
     import Images from './input/Images.svelte';
-    import List from '$components/fragments/List.svelte';
-    import Bottomer from '$components/ui/Bottomer.svelte';
+    import List from '$components/fragments/List.svelte'; 
     import { connectionChecker } from '$lib/stores/connection';
     import { ChatApiSession } from '$lib/tools/chatApiSession';
-    import type { OllamaChat } from '$types/ollama';
-    import { settings } from '$lib/stores/settings.svelte';
-    import { chatParams, chatSession } from '$lib/states/chat.svelte';
-    import { idbqlState } from '$lib/db/dbSchema';
+    import type { OllamaChat } from '$types/ollama'; 
+    import { chatParams } from '$lib/states/chat.svelte'; 
 
     $effect(() => {
         // $inspect(idbqlState.chat.where({ chatId: { eq: 'red' } }));
@@ -51,8 +45,8 @@
         const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images, model: chatParams.models[0] });
         const previousMessages = chatSession.previousMessages;
         const systemPrompt = promptSystem.content;
+        
         // loop on chatParams.models
-
         chatParams.models.forEach(async (model: string) => {
             // chatSession create assistantsDbMessage with concerned model;
             const assistantDbMessage = await chatSession.createAssistantMessage(model);
@@ -81,8 +75,6 @@
             });
         });
 
-        // reset prompt
-        //chatParams.prompt = '';
         chatParams.images = undefined;
 
         // $prompter.prompt = '';
@@ -121,6 +113,14 @@
             submitHandler();
         }
     }
+
+    /* const response =   fetch('/api/capture', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url:'red' }),
+    }); */
 </script>
 
 {#snippet input()}
@@ -155,23 +155,18 @@
             {#snippet home()}
                 {@render input()}
             {/snippet}
-            <!-- <ChatInfo>
-                <Model bind:activeModels={chatParams.models} />
-            </ChatInfo> -->
-            <!-- <Model bind:activeModels={chatParams.models} /> -->
-            <!-- <Model bind:activeModels={chatParams.models} /> -->
-            <List class="flex flex-col w-full gap-4" data={messages ?? []} let:item={message}>
+            <List class="flex flex-col w-full gap-4 flex-1" data={messages ?? []} let:item={message}>
                 <Message messageId={message.messageId} />
             </List>
             {@render input()}
-            <Bottomer />
+            <!-- <Bottomer /> -->
         </DashBoard>
     </div>
 </div>
 
 <style lang="postcss" global>
     .chatZone {
-        @apply flex flex-col w-full sticky mb-0 bottom-0 px-8;
+        @apply flex flex-col w-full sticky mb-0 bottom-0 px-8; 
         /*  background-image: var(--cfab-gradient);
         background-size: 100vh 100vw;
         background-position: bottom; */

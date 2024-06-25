@@ -10,18 +10,17 @@
     import 'prismjs/themes/prism-tomorrow.css';
     import { format } from 'date-fns';
     import { idbQuery } from '$lib/db/dbQuery';
+    import { Looper } from '@medyll/slot-ui';
 
     interface Props {
         messageId: string;
     }
 
     let { messageId }: Props = $props();
-    let message =  $derived(messageId ? idbQuery.getMessage(messageId) : {}); 
+    let message = $derived<DBMessage>(messageId ? idbQuery.getMessage(messageId) : {});
 
     let icon = $derived(message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one');
     let place = $derived(message.role === 'user' ? 'mr-24' : 'ml-24');
-
-
 
     marked.use({
         async: false,
@@ -74,15 +73,14 @@
         return doc.body.innerHTML;
     }
 
-    let assistantCode = $derived.by(()=>{
-         if (message?.role == 'assistant' && message?.content && message.content.length) {
-           return selectCodeTags(message?.content);
+    let assistantCode = $derived.by(() => {
+        if (message?.role == 'assistant' && message?.content && message.content.length) {
+            return selectCodeTags(message?.content);
         }
-    })
+    });
 
-    let dd =  $derived(message?.createdAt.getTime().toString());
+    let dd = $derived(message?.createdAt.getTime().toString());
     let order = $derived(`order: ${dd};`);
- 
 </script>
 
 <div style={order} class="{place}   relative flex w-auto gap-1 elative overflow-hidden mb-1">
@@ -91,7 +89,7 @@
                 <Icon style="font-size:1.6em" {icon} />
             </div>
         </div>
-    {/if} 
+    {/if}
     <div class="flex flex-col w-full">
         <div class="line-gap-2 mb-1 p-1 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
             <div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
@@ -105,11 +103,18 @@
             <div class="soft-title">{dd}</div>
         </div>
         <div class="speech-bubble theme-border">
+            {#if message.urls?.length}
+                <Looper class="flex-h" data={message.urls}>
+                    {#snippet children({ item })}
+                        <div>{item.title}</div>
+                    {/snippet}
+                </Looper>
+                <hr />
+            {/if}
             {#if message.images}
                 <img src={message.images.dataUri} alt="list" style="height:100px" />
             {/if}
             {#if message?.role == 'assistant'}
-                
                 {#if message.status == 'idle'}
                     <Skeleton class="h-full" />
                 {:else if ['streaming', 'done'].includes(message.status)}

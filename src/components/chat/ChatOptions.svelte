@@ -1,4 +1,4 @@
-<script lang="ts"> 
+<script lang="ts">
     import { settings } from '$lib/stores/settings.svelte';
     import Icon from '@iconify/svelte';
     import Selector from '$components/fragments/Selector.svelte';
@@ -14,38 +14,40 @@
         chatParams.temperature = temperature;
     }
 
-    function setRequestMode(format: 'json' | 'plain' ) {
+    function setRequestMode(format: 'json' | 'plain') {
         chatParams.format = format;
     }
 </script>
 
+<div class="p-1 flex-align-middle-center theme-bg rounded-md pb-2">
+    <div class="flex justify-center relative">
+        <Model bind:activeModels={chatParams.models} />
+    </div>
+</div>
 <div class="p-1 flex-align-middle theme-bg rounded-md pb-2">
     <svelte:component this={component} bind:activePrompt={chatParams.promptSystem} />
     <div class="flex-1 text-center relative">
-        <button on:click={() => ui.showHidePromptMenu()}>
+        <button onclick={() => ui.showHidePromptMenu()}>
             {chatParams.promptSystem.title ?? $t('prompt.systemPrompt')}
         </button>
     </div>
-    <div>
-    <Model bind:activeModels={chatParams.models} />
-    </div>
+
     <div class="flex justify-center gauge relative">
         <div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
         {#each Object.keys($settings.temperatures ?? {}) as temperature}
             {@const active = chatParams?.temperature == $settings.temperatures[temperature]}
             <button
-                on:click={() => {
+                onclick={() => {
                     setTemperature($settings.temperatures[temperature]);
                 }}
                 class:active
-                class="button-temp">{temperature}</button
-            >
+                class="button-temp">{temperature}</button>
         {/each}
     </div>
-    <div class="line-gap-2 flex-1 justify-center"> 
+    <div class="line-gap-2 flex-1 justify-center">
         <Icon icon="charm:binary" class="sm" />
         <Selector values={['json', 'plain']} value={chatParams.format} let:item>
-            <button on:click={() => setRequestMode(item)}>{item}</button>
+            <button onclick={() => setRequestMode(item)}>{item}</button>
         </Selector>
     </div>
 </div>

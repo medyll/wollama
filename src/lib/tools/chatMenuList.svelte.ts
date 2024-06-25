@@ -130,5 +130,5 @@ export function groupChatMessages(sortedList: DbChat[], args = { monthGroupSize:
 }
 
 export const groupMessages = (list: any[]) => {
-    return groupChatMessages(sortList(list ?? []));
+    return groupChatMessages(list ?? []); // sortList(list ?? [])
 };

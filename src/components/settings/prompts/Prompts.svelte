@@ -11,7 +11,7 @@
     import PromptForm from './PromptForm.svelte';
  
 
-    let  { prompt, activePrompt } = $props();
+    let  { prompt, activePrompt = $bindable() } = $props();
 
     let promptList = $derived(idbQuery.getPrompts());
     let mode: 'list' | 'create' = $state('list');
