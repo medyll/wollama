@@ -42,7 +42,7 @@ export type OllamaChatMessage = {
 };
 
 export type OllamaResponse = {
-    messageId: string;
+    /** @deprecated*/ messageId: string;
     model: string;
     create_at: string;
     response: string;

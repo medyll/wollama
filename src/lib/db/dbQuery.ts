@@ -4,16 +4,22 @@ import { chatUtils } from '$lib/tools/chatUtils';
 import { idbqlState } from './dbSchema';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
+import { idbqModel } from '$lib/db/dbSchema';
 
-export function O(collection: keyof idbqModel) {
+export function O(collection: keyof typeof idbqModel) {
+    if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
     return {
-        get: (key: string) => {},
-        getAll: (key: string) => {},
-        create: (key: string, value: any) => {},
-        delete: (key: string) => {},
-        update: (key: string) => {},
+        get: idbqlState[collection].getOne,
+        getAll: idbqlState[collection].getAll,
+        create: idbqlState[collection].add,
+        delete: idbqlState[collection].delete,
+        update: idbqlState[collection].update,
+        where: idbqlState[collection].where,
+        updateWhere: idbqlState[collection].updateWhere,
+        deleteWhere: idbqlState[collection].deleteWhere,
     };
 }
+
 export class idbQuery {
     /* chat */
     static getChat(chatId: string) {

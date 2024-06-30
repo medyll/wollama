@@ -69,6 +69,7 @@
                 target: assistantDbMessage,
                 temperature: chatParams.temperature,
                 format: chatParams.format,
+                context: chat.context ?? [],
             });
         });
 

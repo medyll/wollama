@@ -70,6 +70,7 @@ export class PromptSender {
         temperature,
         target,
         format,
+        context = [],
     }: {
         userMessage: OllamaChatMessage;
         previousMessages: any;
@@ -78,6 +79,7 @@ export class PromptSender {
         temperature?: number;
         format?: OllamaChat['format'];
         target: DBMessage;
+        context: number[];
     }): Promise<void> {
         const config = get(settings);
         const ollamaOptions = get(ollamaApiMainOptionsParams);
@@ -86,6 +88,27 @@ export class PromptSender {
         if (systemPrompt ?? config?.system_prompt) {
             system = { role: OllamaChatMessageRole.SYSTEM, content: systemPrompt ?? config?.system_prompt };
         }
+        console.log(previousMessages.map((m) => m.content));
+        return OllamaApi.generate(
+            {
+                prompt: userMessage.content,
+                system: systemPrompt ?? config?.system_prompt,
+                context,
+                //context: previousMessages.map((m) => m.content),
+                model: model ?? config?.defaultModel,
+                options: { ...ollamaOptions, temperature },
+                format: format ?? undefined,
+                stream: true,
+                template: null,
+            },
+            async (data: OllamaResponse) => {
+                console.log('data', data);
+                this.onResponseMessageStream({
+                    data,
+                    target,
+                });
+            }
+        );
 
         // send chat user message
         return OllamaApi.chat(

@@ -182,7 +182,7 @@ export class ChatApiSession {
      */
     public async onMessageDone(assistantMessage: DBMessage, data: OllamaResponse) {
         await Promise.all([
-            idbQuery.updateChat(this.chat.chatId, { context: data.context }),
+            idbQuery.updateChat(this.chat.chatId, { context: data?.context }),
             idbQuery.updateMessage(assistantMessage.messageId, { status: 'done' }),
             // idbQuery.insertMessageStats({ ...data, messageId: assistantMessage.messageId }),
         ]);

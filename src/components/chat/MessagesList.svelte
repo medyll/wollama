@@ -1,6 +1,6 @@
 <script lang="ts">
     import List from '$components/fragments/List.svelte';
-    import { idbQuery } from '$lib/db/dbQuery';
+    import { O, idbQuery } from '$lib/db/dbQuery';
     import { tick } from 'svelte';
     import Message from './Message.svelte';
     import { Looper } from '@medyll/slot-ui';
@@ -19,8 +19,9 @@
             });
         }
     });
-</script>
 
+</script>
+corecteur orthographique
 <div class="flex flex-col w-full gap-4 flex-1">
     <Looper data={messages ?? []}>
         {#snippet children({ item })}

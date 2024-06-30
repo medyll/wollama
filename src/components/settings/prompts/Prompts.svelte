@@ -128,7 +128,10 @@
 
 <style style="postcss">
     .promptZone {
-        @apply absolute z-50 bottom-20  p-4 shadow-md rounded-md;
+        @apply w-96  z-50 bottom-20  p-4 shadow-md rounded-md;
+        max-height: 560px;
+        height: 560px;
+        width:750px;
         background-color: var(--cfab-bg-opacity-90);
         backdrop-filter: blur(3px);
     }

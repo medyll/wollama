@@ -22,28 +22,40 @@
     function setRequestMode(format: 'json' | 'plain') {
         chatParams.format = format;
     }
+
+    let showHide = $state(false);
+    let style = $derived( showHide ? 'display: contents;':'display: none;content-visibility:hidden');
 </script>
 
-<!-- <svelte:component this={Prompts} bind:activePrompt={chatParams.promptSystem} /> -->
-
+{#snippet listItemBottom()}
+    <MenuListItem
+        icon={'mdi:chevron-right'}
+        onclick={() => {
+            showHide = !showHide
+        }}></MenuListItem>
+{/snippet}
+{#snippet popperRight()}
+    <div {style} >
+        <Prompts bind:activePrompt={chatParams.promptSystem} />
+    </div>
+{/snippet}
 <ButtonMenu
     tall="small"
     width="auto"
     icon="material-symbols-light:post-add-sharp"
     value={chatParams.promptSystem?.title ?? $t('prompt.systemPrompt')}
-    popperProps={{ stickToHookWidth: true, position: 'TC', flow: 'fixed' }}
+    popperProps={{ stickToHookWidth: true, position: 'TR', flow: 'fixed', popperRight }}
     menuProps={{
         data: promptList,
+        listItemBottom,
         onclick: (event) => {
             chatParams.promptSystem = event.detail;
         },
     }}>
     {#snippet menuItem({ item })}
-        <MenuListItem   data={item}
+        <MenuListItem data={item}
             >{item?.title}
-            {#snippet menuItemLast()} 
-                sssss
-            {/snippet}
+
         </MenuListItem>
     {/snippet}
 </ButtonMenu>
