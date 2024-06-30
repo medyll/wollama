@@ -65,6 +65,12 @@ export const translations = {
 			startondate: 'date',
 			thisWeek: 'this week',
 			use_model: 'use model'
+		},
+		chat:{
+			categorize: 'categorize',
+			delete_chat: 'delete',
+			guess_chat_title: 'guess title',
+			describe: 'describe',
 		}
 	},
 	es: es.es,

@@ -6,9 +6,11 @@
 
 	$: if (element && $ui.activeChatId && $ui.autoScroll?.[$ui.activeChatId]) scrollDown();
 
+
 	ui.subscribe((chat) => {
 		scrollDown();
 	});
+
 
 	function scrollDown() {
 		if (element && $ui.autoScroll?.[$ui.activeChatId])

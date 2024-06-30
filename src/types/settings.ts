@@ -14,6 +14,7 @@ export interface SettingsType {
     title_auto: boolean;
     voice_auto_stop: boolean;
     avatar_email: string;
+    menuExpanded: boolean;
     temperatures: {
         creative: number;
         balanced: number;

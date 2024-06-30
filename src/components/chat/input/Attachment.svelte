@@ -1,43 +1,49 @@
 <script lang="ts">
-	import type { MessageImageType } from '$types/db';
-	import Icon from '@iconify/svelte';
+    import type { MessageImageType } from '$types/db';
+    import Icon from '@iconify/svelte';
+    import { Button } from '@medyll/slot-ui';
 
-	export let disabled: boolean = false;
-	export let form: string = '';
-	export let imageFile: MessageImageType | undefined;
+    interface Props {
+        disabled?: boolean;
+        form?: string;
+        imageFile: MessageImageType | undefined;
+    }
 
-	let fileinput: HTMLInputElement;
+    let { disabled = false, form = '', imageFile = $bindable(), ...rest }: Props = $props();
 
-	const onFileSelected = (e: any) => {
-		let image = e.target.files[0];
-		let reader = new FileReader();
-		reader.readAsDataURL(image);
-		reader.onload = (e) => {
-			if (e?.target?.result) {
-				imageFile = {
-					base64: e?.target?.result?.toString().split(',')[1],
-					dataUri: e?.target?.result?.toString(),
-					header: e?.target?.result?.toString().split(',')[0],
-					name: image.name,
-					type: 'image'
-				};
-			}
-		};
-	};
+    let fileinput: HTMLInputElement;
+
+    const onFileSelected = (e: any) => {
+        let image = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = (e) => {
+            if (e?.target?.result) {
+                imageFile = {
+                    base64: e?.target?.result?.toString().split(',')[1],
+                    dataUri: e?.target?.result?.toString(),
+                    header: e?.target?.result?.toString().split(',')[0],
+                    name: image.name,
+                    type: 'image',
+                };
+            }
+        };
+    };
 </script>
 
-<div class="px-2">
-	<button
-		on:click={() => {
-			fileinput.click();
-		}}
-		type="button"
-		form="prompt-form"
-		class="mx-auto"
-		{disabled}
-	>
-		<Icon icon="heroicons:paper-clip-solid" style="font-size:1.6em" />
-	</button>
-</div>
+<Button
+    onclick={() => {
+        fileinput.click();
+    }}
+    tall="tiny"
+    type="button"
+    form="prompt-form"
+    class="mx-auto"
+    width="auto"
+    icon="heroicons:paper-clip-solid"
+	value="Attach"
+    {disabled}
+    {...rest}>
+</Button>
 
-<input type="file" {form} accept=".jpg, .jpeg, .png" hidden on:change={(e) => onFileSelected(e)} bind:this={fileinput} />
+<input type="file" {form} accept=".jpg, .jpeg, .png" hidden onchange={(e) => onFileSelected(e)} bind:this={fileinput} />

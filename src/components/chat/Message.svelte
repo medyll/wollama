@@ -17,7 +17,7 @@
     }
 
     let { messageId }: Props = $props();
-    let message = $derived<DBMessage>(messageId ? idbQuery.getMessage(messageId) : {});
+    let message = $derived<DBMessage>(messageId ? idbQuery.getMessage(messageId) : {} as DBMessage);
 
     let icon = $derived(message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one');
     let place = $derived(message.role === 'user' ? 'mr-24' : 'ml-24');

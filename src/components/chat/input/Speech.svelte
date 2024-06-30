@@ -39,7 +39,7 @@
 	}
 </script>
 
-<div class="place-items-center">
+<div class="place-items-center ">
 	<button
 		type="button"
 		{disabled}
@@ -53,6 +53,6 @@
 			}
 		}}
 	>
-		<Icon icon={voiceListening ? 'ooui:ellipsis' : 'mdi:microphone'} style="font-size:1.8em" />
+		<Icon icon={voiceListening ? 'ooui:ellipsis' : 'mdi:microphone'} style="font-size:2rem" />
 	</button>
 </div>

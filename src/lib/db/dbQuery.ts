@@ -5,6 +5,15 @@ import { idbqlState } from './dbSchema';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
 
+export function O(collection: keyof idbqModel) {
+    return {
+        get: (key: string) => {},
+        getAll: (key: string) => {},
+        create: (key: string, value: any) => {},
+        delete: (key: string) => {},
+        update: (key: string) => {},
+    };
+}
 export class idbQuery {
     /* chat */
     static getChat(chatId: string) {
@@ -18,6 +27,7 @@ export class idbQuery {
 
     static async insertChat(chatData?: DbChat): Promise<DbChat> {
         const newChat = chatUtils.getChatDataObject();
+
         await idbqlState.chat.add({ ...newChat, ...chatData });
         return { ...newChat, ...chatData };
     }
@@ -53,7 +63,6 @@ export class idbQuery {
     static async insertMessage(chatId: string, messageData: Partial<DBMessage>): Promise<DBMessage> {
         if (!chatId) throw new Error('chatId is required');
         const message = chatUtils.getMessageDataObject({ chatId, ...messageData });
-        console.log('insertMessage', message);
         await idbqlState.messages.add(message);
 
         return message;
@@ -71,7 +80,7 @@ export class idbQuery {
         const message = await idbQuery.getMessage(messageId);
 
         let content = (message?.content ?? '') + (data?.message?.content ?? data?.response ?? '');
-        console.log('stream', message?.content, data?.message?.content);
+
         if (content)
             await idbQuery.updateMessage(messageId, {
                 messageId,
@@ -102,8 +111,8 @@ export class idbQuery {
         return await idbqlState.prompts.where('id').equals(promptId).first();
     }
 
-    static async getPrompts() {
-        return await idbqlState.prompts.getAll();
+    static getPrompts() {
+        return idbqlState.prompts.getAll();
     }
 
     static async insertPrompt(promptData: Partial<PromptType>) {

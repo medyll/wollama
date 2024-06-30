@@ -1,20 +1,21 @@
 <script lang="ts">
-    import Icon from '@iconify/svelte';
     import { t } from '$lib/stores/i18n.js';
     import { page } from '$app/stores';
-    import { getTimeTitle, groupChatMessages } from '$lib/tools/chatMenuList.svelte.js';
-
+    import { getTimeTitle } from '$lib/tools/chatMenuList.svelte.js';
+    import { format } from 'date-fns';
     import { ui } from '$lib/stores/ui.js';
     import { engine } from '$lib/tools/engine';
-    import ChatList from '../../../components/ui/ChatList.svelte';
     import { groupMessages } from '$lib/tools/chatMenuList.svelte';
     import { idbqlState } from '$lib/db/dbSchema';
     import { Confirm, Looper } from '@medyll/slot-ui';
     import { idbQuery } from '$lib/db/dbQuery';
-    import { chatUtils } from '$lib/tools/chatUtils';
+    import { Button, Icon, Menu, Popper, MenuItem } from '@medyll/slot-ui';
+    import { chatMetadata } from '$lib/tools/promptSystem'; 
 
     //$: showConfigClose = $page.route.id?.includes('/configuration');
-    let chatMenuList = $derived(groupMessages(idbqlState.chat.getAll()));
+    let loadingStae = $state<Record<string, any>>({});
+    let chatList = idbqlState.chat.getAll();
+    let chatMenuList = $derived(groupMessages(chatList));
 
     const openCloseConfig = async () => {
         if ($page.route.id?.includes('/configuration')) {
@@ -26,7 +27,7 @@
     };
 
     const createChat = async () => {
-        $ui.activeChatId = undefined;
+        // $ui.activeChatId = undefined;
         ui.setActiveChatId();
         engine.goto('/');
         engine.goto('/');
@@ -45,15 +46,21 @@
         engine.goto(`/chat/${id}`);
     };
 
-    function deleteCha1tHandler(chat) {
-        /*  idbQuery.deleteChat(chatId);
-        if ($ui.activeChatId === chatId) {
-            ui.setActiveChatId(undefined);
-        } */
+    function deleteCha1tHandler(chatId: any) {
+        return idbQuery.deleteChat(chatId); 
     }
-    function guess(chat) {
-        chatUtils.checkTitle(chat.chatId);
+    async function guess(chatId: any) {
+        return chatMetadata.checkTitle(chatId);
     }
+
+    async function categorize(chatId: any) {
+        return chatMetadata.checkCategorie(chatId);
+    }
+    async function describe(chatId: any) { 
+        return chatMetadata.checkDescription(chatId) 
+        
+    }
+ 
 </script>
 
 <div class="flex flex-align-middle justify-between p-4 gap-4">
@@ -66,49 +73,74 @@
         <div>
             {$t('ui.threads')}
         </div>
-        <div class="hidden md:flex gap-4">
-            <button title={$t('ui.newChat')} onclick={createChat}>
+        <div class=" flex-1 gap-4">
+            <Button width="auto" icon="mdi:chat-plus-outline" title={$t('ui.newChat')} onclick={createChat}>
                 {$t('ui.newChat')}
-                <Icon icon="mdi:chat-plus-outline" class="md" alt={$t('ui.newChat')} />
-            </button>
+            </Button>
         </div>
     </div>
-    <div class="flex flex-col gap-4 w-348">
+    <div class="flex flex-col gap-4">
         <Looper data={chatMenuList}>
             {#snippet children({ item })}
-                <div class="border-b"><h4>- {$t(getTimeTitle(item?.code))}</h4></div>
+                <div class="text-lg">{$t(getTimeTitle(item?.code))}</div>
 
-                <Looper data={item?.items} class="flex flex-col gap-4 w-348">
+                <Looper data={item?.items} class="flex flex-col gap-4  ">
                     {#snippet children({ item })}
-                        <div class="p-2">
-                            <div class="line-clamp-1 break-all transition duration-300  ">
-                                {item?.title}
-                            </div>
+                        <div class="p-2" style="content-visibility:auto">
                             <div class="flex gap-2">
-                                <button
-                                    onclick={() => {
-                                        loadChat(item.chatId);
-                                    }}>load</button>
-                                <Confirm
-                                    icon="delete"
-                                    validate={() => {
-                                        deleteCha1tHandler(item.chatId);
-                                    }}>
-                                    {#snippet confirmInitial()}
-                                        {$t('chat.delete_chat')}
-                                    {/snippet}</Confirm
-                                > 
-                                <Confirm
-                                    validate={() => {
-                                        guess(item.chaiId);
-                                    }}>
-                                    {#snippet confirmInitial()}
-                                        {$t('chat.guess_chat_title')}
-                                    {/snippet}
-                                </Confirm>
+                                <div>- category : {item?.category}</div>
+                                <div>
+                                    <Icon icon="fluent:clock-16-regular" />
+                                    {item?.createdAt ? format(new Date(item?.createdAt), 'dd MMMM y hh:mm') : ''}
+                                </div>
                             </div>
-                            <div class="text-ellipsis overflow-hidden">
-                              item?.description goes here   {item?.description}
+                            <div class="line-clamp-1 break-all transition duration-300 font-bold py-2">
+                                <a title={item?.title} href={`/chat/${item.chatId}`}>{item?.title}</a>
+                            </div>
+                            <div class="flex flex-1 gap-2">
+                                <Confirm
+                                    primaryInitial={$t('chat.guess_chat_title')}
+                                    primaryConfirm={$t('chat.guess_chat_title')}
+                                    iconInitial="question-mark"
+                                    secondary="guess"
+                                    data={item.chatId as string}
+                                    action={guess}
+                                    tall="mini" />
+                                <Confirm
+                                    primaryInitial={$t('chat.delete_chat')}
+                                    primaryConfirm={$t('chat.delete_chat')}
+                                    iconInitial="mdi:trash"
+                                    tall="mini"
+                                    value="delete"
+                                    data={item.chatId as string}
+                                    action={deleteCha1tHandler} />
+                                <Confirm
+                                    primaryInitial={$t('chat.categorize')}
+                                    primaryConfirm={$t('chat.categorize')}
+                                    iconInitial="mdi:trash"
+                                    tall="mini"
+                                    value="categorize"
+                                    data={item.chatId as string}
+                                    action={categorize} />
+                                <Confirm
+                                    primaryInitial={$t('chat.describe')}
+                                    primaryConfirm={$t('chat.describe')}
+                                    iconInitial="mdi:trash"
+                                    tall="mini"
+                                    value="describe"
+                                    data={item.chatId as string}
+                                    action={describe} />
+                                <Confirm
+                                    primaryInitial={$t('chat.tags')}
+                                    primaryConfirm={$t('chat.tags')}
+                                    iconInitial="mdi:tags"
+                                    tall="mini"
+                                    value="tags"
+                                    data={item.chatId as string}
+                                    action={describe} />
+                            </div>
+                            <div class="text-ellipsis overflow-hidden" style="user-select:text">
+                                {@html item?.description ?? ''}
                             </div>
                         </div>
                     {/snippet}

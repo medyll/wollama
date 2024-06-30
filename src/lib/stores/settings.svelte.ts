@@ -4,6 +4,40 @@ import { defaultSettings } from '$configuration/configuration';
 import { merge } from 'ts-deepmerge';
 import type { SettingsType } from '$types/settings';
 
+/* class Settings {
+    settings = $state<SettingsType>(defaultSettings);
+    dataStoreTimer!: NodeJS.Timeout;
+
+    constructor() {
+        this.initSettings();
+        $effect(() => {
+            this.storeData();
+            console.log('settings changed');
+        });
+    }
+
+    initSettings() {
+        if (browser) {
+            const actualSettings = JSON.parse(localStorage.getItem('settings') ?? '{}');
+            this.settings = { ...this.settings, ...actualSettings };
+        }
+    }
+
+    storeData() {
+        clearTimeout(this.dataStoreTimer);
+        this.dataStoreTimer = setTimeout(() => {
+            if (browser) {
+                localStorage.settings = JSON.stringify(settings);
+                //localStorage.theme = settings?.theme;
+            }
+        }, 500);
+    }
+
+    setSetting(key: keyof SettingsType, value: any) {
+        this.settings[key] = value;
+    }
+}
+export const settings = new Settings(); */
 // set to indexedDB
 const settingStore = () => {
     const { subscribe, set, update } = writable<SettingsType>({
@@ -57,83 +91,6 @@ type ResolverPathType<T> = T extends object
           [K in keyof T]: T[K] extends null | undefined ? K & string : `${K & string}${'' extends ResolverPathType<T[K]> ? '' : '.'}${ResolverPathType<T[K]>}`;
       }[keyof T]
     : '';
-
-const SYMBOL = Symbol('svelte-state');
-const settingState = () => {
-    let settings: SettingsType = $state(defaultSettings);
-
-    let dataStoreTimer: NodeJS.Timeout;
-
-    $effect(() => {
-        if (browser && settings) {
-            storeData(settings);
-        }
-    });
-
-    function updateObjectByPath(obj: Record<string, any>, path: string, value: any) {
-        const keys: (keyof typeof obj)[] = path.split('.');
-        let current = structuredClone(obj);
-
-        while (keys.length > 1) {
-            // @ts-ignore
-            const key: keyof typeof obj = keys.shift();
-            current[key] = current[key] || {};
-            current = current[key];
-        }
-
-        current[keys[0]] = value;
-
-        return current;
-    }
-
-    function createObjectByPath<T = Record<string, any>>(path: string, value: any): T {
-        const keys: string[] = path.split('.');
-        let current: Record<string, any> = {};
-
-        while (keys.length > 1) {
-            // @ts-ignore
-            const key: keyof typeof obj = keys.shift();
-            current[key] = current[key] || {};
-            current = current[key];
-        }
-
-        current[keys[0]] = value;
-        return current as T;
-    }
-
-    function initSettings() {
-        if (browser) {
-            const actualSettings = JSON.parse(localStorage.getItem('settings') ?? '{}');
-            settings = actualSettings;
-        }
-    }
-
-    function storeData(currentStore: SettingsType) {
-        clearTimeout(dataStoreTimer);
-        dataStoreTimer = setTimeout(() => {
-            if (browser) {
-                localStorage.settings = JSON.stringify(currentStore);
-                localStorage.theme = currentStore.theme;
-            }
-        }, 500);
-    }
-
-    initSettings();
-
-    return {
-        ...settings,
-        set: function (key: Partial<SettingsType> | ResolverPathType<SettingsType>, value: any) {},
-        get: function (key?: ResolverPathType<SettingsType>) {},
-        update: function (key: Partial<SettingsType> | ResolverPathType<SettingsType>, value: any) {
-            if (typeof key === 'object') {
-                settings = merge(settings, key);
-            } else {
-                const glo = createObjectByPath<SettingsType>(key, value);
-                settings = merge(settings, glo);
-            }
-        },
-    };
-};
 
 export const settings = settingStore();
 

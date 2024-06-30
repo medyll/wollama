@@ -1,7 +1,7 @@
 import type { DBMessage, MessageImageType, PromptType } from '$types/db';
 import type { OllApiGenerate, OllamaChat, OllamaChatMessage } from '$types/ollama';
 
-type ChatGenerate = {
+export type ChatGenerate = {
     disabledPrompt: boolean;
     isPrompting: boolean;
     voiceListening: boolean;

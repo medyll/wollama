@@ -54,7 +54,7 @@ export class OllamaApiCore {
         const ollamaFetch = new OllamaApiFetch();
 
         const res = await ollamaFetch.fetch('POST', `api/chat`, JSON.stringify(chatRequest));
-        console.log({ res });
+
         if (res.ok) {
             if (chatRequest?.stream) {
                 ollamaFetch.stream(res, hook);
@@ -89,7 +89,8 @@ export class OllamaApiCore {
 
     async tags(): Promise<{ models: Record<string, any>[] }> {
         const ollamaFetch = new OllamaApiFetch();
-        return ollamaFetch.fetch('GET', `api/tags`).then((res) => res);
+        const res = ollamaFetch.fetch('GET', `api/tags`);
+        return res;
     }
 
     /** Get the list of models from the Ollama API. */

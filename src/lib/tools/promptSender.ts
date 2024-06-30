@@ -22,7 +22,7 @@ export type SenderCallback<T = any> = {
  * Represents a class that sends prompts and receives responses in a chat.
  * uses api/generate or api/chat depending of chatSessionType
  */
-export class PromptMaker {
+export class PromptSender {
     private assistantMessage!: DBMessage;
     public chatSessionType: 'generate' | 'chat' = 'chat';
     //
@@ -33,7 +33,7 @@ export class PromptMaker {
      * @param chatId - The ID of the chat.
      * @param apiChatParams - The chat apiChatParams | body.
      */
-    constructor(apiChatParams = {} as PromptMaker['apiChatParams']) {
+    constructor(apiChatParams = {} as PromptSender['apiChatParams']) {
         this.apiChatParams = apiChatParams as OllamaChat;
     }
 
@@ -53,9 +53,9 @@ export class PromptMaker {
      * Sets the assistant message for the chat.
      * @param message - The assistant message.
      */
-    public setRoleAssistant(message: DBMessage): void {
+    /* public setRoleAssistant(message: DBMessage): void {
         this.assistantMessage = message;
-    }
+    } */
 
     /**
      * Sends a chat message and play a callback
@@ -66,15 +66,17 @@ export class PromptMaker {
         userMessage,
         previousMessages,
         systemPrompt,
-        ollamaChatBody,
         model,
+        temperature,
         target,
+        format,
     }: {
         userMessage: OllamaChatMessage;
         previousMessages: any;
         systemPrompt?: string;
-        ollamaChatBody?: Partial<OllamaChat>;
         model?: string;
+        temperature?: number;
+        format?: OllamaChat['format'];
         target: DBMessage;
     }): Promise<void> {
         const config = get(settings);
@@ -84,14 +86,16 @@ export class PromptMaker {
         if (systemPrompt ?? config?.system_prompt) {
             system = { role: OllamaChatMessageRole.ASSISTANT, content: systemPrompt ?? config?.system_prompt };
         }
+
         // send chat user message
         return OllamaApi.chat(
             {
                 messages: [system, ...previousMessages, userMessage].filter((m) => m),
                 model: model ?? config?.defaultModel,
                 stream: true,
-                ...ollamaChatBody,
-                options: { ...ollamaOptions, ...ollamaChatBody?.options },
+                format: format ?? undefined,
+                options: { ...ollamaOptions, temperature },
+                template: null,
             } as OllamaChat,
             async (data: OllamaResponse) => {
                 this.onResponseMessageStream({

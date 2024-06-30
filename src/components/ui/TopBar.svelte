@@ -34,7 +34,7 @@
     </div>
     <full />
     <StatusBar />
-    {#if typeof window.__currentWindow !== 'undefined'}
+    {#if typeof window.__TAURI__ !== 'undefined'}
         <button
             on:click={() => {
                 getCurrent().minimize();

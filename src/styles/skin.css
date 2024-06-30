@@ -2,13 +2,7 @@
 @tailwind utilities;
 @tailwind base;
 
-
- 
-
 @layer base {
-
-
-
     .theme-gradient-from {
         background-color: var(--cfab-gradient-from);
     }
@@ -88,7 +82,8 @@
         overflow: hidden;
 
         .application-sideBar {
-            @apply hidden lg:w-[80px] lg:flex h-full;
+            /* @apply hidden lg:w-[80px] lg:flex ; */
+            @apply flex h-full;
             @apply flex-col flex-shrink;
             @apply overflow-hidden;
             @apply shadow-lg;
@@ -152,13 +147,14 @@
 @layer components {
     /* inputs */
     .application {
+        .input,
         input[type='search'],
         input[type='submit'],
         input[type='reset'],
         input[type='number'],
         input[type='text'],
-        select,
-        textarea {
+        textarea,
+        select {
             outline: none;
             display: inline-flex;
             align-items: center;
@@ -170,8 +166,7 @@
             color: var(--cfab-input-foreground-color);
 
             transition: all 0.2s ease-in-out;
-
-            white-space: pre-wrap;
+ 
             overflow-wrap: break-word;
 
             &.naked {
@@ -204,8 +199,7 @@
             }
         }
 
-        textarea {
-            display: block;
+        textarea { 
             width: 100%;
         }
     }

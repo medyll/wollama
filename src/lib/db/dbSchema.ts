@@ -7,7 +7,7 @@ import { createIdbqDb } from '@medyll/idbql';
 
 export const idbqModel = {
     chat: {
-        keyPath: '&chatId, created_at, dateLastMessage',
+        keyPath: '&chatId, createdAt, category, dateLastMessage',
         model: {} as DbChat,
     },
     messages: {
@@ -32,5 +32,5 @@ export const idbqModel = {
     },
 } as const;
 
-const idbqStore = createIdbqDb<typeof idbqModel>(idbqModel, 5);
+const idbqStore = createIdbqDb<typeof idbqModel>(idbqModel, 6);
 export const { idbql, idbqlState, idbDatabase } = idbqStore.create('woolama');

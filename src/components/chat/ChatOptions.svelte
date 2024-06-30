@@ -7,8 +7,13 @@
     import { ui } from '$lib/stores/ui';
     import { chatParams } from '$lib/states/chat.svelte';
     import Model from './input/Model.svelte';
+    import { Button, ButtonMenu, MenuListItem, Popper } from '@medyll/slot-ui';
+    import Attachment from './input/Attachment.svelte';
+    import { idbQuery } from '$lib/db/dbQuery';
 
-    $: component = $ui.showPrompt ? Prompts : undefined;
+    let component = $ui.showPrompt ? Prompts : undefined;
+
+    let promptList = $derived(idbQuery.getPrompts());
 
     function setTemperature(temperature: number) {
         chatParams.temperature = temperature;
@@ -17,40 +22,73 @@
     function setRequestMode(format: 'json' | 'plain') {
         chatParams.format = format;
     }
+
+
 </script>
 
-<div class="p-1 flex-align-middle-center theme-bg rounded-md pb-2">
-    <div class="flex justify-center relative">
-        <Model bind:activeModels={chatParams.models} />
-    </div>
-</div>
-<div class="p-1 flex-align-middle theme-bg rounded-md pb-2">
-    <svelte:component this={component} bind:activePrompt={chatParams.promptSystem} />
-    <div class="flex-1 text-center relative">
-        <button onclick={() => ui.showHidePromptMenu()}>
-            {chatParams.promptSystem.title ?? $t('prompt.systemPrompt')}
-        </button>
-    </div>
+<!-- <svelte:component this={Prompts} bind:activePrompt={chatParams.promptSystem} /> -->
 
-    <div class="flex justify-center gauge relative">
-        <div class="absolute -left-10"><Icon icon="mdi:temperature" class="md" /></div>
-        {#each Object.keys($settings.temperatures ?? {}) as temperature}
-            {@const active = chatParams?.temperature == $settings.temperatures[temperature]}
-            <button
-                onclick={() => {
-                    setTemperature($settings.temperatures[temperature]);
-                }}
-                class:active
-                class="button-temp">{temperature}</button>
-        {/each}
+<ButtonMenu
+    tall="small"
+    width="auto"
+    icon="material-symbols-light:post-add-sharp"
+    value={chatParams.promptSystem?.title ?? $t('prompt.systemPrompt')}
+    popperProps={{ stickToHookWidth: true, position: 'TC', flow: 'fixed' }}
+    menuProps={{
+        data: promptList,
+        onclick: (event) => {
+            chatParams.promptSystem = event.detail;
+        },
+    }}>
+    {#snippet menuItem({ item })}
+        <MenuListItem data={item}>{item?.title}</MenuListItem>
+    {/snippet}
+</ButtonMenu>
+<Attachment form="prompt-form" bind:imageFile={chatParams.images} disabled={false} />
+<ButtonMenu popperProps={{ stickToHookWidth: true, position: 'TC', flow: 'fixed' }} tall="tiny" width="auto" variant="naked">
+    <div class="flex-h flex-align-middle gap-2">
+        <Icon icon="mdi:temperature" />
+        {chatParams?.temperature}
+        <Icon icon="bx:brain" />
+        {chatParams?.models}
+        <Icon icon="charm:binary" />
+        {chatParams?.format}
     </div>
-    <div class="line-gap-2 flex-1 justify-center">
-        <Icon icon="charm:binary" class="sm" />
-        <Selector values={['json', 'plain']} value={chatParams.format} let:item>
-            <button onclick={() => setRequestMode(item)}>{item}</button>
-        </Selector>
-    </div>
-</div>
+    {#snippet menuItem({ item })}
+        <table cellpadding="4">
+            <tbody>
+                <tr>
+                    <td>model</td>
+                    <td><Model bind:activeModels={chatParams.models} /></td>
+                </tr>
+                <tr>
+                    <td>temperature</td>
+                    <td
+                        >{#each Object.keys($settings.temperatures ?? {}) as temperature}
+                            {@const active = chatParams?.temperature == $settings.temperatures[temperature]}
+                            <button
+                                onclick={() => {
+                                    setTemperature($settings.temperatures[temperature]);
+                                }}
+                                class:active
+                                class="button-temp">{temperature}</button>
+                        {/each}</td>
+                </tr>
+                <tr>
+                    <td>mode</td>
+                    <td
+                        ><div class="line-gap-2 flex-1">
+                            <Icon icon="charm:binary" class="sm" />
+                            <Selector values={['json', 'plain']} value={chatParams.format} let:item>
+                                <button onclick={() => setRequestMode(item)}>{item}</button>
+                            </Selector>
+                        </div></td>
+                </tr>
+            </tbody>
+        </table>
+    {/snippet}
+</ButtonMenu>
+
 
 <style lang="postcss">
     .gauge {

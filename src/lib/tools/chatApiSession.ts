@@ -30,21 +30,31 @@ export class ChatApiSession {
      * @param chatId The ID of the chat.
      * @param chatSessionType The type of chat session for the api call.
      */
-    constructor(chatId: string | undefined) {
+    constructor(chatId?: string | undefined) {
         this.chatId = chatId;
     }
-
+    async initChat(chatId?: string) {
+        if (this.chatId) {
+            let chat = idbQuery.getChat(this.chatId);
+            if (chat) {
+                this.chat = chat;
+                this.chatId = this.chat.chatId;
+            }
+        }
+    }
     /**
      * Sets the chat data for the chat session.
      * @param chatData - The partial chat data to set.
      * @returns A promise that resolves when the chat data is set.
      */
-    public async initChatSession(chatData: Partial<DbChat> = {} as DbChat) {
+    public async createChatDbSession(chatData: Partial<DbChat> = {} as DbChat) {
+        // getChat(chatId: string) {
         this.chat = await idbQuery.initChat(this.chatId, chatData as DbChat);
         this.chatId = this.chat.chatId;
     }
 
     public async updateChatSession(chatData: Partial<DbChat> = {} as DbChat) {
+        this.chatId = chatData?.chatId;
         this.chat = await idbQuery.updateChat(this.chatId, { ...chatData } as DbChat);
         this.chatId = this.chat.chatId;
     }
@@ -54,8 +64,8 @@ export class ChatApiSession {
      * transforms the array of DbMessages to an array of OllChatMessage
      * @returns A promise that resolves when the previous messages are set.
      */
-    private async setPreviousMessages(): Promise<Partial<DBMessage>[]> {
-        const chatList = idbQuery.getMessages(this.chat.chatId);
+    public async setPreviousMessages(): Promise<Partial<DBMessage>[]> {
+        let chatList = idbQuery.getMessages(this.chat.chatId);
 
         this.previousMessages = chatList.map((e) => ({
             content: e.content,
@@ -171,7 +181,6 @@ export class ChatApiSession {
      * @param data - The response data from the assistant.
      */
     public async onMessageDone(assistantMessage: DBMessage, data: OllamaResponse) {
-        console.log('done', assistantMessage.messageId, data);
         await Promise.all([
             idbQuery.updateChat(this.chat.chatId, { context: data.context }),
             idbQuery.updateMessage(assistantMessage.messageId, { status: 'done' }),

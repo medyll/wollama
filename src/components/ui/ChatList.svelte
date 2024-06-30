@@ -8,7 +8,6 @@
     import { idbqlState } from '$lib/db/dbSchema';
 
     const loadChat = async (id: string) => {
-        ui.setActiveChatId(id);
         ui.showHideMenu(false);
         engine.goto(`/chat/${id}`);
     };
@@ -17,13 +16,12 @@
  
 </script>
 
-<MenuList selectorField="code" data={chatMenuList ?? []}>
+<MenuList style="width:100%" selectorField="code" data={chatMenuList ?? []}>
     {#snippet children({ item, itemIndex })}
         <ListTitle class="soft-title">
-            {itemIndex}
             {$t(getTimeTitle(item?.code))}
         </ListTitle>
-        <MenuList density="tight" style="width:100%;" data={item?.items ?? []}>
+        <MenuList tall="mini" style="width:100%;" data={item?.items ?? []}>
             {#snippet children({ item })} 
                 <MenuListItem selected={item.chatId === $ui.activeChatId} data={item}>
                     <ChatMenuItem

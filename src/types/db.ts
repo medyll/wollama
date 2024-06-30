@@ -10,7 +10,9 @@ export type DbChat = {
     description: string;
     models: string[];
     createdAt: Date;
+    category: string;
     dateLastMessage: Date;
+    tags: string[];
     systemPrompt: PromptType;
     /** @deprecated find in ollamaBody */ context: number[];
     ollamaBody: Partial<OllamaChat>;

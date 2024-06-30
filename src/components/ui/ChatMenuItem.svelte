@@ -11,19 +11,16 @@
     import { chatUtils } from '$lib/tools/chatUtils';
 
     import { idbqlState } from '$lib/db/dbSchema';
+    import { chatMetadata } from '$lib/tools/promptSystem';
 
-
-    const  {
-        chatId  = '',
-        selected  = false,
-    } = $props()
+    const { chatId = '', selected = false } = $props();
 
     let chat = $derived(idbQuery.getChat(chatId));
 
     let editChat: boolean = $state(false);
     let isOpen: boolean = $state(false);
     let title = chat?.title;
-   // $: title = chat?.title;
+    // $: title = chat?.title;
 
     function deleteCha1tHandler() {
         idbQuery.deleteChat(chatId);
@@ -45,7 +42,7 @@
     }
 
     function guess() {
-        chatUtils.checkTitle(chat.chatId);
+        chatMetadata.checkTitle(chat.chatId);
     }
 
     function onSubmit(event: Event) {
@@ -54,33 +51,22 @@
         toggleEdit(false);
         idbQuery.updateChat(chatId, { title: title.value });
     }
-  
- 
 </script>
 
-<div class="line-gap-2">
-    {#if editChat && selected}
-        <form id="chat-form" on:submit|preventDefault={onSubmit} />
-        <input class="naked tight" form="chat-form" type="text" flex-1 h-auto value={title} name="title" />
-        <button form="chat-form" type="submit">
-            <Icon icon="mdi:check" />
-        </button>
-        <button
-            aspect-square
-            on:click|preventDefault={() => {
-                toggleEdit(false);
-                return false;
-            }}>
-            <Icon icon="mdi:cancel" />
-        </button>
-    {:else}
-        <button on:click class="w-full whitespace-nowrap overflow-hidden text-left text-ellipsis">
-            {chat?.title}
-        </button>
-    {/if}
+<div class="line-gap-2 relative  w-full overflow-hidden ">
+    <button title={chat?.title} on:click class="w-full text-left truncate block">
+        {chat?.title}
+    </button>
     {#if selected && !editChat}
         <Popper bind:isOpen position="BC" autoClose class="w-48">
-            <Button link slot="popperHolder" icon="mdi:ellipsis-vertical" height="auto" onclick={()=>{togglePopper()}} />
+            <Button
+                link
+                slot="popperHolder"
+                icon="mdi:ellipsis-vertical"
+                height="auto"
+                onclick={() => {
+                    togglePopper();
+                }} />
             <Menu class="w-full">
                 <MenuItem
                     icon="mdi:edit"

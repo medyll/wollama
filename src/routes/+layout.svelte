@@ -26,13 +26,13 @@
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
     import { OllamaApi, ollamaApiConfig } from '$lib/db/ollamaApi';
 
-    import '$lib/playground.js';    
+    import '$lib/playground.js';
 
-    let {children,  } = $props();
+    let { children } = $props();
 
     // load models into store
     async function loadModels(models: Record<string, any>[]) {
-        if(!models) return
+        if (!models) return;
         settings.setSetting('ollamaModels', [...models]);
         if (!$settings.defaultModel) settings.setSetting('defaultModel', models[0].name);
         if ($settings.defaultModel) $activeModels.push($settings.defaultModel);
@@ -72,29 +72,12 @@
         });
     });
 
-   /*  $: if ($settings.ollamaModels) {
-    } */
-    $effect(()=>{
-        if (browser && $page.params.id && $page.params.id!=$ui.activeChatId) {
-        const chat = idbQuery.getChat($page.params.id)
-            if (chat) {
-                ui.setActiveChatId($page.params.id);
-            } else {
-                engine.goto('/');
-            }
-    } else {
-        //ui.setActiveChatId();
-    }
-    })
-
-    
  
 </script>
 
 <svelte:head>
     <title>wOOllama !</title>
 </svelte:head>
-
 
 {#snippet sideBar()}
     {#snippet sideBar_vendor()}
@@ -107,23 +90,25 @@
     {/snippet}
     {#snippet sideBar_chatMenuList()}
         <column :nav chatMenuList>
-                <row> <h /></row>
-                <row><button /></row>
-            </column>
+            <row> <h /></row>
+            <row><button /></row>
+            
+            
+            
+        </column>
     {/snippet}
 {/snippet}
 
-
-{@render sideBar() }
+ 
 <Opening>
     <div class="application">
         <Notifications />
-        <MenuMobile />
+        <!-- <MenuMobile /> -->
         <Sidebar />
         <div class="application-content">
             <TopBar />
             <main class="application-main">
-               {@render children?.()}
+                {@render children?.()}
             </main>
         </div>
         <Modal show={$showSettings}>
