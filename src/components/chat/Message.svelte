@@ -102,7 +102,7 @@
             <div class="soft-title">{format(new Date(message?.createdAt), 'dd MMMM y hh:mm')}</div>
             <div class="soft-title">{dd}</div>
         </div>
-        <div class="speech-bubble theme-border">
+        <div style="user-select:all;" class="speech-bubble theme-border">
             {#if message.urls?.length}
                 <Looper class="flex-h" data={message.urls}>
                     {#snippet children({ item })}
@@ -119,7 +119,7 @@
                     <Skeleton class="h-full" />
                 {:else if ['streaming', 'done'].includes(message.status)}
                     <!-- {@html assistantCode} -->
-                    {@html selectCodeTags(message?.content)}
+                    <div style="user-select: all;">{@html selectCodeTags(message?.content)}</div>
                 {/if}
             {:else if message?.role == 'user'}
                 {@html message?.content}

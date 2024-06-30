@@ -87,7 +87,7 @@
         await chatApiSession.updateChatSession({
             chatId,
             models: [...chatParams.models],
-            systemPrompt: { ...chatParams.promptSystem },
+            systemPrompt: chatParams.promptSystem,
             ollamaBody: $ollamaBodyStore,
         });
 
@@ -108,6 +108,7 @@
         chatParams.mode = $settings.request_mode;
         chatParams.models = [$settings.defaultModel];
     });
+    $inspect(chatParams.promptSystem);
 </script>
 
 {#snippet input()}

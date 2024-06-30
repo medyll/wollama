@@ -6,16 +6,27 @@ import type { OllamaChat, OllamaOptions, OllamaResponse } from './ollama';
 export type DbChat = {
     id: string;
     chatId: string;
+    categoryId: number;
     title: string;
     description: string;
     models: string[];
     createdAt: Date;
     category: string;
     dateLastMessage: Date;
-    tags: string[];
+    tags: DbTags[];
     systemPrompt: PromptType;
     /** @deprecated find in ollamaBody */ context: number[];
     ollamaBody: Partial<OllamaChat>;
+};
+export type DbCategory = {
+    id: number;
+    name: string;
+    code: string;
+};
+export type DbTags = {
+    id: number;
+    name: string;
+    code: string;
 };
 
 /**
@@ -38,6 +49,7 @@ export type DBMessage = {
     images?: MessageImageType;
     status: 'idle' | 'done' | 'sent' | 'streaming' | 'error';
     context: number[];
+    resume: string;
     model: string;
     urls?: { url: string; image?: string; order: number; title?: string }[];
 } & (

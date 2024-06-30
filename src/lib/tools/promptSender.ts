@@ -84,13 +84,13 @@ export class PromptSender {
 
         let system = null;
         if (systemPrompt ?? config?.system_prompt) {
-            system = { role: OllamaChatMessageRole.ASSISTANT, content: systemPrompt ?? config?.system_prompt };
+            system = { role: OllamaChatMessageRole.SYSTEM, content: systemPrompt ?? config?.system_prompt };
         }
 
         // send chat user message
         return OllamaApi.chat(
             {
-                messages: [system, ...previousMessages, userMessage].filter((m) => m),
+                messages: [...previousMessages, system, userMessage].filter((m) => m),
                 model: model ?? config?.defaultModel,
                 stream: true,
                 format: format ?? undefined,

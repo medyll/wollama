@@ -22,8 +22,6 @@
     function setRequestMode(format: 'json' | 'plain') {
         chatParams.format = format;
     }
-
-
 </script>
 
 <!-- <svelte:component this={Prompts} bind:activePrompt={chatParams.promptSystem} /> -->
@@ -41,7 +39,12 @@
         },
     }}>
     {#snippet menuItem({ item })}
-        <MenuListItem data={item}>{item?.title}</MenuListItem>
+        <MenuListItem   data={item}
+            >{item?.title}
+            {#snippet menuItemLast()} 
+                sssss
+            {/snippet}
+        </MenuListItem>
     {/snippet}
 </ButtonMenu>
 <Attachment form="prompt-form" bind:imageFile={chatParams.images} disabled={false} />
@@ -88,7 +91,6 @@
         </table>
     {/snippet}
 </ButtonMenu>
-
 
 <style lang="postcss">
     .gauge {
