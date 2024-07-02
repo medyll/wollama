@@ -86,7 +86,7 @@
 	"dependencies": {
 		"@capacitor/core": "^6.1.0",
 		"@medyll/htmludom": "^0.11.1",
-		"@medyll/idbql": "^3.3.2",
+		"@medyll/idbql": "^3.3.5",
 		"@medyll/slot-ui": "file:../../app-node/slot-ui",
 		"@medyll/slotui": "file:C:/Users/Mydde/AppData/Roaming/npm/node_modules/@medyll/slotui",
 		"@sveltejs/adapter-node": "^5.2.0",

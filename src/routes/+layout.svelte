@@ -27,6 +27,8 @@
     import { OllamaApi, ollamaApiConfig } from '$lib/db/ollamaApi';
 
     import '$lib/playground.js';
+    import { dbFields } from '$lib/db/dbFields';
+    import { schemeModel } from '$lib/db/dbSchema';
 
     let { children } = $props();
 
@@ -70,9 +72,14 @@
                 loadModels(models.models);
             }
         });
-    });
 
- 
+        let test = new dbFields(schemeModel);
+
+        /* let val = test.parsIdbType('fk-agentPrompt.id');
+        let val2 = test.parseCollectionFieldName('agent', 'name'); */
+        let val3 = test.parseAllCollections( );
+        console.log(val3);
+    });
 </script>
 
 <svelte:head>
@@ -92,14 +99,10 @@
         <column :nav chatMenuList>
             <row> <h /></row>
             <row><button /></row>
-            
-            
-            
         </column>
     {/snippet}
 {/snippet}
 
- 
 <Opening>
     <div class="application">
         <Notifications />

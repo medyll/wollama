@@ -22,11 +22,13 @@ export type DbCategory = {
     id: number;
     name: string;
     code: string;
+    ia_lock: boolean;
 };
 export type DbTags = {
     id: number;
     name: string;
     code: string;
+    ia_lock: boolean;
 };
 
 /**
@@ -51,6 +53,7 @@ export type DBMessage = {
     context: number[];
     resume: string;
     model: string;
+    ia_lock: boolean;
     urls?: { url: string; image?: string; order: number; title?: string }[];
 } & (
     | {
@@ -64,6 +67,41 @@ export type DBMessage = {
           model?: string;
       }
 );
+
+export type DbPrimitive = 'date' | 'string' | 'number' | 'boolean' | 'array' | 'object' | `${string}.${string}`;
+export type DbFieldTypes = DbPrimitive | `array-of-${DbPrimitive}` | `object-${DbPrimitive}` | `fk-${DbPrimitive}`;
+
+export type DbTemplateModel<TPL> = {
+    [COL in keyof TPL]: {
+        fields: {
+            [T in keyof TPL[COL]]: TPL[COL][T]; //extends { model: infer M } ? DbTemplate<M> : never;
+        };
+    };
+};
+
+export type DbTemplate<T> = {
+    fields: {
+        [K in keyof T]: DbFieldTypes;
+    };
+};
+export type DBAgent = {
+    id: number;
+    name: string;
+    code: string;
+    model: string;
+    agentPromptId: number;
+    ia_lock: boolean;
+    created_at: Date;
+};
+
+export type DbAgentPrompt = {
+    id: number;
+    created_at: Date;
+    value: string;
+    name: string;
+    code: string;
+    ia_lock: boolean;
+}; //
 
 export type DbMessageListType = {
     [key: string]: DBMessage;
@@ -82,4 +120,5 @@ export type PromptType = {
     createdAt: Date;
     content: string;
     title: string;
+    ia_lock: boolean;
 };

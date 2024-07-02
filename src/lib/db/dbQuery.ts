@@ -4,9 +4,9 @@ import { chatUtils } from '$lib/tools/chatUtils';
 import { idbqlState } from './dbSchema';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
-import { idbqModel } from '$lib/db/dbSchema';
+import { schemeModel } from '$lib/db/dbSchema';
 
-export function O(collection: keyof typeof idbqModel) {
+export function ideo(collection: keyof typeof schemeModel) {
     if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
     return {
         get: idbqlState[collection].getOne,

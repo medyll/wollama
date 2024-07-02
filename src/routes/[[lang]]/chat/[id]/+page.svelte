@@ -2,7 +2,7 @@
 	import MainChat from '$components/chat/MainChat.svelte';
 	
     import { page } from '$app/stores';
-	$inspect($page.params.id);
+ 
 </script>
 
 {#key $page.params.id}

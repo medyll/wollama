@@ -1,7 +1,5 @@
 <script lang="ts">
-    import List from '$components/fragments/List.svelte';
-    import { O, idbQuery } from '$lib/db/dbQuery';
-    import { tick } from 'svelte';
+    import {  idbQuery } from '$lib/db/dbQuery';
     import Message from './Message.svelte';
     import { Looper } from '@medyll/slot-ui';
 

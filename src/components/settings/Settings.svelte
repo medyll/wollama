@@ -7,6 +7,7 @@
     import Addons from './mdl/Addons.svelte';
     import { Cartouche, Looper } from '@medyll/slot-ui';
     import Options from './mdl/Options.svelte';
+    import PageTitle from '$components/ui/PageTitle.svelte';
 
     /* let settingGen = {
         general: General,
@@ -21,10 +22,8 @@
     }); */
 </script>
 
-<div class="flex-align-middle justify-between px-5 py-4 gap-4">
-    <div class=" "><Icon icon="mdi:settings" class="md" /></div>
-    <div class="flex-1 text-2xl font-medium self-center capitalize">{$t('ui.settings')}</div>
-</div>
+ 
+<PageTitle icon="mdi:settings" title="ui.settings" />
 <div class="flex w-full settings p-4 px-8">
     <div class="flex flex-col gap-4 w-348">
         <div class="soft-title">{$t(`settings.general`)}</div>

@@ -25,7 +25,7 @@
         settings.setSetting('menuExpanded', !$settings.menuExpanded);
     };
 
-    const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib') => {
+    const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore') => {
         switch (link) {
             case 'settings':
                 return '../settings';
@@ -35,6 +35,8 @@
                 return `/chat`;
             case 'lib':
                 return `/lib`;
+            case 'explore':
+                return `/explore`;
             default:
                 return `${link}`;
         }
@@ -70,6 +72,10 @@
                 <Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
             </MenuListItem>
             <hr />
+            <MenuListItem title={$t('ui.settings')} href={getChatLink('explore')}>
+                <Icon icon="settings" alt={$t('ui.newChat')} />
+                <span>{$t('ui.settings')}</span>
+            </MenuListItem>
             <MenuListItem title={$t('ui.settings')} href={getChatLink('settings')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
