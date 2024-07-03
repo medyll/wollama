@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { dbFields } from '$lib/db/dbFields';
+    import { IDbFields } from '$lib/db/dbFields';
     import { schemeModel } from '$lib/db/dbSchema';
     import { Looper } from '@medyll/slot-ui';
     import type { PageData } from './$types';
@@ -7,7 +7,7 @@
 
     export let data: PageData;
 
-    let test = new dbFields(schemeModel);
+    let test = new IDbFields(schemeModel);
 
     let val3 = test.parseAllCollections();
     console.log(val3);

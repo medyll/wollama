@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { dbFields } from '$lib/db/dbFields';
+    import { IDbFields as DbFields } from '$lib/db/dbFields';
     import { idbQuery, ideo } from '$lib/db/dbQuery';
     import { schemeModel, idbqlState } from '$lib/db/dbSchema';
-    import type { IdbqModelCollectionName } from '@medyll/idbql';
+    import type { TplCollectionName } from '@medyll/idbql';
 
     interface Props {
         mode: 'create' | 'update' | 'show';
-        collection: IdbqModelCollectionName;
+        collection: TplCollectionName;
         data?: Record<string, any>;
         dataId?: any;
         /** fields to show */
@@ -14,12 +14,20 @@
     }
     let { collection, data = {}, dataId, mode }: Props = $props();
     let inputForm = `form-${String(collection)}`;
-    let test = new dbFields(schemeModel);
-    let formFields = test.parseRawCollection(collection) ?? {};
+    let dbFields = new DbFields(schemeModel);
+    let formFields = dbFields.parseRawCollection(collection) ?? {};
+    let indexName = dbFields.getIndexName(collection);
+ 
+
+    let qy: any = $derived((dataId && indexName) ? idbqlState[collection].where({ [indexName]: { eq: dataId } }) : {});
 
     let formData = $state<Record<string, any>>(data);
 
-    let qy = idbqlState[collection as string].get(dataId)
+    if ((mode = 'show')) {
+    } else {
+    }
+
+    let ds = Object.keys(data).length > 0 ? data : qy[0];
 
     let onSubmit = async (event: FormDataEvent) => {
         let data = $state.snapshot(formData);
@@ -28,16 +36,17 @@
             case 'create':
                 if (!dataId) {
                     console.log('create', data);
-                    await idbqlState[collection as string].add(data);
+                    await idbqlState[collection].add(data);
                 }
                 break;
             case 'update':
                 if (dataId) {
-                    await idbqlState[collection as string].update(dataId, data);
+                    await idbqlState[collection].update(dataId, data);
                 }
                 break;
         }
     };
+    $inspect(indexName, dataId,qy,ds);
 </script>
 
 {#snippet control(value)}
@@ -77,17 +86,17 @@
     {/if}
 {/snippet}
 {#snippet input(tag: any, value)}
-    {#if mode === 'show'}s
-    {formData[value.fieldName]}
-    {:else  }
+    {#if mode === 'show'}
+        {ds?.[value.fieldName]}
+    {:else}
         <input
             required={value?.fieldArgs?.includes('required')}
             readonly={value?.fieldArgs?.includes('readonly')}
             form={inputForm}
-            bind:value={formData[value.fieldName]}
+            bind:value={ds[value.fieldName]}
             type={tag}
             name={value.fieldName}
-            placeholder={value.fieldName} />
+            placeholder={ds?.[value.fieldName]} />
     {/if}
 {/snippet}
 
@@ -95,7 +104,7 @@
     id={inputForm}
     onsubmit={(event) => {
         event.preventDefault();
-        onSubmit(event);
+        // onSubmit(event);
     }}>
 </form>
 
@@ -103,7 +112,7 @@
     <div style="display:flex" class="  flex-wrap">
         {#each Object.entries(formFields) as [field, value]}
             {@const placeholder = value.fieldType}
-            <div class="flex flex-col gap-2 p-2   flex-1" style="min-width:25%">
+            <div class="flex flex-col gap-2 p-2 flex-1" style="min-width:25%">
                 <label class="w-20 border-b">{value.fieldName}</label>
                 <div>{@render control(value)}</div>
             </div>

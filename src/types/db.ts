@@ -89,6 +89,7 @@ export type DBAgent = {
     name: string;
     code: string;
     model: string;
+    prompt: string;
     agentPromptId: number;
     ia_lock: boolean;
     created_at: Date;
@@ -103,6 +104,16 @@ export type DbAgentPrompt = {
     ia_lock: boolean;
 }; //
 
+export type DbAgentOf = {
+    id: number;
+    created_at: Date;
+    value: string;
+    name: string;
+    code: string;
+    collection: string;
+    collectionId: number;
+    ia_lock: boolean;
+}; //
 export type DbMessageListType = {
     [key: string]: DBMessage;
 };

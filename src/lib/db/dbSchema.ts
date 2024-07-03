@@ -1,4 +1,4 @@
-import type { DBAgent, DbAgentPrompt, DbCategory, DbChat, DbTags, PromptType } from '$types/db';
+import type { DBAgent, DbAgentOf, DbAgentPrompt, DbCategory, DbChat, DbTags, PromptType } from '$types/db';
 import type { DBMessage } from '$types/db';
 import type { OllamaResponse } from '$types/ollama';
 import type { SettingsType } from '$types/settings';
@@ -12,17 +12,23 @@ export const schemeModel: IdbqModel = {
         ts: {} as DBAgent,
         template: {
             index: 'id',
+            presentation: 'name model',
             fields: {
                 id: 'id (readonly)',
                 name: 'text (private)',
                 code: 'text',
                 model: 'text',
+                prompt: 'text-long',
                 created_at: 'date (private)',
                 ia_lock: 'boolean (private)',
                 agentPromptId: 'fk-agentPrompt.id (required)',
             },
             fks: {
-                agentPrompt: 'readonly private',
+                agentPrompt: {
+                    code: 'agentPrompt',
+                    rules: 'readonly private',
+                    multiple: true,
+                },
             },
         },
     },
@@ -32,6 +38,7 @@ export const schemeModel: IdbqModel = {
         ts: {} as DbAgentPrompt,
         template: {
             index: 'id',
+            presentation: 'name',
             fields: {
                 id: 'id (readonly)',
                 created_at: 'date (private)',
@@ -39,6 +46,21 @@ export const schemeModel: IdbqModel = {
                 name: 'text (required)',
                 code: 'text (required)',
                 ia_lock: 'boolean (private)',
+            },
+            fks: {},
+        },
+    },
+    agentOf: {
+        keyPath: '++id, created_at',
+        model: {} as DbAgentOf,
+        ts: {} as DbAgentOf,
+        template: {
+            index: 'id',
+            presentation: 'name',
+            fields: {
+                code: 'text',
+                name: 'text',
+                context: 'array-of-number',
             },
             fks: {},
         },
@@ -171,5 +193,7 @@ export const schemeModel: IdbqModel = {
 } as const;
 
 //type test = DbTemplateModel<typeof idbqModel>;
-const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 9);
+const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 10);
 export const { idbql, idbqlState, idbDatabase, idbqModel } = idbqStore.create('woolama');
+
+//idbql.agent.where({ $eq: { id: 3 } });

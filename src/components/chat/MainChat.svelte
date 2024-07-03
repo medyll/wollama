@@ -6,7 +6,7 @@
     import { ui } from '$lib/stores/ui';
     import ChatOptions from './ChatOptions.svelte';
     import { PromptSender } from '$lib/tools/promptSender.js';
-    import { ollamaBodyStore,   } from '$lib/stores/prompter';
+    import { ollamaBodyStore } from '$lib/stores/prompter';
     import { aiState } from '$lib/stores';
     import DashBoard from '$components/DashBoard.svelte';
     import Images from './input/Images.svelte';
@@ -17,13 +17,13 @@
     import MessagesList from './MessagesList.svelte';
     import { chatMetadata } from '$lib/tools/promptSystem';
     import CreateUpdate from '$lib/form/CreateUpdate.svelte';
+    import AgentPick from '$components/agents/AgentPick.svelte';
 
     interface Props {
         activeChatId?: any;
     }
 
-    let { activeChatId }: Props = $props();
-    $inspect(activeChatId);
+    let { activeChatId }: Props = $props(); 
 
     let chatApiSession: ChatApiSession = new ChatApiSession(activeChatId);
 
@@ -83,7 +83,7 @@
             await chatApiSession.createChatDbSession({});
             // set active chat
             activeChatId = chatId = chatApiSession.chat.chatId;
-            window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`); 
+            window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`);
         }
 
         await chatApiSession.updateChatSession({
@@ -112,7 +112,7 @@
     });
     $inspect(chatParams.promptSystem);
 </script>
-<CreateUpdate mode="create"  collection="agentPrompt" data={{}} />
+
 {#snippet input()}
     <div class="chatZone">
         <div class="input inputTextarea">
@@ -140,9 +140,10 @@
         <div class="text-xs text-center theme-bg p-2">{$t('ui.aiCautionMessage')}</div>
     </div>
 {/snippet}
+<div class="absolute right-4"><AgentPick /></div>
 <form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
 <div class="h-full w-full">
-    <div class="application-container flex-v h-full mx-auto ">
+    <div class="application-container flex-v h-full mx-auto">
         <DashBoard showList={Boolean(activeChatId)}>
             {#snippet home()}
                 {@render input()}

@@ -1,4 +1,5 @@
 import type { CollectionModel, IdbqModel, TplCollectionName, Tpl, TplFields } from '@medyll/idbql';
+import { schemeModel } from './dbSchema';
 
 export enum enumPrimitive {
     id = 'id',
@@ -53,11 +54,11 @@ export type IDbForge = {
     is: any;
 };
 
-export class dbFields<T = Record<string, any>> {
-    model!: IdbqModel;
+export class IDbFields<T = Record<string, any>> {
+    model: IdbqModel = schemeModel;
 
-    constructor(model: IdbqModel) {
-        this.model = model;
+    constructor(model?: IdbqModel) {
+        this.model = model ?? this.model;
     }
 
     parseAllCollections() {
@@ -70,7 +71,7 @@ export class dbFields<T = Record<string, any>> {
     }
 
     parseRawCollection(collection: TplCollectionName): Record<string, IDbForge | undefined> | undefined {
-        const fields = this.#getTemplateFields(collection);
+        const fields = this.getTemplateFields(collection);
         if (!fields) return;
         let out: Record<string, IDbForge | undefined> = {};
 
@@ -92,14 +93,12 @@ export class dbFields<T = Record<string, any>> {
         return this.forge({ collection, fieldName, ...fieldType });
     }
 
-    parsIdbType(fieldRule: IDbFieldRules) {
+    parsFieldRule(fieldRule: IDbFieldRules) {
         if (!fieldRule) return;
-        let a;
-        if (this.is('primitive', fieldRule).fieldType) a = fieldRule;
+        let fieldType =
+            this.testIs('primitive', fieldRule) ?? this.testIs('array', fieldRule) ?? this.testIs('object', fieldRule) ?? this.testIs('fk', fieldRule);
 
-        if (this.is('fk', fieldRule).fieldType) a = this.is('fk', fieldRule);
-
-        return a ? this.forge(a) : undefined;
+        return undefined;
     }
 
     forge({ collection, fieldName, fieldType, fieldRule, fieldArgs, is }: IDbForge): IDbForge {
@@ -116,17 +115,24 @@ export class dbFields<T = Record<string, any>> {
     #getModel() {
         return this.model;
     }
+
     getCollection(collection: TplCollectionName) {
         return this.#getModel()[String(collection)] as CollectionModel;
     }
-    #getTemplate(collection: TplCollectionName) {
+    getTemplate(collection: TplCollectionName) {
         return this.getCollection(collection)['template'] as Tpl;
     }
-    #getTemplateFields(collection: TplCollectionName) {
-        return this.#getTemplate(collection)?.fields as TplFields;
+    getIndexName(collection: string) {
+        return this.getCollection(collection)?.template?.index;
+    }
+    getTemplateFields(collection: TplCollectionName) {
+        return this.getTemplate(collection)?.fields as TplFields;
+    }
+    getTemplatePresentation(collection: TplCollectionName) {
+        return this.getTemplate(collection)?.presentation as string;
     }
     getTemplateFieldRule(collection: TplCollectionName, fieldName: keyof TplFields) {
-        return this.#getTemplateFields(collection)?.[String(fieldName)] as IDbFieldRules | undefined;
+        return this.getTemplateFields(collection)?.[String(fieldName)] as IDbFieldRules | undefined;
     }
 
     getFieldArgs(string: IDbFieldRules) {}
@@ -172,6 +178,22 @@ export class dbFields<T = Record<string, any>> {
         }
     }
 
+    // class for values IDbFieldValues
+    presentation(collection: TplCollectionName, data: Record<string, any>) {
+        let presentation = this.getTemplatePresentation(collection);
+        let fields = presentation.split(' ');
+        fields.map((field: string) => data[field]).join(' ');
+        return fields.map((field: string) => data[field]).join(' ');
+    }
+
+    text(field: string, collection: TplCollectionName, data: Record<string, any>) {}
+    input(field: string, collection: TplCollectionName, data: Record<string, any>) {}
+
+    indexValue(collection: TplCollectionName, data: Record<string, any>) {
+        let presentation = this.getIndexName(collection);
+        return data[presentation];
+    }
+
     extract(type: 'array' | 'object' | 'fk' | 'primitive', fieldRule: IDbFieldRules): Partial<IDbForge> {
         // fieldType
         function extractAfter(pattern: string, source: string) {
@@ -215,5 +237,49 @@ export class dbFields<T = Record<string, any>> {
         }
 
         return { fieldType, fieldRule, fieldArgs, is: type };
+    }
+}
+
+export class IDbFieldValues {
+    dbFields: IDbFields;
+    collection: TplCollectionName;
+
+    constructor(collection: TplCollectionName) {
+        this.collection = collection;
+        this.dbFields = new IDbFields();
+    }
+
+    // class for values IDbFieldValues
+    presentation(data: Record<string, any>) {
+        let presentation = this.dbFields.getTemplatePresentation(this.collection);
+        let fields = presentation.split(' ');
+        fields.map((field: string) => data[field]).join(' ');
+        return fields.map((field: string) => data[field]).join(' ');
+    }
+
+    text(field: string, data: Record<string, any>) {
+        let fields = this.dbFields.getTemplateFields(this.collection);
+        let rules = this.dbFields.parseCollectionFieldName(this.collection, field);
+        let tpl = fields[field];
+        switch(rules?.fieldType){
+            case 'text-tiny':
+                return data[field].substring(0, 10);
+            case 'text-short':
+                return data[field].substring(0, 20);
+            case 'text-medium':
+                return data[field].substring(0, 30);
+            case 'text-long':
+                return data[field].substring(0, 40);
+            case 'text-giant':
+                return data[field].substring(0, 50);
+            default:
+                return data[field];
+        }
+    }
+    input(field: string, data: Record<string, any>) {}
+
+    indexValue(data: Record<string, any>) {
+        let presentation = this.dbFields.getIndexName(this.collection);
+        return data[presentation];
     }
 }

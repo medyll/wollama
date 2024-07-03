@@ -27,8 +27,9 @@
     import { OllamaApi, ollamaApiConfig } from '$lib/db/ollamaApi';
 
     import '$lib/playground.js';
-    import { dbFields } from '$lib/db/dbFields';
-    import { schemeModel } from '$lib/db/dbSchema';
+    import { IDbFields } from '$lib/db/dbFields';
+    import { idbql, schemeModel } from '$lib/db/dbSchema';
+    import { init } from '$lib/init/init';
 
     let { children } = $props();
 
@@ -43,7 +44,7 @@
     onMount(async () => {
         settings.initSettings();
 
-        ollamaApiConfig.setOptions({ ollama_endpoint: $settings.ollama_server });
+        ollamaApiConfig.setOptions({ ollama_endpoint: $settings.ollama_server, model: $settings.defaultModel });
 
         let models: { models: Record<string, any>[] } = { models: [{}] };
 
@@ -53,14 +54,21 @@
         } catch (e) {
             console.log(e);
         }
-
+        try { 
+            let a = await idbql.agent.where({ code: { eq: 'tesst' } });
+            if(!a[0]){
+                // create agent from promptLib
+            }
+        } catch (e) {
+            console.log(e);
+        }
         //
         ollamaApiMainOptionsParams.init();
         engine.checkOllamaEndPoints();
 
         const users = await idbQuery.getUsers();
-        if (!users.length) {
-            idbQuery.insertUser({ name: 'user' });
+        if (users.length < 0) {
+            idbQuery.insertUser({ name: 'Mydde' });
         }
 
         connectionChecker.subscribe(async (state) => {
@@ -73,12 +81,14 @@
             }
         });
 
-        let test = new dbFields(schemeModel);
+        init();
+
+        let test = new IDbFields(schemeModel);
 
         /* let val = test.parsIdbType('fk-agentPrompt.id');
         let val2 = test.parseCollectionFieldName('agent', 'name'); */
-        let val3 = test.parseAllCollections( );
-        console.log(val3);
+        /* let val3 = test.parseAllCollections();
+        console.log(val3); */
     });
 </script>
 

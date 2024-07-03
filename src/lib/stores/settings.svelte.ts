@@ -1,7 +1,6 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import { defaultSettings } from '$configuration/configuration';
-import { merge } from 'ts-deepmerge';
 import type { SettingsType } from '$types/settings';
 
 /* class Settings {
