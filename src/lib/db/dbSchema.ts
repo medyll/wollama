@@ -105,6 +105,7 @@ export const schemeModel: IdbqModel = {
         ts: {} as DbTags,
         template: {
             index: 'id',
+            presentation: 'name',
             fields: {
                 id: 'id',
                 code: 'text',
@@ -120,6 +121,7 @@ export const schemeModel: IdbqModel = {
         ts: {} as DBMessage,
         template: {
             index: 'messageId',
+            presentation: 'resume',
             fields: {
                 id: 'id',
                 chatId: 'id',
@@ -145,6 +147,7 @@ export const schemeModel: IdbqModel = {
         ts: {} as PromptType,
         template: {
             index: 'id',
+            presentation: 'name',
             fields: {
                 id: 'id',
                 name: 'text',
@@ -162,6 +165,7 @@ export const schemeModel: IdbqModel = {
         ts: {} as SettingsType,
         template: {
             index: 'id',
+            presentation: 'code',
             fields: {
                 id: 'id',
                 userId: 'id',
@@ -180,8 +184,11 @@ export const schemeModel: IdbqModel = {
         ts: {} as UserType,
         template: {
             index: 'id',
+            presentation: 'email',
             fields: {
                 id: 'id',
+                name: 'text',
+                color: 'text',
                 created_at: 'date (readonly)',
                 email: 'email',
                 password: 'password',

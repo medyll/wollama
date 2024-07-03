@@ -167,7 +167,7 @@
 
             transition: all 0.2s ease-in-out;
  
-            overflow-wrap: break-word;
+            /* overflow-wrap: break-word; */
 
             &.naked {
                 border-color: transparent;

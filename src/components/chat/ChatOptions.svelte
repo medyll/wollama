@@ -10,6 +10,8 @@
     import { Button, ButtonMenu, MenuListItem, Popper } from '@medyll/slot-ui';
     import Attachment from './input/Attachment.svelte';
     import { idbQuery } from '$lib/db/dbQuery';
+    import CrudCollectionList from '$components/form/CrudCollectionList.svelte';
+    import CrudZone from '$components/form/CrudZone.svelte';
 
     let component = $ui.showPrompt ? Prompts : undefined;
 
@@ -24,38 +26,38 @@
     }
 
     let showHide = $state(false);
-    let style = $derived( showHide ? 'display: contents;':'display: none;content-visibility:hidden');
+    let style = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
 </script>
 
 {#snippet listItemBottom()}
     <MenuListItem
         icon={'mdi:chevron-right'}
         onclick={() => {
-            showHide = !showHide
+            showHide = !showHide;
         }}></MenuListItem>
 {/snippet}
+<!-- bind:activePrompt={chatParams.promptSystem} -->
 {#snippet popperRight()}
-    <div {style} >
-        <Prompts bind:activePrompt={chatParams.promptSystem} />
+    <div {style}>
+        <CrudZone collection="prompts" />
     </div>
 {/snippet}
 <ButtonMenu
     tall="small"
     width="auto"
     icon="material-symbols-light:post-add-sharp"
-    value={chatParams.promptSystem?.title ?? $t('prompt.systemPrompt')}
-    popperProps={{ stickToHookWidth: true, position: 'TR', flow: 'fixed', popperRight }}
+    value={chatParams.promptSystem?.code ?? $t('prompt.systemPrompt')}
+    popperProps={{ stickToHookWidth: true, position: 'TL', flow: 'fixed', popperRight }}
     menuProps={{
         data: promptList,
         listItemBottom,
-        onclick: (event) => {
-            chatParams.promptSystem = event.detail;
+        onclick: (event) => { 
+            chatParams.promptSystem = event?.detail;
         },
     }}>
     {#snippet menuItem({ item })}
-        <MenuListItem data={item}
-            >{item?.title}
-
+        <MenuListItem data={item}>
+            {item?.name}
         </MenuListItem>
     {/snippet}
 </ButtonMenu>

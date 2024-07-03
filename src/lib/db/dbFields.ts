@@ -181,7 +181,7 @@ export class IDbFields<T = Record<string, any>> {
     // class for values IDbFieldValues
     presentation(collection: TplCollectionName, data: Record<string, any>) {
         let presentation = this.getTemplatePresentation(collection);
-        let fields = presentation.split(' ');
+        let fields = presentation?.split(' ') ?? [];
         fields.map((field: string) => data[field]).join(' ');
         return fields.map((field: string) => data[field]).join(' ');
     }
@@ -240,7 +240,7 @@ export class IDbFields<T = Record<string, any>> {
     }
 }
 
-export class IDbFieldValues {
+export class iDBFieldValues {
     dbFields: IDbFields;
     collection: TplCollectionName;
 
@@ -260,8 +260,11 @@ export class IDbFieldValues {
     text(field: string, data: Record<string, any>) {
         let fields = this.dbFields.getTemplateFields(this.collection);
         let rules = this.dbFields.parseCollectionFieldName(this.collection, field);
-        let tpl = fields[field];
-        switch(rules?.fieldType){
+        rules?.fieldArgs;
+        let tpl = fields[field]; // IDbTypes
+        switch (rules?.fieldType) {
+            case 'number':
+                return;
             case 'text-tiny':
                 return data[field].substring(0, 10);
             case 'text-short':

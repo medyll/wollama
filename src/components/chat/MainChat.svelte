@@ -16,7 +16,7 @@
     import { Button, Icon, IconButton } from '@medyll/slot-ui';
     import MessagesList from './MessagesList.svelte';
     import { chatMetadata } from '$lib/tools/promptSystem';
-    import CreateUpdate from '$lib/form/CreateUpdate.svelte';
+    import CreateUpdate from '$components/form/CreateUpdate.svelte';
     import AgentPick from '$components/agents/AgentPick.svelte';
 
     interface Props {

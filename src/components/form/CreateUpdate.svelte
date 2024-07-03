@@ -23,15 +23,10 @@
 
     let formData = $state<Record<string, any>>(data);
 
-    if ((mode = 'show')) {
-    } else {
-    }
-
     let ds = Object.keys(data).length > 0 ? data : qy[0];
 
-    let onSubmit = async (event: FormDataEvent) => {
+    export const submit = async (event: FormDataEvent) => {
         let data = $state.snapshot(formData);
-        console.log('formData', formData);
         switch (mode) {
             case 'create':
                 if (!dataId) {
@@ -46,7 +41,7 @@
                 break;
         }
     };
-    $inspect(indexName, dataId,qy,ds);
+ 
 </script>
 
 {#snippet control(value)}
@@ -79,24 +74,27 @@
             name={value.fieldName}
             class="rounded-md h-24"
             placeholder={value.fieldName}>
-            {value.fieldType}
+            {formData[value.fieldName]}
         </textarea>
     {:else}
         {@render input('text', value)}
     {/if}
 {/snippet}
-{#snippet input(tag: any, value)}
+{#snippet input(tag: any, value)}  
     {#if mode === 'show'}
-        {ds?.[value.fieldName]}
+        {formData?.[value.fieldName]}
     {:else}
         <input
             required={value?.fieldArgs?.includes('required')}
             readonly={value?.fieldArgs?.includes('readonly')}
             form={inputForm}
-            bind:value={ds[value.fieldName]}
+            bind:value={formData[value.fieldName]}
             type={tag}
             name={value.fieldName}
-            placeholder={ds?.[value.fieldName]} />
+            placeholder={formData?.[value?.fieldName]} 
+            data-id={dataId}
+            data-fieldName={value.fieldName}
+            data-collection={collection}/>
     {/if}
 {/snippet}
 
@@ -118,5 +116,5 @@
             </div>
         {/each}
     </div>
-    <input type="submit" form={inputForm} value="submit" />
+    <!-- <input type="submit" form={inputForm} value="submit" /> -->
 </div>

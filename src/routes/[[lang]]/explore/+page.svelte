@@ -9,8 +9,7 @@
 
     let test = new IDbFields(schemeModel);
 
-    let val3 = test.parseAllCollections();
-    console.log(val3);
+    let val3 = test.parseAllCollections(); 
 </script>
 
 
