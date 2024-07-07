@@ -1,9 +1,23 @@
-import type { DBAgent, DbAgentOf, DbAgentPrompt, DbCategory, DbChat, DbTags, PromptType } from '$types/db';
+import type {
+    DBAgent,
+    DbAgentOf,
+    DbAgentPrompt,
+    DbBook,
+    DbBookPrompts,
+    DbCategory,
+    DbChapter,
+    DbCharacter,
+    DbCharacterChapterStatus,
+    DbChat,
+    DbTags,
+    DbWritingGoal,
+    PromptType,
+} from '$types/db';
 import type { DBMessage } from '$types/db';
 import type { OllamaResponse } from '$types/ollama';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
-import { createIdbqDb, type IdbqModel, type Tpl } from '@medyll/idbql';
+import { createIdbqDb, type IdbqModel, type Tpl, type DbFieldTypes, type TplFieldType } from '@medyll/idbql';
 
 export const schemeModel: IdbqModel = {
     agent: {
@@ -71,6 +85,7 @@ export const schemeModel: IdbqModel = {
         ts: {} as DbChat,
         template: {
             index: 'chatId',
+            presentation: 'name',
             fields: {
                 chatId: 'id',
                 createdAt: 'date',
@@ -90,6 +105,7 @@ export const schemeModel: IdbqModel = {
         ts: {} as DbCategory,
         template: {
             index: 'id',
+            presentation: 'name',
             fields: {
                 id: 'id',
                 code: 'text',
@@ -135,11 +151,6 @@ export const schemeModel: IdbqModel = {
             },
             fks: {},
         },
-    },
-    messageStats: {
-        keyPath: '++id, chatId, created_at',
-        model: {} as OllamaResponse,
-        ts: {} as OllamaResponse,
     },
     prompts: {
         keyPath: '++id, created_at',
@@ -197,10 +208,196 @@ export const schemeModel: IdbqModel = {
             fks: {},
         },
     },
+    // Nouvelles entités pour le Book Creator Helper
+    book: {
+        keyPath: '++id, userId, created_at',
+        model: {} as DbBook,
+        ts: {} as DbBook,
+        template: {
+            index: 'id',
+            presentation: 'title',
+            fields: {
+                id: 'id (readonly)',
+                userId: 'id',
+                title: 'text (required)',
+                description: 'text-long',
+                created_at: 'date (readonly)',
+                updated_at: 'date',
+                status: 'text',
+                ia_lock: 'boolean (private)',
+            },
+            fks: {
+                user: {
+                    code: 'user',
+                    multiple: false,
+                    rules: 'readonly',
+                },
+            },
+        },
+    },
+
+    chapter: {
+        keyPath: '++id, bookId, order',
+        model: {} as DbChapter,
+        ts: {} as DbChapter,
+        template: {
+            index: 'id',
+            presentation: 'title',
+            fields: {
+                id: 'id (readonly)',
+                bookId: 'id',
+                title: 'text (required)',
+                content: 'text-long',
+                order: 'number',
+                created_at: 'date (readonly)',
+                updated_at: 'date',
+                ia_lock: 'boolean (private)',
+            },
+            fks: {
+                book: {
+                    code: 'book',
+                    multiple: false,
+                    rules: 'readonly',
+                },
+            },
+        },
+    },
+
+    writingGoal: {
+        keyPath: '++id, userId, bookId',
+        model: {} as DbWritingGoal,
+        ts: {} as DbWritingGoal,
+        template: {
+            index: 'id',
+            presentation: 'description',
+            fields: {
+                id: 'id (readonly)',
+                userId: 'id',
+                bookId: 'id',
+                description: 'text (required)',
+                targetWordCount: 'number',
+                deadline: 'date',
+                created_at: 'date (readonly)',
+                updated_at: 'date',
+                ia_lock: 'boolean (private)',
+            },
+            fks: {
+                user: {
+                    code: 'user',
+                    multiple: false,
+                    rules: 'readonly',
+                },
+                book: {
+                    code: 'book',
+                    multiple: false,
+                    rules: 'readonly',
+                },
+            },
+        },
+    },
+
+    character: {
+        keyPath: '++id, bookId',
+        model: {} as DbCharacter,
+        ts: {} as DbCharacter,
+        template: {
+            index: 'id',
+            presentation: 'firstName lastName',
+            fields: {
+                id: 'id (readonly)',
+                bookId: 'id',
+                firstName: 'text (required)',
+                lastName: 'text',
+                nickname: 'text',
+                role: 'text',
+                description: 'text-long',
+                backstory: 'text-long',
+                age: 'number',
+                gender: 'text',
+                occupation: 'text',
+                physicalDescription: 'text-long',
+                personalityTraits: 'array-of-text',
+                goals: 'text-long',
+                conflicts: 'text-long',
+                relationships: 'array-of-object',
+                created_at: 'date (readonly)',
+                updated_at: 'date',
+                ia_lock: 'boolean (private)',
+            },
+            fks: {
+                book: {
+                    code: 'book',
+                    multiple: false,
+                    rules: 'readonly',
+                },
+            },
+        },
+    },
+
+    characterChapterStatus: {
+        keyPath: '++id, characterId, chapterId',
+        model: {} as DbCharacterChapterStatus,
+        ts: {} as DbCharacterChapterStatus,
+        template: {
+            index: 'id',
+            presentation: 'characterId chapterId status',
+            fields: {
+                id: 'id (readonly)',
+                characterId: 'id',
+                chapterId: 'id',
+                status: 'text',
+                role: 'text',
+                actions: 'text-long',
+                development: 'text-long',
+                notes: 'text-long',
+                created_at: 'date (readonly)',
+                updated_at: 'date',
+            },
+            fks: {
+                character: {
+                    code: 'character',
+                    multiple: false,
+                    rules: 'readonly',
+                },
+                chapter: {
+                    code: 'chapter',
+                    multiple: false,
+                    rules: 'readonly',
+                },
+            },
+        },
+    },
+
+    bookPrompts: {
+        keyPath: '++id, bookId',
+        model: {} as DbBookPrompts,
+        ts: {} as DbBookPrompts,
+        template: {
+            index: 'id',
+            presentation: 'name',
+            fields: {
+                id: 'id (readonly)',
+                bookId: 'id',
+                name: 'text (required)',
+                category: 'text',
+                content: 'text-long',
+                created_at: 'date (readonly)',
+                updated_at: 'date',
+                ia_lock: 'boolean (private)',
+            },
+            fks: {
+                book: {
+                    code: 'book',
+                    multiple: false,
+                    rules: 'readonly',
+                },
+            },
+        },
+    },
 } as const;
 
 //type test = DbTemplateModel<typeof idbqModel>;
-const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 10);
+const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 12);
 export const { idbql, idbqlState, idbDatabase, idbqModel } = idbqStore.create('woolama');
 
-//idbql.agent.where({ $eq: { id: 3 } });
+// idbql.agent.where({ $eq: { id: 3 } });

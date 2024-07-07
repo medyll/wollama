@@ -102,7 +102,7 @@ export class idbQuery {
     }
 
     static getMessages(chatId: string) {
-        if (!chatId) return []; //throw new Error('chatId is required');
+        if (!chatId) return [];
         return idbqlState.messages.where({ chatId: { eq: chatId } }).sortBy({ createdAt: 'asc' });
     }
     /* MessageStats */

@@ -1,3 +1,7 @@
+/* 
+    path: D:\boulot\python\wollama\src\lib\db\dbFields.ts
+ */
+
 import type { CollectionModel, IdbqModel, TplCollectionName, Tpl, TplFields } from '@medyll/idbql';
 import { schemeModel } from './dbSchema';
 
@@ -5,14 +9,14 @@ export enum enumPrimitive {
     id = 'id',
     any = 'any',
     date = 'date',
+    datetime = 'datetime',
+    time = 'time',
     text = 'text',
     number = 'number',
     boolean = 'boolean',
-    datetime = 'datetime',
     url = 'url',
     email = 'email',
     phone = 'phone',
-    time = 'time',
     password = 'password',
 }
 
@@ -53,17 +57,40 @@ export type IDbForge = {
     fieldArgs?: [keyof typeof TplProperties] | undefined;
     is: any;
 };
+/* 
+    renamed from DbCollectionError to IDbErrors
+ */
+class IDbError extends Error {
+    constructor(
+        message: string,
+        public readonly code: string
+    ) {
+        super(message);
+        this.name = 'DbCollectionError';
+    }
+    static throwError(message: string, code: string) {
+        throw new IDbError(message, code);
+    }
+
+    static handleError(error: unknown): void {
+        if (error instanceof IDbError) {
+            console.error(`${error.name}: ${error.message} (Code: ${error.code})`);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+    }
+}
 
 export class IDbFields<T = Record<string, any>> {
     model: IdbqModel = schemeModel;
 
     constructor(model?: IdbqModel) {
-        this.model = model ?? this.model;
+        this.model = schemeModel; //model ?? this.model;
     }
 
-    parseAllCollections() {
+    parseAllCollections(): Record<string, Record<string, IDbForge | undefined> | undefined> {
         let out: Record<string, Record<string, IDbForge | undefined> | undefined> = {};
-        Object.keys(this.#getModel()).forEach((collection) => {
+        Object.keys(this.model).forEach((collection) => {
             out[collection] = this.parseRawCollection(collection as TplCollectionName);
         });
 
@@ -71,7 +98,7 @@ export class IDbFields<T = Record<string, any>> {
     }
 
     parseRawCollection(collection: TplCollectionName): Record<string, IDbForge | undefined> | undefined {
-        const fields = this.getTemplateFields(collection);
+        const fields = this.getCollectionTemplateFields(collection);
         if (!fields) return;
         let out: Record<string, IDbForge | undefined> = {};
 
@@ -85,9 +112,12 @@ export class IDbFields<T = Record<string, any>> {
         return out;
     }
 
-    parseCollectionFieldName(collection: TplCollectionName, fieldName: keyof TplFields) {
-        const field = this.getTemplateFieldRule(collection, fieldName);
-        if (!field) return;
+    parseCollectionFieldName(collection: TplCollectionName, fieldName: keyof TplFields): IDbForge | undefined {
+        const field = this.#getTemplateFieldRule(collection, fieldName);
+        if (!field) {
+            IDbError.throwError(`Field ${fieldName} not found in collection ${collection}`, 'FIELD_NOT_FOUND');
+            return undefined;
+        }
         let fieldType = this.testIs('primitive', field) ?? this.testIs('array', field) ?? this.testIs('object', field) ?? this.testIs('fk', field);
 
         return this.forge({ collection, fieldName, ...fieldType });
@@ -98,10 +128,10 @@ export class IDbFields<T = Record<string, any>> {
         let fieldType =
             this.testIs('primitive', fieldRule) ?? this.testIs('array', fieldRule) ?? this.testIs('object', fieldRule) ?? this.testIs('fk', fieldRule);
 
-        return undefined;
+        return fieldType;
     }
 
-    forge({ collection, fieldName, fieldType, fieldRule, fieldArgs, is }: IDbForge): IDbForge {
+    private forge({ collection, fieldName, fieldType, fieldRule, fieldArgs, is }: IDbForge): IDbForge {
         return {
             collection,
             fieldName,
@@ -119,29 +149,28 @@ export class IDbFields<T = Record<string, any>> {
     getCollection(collection: TplCollectionName) {
         return this.#getModel()[String(collection)] as CollectionModel;
     }
-    getTemplate(collection: TplCollectionName) {
+    getCollectionTemplate(collection: TplCollectionName) {
         return this.getCollection(collection)['template'] as Tpl;
+    }
+    getCollectionTemplateFks(collection: TplCollectionName) {
+        return this.getCollection(collection)['template']?.fks as Tpl['fks'];
     }
     getIndexName(collection: string) {
         return this.getCollection(collection)?.template?.index;
     }
-    getTemplateFields(collection: TplCollectionName) {
-        return this.getTemplate(collection)?.fields as TplFields;
+    getCollectionTemplateFields(collection: TplCollectionName) {
+        return this.getCollectionTemplate(collection)?.fields as TplFields;
     }
     getTemplatePresentation(collection: TplCollectionName) {
-        return this.getTemplate(collection)?.presentation as string;
+        return this.getCollectionTemplate(collection)?.presentation as string;
     }
-    getTemplateFieldRule(collection: TplCollectionName, fieldName: keyof TplFields) {
-        return this.getTemplateFields(collection)?.[String(fieldName)] as IDbFieldRules | undefined;
+    #getTemplateFieldRule(collection: TplCollectionName, fieldName: keyof TplFields) {
+        return this.getCollectionTemplateFields(collection)?.[String(fieldName)] as IDbFieldRules | undefined;
     }
-
-    getFieldArgs(string: IDbFieldRules) {}
-
-    extractFieldArgs(string: IDbFieldRules) {}
 
     getFkFieldType(string: `${string}.${string}`) {
         const [collection, field] = string.split('.') as [string, string];
-        let template = this.getTemplateFieldRule(collection, field as any);
+        let template = this.#getTemplateFieldRule(collection, field as any);
 
         return template as IDbFieldRules | undefined;
     }
@@ -151,43 +180,23 @@ export class IDbFields<T = Record<string, any>> {
         return this.getCollection(collection).template?.fields;
     }
 
-    doArray(string: IDbFieldRules) {}
-
-    doObject(string: `${IdDbPrimitive}.${IdDbPrimitive}`) {}
-
-    testIs(what: 'array' | 'object' | 'fk' | 'primitive', fieldType: IDbFieldRules): any | undefined {
-        let test;
-        if (what === 'fk') test = fieldType.startsWith('fk-');
-        if (what === 'array') test = fieldType.startsWith('array-of-');
-        if (what === 'object') test = fieldType.startsWith('object-');
-        if (what === 'primitive') test = !fieldType.startsWith('fk-') && !fieldType.startsWith('array-of-') && !fieldType.startsWith('object-');
-        return test ? this.is(what, fieldType) : undefined;
-    }
-
-    is(what: 'array' | 'object' | 'fk' | 'primitive', fieldType: IDbFieldRules): Partial<IDbForge> {
-        const forge = this.extract(what, fieldType);
-        switch (what) {
-            case 'array':
-                return forge;
-            case 'object':
-                return forge;
-            case 'fk':
-                return forge;
-            case 'primitive':
-                return forge;
+    private testIs(what: 'array' | 'object' | 'fk' | 'primitive', fieldRule: IDbFieldRules): Partial<IDbForge> | undefined {
+        const typeMappings = {
+            fk: 'fk-',
+            array: 'array-of-',
+            object: 'object-',
+            primitive: '',
+        };
+        const prefix = typeMappings[what];
+        if (fieldRule.startsWith(prefix)) {
+            return this.is(what, fieldRule);
         }
+        return undefined;
     }
 
-    // class for values IDbFieldValues
-    presentation(collection: TplCollectionName, data: Record<string, any>) {
-        let presentation = this.getTemplatePresentation(collection);
-        let fields = presentation?.split(' ') ?? [];
-        fields.map((field: string) => data[field]).join(' ');
-        return fields.map((field: string) => data[field]).join(' ');
+    is(what: 'array' | 'object' | 'fk' | 'primitive', fieldRule: IDbFieldRules): Partial<IDbForge> {
+        return this.extract(what, fieldRule);
     }
-
-    text(field: string, collection: TplCollectionName, data: Record<string, any>) {}
-    input(field: string, collection: TplCollectionName, data: Record<string, any>) {}
 
     indexValue(collection: TplCollectionName, data: Record<string, any>) {
         let presentation = this.getIndexName(collection);
@@ -205,9 +214,10 @@ export class IDbFields<T = Record<string, any>> {
 
         function extractArgs(source: string): { piece: any; args: [TplProperties] | [keyof typeof TplProperties] } | undefined {
             const [piece, remaining] = source.split('(');
-            if (!remaining) return;
+            if (!remaining) return { piece, args: undefined };
             const [central] = remaining?.split(')');
             const args = central?.split(' ') as [TplProperties] | [keyof typeof TplProperties];
+            // console.log({ piece, args });
             return { piece, args };
         }
 
@@ -227,10 +237,9 @@ export class IDbFields<T = Record<string, any>> {
             case 'fk':
                 fieldType = this.getFkFieldType(extractAfter('fk-', fieldRule));
                 is = extractedArgs?.piece;
-                console.log('extractAfter', extractAfter('fk-', fieldRule), { fieldType, fieldRule, fieldArgs, is });
-
                 break;
             case 'primitive':
+                console.log({ fieldRule, extractedArgs });
                 fieldType = extractedArgs?.piece;
                 is = is ?? fieldType;
                 break;
@@ -238,51 +247,324 @@ export class IDbFields<T = Record<string, any>> {
 
         return { fieldType, fieldRule, fieldArgs, is: type };
     }
+
+    fks(collection: string): { [collection: string]: Tpl } {
+        let fks = this.getCollectionTemplateFks(collection);
+        let out: Record<string, any> = {};
+        // loop over fks
+        if (fks) {
+            Object.keys(fks).forEach((collection: TplCollectionName) => {
+                out[collection] = this.parseRawCollection(collection as TplCollectionName);
+            });
+        }
+        return out;
+    }
+
+    reverseFks(targetCollection: TplCollectionName): Record<string, any> {
+        const result: Record<string, any> = {};
+
+        Object.entries(this.#getModel()).forEach(([collectionName, collectionModel]) => {
+            const template = (collectionModel as CollectionModel).template;
+            if (template && template.fks) {
+                Object.entries(template.fks).forEach(([fkName, fkConfig]) => {
+                    if (fkConfig?.code === targetCollection) {
+                        if (!result[collectionName]) {
+                            result[collectionName] = {};
+                        }
+                        result[collectionName][fkName] = fkConfig;
+                    }
+                });
+            }
+        });
+
+        return result;
+    }
 }
 
-export class iDBFieldValues {
-    dbFields: IDbFields;
-    collection: TplCollectionName;
+// display field values, based on schema and provided data
+// renamed from iDBFieldValues to iDbCollectionValues
+export class iDbCollectionValues<T extends Record<string, any>> {
+    private dbFields: IDbFields;
+    private collection: TplCollectionName;
 
     constructor(collection: TplCollectionName) {
         this.collection = collection;
         this.dbFields = new IDbFields();
     }
 
-    // class for values IDbFieldValues
-    presentation(data: Record<string, any>) {
-        let presentation = this.dbFields.getTemplatePresentation(this.collection);
-        let fields = presentation.split(' ');
-        fields.map((field: string) => data[field]).join(' ');
-        return fields.map((field: string) => data[field]).join(' ');
-    }
+    presentation(data: Record<string, any>): string {
+        try {
+            this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
+            const presentation = this.dbFields.getTemplatePresentation(this.collection);
+            this.#checkError(!presentation, 'Presentation template not found', 'TEMPLATE_NOT_FOUND');
 
-    text(field: string, data: Record<string, any>) {
-        let fields = this.dbFields.getTemplateFields(this.collection);
-        let rules = this.dbFields.parseCollectionFieldName(this.collection, field);
-        rules?.fieldArgs;
-        let tpl = fields[field]; // IDbTypes
-        switch (rules?.fieldType) {
-            case 'number':
-                return;
-            case 'text-tiny':
-                return data[field].substring(0, 10);
-            case 'text-short':
-                return data[field].substring(0, 20);
-            case 'text-medium':
-                return data[field].substring(0, 30);
-            case 'text-long':
-                return data[field].substring(0, 40);
-            case 'text-giant':
-                return data[field].substring(0, 50);
-            default:
-                return data[field];
+            const fields = presentation.split(' ');
+            return fields
+                .map((field: string) => {
+                    this.#checkError(!(field in data), `Field ${field} not found in data`, 'FIELD_NOT_FOUND');
+                    return data[field];
+                })
+                .join(' ');
+        } catch (error) {
+            IDbError.handleError(error);
+            return '';
         }
     }
-    input(field: string, data: Record<string, any>) {}
 
-    indexValue(data: Record<string, any>) {
-        let presentation = this.dbFields.getIndexName(this.collection);
-        return data[presentation];
+    indexValue(data: Record<string, any>): any | null {
+        try {
+            this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
+            const indexName = this.dbFields.getIndexName(this.collection);
+            this.#checkError(!indexName, 'Index not found for collection', 'INDEX_NOT_FOUND');
+            this.#checkError(!(indexName in data), `Index field ${indexName} not found in data`, 'FIELD_NOT_FOUND');
+            return data[indexName];
+        } catch (error) {
+            IDbError.handleError(error);
+            return null;
+        }
     }
+
+    format(fieldName: keyof T, data: T): string {
+        try {
+            this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
+            this.#checkError(!(fieldName in data), `Field ${String(fieldName)} not found in data`, 'FIELD_NOT_FOUND');
+            const fieldInfo = this.dbFields.parseCollectionFieldName(this.collection, fieldName as string);
+            this.#checkError(!fieldInfo, `Field ${String(fieldName)} not found in collection`, 'FIELD_NOT_FOUND');
+
+            switch (fieldInfo?.fieldType) {
+                case 'number':
+                    return this.#formatNumberField(data[fieldName]);
+                case 'text':
+                case 'text-tiny':
+                case 'text-short':
+                case 'text-medium':
+                case 'text-long':
+                case 'text-giant':
+                    return this.#formatTextField(data[fieldName], fieldInfo.fieldType);
+                default:
+                    return String(data[fieldName]);
+            }
+        } catch (error) {
+            IDbError.handleError(error);
+            return '';
+        }
+    }
+
+    #formatNumberField(value: number): string {
+        // Implement number formatting logic here
+        return value.toString();
+    }
+
+    #formatTextField(value: string, type: string): string {
+        const lengths = { 'text-tiny': 10, 'text-short': 20, 'text-medium': 30, 'text-long': 40, 'text-giant': 50 };
+        const maxLength = lengths[type as keyof typeof lengths] || value.length;
+        return value.substring(0, maxLength);
+    }
+
+    #checkAccess(): boolean {
+        // Implement access check logic here
+        return true;
+    }
+
+    #checkError(condition: boolean, message: string, code: string): void {
+        if (condition) {
+            IDbError.throwError(message, code);
+        }
+    }
+}
+
+export class iDbCollectionFieldValues<T extends Record<string, any>> {
+    collection: TplCollectionName;
+    collectionDataRow: iDbCollectionValues<T>;
+    data: T;
+
+    constructor(collection: TplCollectionName, data: T) {
+        this.collection = collection;
+        this.collectionDataRow = new iDbCollectionValues(collection);
+        this.data = data;
+    }
+
+    format(fieldName: keyof T): string {
+        return this.collectionDataRow.format(fieldName, this.data);
+    }
+}
+
+class IDbValidationError extends Error {
+    constructor(
+        public field: string,
+        public code: string,
+        message: string
+    ) {
+        super(message);
+        this.name = 'IDbValidationError';
+    }
+}
+
+export class IDbFormValidate {
+    private dbFields: IDbFields;
+
+    constructor(private collection: TplCollectionName) {
+        this.dbFields = new IDbFields();
+    }
+
+    validateField(fieldName: keyof TplFields, value: any): { isValid: boolean; error?: string } {
+        try {
+            const fieldInfo = this.dbFields.parseCollectionFieldName(this.collection, fieldName);
+            if (!fieldInfo) {
+                return { isValid: false, error: `Field ${String(fieldName)} not found in collection` };
+            }
+            // Vérification du type
+            if (!this.#validateType(value, fieldInfo.fieldType)) {
+                return this.#returnError(fieldName, fieldInfo.fieldType);
+            }
+
+            // Vérification des arguments du champ (required, etc.)
+            if (fieldInfo.fieldArgs) {
+                for (const arg of fieldInfo.fieldArgs) {
+                    if (arg === 'required' && (value === undefined || value === null || value === '')) {
+                        return this.#returnError(fieldName, 'required');
+                    }
+                }
+            }
+
+            // Validations spécifiques selon le type de champ
+            switch (fieldInfo.fieldType) {
+                case enumPrimitive.email:
+                    if (!this.validateEmail(value)) {
+                        return this.#returnError(fieldName, fieldInfo.fieldType);
+                    }
+                    break;
+                case enumPrimitive.url:
+                    if (!this.validateUrl(value)) {
+                        return this.#returnError(fieldName, fieldInfo.fieldType);
+                    }
+                    break;
+                case enumPrimitive.phone:
+                    if (!this.validatePhone(value)) {
+                        return this.#returnError(fieldName, fieldInfo.fieldType);
+                    }
+                    break;
+                case enumPrimitive.date:
+                case enumPrimitive.datetime:
+                case enumPrimitive.time:
+                    if (!this.validateDateTime(value, fieldInfo.fieldType)) {
+                        return this.#returnError(fieldName, fieldInfo.fieldType);
+                    }
+                    break;
+                // Ajoutez d'autres cas spécifiques ici
+            }
+
+            return { isValid: true };
+        } catch (error) {
+            if (error instanceof IDbValidationError) {
+                return { isValid: false, error: error.message };
+            }
+            throw error;
+        }
+    }
+
+    validateFieldValue(fieldName: keyof TplFields, value: any): boolean {
+        try {
+            this.validateField(fieldName, value);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    validateForm(formData: Record<string, any>): {
+        isValid: boolean;
+        errors: Record<string, string>;
+        invalidFields: string[];
+    } {
+        const errors: Record<string, string> = {};
+        const invalidFields: string[] = [];
+        let isValid = true;
+
+        const fields = this.dbFields.getCollectionTemplateFields(this.collection);
+        if (!fields) {
+            return {
+                isValid: false,
+                errors: { general: 'Collection template not found' },
+                invalidFields: ['general'],
+            };
+        }
+
+        for (const [fieldName, fieldRule] of Object.entries(fields)) {
+            const result = this.validateField(fieldName as keyof TplFields, formData[fieldName]);
+            if (!result.isValid) {
+                errors[fieldName] = result.error || 'Invalid field';
+                invalidFields.push(fieldName);
+                isValid = false;
+            }
+        }
+
+        return { isValid, errors, invalidFields };
+    }
+
+    #validateType(value: any, type: string | undefined): boolean {
+        switch (type) {
+            case enumPrimitive.number:
+                return typeof value === 'number' && !isNaN(value);
+            case enumPrimitive.boolean:
+                return typeof value === 'boolean';
+            case enumPrimitive.text:
+            case enumPrimitive.email:
+            case enumPrimitive.url:
+            case enumPrimitive.phone:
+            case enumPrimitive.password:
+                return typeof value === 'string';
+            case enumPrimitive.date:
+            case enumPrimitive.datetime:
+            case enumPrimitive.time:
+                return value instanceof Date || typeof value === 'string';
+            case enumPrimitive.any:
+                return true;
+            default:
+                return true; // Pour les types non gérés, on considère que c'est valide
+        }
+    }
+
+    #returnError(fieldName: keyof TplFields, enumCode: enumPrimitive | string | undefined): never {
+        throw new IDbValidationError(String(fieldName), enumCode ?? 'unknown', `Invalid format for field ${String(fieldName)}. Cause "${enumCode}" `);
+    }
+
+    private validateEmail(email: string): boolean {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    private validateUrl(url: string): boolean {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    private validatePhone(phone: string): boolean {
+        // Ceci est un exemple simple. Vous pouvez ajuster selon vos besoins spécifiques
+        const phoneRegex = /^\+?[\d\s-]{10,}$/;
+        return phoneRegex.test(phone);
+    }
+
+    private validateDateTime(value: string | Date, type: string): boolean {
+        const date = value instanceof Date ? value : new Date(value);
+        if (isNaN(date.getTime())) return false;
+
+        switch (type) {
+            case enumPrimitive.date:
+                return true; // La conversion en Date a déjà validé le format
+            case enumPrimitive.time:
+                // Vérifiez si la chaîne contient uniquement l'heure
+                return /^([01]\d|2[0-3]):([0-5]\d)(:([0-5]\d))?$/.test(value as string);
+            case enumPrimitive.datetime:
+                return true; // La conversion en Date a déjà validé le format
+            default:
+                return false;
+        }
+    }
+
+    // Ajoutez d'autres méthodes de validation spécifiques ici
 }
