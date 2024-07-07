@@ -8,10 +8,6 @@
     import { Icon, MenuList, MenuListItem } from '@medyll/slot-ui';
     import { settings } from '$lib/stores/settings.svelte';
 
-    //$: showConfigClose = $page.route.id?.includes('/configuration');
-
-    let expanded = $state(true);
-
     const openCloseConfig = async () => {
         if ($page.route.id?.includes('/configuration')) {
             ui.setActiveChatId();
@@ -25,20 +21,20 @@
         settings.setSetting('menuExpanded', !$settings.menuExpanded);
     };
 
-    const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore') => {
+    const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books') => {
         switch (link) {
             case 'settings':
-                return '../settings';
+                return `${window.location.origin}/settings`;
             case 'chat':
                 return `chat/${link}`;
             case 'newChat':
-                return `/chat`;
+                return `${window.location.origin}/chat`;
             case 'lib':
-                return `/lib`;
+                return `${window.location.origin}/lib`;
             case 'explore':
-                return `/explore`;
+                return `${window.location.origin}/explore`;
             default:
-                return `${link}`;
+                return `${window.location.origin}/${link}`;
         }
     };
 </script>
@@ -54,8 +50,8 @@
             <input class="w-full" type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
         </div>
     </div>
-    <div class="flex-1 overflow-hidden">
-        <MenuList tall="kind" class="flex-h flex-1 h-full">
+    <div class="application-sideBar-menu">
+        <MenuList tall="kind" class="flex flex-col h-full">
             <MenuListItem selectable={false} href={getChatLink('newChat')} title={$t('ui.newChat')}>
                 <Icon icon="mdi:plus" alt={$t('ui.newChat')} />
                 <span>{$t('ui.newChat')}</span>
@@ -72,6 +68,10 @@
                 <Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
             </MenuListItem>
             <hr />
+            <MenuListItem title={$t('ui.books')} href={getChatLink('books')}>
+                <Icon icon="settings" alt={$t('ui.books')} />
+                <span>{$t('ui.books')}</span>
+            </MenuListItem>
             <MenuListItem title={$t('ui.settings')} href={getChatLink('explore')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
@@ -85,12 +85,18 @@
 </div>
 
 <style lang="scss">
-            :global(.red) {
-                transition: all 1s ease; 
-            }
+    :global(.red) {
+        transition: all 1s ease;
+    }
     .application-sideBar {
         height: 100%;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        .application-sideBar-menu {
+            flex: 1;
+        }
         .application-sideBar-content {
             content-visibility: hidden;
             overflow: auto;

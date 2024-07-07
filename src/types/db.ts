@@ -1,3 +1,4 @@
+import type { TplFieldType } from '@medyll/idbql';
 import type { OllamaChat, OllamaOptions, OllamaResponse } from './ollama';
 
 /**
@@ -15,8 +16,10 @@ export type DbChat = {
     dateLastMessage: Date;
     tags: DbTags[];
     systemPrompt: PromptType;
-    /** @deprecated find in ollamaBody */ context: number[];
+    context: number[];
     ollamaBody: Partial<OllamaChat>;
+    // Ajout suggéré
+    bookId?: number;
 };
 export type DbCategory = {
     id: number;
@@ -68,7 +71,7 @@ export type DBMessage = {
       }
 );
 
-export type DbPrimitive = 'date' | 'string' | 'number' | 'boolean' | 'array' | 'object' | `${string}.${string}`;
+export type DbPrimitive = 'date' | 'text' | 'number' | 'boolean' | 'array' | 'object' | `${string}.${string}`;
 export type DbFieldTypes = DbPrimitive | `array-of-${DbPrimitive}` | `object-${DbPrimitive}` | `fk-${DbPrimitive}`;
 
 export type DbTemplateModel<TPL> = {
@@ -81,7 +84,7 @@ export type DbTemplateModel<TPL> = {
 
 export type DbTemplate<T> = {
     fields: {
-        [K in keyof T]: DbFieldTypes;
+        [K in keyof T]: TplFieldType;
     };
 };
 export type DBAgent = {
@@ -93,6 +96,8 @@ export type DBAgent = {
     agentPromptId: number;
     ia_lock: boolean;
     created_at: Date;
+    //
+    specialization?: 'character development' | 'plot outline' | 'world building' | 'dialogue' | 'general';
 };
 
 export type DbAgentPrompt = {
@@ -129,7 +134,95 @@ export type MessageImageType = {
 export type PromptType = {
     id: string;
     createdAt: Date;
-    content: string;
+    value: string;
     title: string;
+    code: string;
     ia_lock: boolean;
 };
+
+// BOOKER
+// Nouvelles interfaces pour le Book Creator Helper
+
+export interface DbBook {
+    id?: number;
+    userId: number;
+    title: string;
+    description: string;
+    created_at: Date;
+    updated_at: Date;
+    status: 'draft' | 'in_progress' | 'completed' | 'published';
+    ia_lock: boolean;
+}
+
+export interface DbChapter {
+    id?: number;
+    bookId: number;
+    title: string;
+    content: string;
+    order: number;
+    created_at: Date;
+    updated_at: Date;
+    ia_lock: boolean;
+}
+
+export interface DbWritingGoal {
+    id?: number;
+    userId: number;
+    bookId: number;
+    description: string;
+    targetWordCount: number;
+    deadline: Date;
+    created_at: Date;
+    updated_at: Date;
+    ia_lock: boolean;
+}
+
+export interface DbCharacter {
+    id?: number;
+    bookId: number;
+    firstName: string;
+    lastName: string;
+    nickname?: string;
+    role: 'protagonist' | 'antagonist' | 'supporting' | 'minor';
+    description: string;
+    backstory?: string;
+    age?: number;
+    gender?: string;
+    occupation?: string;
+    physicalDescription?: string;
+    personalityTraits: string[];
+    goals?: string;
+    conflicts?: string;
+    relationships: {
+        characterId: number;
+        relationshipType: string;
+        description: string;
+    }[];
+    created_at: Date;
+    updated_at: Date;
+    ia_lock: boolean;
+}
+
+export interface DbCharacterChapterStatus {
+    id?: number;
+    characterId: number;
+    chapterId: number;
+    status: 'present' | 'mentioned' | 'absent';
+    role: 'major' | 'minor' | 'background';
+    actions: string;
+    development: string;
+    notes: string;
+    created_at: Date;
+    updated_at: Date;
+}
+
+export interface DbBookPrompts {
+    id?: number;
+    bookId: number;
+    name: string;
+    category: 'character' | 'plot' | 'setting' | 'dialogue' | 'general';
+    content: string;
+    created_at: Date;
+    updated_at: Date;
+    ia_lock: boolean;
+}

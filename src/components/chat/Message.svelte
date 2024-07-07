@@ -17,7 +17,7 @@
     }
 
     let { messageId }: Props = $props();
-    let message = $derived<DBMessage>(messageId ? idbQuery.getMessage(messageId) : {} as DBMessage);
+    let message = $derived<DBMessage>(messageId ? idbQuery.getMessage(messageId) : ({} as DBMessage));
 
     let icon = $derived(message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one');
     let place = $derived(message.role === 'user' ? 'mr-24' : 'ml-24');
@@ -130,7 +130,8 @@
             <div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
                 <Icon style="font-size:1.6em" {icon} />
             </div>
-        </div>{/if}
+        </div>
+    {/if}
 </div>
 
 <style lang="postcss">

@@ -3,8 +3,9 @@
     import Message from './Message.svelte';
     import { Looper } from '@medyll/slot-ui';
 
-    let { chatId } = $props();
+    let { chatId }:{chatId: string} = $props();
 
+    let chat = $derived(chatId ? idbQuery.getChat(chatId) : []);
     let messages = $derived(chatId ? idbQuery.getMessages(chatId) : []);
     let element: HTMLElement;
 
@@ -19,7 +20,8 @@
     });
 
 </script>
-corecteur orthographique
+<!-- corecteur orthographique -->
+{chat?.tags}
 <div class="flex flex-col w-full gap-4 flex-1">
     <Looper data={messages ?? []}>
         {#snippet children({ item })}

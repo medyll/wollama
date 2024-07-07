@@ -4,7 +4,7 @@
 
 interface Props {
     title: string;
-    addTitle: string;
+    addTitle?: string;
     icon: string;
 }
 

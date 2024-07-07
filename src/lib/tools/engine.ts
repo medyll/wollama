@@ -8,6 +8,8 @@ import type { ResolverPathType } from '$lib/stores/i18n';
 /**
  * Represents the engine class.
  */
+
+let ollamaCheckRetries: NodeJS.Timeout;
 export class engine {
     public static applyTheme(theme: string) {
         const currentTheme = theme == 'light' ? 'dark' : 'light';
@@ -59,23 +61,34 @@ export class engine {
     }
 
     public static async checkOllamaEndPoints(fn: () => any = () => {}) {
+        console.log('Checking Ollama endpoints...');
         connectionChecker.setConnectionStatus('connecting');
         const models = (await OllamaApi.tags()) ?? {};
 
-        await OllamaApi.tags()
-            .then(() => {
+        try {
+            let tg = await OllamaApi.tags();
+            console.log('---------------------------------------------------------------------------', { tg });
+        } catch (error) {
+            alert('Error');
+            throw error;
+        }
+        /* OllamaApi.tags()
+            .then((data) => {
+                console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
                 connectionChecker.setConnectionStatus('connected');
                 connectionChecker.setKey('connectionRetryCount', 0);
             })
             .catch((error) => {
+                console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
                 connectionChecker.incrementConnectionRetryCount();
                 connectionChecker.setConnectionStatus('error');
+                // ollamaCheckRetries
+                ollamaCheckRetries = setTimeout(() => this.checkOllamaEndPoints(fn), connectionChecker.get('connectionRetryTimeout'));
             })
             .finally(() => {
                 if (connectionChecker.get('connectionStatus') != 'connected' && connectionChecker.get('connectionRetryTimeout') != 0) {
-                    const ollamaCheckRetries = setTimeout(() => this.checkOllamaEndPoints(fn), connectionChecker.get('connectionRetryTimeout'));
                 }
-            });
+            }); */
 
         function getRetryTimeOut(retryCount: number, maxRetries?: number = 5) {
             const retryInterval = retryCount * 3.5;

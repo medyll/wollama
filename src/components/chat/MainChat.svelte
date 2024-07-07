@@ -9,15 +9,14 @@
     import { ollamaBodyStore } from '$lib/stores/prompter';
     import { aiState } from '$lib/stores';
     import DashBoard from '$components/DashBoard.svelte';
-    import Images from './input/Images.svelte';
-    import { connectionChecker } from '$lib/stores/connection';
+    import Images from './input/Images.svelte'; 
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import { chatParams, type ChatGenerate } from '$lib/states/chat.svelte';
-    import { Button, Icon, IconButton } from '@medyll/slot-ui';
+    import {   IconButton } from '@medyll/slot-ui';
     import MessagesList from './MessagesList.svelte';
-    import { chatMetadata } from '$lib/tools/promptSystem';
-    import CreateUpdate from '$components/form/CreateUpdate.svelte';
+    import { chatMetadata } from '$lib/tools/promptSystem'; 
     import AgentPick from '$components/agents/AgentPick.svelte';
+    import { connectionTimer } from '$lib/stores/timer.svelte';
 
     interface Props {
         activeChatId?: any;
@@ -35,13 +34,15 @@
 
     async function sendPrompt(chatSession: ChatApiSession, chatParams: ChatGenerate) {
         //
+        await chatApiSession.initChat(chatSession.chat.chatId);
+
         const chat = chatSession.chat;
-        aiState.set('running');
+      
         //  chatSession get unique userDbMessage with model;
         const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
         const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
         const previousMessages = await chatSession.setPreviousMessages();
-        const systemPrompt = chatParams.promptSystem.content; // chat.systemPrompt.content;
+        const systemPrompt = chatParams.promptSystem.value; // chat.systemPrompt.content;
 
         // loop on chatParams.models
         chatParams.models.forEach(async (model: string) => {
@@ -56,7 +57,7 @@
                 ui.setAutoScroll(target.chatId, false);
             };
 
-            sender.onEnd = ({ data }) => {
+            sender.onEnd = ({ data }) => { 
                 chatSession.onMessageDone(assistantDbMessage, data);
                 aiState.set('done');
                 chatMetadata.checkTitle(userDbMessage.chatId);
@@ -88,7 +89,7 @@
 
         await chatApiSession.updateChatSession({
             chatId,
-            models: [...chatParams.models],
+            models: [...chatParams?.models],
             systemPrompt: chatParams.promptSystem,
             ollamaBody: $ollamaBodyStore,
         });
@@ -110,7 +111,7 @@
         chatParams.mode = $settings.request_mode;
         chatParams.models = [$settings.defaultModel];
     });
-    $inspect(chatParams.promptSystem);
+    $inspect(chatApiSession);
 </script>
 
 {#snippet input()}
@@ -121,7 +122,7 @@
                 <Speech onEnd={submitHandler} bind:prompt={chatParams.prompt} bind:voiceListening={chatParams.voiceListening} />
             </div>
             <Input
-                disabled={$connectionChecker.connectionStatus != 'connected'}
+                disabled={!connectionTimer.connected}
                 onkeypress={keyPressHandler}
                 bind:value={chatParams.prompt}
                 bind:requestStop={$aiState}

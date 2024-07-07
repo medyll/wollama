@@ -1,49 +1,54 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
+    import Icon from '@iconify/svelte';
 
-	export let validate: Function;
-	export let message: string | undefined = undefined;
+    interface Props {
+		collection: string;
+		field: string;
+        validate: Function;
+        message?: string | undefined;
+        initial?: import('svelte').Snippet;
+        children?: import('svelte').Snippet;
+    }
 
-	let status = 'default';
+    let { validate, message = undefined, initial, children }: Props = $props();
+
+    let status = $state('default');
 </script>
 
 <div class="line-gap-2 w-full">
-	<slot name="initial" />
-	{#if status === 'default'}
-		<button
-			class="line-gap-2"
-			hidden={status !== 'default'}
-			on:click={() => {
-				status = 'show_confirm';
-			}}
-		>
-			<slot />
-		</button>
-	{/if}
-	{#if status === 'show_confirm'}
-		<button
-			on:click={() => {
-				validate();
-				status = 'default';
-			}}
-		>
-			{message ?? ''}
-			<Icon class="text-green-800 color-success md" icon="mdi:done" />
-		</button>
-		<button
-			on:click={() => {
-				status = 'default';
-			}}
-		>
-			<Icon icon="typcn:cancel" style="color: red" class="md fill-red-800 " />
-		</button>
-	{/if}
+    {@render initial?.()}
+    {#if status === 'default'}
+        <button
+            class="line-gap-2"
+            hidden={status !== 'default'}
+            onclick={() => {
+                status = 'show_confirm';
+            }}>
+            {@render children?.()}
+        </button>
+    {/if}
+    {#if status === 'show_confirm'}
+        <button
+            onclick={() => {
+                validate?.();
+                status = 'default';
+            }}>
+            {message ?? ''}
+            <Icon class="text-green-800 color-success md" icon="mdi:done" />
+        </button>
+        <button
+            onclick={() => {
+                status = 'default';
+            }}>
+            <Icon icon="typcn:cancel" style="color: red" class="md fill-red-800 " />
+        </button>
+    {/if}
 </div>
 
 <style lang="postcss">
-	svg {
-		> path {
-			color: red !important;
-		}
-	}
+    svg {
+        > path {
+            color: red !important;
+        }
+    }
 </style>

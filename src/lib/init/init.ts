@@ -16,10 +16,14 @@ export async function init() {
     // SYSTEM PROMPT
     query = await idbql.prompts.where({ code: { eq: 'project_manager' } });
     if (!query?.[0]) {
-        idbql.prompts.add({ code: 'project_manager', name: 'chat_eval', value: promptLib.project_manager.prompt });
+        idbql.prompts.add({ code: 'project_manager', name: 'project_manager', value: promptLib.project_manager.prompt });
     }
     query = await idbql.prompts.where({ code: { eq: 'prompt_maker' } });
     if (!query?.[0]) {
         idbql.prompts.add({ code: 'prompt_maker', name: 'prompt_maker', value: promptLib.prompt_maker.prompt });
+    }
+    query = await idbql.prompts.where({ code: { eq: 'system_default' } });
+    if (!query?.[0]) {
+        idbql.prompts.add({ code: 'system_default', name: 'system_default', value: promptLib.system_default.prompt });
     }
 }

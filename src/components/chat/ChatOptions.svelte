@@ -10,7 +10,7 @@
     import { Button, ButtonMenu, MenuListItem, Popper } from '@medyll/slot-ui';
     import Attachment from './input/Attachment.svelte';
     import { idbQuery } from '$lib/db/dbQuery';
-    import CrudCollectionList from '$components/form/CrudCollectionList.svelte';
+    import CrudCollectionList from '$components/form/CollectionListMenu.svelte';
     import CrudZone from '$components/form/CrudZone.svelte';
 
     let component = $ui.showPrompt ? Prompts : undefined;
@@ -34,7 +34,7 @@
         icon={'mdi:chevron-right'}
         onclick={() => {
             showHide = !showHide;
-        }}></MenuListItem>
+        }} />
 {/snippet}
 <!-- bind:activePrompt={chatParams.promptSystem} -->
 {#snippet popperRight()}
@@ -44,15 +44,15 @@
 {/snippet}
 <ButtonMenu
     tall="small"
-    width="auto"
+    width="med"
     icon="material-symbols-light:post-add-sharp"
     value={chatParams.promptSystem?.code ?? $t('prompt.systemPrompt')}
-    popperProps={{ stickToHookWidth: true, position: 'TL', flow: 'fixed', popperRight }}
+    popperProps={{ stickToHookWidth: true, position: 'TL', flow: 'fixed' }}
     menuProps={{
-        data: promptList,
-        listItemBottom,
-        onclick: (event) => { 
-            chatParams.promptSystem = event?.detail;
+        data: promptList, 
+        grid: 3,
+        onclick: (event) => {  
+            chatParams.promptSystem = event;
         },
     }}>
     {#snippet menuItem({ item })}

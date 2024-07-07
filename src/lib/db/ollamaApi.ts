@@ -68,7 +68,7 @@ export class OllamaApiCore {
     }
 
     async ping(url: string) {
-        return fetch(`${url}/api/tags`, {
+        return fetch(`${url}/api/tags/`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
@@ -87,10 +87,24 @@ export class OllamaApiCore {
             });
     }
 
-    async tags(): Promise<{ models: Record<string, any>[] }> {
-        const ollamaFetch = new OllamaApiFetch();
-        const res = ollamaFetch.fetch('GET', `api/tags`);
-        return res;
+    async tags(cb?: (data: any) => {}): Promise<any> {
+        try {
+            const ollamaFetch = new OllamaApiFetch();
+            const res = await ollamaFetch.fetch('GET', `api/tags`);
+            if (res.body instanceof ReadableStream) {
+                let dta: any[] = [];
+                await ollamaFetch.stream(res, (data: any) => {
+                    dta = data;
+                    if (cb) cb(dta);
+                });
+                if (cb) cb(dta);
+                return dta;
+            }
+            return res;
+        } catch (e) {
+            console.error(e);
+            throw new Error('Failed to fetch models');
+        }
     }
 
     /** Get the list of models from the Ollama API. */
@@ -126,15 +140,16 @@ class OllamaApiFetch {
     constructor() {}
 
     fetch = async (method: 'GET' | 'POST' | 'DELETE', url: string, body?: string): Promise<any> => {
-        let headers = {
+        let headers: RequestInit['headers'] = {
             'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'Access-Control-Allow-Origin': '*',
         };
 
         return fetch(`${this.config.ollama_endpoint}/${url}`, {
             headers,
             method,
             body,
-            // mode: 'no-cors',
         })
             .then(async (res) => {
                 if (!res?.ok) throw await res.json();
@@ -147,7 +162,7 @@ class OllamaApiFetch {
                 return res;
             })
             .catch((error) => {
-                throw error;
+                throw new Error('{ failed: true }');
             });
     };
 
