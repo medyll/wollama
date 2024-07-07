@@ -3,7 +3,7 @@ import { OllamaOptionsDefaults } from '$configuration/configuration';
 import type { OllamaOptions } from '$types/ollama';
 import { writable } from 'svelte/store';
 
-function ollamaOptionStoreBuild() {
+function ollamaOptionStorage() {
     const store = writable<OllamaOptions>({} as OllamaOptions);
 
     store.subscribe((o) => {
@@ -56,4 +56,4 @@ function ollamaOptionStoreBuild() {
     };
 }
 
-export const ollamaApiMainOptionsParams = ollamaOptionStoreBuild();
+export const ollamaApiMainOptionsParams = ollamaOptionStorage();
