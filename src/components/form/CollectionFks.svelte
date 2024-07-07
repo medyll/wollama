@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { IDbFields } from '$lib/db/dbFields';
+    import { IDbCollections } from '$lib/db/dbFields';
     import { schemeModel, idbqlState } from '$lib/db/dbSchema';
     import type { TplCollectionName, Where } from '@medyll/idbql';
     import { Looper } from '@medyll/slot-ui';
@@ -13,7 +13,7 @@
 
     // idbqlState[fkCollection].get(fkId);
 
-    const dbFields = new IDbFields(schemeModel);
+    const dbFields = new IDbCollections(schemeModel);
     const fks = $derived(dbFields.fks(collection));
 </script>
 

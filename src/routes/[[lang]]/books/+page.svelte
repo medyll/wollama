@@ -1,14 +1,14 @@
 <script lang="ts">
     import { idbqlState } from '$lib/db/dbSchema';
     import { Button, Looper, openWindow } from '@medyll/slot-ui';
-    import { iDbCollectionValues } from '$lib/db/dbFields';
+    import { IDbCollectionValues } from '$lib/db/dbFields';
     import PageTitle from '$components/ui/PageTitle.svelte';
     import CreateUpdate from '$components/form/CreateUpdate.svelte';
 
     let { collection = 'book'} = $props(); 
     let collectionList = $derived(idbqlState[collection].getAll());
 
-    let fieldValues = new iDbCollectionValues(collection);
+    let fieldValues = new IDbCollectionValues(collection);
 
     function openCrud(collection: string) {
         openWindow(`create-${collection}`, {

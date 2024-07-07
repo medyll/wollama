@@ -5,11 +5,12 @@
  -->
 
 <script lang="ts">
-    import { IDbFields as DbFields, iDbCollectionValues, IDbFormValidate } from '$lib/db/dbFields';
+    import { IDbCollections as DbFields, IDbCollectionValues, IDbFormValidate } from '$lib/db/dbFields';
     import { schemeModel, idbqlState, idbql } from '$lib/db/dbSchema';
     import { IconButton } from '@medyll/slot-ui';
     import type { CreateUpdateProps } from './types';
     import CollectionReverseFks from './CollectionReverseFks.svelte';
+    import CollectionFieldInput from './CollectionFieldValue.svelte';
 
     let {
         collection,
@@ -51,12 +52,11 @@
     };
 
     export const submit = async (event: FormDataEvent) => {
-        // event?.preventDefault();
+        
         if (!validateFormData($state.snapshot(formData))) {
-            //console.error('Form validation failed', validationErrors);
+          
             console.log(validationErrors);
-            // for each validationErrors find input in form $inputForm:string
-            // and add error message and class
+          
             Object.entries(validationErrors).forEach(([fieldName, errorMessage]) => {
                 // Trouver l'élément input correspondant dans le formulaire
                 const inputElement = document.querySelector(`[name="${fieldName}"][form="${inputForm}"]`) as HTMLInputElement | null;
@@ -120,10 +120,10 @@
         }
     }
 
-    let fieldValues = new iDbCollectionValues(collection);
+    let collectionFieldValues = new IDbCollectionValues(collection);
 
     function formatFieldValue(fieldName: string, value: any) {
-        return fieldValues.format(fieldName, { [fieldName]: value });
+        return collectionFieldValues.format(fieldName, { [fieldName]: value });
     }
 </script>
 
@@ -133,10 +133,11 @@
             <input
                 type="checkbox"
                 form={inputForm}
+                name={value.field}
                 required={value?.fieldArgs?.includes('required')}
                 readonly={value?.fieldArgs?.includes('readonly')}
                 bind:checked={formData[value.fieldName]}
-                name={value.field} />
+                {...collectionFieldValues.getInputDataSet(value.fieldName, formData)} />
         {/if}
     {:else if value.fieldType.trim() === 'id'}
         {#if inputMode != 'create'}
@@ -165,10 +166,7 @@
             name={value.fieldName}
             class="textfield h-24"
             placeholder={value.fieldName + ' ' + value?.fieldType}
-            data-collection={collection}
-            data-collectionId={dataId}
-            data-fieldType={value.fieldType}
-            data-fieldName={value.fieldName}>
+            {...collectionFieldValues.getInputDataSet(value.fieldName, formData)}>
             {formData[value.fieldName]}
         </textarea>
     {:else}
@@ -177,7 +175,7 @@
 {/snippet}
 {#snippet input(tag: any, value, inputMode)}
     {#if inputMode === 'show' || value?.fieldArgs?.includes('readonly')}
-        {@html fieldValues.format(value.fieldName, formData)}
+        {@html collectionFieldValues.format(value.fieldName, formData)}
     {:else}
         <input
             style="width: 100%"
@@ -189,32 +187,35 @@
             type={tag.trim()}
             name={value.fieldName}
             placeholder={value?.fieldName + ' ' + value?.fieldType}
-            data-collection={collection}
-            data-collectionId={dataId}
-            data-fieldType={value.fieldType.trim()}
-            data-fieldName={value.fieldName} />
+            {...collectionFieldValues.getInputDataSet(value.fieldName, formData)} />
     {/if}
 {/snippet}
 
 <form
     id={inputForm}
     name={inputForm}
+    onchange={(event) => {
+        console.log('Form changed', event)
+        
+    }}
     onsubmit={(event) => {
         event.preventDefault();
         // onSubmit(event);
-    }}>
-</form>
+    }}  ></form>
 
 <div style="width:750px;display:flex;">
     <div class="crud {displayMode}">
-        {#each Object.entries(formFields) as [field, value]}
-            <div class="cell flex flex-col gap-2" class:hidden={value?.fieldArgs?.includes('private')}>
-                <label class="border-b font-bold">- {value.fieldName}</label>
+        {#each Object.entries(formFields) as [fieldName, fieldInfo]}
+            <div class="cell flex flex-col gap-2" class:hidden={fieldInfo?.fieldArgs?.includes('private')}>
                 <div class="relative">
-                    {#if mode === 'show' && (inPlaceEdit === true || (Array.isArray(inPlaceEdit) && inPlaceEdit.includes(field)))}
-                        <IconButton width="tiny" onclick={() => console.log('Edit in place for', field)} icon="mdi:pencil" />
-                    {/if}
-                    {@render control(value, mode)}
+              
+                    <CollectionFieldInput
+                        {collection}
+                        {fieldName}
+                        {mode}
+                        editInPlace={inPlaceEdit === true || (Array.isArray(inPlaceEdit) && inPlaceEdit.includes(fieldName))}
+                        bind:data={formData}
+                        {inputForm} />
                 </div>
             </div>
         {/each}
@@ -234,7 +235,7 @@
     .input-error {
         border: 10px solid red;
     }
-    .crud {
+    :global(.crud) {
         padding: 1rem;
         min-width: 32rem;
         &.wrap {
@@ -246,19 +247,24 @@
                 min-width: 30%;
                 width: 30%;
                 flex: 1 auto;
-                &:has(textarea) {
+                :global(.field-input) {
+                    width: 100%; 
+                    min-height: 2rem;
+                }
+            }
+
+            .cell:has(textarea) {
+                width: 100%;
+                :global(textarea) {
                     width: 100% !important;
-                    & textarea {
-                        width: max-content !important;
-                    }
                 }
-                &:has([data-fieldType='text-long']),
-                &:has([data-fieldType='text-giant']) {
-                    width: 100%;
-                }
-                &:has([data-fieldType='number']) {
-                    width: 25%;
-                }
+            }
+            .cell:has([data-fieldType='text-long']),
+            .cell:has([data-fieldType='text-giant']) {
+                width: 100%;
+            }
+            .cell:has([data-fieldType='number']) {
+                width: 25%;
             }
         }
         &.vertical {

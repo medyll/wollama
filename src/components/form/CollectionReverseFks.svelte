@@ -14,7 +14,7 @@
     } 
  -->
 <script lang="ts">
-    import { IDbFields } from '$lib/db/dbFields';
+    import { IDbCollections } from '$lib/db/dbFields';
     import { schemeModel, idbqlState } from '$lib/db/dbSchema';
     import type { Tpl, TplCollectionName, Where } from '@medyll/idbql';
     import { Looper } from '@medyll/slot-ui';
@@ -30,7 +30,7 @@
         componentProps?: Record<string, any>;
     };
     let { collection, children: child, showTitle = false, component, componentProps = {} }: CollectionFksProps = $props();
-    const dbFields = new IDbFields(schemeModel);
+    const dbFields = new IDbCollections(schemeModel);
     const fks = $derived(dbFields.reverseFks(collection));
 
     function getTitle() {
@@ -42,11 +42,15 @@
 <Looper data={Object.entries(fks)}>
     {#snippet children({ item })}
         {#if showTitle}
-            <div  class="p2 font-bold">{item?.[0]}</div>
+            <div class="p2 font-bold">{item?.[0]}</div>
         {/if}
-        {@render child({
-            collection: item[0],
-            template: item[1],
-        })}
+        {#if component}
+            <svelte:component this={component} collection={item[0]} template={item[1]} {...componentProps} />
+        {:else}
+            {@render child({
+                collection: item[0],
+                template: item[1],
+            })}
+        {/if}
     {/snippet}
 </Looper>

@@ -49,12 +49,13 @@ const a: IDBArgumentsTypes = 'any(private required readonly)';
 export type IDbFieldRules = IDBArgumentsTypes | IDbTypes;
 export type IDbFieldType = IDBArgumentsTypes | IDbTypes;
 
+type IDbForgeArgs = keyof typeof TplProperties;
 export type IDbForge = {
     collection?: TplCollectionName;
     fieldName?: keyof TplFields;
     fieldType?: IDbFieldType;
     fieldRule?: IDbFieldRules;
-    fieldArgs?: [keyof typeof TplProperties] | undefined;
+    fieldArgs?: IDbForgeArgs | undefined;
     is: any;
 };
 /* 
@@ -80,8 +81,8 @@ class IDbError extends Error {
         }
     }
 }
-
-export class IDbFields<T = Record<string, any>> {
+// renammed from IDbFields to IDbCollections
+export class IDbCollections<T = Record<string, any>> {
     model: IdbqModel = schemeModel;
 
     constructor(model?: IdbqModel) {
@@ -212,11 +213,11 @@ export class IDbFields<T = Record<string, any>> {
             return reg.split(pattern)[1] as IDbFieldRules;
         }
 
-        function extractArgs(source: string): { piece: any; args: [TplProperties] | [keyof typeof TplProperties] } | undefined {
+        function extractArgs(source: string): { piece: any; args: [TplProperties] | IDbForgeArgs } | undefined {
             const [piece, remaining] = source.split('(');
             if (!remaining) return { piece: piece.trim(), args: undefined };
             const [central] = remaining?.split(')');
-            const args = central?.split(' ') as [TplProperties] | [keyof typeof TplProperties];
+            const args = central?.split(' ') as [TplProperties | keyof typeof TplProperties];
             // console.log({ piece, args });
             return { piece: piece.trim(), args };
         }
@@ -278,23 +279,43 @@ export class IDbFields<T = Record<string, any>> {
 
         return result;
     }
+
+    // iterate base
+    iterateArrayField(collection: TplCollectionName, fieldName: keyof TplFields, data: any[]): IDbForge[] {
+        const fieldInfo = this.parseCollectionFieldName(collection, fieldName);
+        if (fieldInfo?.is !== 'array' || !Array.isArray(data)) {
+            return [];
+        }
+
+        return data.map(() => this.parseCollectionFieldName(collection, fieldName));
+    }
+
+    iterateObjectField(collection: TplCollectionName, fieldName: keyof TplFields, data: Record<string, any>): IDbForge[] {
+        const fieldInfo = this.parseCollectionFieldName(collection, fieldName);
+        if (fieldInfo?.is !== 'object' || typeof data !== 'object') {
+            return [];
+        }
+
+        return Object.keys(data).map((key) => this.parseCollectionFieldName(collection, key as keyof TplFields));
+    }
 }
 
 // display field values, based on schema and provided data
 // renamed from iDBFieldValues to iDbCollectionValues
-export class iDbCollectionValues<T extends Record<string, any>> {
-    private dbFields: IDbFields;
+// path D:\boulot\python\wollama\src\lib\db\dbFields.ts
+export class IDbCollectionValues<T extends Record<string, any>> {
+    dbCollections: IDbCollections;
     private collection: TplCollectionName;
 
     constructor(collection: TplCollectionName) {
         this.collection = collection;
-        this.dbFields = new IDbFields();
+        this.dbCollections = new IDbCollections();
     }
 
     presentation(data: Record<string, any>): string {
         try {
             this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
-            const presentation = this.dbFields.getTemplatePresentation(this.collection);
+            const presentation = this.dbCollections.getTemplatePresentation(this.collection);
             this.#checkError(!presentation, 'Presentation template not found', 'TEMPLATE_NOT_FOUND');
 
             const fields = presentation.split(' ');
@@ -313,7 +334,7 @@ export class iDbCollectionValues<T extends Record<string, any>> {
     indexValue(data: Record<string, any>): any | null {
         try {
             this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
-            const indexName = this.dbFields.getIndexName(this.collection);
+            const indexName = this.dbCollections.getIndexName(this.collection);
             this.#checkError(!indexName, 'Index not found for collection', 'INDEX_NOT_FOUND');
             this.#checkError(!(indexName in data), `Index field ${indexName} not found in data`, 'FIELD_NOT_FOUND');
             return data[indexName];
@@ -327,7 +348,7 @@ export class iDbCollectionValues<T extends Record<string, any>> {
         try {
             this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
             this.#checkError(!(fieldName in data), `Field ${String(fieldName)} not found in data`, 'FIELD_NOT_FOUND');
-            const fieldInfo = this.dbFields.parseCollectionFieldName(this.collection, fieldName as string);
+            const fieldInfo = this.dbCollections.parseCollectionFieldName(this.collection, fieldName as string);
             this.#checkError(!fieldInfo, `Field ${String(fieldName)} not found in collection`, 'FIELD_NOT_FOUND');
 
             switch (fieldInfo?.fieldType) {
@@ -347,6 +368,29 @@ export class iDbCollectionValues<T extends Record<string, any>> {
             IDbError.handleError(error);
             return '';
         }
+    }
+
+    getInputDataSet(fieldName: string, data: T): Record<`data-${'collection' | 'collectionId' | 'fieldName' | 'fieldType' | 'fieldArgs'}`, string> {
+        const fieldInfo = this.dbCollections.parseCollectionFieldName(this.collection, fieldName as string);
+        const fieldType = fieldInfo?.fieldType ?? '';
+        const fieldArgs = fieldInfo?.fieldArgs?.join(' ') ?? '';
+        const indexName = this.dbCollections.getIndexName(this.collection);
+
+        return {
+            'data-collection': this.collection,
+            'data-collectionId': indexName && data?.[indexName] !== undefined ? String(data?.[indexName]) : '',
+            'data-fieldName': String(fieldName),
+            'data-fieldType': fieldType,
+            'data-fieldArgs': fieldArgs,
+        };
+    }
+
+    iterateArrayField(fieldName: keyof TplFields, data: any[]): IDbForge[] {
+        return this.dbCollections.iterateArrayField(this.collection, fieldName, data);
+    }
+
+    iterateObjectField(fieldName: keyof TplFields, data: Record<string, any>): IDbForge[] {
+        return this.dbCollections.iterateObjectField(this.collection, fieldName, data);
     }
 
     #formatNumberField(value: number): string {
@@ -372,19 +416,105 @@ export class iDbCollectionValues<T extends Record<string, any>> {
     }
 }
 
-export class iDbCollectionFieldValues<T extends Record<string, any>> {
-    collection: TplCollectionName;
-    collectionDataRow: iDbCollectionValues<T>;
-    data: T;
+export class IDbCollectionFieldValues<T extends Record<string, any>> {
+    #collection: TplCollectionName;
+    #collectionValues: IDbCollectionValues<T>;
+    #data: T;
 
     constructor(collection: TplCollectionName, data: T) {
-        this.collection = collection;
-        this.collectionDataRow = new iDbCollectionValues(collection);
-        this.data = data;
+        this.#collection = collection;
+        this.#collectionValues = new IDbCollectionValues(collection);
+        this.#data = data;
     }
 
-    format(fieldName: keyof T): string {
-        return this.collectionDataRow.format(fieldName, this.data);
+    format(fieldName: keyof T): string | string[] {
+        const fieldInfo = this.#collectionValues.dbCollections.parseCollectionFieldName(this.#collection, fieldName);
+        if (fieldInfo?.is === 'array') {
+            return this.iterateArray(String(fieldName), this.#data);
+        }
+
+        if (fieldInfo?.is === 'object') {
+            return this.iterateObject(String(fieldName), this.#data);
+        }
+        return this.#collectionValues.format(fieldName, this.#data);
+    }
+
+    getInputDataSet(fieldName: keyof T) {
+        return this.#collectionValues.getInputDataSet(String(fieldName), this.#data);
+    }
+    // renamed from parseCollectionFieldName
+    getForge(fieldName: keyof T): IDbForge | undefined {
+        return this.#collectionValues.dbCollections.parseCollectionFieldName(this.#collection, String(fieldName));
+    }
+
+    iterateArray(fieldName: string, data: any[]): IDbForge[] {
+        return this.#collectionValues.iterateArrayField(fieldName, data);
+    }
+
+    iterateObject(fieldName: string, data: Record<string, any>): IDbForge[] {
+        return this.#collectionValues.iterateObjectField(fieldName, data);
+    }
+}
+
+/* 
+    path: D:\boulot\python\wollama\src\lib\db\dbFields.ts
+    forge values for a collection field and $data
+ */
+export class IDbCollectionFieldForge<T extends Record<string, any>> {
+    #collection: TplCollectionName;
+    #collectionValues: IDbCollectionValues<T>;
+    #fieldName: keyof T | string;
+    #data: T;
+    #forge: IDbForge | undefined;
+
+    constructor(collection: TplCollectionName, fieldName: any, data: T) {
+        this.#collection = collection;
+        this.#collectionValues = new IDbCollectionValues(collection);
+        this.#fieldName = String(fieldName);
+        this.#data = data;
+    }
+
+    get format(): string {
+        return this.#collectionValues.format(String(this.#fieldName), this.#data);
+    }
+
+    get inputDataSet() {
+        return this.#collectionValues.getInputDataSet(String(this.#fieldName), this.#data);
+    }
+    // renamed from parseCollectionFieldName
+    get forge(): IDbForge | undefined {
+        return this.#collectionValues.dbCollections.parseCollectionFieldName(this.#collection, String(this.#fieldName));
+    }
+
+    get fieldArgs(): IDbForgeArgs | undefined {
+        return this.forge?.fieldArgs;
+    }
+    get fieldType(): IDbFieldType | undefined {
+        return this.forge?.fieldType;
+    }
+    /**
+     * will return  text.inputBase  for ['url', 'email', 'number', 'date', 'time', 'datetime', 'phone', 'password']
+     */
+    get htmlInputType(): string | 'text' | 'area' {
+        let variant = this?.fieldType?.split('text-')?.[1] ?? this.fieldType;
+        if (variant === 'area') return variant;
+        if (this.forge?.fieldType?.startsWith('text-')) return 'text';
+        if (['url', 'email', 'number', 'date', 'time', 'datetime', 'phone', 'password'].includes(this.forge?.fieldType ?? '')) {
+            return this.forge?.fieldType?.trim?.() ?? 'text';
+        }
+        return 'text';
+    }
+
+    get rawData() {
+        return this.#data;
+    }
+
+    iterateArray(fieldName: string, data: any[]): IDbForge[] {
+        return this.#collectionValues.iterateArrayField(fieldName, data);
+    }
+
+    iterateObject(fieldName: string, data: Record<string, any>): IDbForge[] {
+        return this.#collectionValues.iterateObjectField(fieldName, data);
     }
 }
 
@@ -400,10 +530,10 @@ class IDbValidationError extends Error {
 }
 
 export class IDbFormValidate {
-    private dbFields: IDbFields;
+    private dbFields: IDbCollections;
 
     constructor(private collection: TplCollectionName) {
-        this.dbFields = new IDbFields();
+        this.dbFields = new IDbCollections();
     }
 
     validateField(fieldName: keyof TplFields, value: any): { isValid: boolean; error?: string } {

@@ -2,7 +2,7 @@
     import { type MenuListProps, Button, MenuList, MenuListItem, openWindow, type Props } from '@medyll/slot-ui';
     import CreateUpdate from '$components/form/CreateUpdate.svelte';
     import { idbqlState } from '$lib/db/dbSchema';
-    import { IDbFields, iDbCollectionValues } from '$lib/db/dbFields';
+    import { IDbCollections, IDbCollectionValues } from '$lib/db/dbFields';
     import {  hydrate } from 'svelte';
     import type { Where } from '@medyll/idbql';
 
@@ -18,8 +18,8 @@
 
     let { collection, target, data, menuListProps,onclick ,style,where}: Props = $props();
 
-    let test = new IDbFields();
-    let fieldValues = new iDbCollectionValues(collection);
+    let test = new IDbCollections();
+    let fieldValues = new IDbCollectionValues(collection);
     let index = test.getIndexName(collection);
 
     let qy = $derived(where ? idbqlState[collection].where(where): idbqlState[collection].getAll());
