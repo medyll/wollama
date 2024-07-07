@@ -32,9 +32,7 @@
             <p>Index: {fieldValues.indexValue(item)}</p>
 
             <!-- Affichez d'autres champs spécifiques si nécessaire -->
-            <p>Title: {fieldValues.format('title', item)}</p>
-            <p>Description: {fieldValues.format('description', item)}</p>
-            <p>Status: {fieldValues.format('status', item)}</p>
+            <p>Title: {fieldValues.format('title', item)}</p> 
 
             <!-- Vous pouvez ajouter d'autres champs selon vos besoins -->
         </div>

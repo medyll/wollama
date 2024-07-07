@@ -15,7 +15,7 @@
     let status = $state('default');
 </script>
 
-<div class="line-gap-2 w-full">
+<div class="line-gap-2 w-full"> 
     {@render initial?.()}
     {#if status === 'default'}
         <button

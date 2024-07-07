@@ -17,4 +17,6 @@ export interface CreateUpdateProps<T = string> {
 
     /**  display mode for the fields */
     displayMode?: 'vertical' | 'wrap';
+
+    showFks?: boolean;
 }

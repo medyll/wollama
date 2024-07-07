@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Interface Livre</title>
+    </head>
+    <body>
+        <header>
+            <h1>Titre du Livre (éditable)</h1>
+            <p>Auteur: Nom de l'auteur</p>
+            <p>Statut: En cours</p>
+            <button>Sauvegarder les modifications</button>
+        </header>
+
+        <div id="main-container" style="display: flex">
+            <nav style="width: 20%">
+                <h2>Navigation</h2>
+                <ul>
+                    <li>Chapitre 1</li>
+                    <li>Chapitre 2</li>
+                    <li>Chapitre 3</li>
+                    <button>+ Ajouter un chapitre</button>
+                </ul>
+                <ul>
+                    <li><a href="#resume">Résumé</a></li>
+                    <li><a href="#personnages">Personnages</a></li>
+                    <li><a href="#objectifs">Objectifs</a></li>
+                    <li><a href="#notes">Notes</a></li>
+                </ul>
+            </nav>
+
+            <main style="width: 60%">
+                <section id="resume">
+                    <h2>Résumé du livre</h2>
+                    <textarea rows="5" cols="50">Résumé du livre ici...</textarea>
+                </section>
+
+                <section id="editeur-chapitre">
+                    <h2>Éditeur de chapitre</h2>
+                    <input type="text" value="Titre du chapitre" />
+                    <textarea rows="10" cols="50">Contenu du chapitre ici...</textarea>
+                </section>
+
+                <section id="personnages">
+                    <h2>Liste des personnages</h2>
+                    <div>
+                        <h3>Personnage 1</h3>
+                        <p>Rôle: Protagoniste</p>
+                        <p>Description courte: ...</p>
+                    </div>
+                    <button>+ Ajouter un personnage</button>
+                </section>
+
+                <section id="objectifs">
+                    <h2>Objectifs d'écriture</h2>
+                    <ul>
+                        <li>Objectif 1: 5000 mots d'ici le 15/07</li>
+                        <li>Objectif 2: Terminer le chapitre 3 d'ici le 20/07</li>
+                    </ul>
+                    <button>+ Ajouter un objectif</button>
+                </section>
+
+                <section id="notes">
+                    <h2>Notes et idées</h2>
+                    <textarea rows="5" cols="50">Notes générales ici...</textarea>
+                </section>
+            </main>
+
+            <aside style="width: 20%">
+                <h2>Outils et statistiques</h2>
+                <p>Nombre total de mots: 12345</p>
+                <p>Progression: 45%</p>
+                <button>Générer des idées</button>
+                <button>Accéder aux prompts AI</button>
+            </aside>
+        </div>
+
+        <footer>
+            <p>Dernière sauvegarde: 06/07/2024 15:30</p>
+            <button>Exporter le livre</button>
+        </footer>
+    </body>
+</html>

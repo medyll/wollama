@@ -1,39 +1,94 @@
 <!-- 
-    Component to open a CreateUpdateShow window for a specific collection.
+    Component CreateUpdate :  to open a CreateUpdateShow window for a specific collection.
     Button validate and cancel is in the Window component.
     D:\boulot\python\wollama\src\components\form\CreateUpdate.svelte
  -->
 
 <script lang="ts">
-    import { IDbFields as DbFields } from '$lib/db/dbFields';
-    import { schemeModel, idbqlState } from '$lib/db/dbSchema';
+    import { IDbFields as DbFields, iDbCollectionValues, IDbFormValidate } from '$lib/db/dbFields';
+    import { schemeModel, idbqlState, idbql } from '$lib/db/dbSchema';
     import { IconButton } from '@medyll/slot-ui';
-    import FieldInPlace from './FieldInPlace.svelte';
     import type { CreateUpdateProps } from './types';
+    import CollectionReverseFks from './CollectionReverseFks.svelte';
 
-    let { collection, data = {}, dataId, mode = 'show', withData, showFields, inPlaceEdit, displayMode = 'wrap' }: CreateUpdateProps = $props();
-    let inputForm = `form-${String(collection)}`;
+    let {
+        collection,
+        data = {},
+        dataId,
+        mode = 'show',
+        withData,
+        showFields,
+        inPlaceEdit,
+        displayMode = 'wrap',
+        showFks = false,
+    }: CreateUpdateProps = $props();
+    let inputForm = `form-${String(collection)}-${mode}`;
     let dbFields = new DbFields(schemeModel);
     let indexName = dbFields.getIndexName(collection);
     let formFields = showFields
         ? Object.fromEntries(Object.entries(dbFields.parseRawCollection(collection) ?? {}).filter(([key]) => showFields.includes(key)))
         : dbFields.parseRawCollection(collection) ?? {};
 
-        $inspect(formFields)
-
     let qy: any = $derived(dataId && indexName ? idbqlState[collection].where({ [indexName]: { eq: dataId } }) : {});
 
     let formData = $state<Record<string, any>>({ ...data, ...withData, ...$state.snapshot(qy)[0] });
 
+    $effect.pre(() => {
+        setFormDataDefaultFieldValues();
+    });
     let ds = Object.keys(data).length > 0 ? data : qy[0];
 
+    let formValidator = new IDbFormValidate(collection);
+    let validationErrors: Record<string, string> = {};
+
+    const validateFormData = (formData: Record<string, any> = {}) => {
+        const { isValid, errors } = formValidator.validateForm(formData, {
+            ignoreFields: mode == 'create' ? [indexName] : undefined,
+        });
+        validationErrors = errors;
+
+        return isValid;
+    };
+
     export const submit = async (event: FormDataEvent) => {
+        // event?.preventDefault();
+        if (!validateFormData($state.snapshot(formData))) {
+            //console.error('Form validation failed', validationErrors);
+            console.log(validationErrors);
+            // for each validationErrors find input in form $inputForm:string
+            // and add error message and class
+            Object.entries(validationErrors).forEach(([fieldName, errorMessage]) => {
+                // Trouver l'élément input correspondant dans le formulaire
+                const inputElement = document.querySelector(`[name="${fieldName}"][form="${inputForm}"]`) as HTMLInputElement | null;
+                console.log({ inputElement });
+
+                if (inputElement) {
+                    // Ajouter une classe d'erreur à l'élément input
+                    inputElement.classList.add('input-error');
+
+                    // Créer ou mettre à jour un message d'erreur
+                    let errorElement = inputElement.nextElementSibling as HTMLElement;
+                    if (!errorElement || !errorElement.classList.contains('error-message')) {
+                        errorElement = document.createElement('div');
+                        errorElement.classList.add('error-message');
+                        inputElement.parentNode?.insertBefore(errorElement, inputElement.nextSibling);
+                    }
+                    errorElement.textContent = errorMessage;
+
+                    // Optionnel : Ajouter un attribut aria pour l'accessibilité
+                    inputElement.setAttribute('aria-invalid', 'true');
+                    inputElement.setAttribute('aria-describedby', `error-${fieldName}`);
+                    errorElement.id = `error-${fieldName}`;
+                }
+            });
+            return;
+        }
         let datadb = $state.snapshot(formData);
         switch (mode) {
             case 'create':
                 if (!dataId) {
-                    console.log('create', { ...datadb, ...withData });
-                    await idbqlState[collection].add({ ...datadb, ...withData });
+                    await idbql[collection].add({ ...datadb, ...withData });
+                    mode = 'show';
                 }
                 break;
             case 'update':
@@ -43,19 +98,54 @@
                 break;
         }
     };
+
+    function setFormDataDefaultFieldValues() {
+        Object.entries(formFields).forEach(([fieldName, field]) => {
+            if (formData[fieldName] === undefined && getDefaultValue(field?.fieldType)) {
+                formData[fieldName] = getDefaultValue(field?.fieldType);
+            }
+        });
+    }
+
+    // déplacer qqpart ?
+    function getDefaultValue(fieldType?: string) {
+        if (mode !== 'create') return undefined;
+        switch (fieldType) {
+            case 'date':
+                return new Date().toISOString().split('T')[0];
+            case 'datetime':
+                return new Date().toISOString();
+            case 'time':
+                return new Date().toISOString().split('T')[1].split('.')[0];
+        }
+    }
+
+    let fieldValues = new iDbCollectionValues(collection);
+
+    function formatFieldValue(fieldName: string, value: any) {
+        return fieldValues.format(fieldName, { [fieldName]: value });
+    }
 </script>
 
 {#snippet control(value, inputMode)}
-    {#if value.fieldType === 'boolean'}
-        <input type="checkbox" form={inputForm} bind:checked={formData[value.fieldName]} name={value.field} />
-    {:else if value.fieldType === 'id'}
-        <input type="hidden" form={inputForm} name={value.field} value={value.fieldType} />
+    {#if value?.fieldType?.trim() === 'boolean'}
+        {#if value?.fieldType?.trim() === 'boolean' && !value?.fieldArgs?.includes('private')}
+            <input
+                type="checkbox"
+                form={inputForm}
+                required={value?.fieldArgs?.includes('required')}
+                readonly={value?.fieldArgs?.includes('readonly')}
+                bind:checked={formData[value.fieldName]}
+                name={value.field} />
+        {/if}
+    {:else if value.fieldType.trim() === 'id'}
+        {#if inputMode != 'create'}
+            {@render input('hidden', value, inputMode)}
+        {/if}
     {:else if value.fieldType?.startsWith('text')}
         {@render controlText(value, inputMode)}
-    {:else if ['url', 'email', 'number', 'date', 'time', 'datetime'].includes(value.fieldType)}
+    {:else if ['url', 'email', 'number', 'date', 'time', 'datetime', 'phone', 'text'].includes(value.fieldType.trim())}
         {@render input(value.fieldType, value, inputMode)}
-    {:else if value.fieldType === 'phone'}
-        {@render input('tel', value, inputMode)}
     {:else if value.fieldType === 'password'}
         {@render input('password', value, inputMode)}
     {:else}
@@ -66,15 +156,19 @@
     {@const variant = value.fieldType.split('text-')[1] ?? value.fieldType}
     {#if variant.trim() == 'text'}
         {@render input('text', value, inputMode)}
-    {:else if variant.trim() == 'long'}
+    {:else if inputMode !== 'show' && variant.trim() == 'area'}
         <textarea
-            style="width: 450px"
+            style="width:100%;"
             bind:value={formData[value.fieldName]}
             form={inputForm}
             rows="3"
             name={value.fieldName}
             class="textfield h-24"
-            placeholder={value.fieldName}>
+            placeholder={value.fieldName + ' ' + value?.fieldType}
+            data-collection={collection}
+            data-collectionId={dataId}
+            data-fieldType={value.fieldType}
+            data-fieldName={value.fieldName}>
             {formData[value.fieldName]}
         </textarea>
     {:else}
@@ -82,57 +176,103 @@
     {/if}
 {/snippet}
 {#snippet input(tag: any, value, inputMode)}
-    {#if inputMode === 'show'}
-        {formData?.[value.fieldName]}
+    {#if inputMode === 'show' || value?.fieldArgs?.includes('readonly')}
+        {@html fieldValues.format(value.fieldName, formData)}
     {:else}
         <input
+            style="width: 100%"
             class="textfield"
             required={value?.fieldArgs?.includes('required')}
             readonly={value?.fieldArgs?.includes('readonly')}
             form={inputForm}
             bind:value={formData[value.fieldName]}
-            type={tag}
+            type={tag.trim()}
             name={value.fieldName}
-            placeholder={formData?.[value?.fieldName] + ' ' + formData?.[value?.fieldType]}
-            data-id={dataId}
-            data-fieldName={value.fieldName}
-            data-collection={collection} />
+            placeholder={value?.fieldName + ' ' + value?.fieldType}
+            data-collection={collection}
+            data-collectionId={dataId}
+            data-fieldType={value.fieldType.trim()}
+            data-fieldName={value.fieldName} />
     {/if}
 {/snippet}
 
 <form
     id={inputForm}
+    name={inputForm}
     onsubmit={(event) => {
         event.preventDefault();
         // onSubmit(event);
     }}>
 </form>
 
-<div class="flex flex-col gap-2" style="max-width:750px">
-    <div class="crud {displayMode}"> 
-        {#each Object.entries(formFields) as [field, value]} 
-            <div class="flex flex-col gap-2 p-2 flex-1" style="min-width:25%">
-                <label class="w-20 border-b font-bold">{value.fieldName} {value.fieldType}</label>
-                <div class="flex flex-align-middle">
-                    <div class="flex-1">{@render control(value, mode)}</div>
+<div style="width:750px;display:flex;">
+    <div class="crud {displayMode}">
+        {#each Object.entries(formFields) as [field, value]}
+            <div class="cell flex flex-col gap-2" class:hidden={value?.fieldArgs?.includes('private')}>
+                <label class="border-b font-bold">- {value.fieldName}</label>
+                <div class="relative">
                     {#if mode === 'show' && (inPlaceEdit === true || (Array.isArray(inPlaceEdit) && inPlaceEdit.includes(field)))}
-                        <IconButton onclick={() => console.log('Edit in place for', field)} icon="mdi:pencil" />
+                        <IconButton width="tiny" onclick={() => console.log('Edit in place for', field)} icon="mdi:pencil" />
                     {/if}
+                    {@render control(value, mode)}
                 </div>
             </div>
         {/each}
     </div>
+    {#if showFks && (mode === 'show' || mode === 'update')}
+        <div>
+            <CollectionReverseFks showTitle={true} {collection} collectionId={dataId}>
+                {#snippet children({ collection, template })}
+                    <div class="p2">presentation</div>
+                {/snippet}
+            </CollectionReverseFks>
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">
+    .input-error {
+        border: 10px solid red;
+    }
     .crud {
+        padding: 1rem;
+        min-width: 32rem;
         &.wrap {
             display: flex;
             flex-wrap: wrap;
+            gap: 0.5rem;
+            .cell {
+                max-width: 100%;
+                min-width: 30%;
+                width: 30%;
+                flex: 1 auto;
+                &:has(textarea) {
+                    width: 100% !important;
+                    & textarea {
+                        width: max-content !important;
+                    }
+                }
+                &:has([data-fieldType='text-long']),
+                &:has([data-fieldType='text-giant']) {
+                    width: 100%;
+                }
+                &:has([data-fieldType='number']) {
+                    width: 25%;
+                }
+            }
         }
         &.vertical {
             display: block;
-            flex-wrap: nowrap;
         }
+    }
+    [aria-invalid='true'] {
+        border-color: red;
+        background-color: #ffeeee;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 0.8em;
+        margin-top: 0.2em;
     }
 </style>

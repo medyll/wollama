@@ -13,8 +13,10 @@
 
     let {
         id,
+        collection="book"
     }: {
         id: any;
+        collection?:string
     } = $props();
 
     let where = { bookId: { eq: id } };
@@ -22,9 +24,9 @@
 
 <div class="flex w-full">
     <div class="p4">
-        <CollectionFks collection="book" collectionId={id} {where} />
+        <CollectionFks {collection}  collectionId={id} {where} />
         <hr />
-        <CollectionReverseFks collection="book" collectionId={id} {where}>
+        <CollectionReverseFks {collection} collectionId={id} {where}>
             {#snippet children(item)}
                 <div class="p2 font-bold ">{item.collection}</div>
                  <!-- list and button create -->
@@ -38,7 +40,7 @@
     </div>
     <div class="flex-1 p4">
         <!-- Book information -->
-        <CreateUpdate collection="book" inPlaceEdit dataId={id} mode="show" displayMode="vertical" showFields={['title', 'status', 'description']} />
+        <CreateUpdate {collection} inPlaceEdit dataId={id} mode="show" displayMode="vertical" showFields={['title', 'status', 'description']} />
         <!-- characters list and button create -->
         <CollectionListMenu {where} data={{} as DbCharacter} collection={'character'} target="red" />
         <CollectionButton mode="create" collection="character" withData={{ bookId: id }} />

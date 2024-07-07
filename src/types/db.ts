@@ -1,5 +1,5 @@
 import type { TplFieldType } from '@medyll/idbql';
-import type { OllamaChat, OllamaOptions, OllamaResponse } from './ollama';
+import type { OllamaChat } from './ollama';
 
 /**
  * Represents a chat.
@@ -180,6 +180,7 @@ export interface DbWritingGoal {
 export interface DbCharacter {
     id?: number;
     bookId: number;
+    characterLinkId: number[];
     firstName: string;
     lastName: string;
     nickname?: string;
@@ -193,11 +194,6 @@ export interface DbCharacter {
     personalityTraits: string[];
     goals?: string;
     conflicts?: string;
-    relationships: {
-        characterId: number;
-        relationshipType: string;
-        description: string;
-    }[];
     created_at: Date;
     updated_at: Date;
     ia_lock: boolean;
@@ -225,4 +221,12 @@ export interface DbBookPrompts {
     created_at: Date;
     updated_at: Date;
     ia_lock: boolean;
+}
+
+export interface DbCharacterLink {
+    id: string;
+    characterId: number[];
+    type: string;
+    description: string;
+    active: boolean;
 }

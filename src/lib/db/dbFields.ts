@@ -34,7 +34,7 @@ type IdbObjectify<T extends string = 'number'> = `array-of-${T}` | `object-${T}`
 // make a method parse primitive types
 export type IdDbPrimitive<T = {}> =
     | keyof typeof enumPrimitive
-    | `text-${'tiny' | 'short' | 'medium' | 'long' | 'giant'}`
+    | `text-${'tiny' | 'short' | 'medium' | 'long' | 'area'}`
     | `${string}.${string}`
     | `fk-${string}.${string}`;
 
@@ -214,11 +214,11 @@ export class IDbFields<T = Record<string, any>> {
 
         function extractArgs(source: string): { piece: any; args: [TplProperties] | [keyof typeof TplProperties] } | undefined {
             const [piece, remaining] = source.split('(');
-            if (!remaining) return { piece, args: undefined };
+            if (!remaining) return { piece: piece.trim(), args: undefined };
             const [central] = remaining?.split(')');
             const args = central?.split(' ') as [TplProperties] | [keyof typeof TplProperties];
             // console.log({ piece, args });
-            return { piece, args };
+            return { piece: piece.trim(), args };
         }
 
         let extractedArgs = extractArgs(fieldRule);
@@ -239,7 +239,6 @@ export class IDbFields<T = Record<string, any>> {
                 is = extractedArgs?.piece;
                 break;
             case 'primitive':
-                console.log({ fieldRule, extractedArgs });
                 fieldType = extractedArgs?.piece;
                 is = is ?? fieldType;
                 break;
@@ -301,8 +300,8 @@ export class iDbCollectionValues<T extends Record<string, any>> {
             const fields = presentation.split(' ');
             return fields
                 .map((field: string) => {
-                    this.#checkError(!(field in data), `Field ${field} not found in data`, 'FIELD_NOT_FOUND');
-                    return data[field];
+                    const value = data[field];
+                    return value !== null && value !== undefined ? String(value) : '';
                 })
                 .join(' ');
         } catch (error) {
@@ -472,7 +471,10 @@ export class IDbFormValidate {
         }
     }
 
-    validateForm(formData: Record<string, any>): {
+    validateForm(
+        formData: Record<string, any>,
+        options: { ignoreFields?: string[] | undefined } = {}
+    ): {
         isValid: boolean;
         errors: Record<string, string>;
         invalidFields: string[];
@@ -491,6 +493,11 @@ export class IDbFormValidate {
         }
 
         for (const [fieldName, fieldRule] of Object.entries(fields)) {
+            // Ignorer les champs spécifiés dans options.ignoreFields
+            if (options.ignoreFields && options.ignoreFields.includes(fieldName)) {
+                continue;
+            }
+
             const result = this.validateField(fieldName as keyof TplFields, formData[fieldName]);
             if (!result.isValid) {
                 errors[fieldName] = result.error || 'Invalid field';
