@@ -4,6 +4,7 @@
     import { Looper } from '@medyll/slot-ui';
     import type { PageData } from './$types';
     import PageTitle from '$components/ui/PageTitle.svelte';
+    import CrudZone from '$components/form/CrudZone.svelte';
 
     export let data: PageData;
 
@@ -11,6 +12,7 @@
 
     let val3 = test.parseAllCollections(); 
 </script>
+
 
 
 <Looper data={Object.entries(val3)}>

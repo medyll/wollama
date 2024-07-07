@@ -7,14 +7,13 @@
     import { engine } from '$lib/tools/engine';
     import { groupMessages } from '$lib/tools/chatMenuList.svelte';
     import { idbqlState } from '$lib/db/dbSchema';
-    import { Confirm, Looper } from '@medyll/slot-ui';
+    import { Confirm, Looper, TitleBar } from '@medyll/slot-ui';
     import { idbQuery } from '$lib/db/dbQuery';
     import { Button, Icon, Menu, Popper, MenuItem } from '@medyll/slot-ui';
     import { chatMetadata } from '$lib/tools/promptSystem'; 
-
-    //$: showConfigClose = $page.route.id?.includes('/configuration');
+ 
     let loadingStae = $state<Record<string, any>>({});
-    let chatList = idbqlState.chat.getAll();
+    let chatList = $derived(idbqlState.chat.getAll());
     let chatMenuList = $derived(groupMessages(chatList));
 
     const openCloseConfig = async () => {
@@ -61,8 +60,7 @@
         
     }
  
-</script>
-
+</script>  
 <div class="flex flex-align-middle justify-between p-4 gap-4">
     <div class=" "><Icon icon="mdi:settings" class="md" /></div>
     <div class="flex-1 text-2xl font-medium self-center capitalize">{$t('ui.myLib')}</div>
@@ -86,6 +84,7 @@
 
                 <Looper data={item?.items} class="flex flex-col gap-4  ">
                     {#snippet children({ item })}
+                    <!-- {item.tags} -->
                         <div class="p-2" style="content-visibility:auto">
                             <div class="flex gap-2">
                                 <div>- category : {item?.category}</div>
@@ -93,6 +92,7 @@
                                     <Icon icon="fluent:clock-16-regular" />
                                     {item?.createdAt ? format(new Date(item?.createdAt), 'dd MMMM y hh:mm') : ''}
                                 </div>
+                                {item.tags}
                             </div>
                             <div class="line-clamp-1 break-all transition duration-300 font-bold py-2">
                                 <a title={item?.title} href={`/chat/${item.chatId}`}>{item?.title}</a>

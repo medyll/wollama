@@ -22,7 +22,7 @@ html,
     }
 
 html {
-	word-break: break-word;
+	/* word-break: break-word; */
 	height: 100%;
 	min-height: 100%;
 	font-family:
@@ -48,7 +48,7 @@ html {
 body {
 	height: 100%;
 	min-height: 100%;
-	word-break: break-word;
+	/* word-break: break-word; */
 	font-size: 0.875rem;
 }
 
