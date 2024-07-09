@@ -22,7 +22,7 @@
     import { Backdrop } from '@medyll/slot-ui';
     import { connectionTimer } from '$lib/stores/timer.svelte';
     import { notifierState } from '$lib/stores/notifications';
-
+    import { cssDom, HtmluDom } from '@medyll/htmludom';
     let { children } = $props();
 
     let initiated: boolean = $state(false);
@@ -46,7 +46,7 @@
             console.log(e);
         }
         //
-        ollamaApiMainOptionsParams.init(); 
+        ollamaApiMainOptionsParams.init();
 
         const users = await idbQuery.getUsers();
         if (users.length < 0) {
@@ -61,7 +61,7 @@
     async function loader() {
         settings.initSettings();
 
-        await loadConfig(); 
+        await loadConfig();
         await loadOthers();
         await init();
     }
@@ -74,11 +74,11 @@
             },
             (data) => {
                 loadModels();
-                notifierState.notify('success', `Connection successfully established to ${data.url}`); 
+                notifierState.notify('success', `Connection successfully established to ${data.url}`);
             },
             (data) => {
-                notifierState.notify('error', `Connection failure on ollama endpoint ${data.url}`); 
-                console.log('url', data); 
+                notifierState.notify('error', `Connection failure on ollama endpoint ${data.url}`);
+                console.log('url', data);
             }
         );
     });
@@ -87,6 +87,74 @@
         loader();
         initiated = true;
     });
+
+    detectAndAct('.application-container', ['data-action', 'class', 'style'])
+        .resize()
+        .characterData()
+        .childList()
+        .actions((element, changes, mutation) => {
+            console.log('button', element, changes, mutation);
+        });
+
+    type DetectAndActCallback = (
+        element: Element,
+        changes: {
+            attributes?: string[];
+            childList?: boolean;
+            characterData?: boolean;
+            resize?: boolean;
+        },
+        mutation?: MutationRecord
+    ) => void;
+
+    export function detectAndAct(selector: string, attributes?: string[] | boolean) {
+        let trackResize = false;
+        let trackChildList = false;
+        let trackCharacterData = false;
+
+        const api = {
+            resize: () => {
+                trackResize = true;
+                return api;
+            },
+            childList: () => {
+                trackChildList = true;
+                return api;
+            },
+            characterData: () => {
+                trackCharacterData = true;
+                return api;
+            },
+            actions: (callback: DetectAndActCallback) => {
+                const options = {
+                    onlyNew: false,
+                    trackResize,
+                    trackChildList,
+                    trackAttributes: attributes,
+                    trackCharacterData,
+                };
+
+                const cssObserver = cssDom(selector, options).each((element, mutation) => {
+                    const changes = {
+                        resize: trackResize,
+                        attributes: attributes ? [mutation?.attributeName!] : undefined,
+                        childList: mutation?.type === 'childList',
+                        characterData: mutation?.type === 'characterData',
+                    };
+                    console.log(element, changes, mutation);
+                    callback(element, changes, mutation);
+                });
+
+                return {
+                    stop: () => {
+                        cssObserver.destroy();
+                    },
+                };
+            },
+        };
+
+        return api;
+    }
 </script>
 
 <svelte:head>

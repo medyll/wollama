@@ -85,7 +85,7 @@
 	"type": "module",
 	"dependencies": {
 		"@capacitor/core": "^6.1.0",
-		"@medyll/htmludom": "^0.11.1",
+		"@medyll/htmludom": "^0.11.2",
 		"@medyll/idbql": "file:../../app-node/idbql",
 		"@medyll/slot-ui": "file:../../app-node/slot-ui",
 		"@medyll/slotui": "file:C:/Users/Mydde/AppData/Roaming/npm/node_modules/@medyll/slotui",
