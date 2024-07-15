@@ -1,7 +1,7 @@
 <script lang="ts">
     import { IDbCollections } from '$lib/db/dbFields';
     import { schemeModel, idbqlState } from '$lib/db/dbSchema';
-    import type { TplCollectionName, Where } from '@medyll/idbql';
+    import type { TplCollectionName, Where } from '@medyll/idae-idbql';
     import { Looper } from '@medyll/slot-ui';
 
     type CollectionFksProps = {

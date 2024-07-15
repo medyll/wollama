@@ -1,6 +1,3 @@
-import { idbqModel, schemeModel } from '$lib/db/dbSchema';
-import type { IdbqModel, TplCollectionName } from '@medyll/idbql';
-
 export interface CreateUpdateProps<T = string> {
     mode: 'create' | 'update' | 'show';
     collection: string;

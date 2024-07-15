@@ -4,7 +4,7 @@
     import { idbqlState } from '$lib/db/dbSchema';
     import { IDbCollections, IDbCollectionValues } from '$lib/db/dbFields';
     import {  hydrate } from 'svelte';
-    import type { Where } from '@medyll/idbql';
+    import type { Where } from '@medyll/idae-idbql';
 
     interface Props {
         collection: string;

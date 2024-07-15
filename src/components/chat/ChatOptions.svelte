@@ -29,25 +29,15 @@
     let style = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
 </script>
 
-{#snippet listItemBottom()}
-    <MenuListItem
-        icon={'mdi:chevron-right'}
-        onclick={() => {
-            showHide = !showHide;
-        }} />
-{/snippet}
-<!-- bind:activePrompt={chatParams.promptSystem} -->
-{#snippet popperRight()}
-    <div {style}>
-        <CrudZone collection="prompts" />
-    </div>
-{/snippet}
+ 
+ 
 <ButtonMenu
     tall="small"
     width="med"
     icon="material-symbols-light:post-add-sharp"
     value={chatParams.promptSystem?.code ?? $t('prompt.systemPrompt')}
     popperProps={{ stickToHookWidth: true, position: 'TL', flow: 'fixed' }}
+    variant="naked"
     menuProps={{
         data: promptList, 
         grid: 3,

@@ -88,13 +88,50 @@
         initiated = true;
     });
 
-    detectAndAct('.application-container', ['data-action', 'class', 'style'])
-        .resize()
-        .characterData()
-        .childList()
-        .actions((element, changes, mutation) => {
-            console.log('button', element, changes, mutation);
-        });
+    let a = {
+        name: 'toggler',
+        selector: 'data-toggler',
+        actions: (element, changes) => {
+            // toggler-for
+
+            return {
+                attrs: {
+                    '[toggler-for]': '',
+                },
+            };
+        },
+    };
+    let b = {
+        name: 'shower',
+        selector: 'data-toggler',
+        actions: (element, changes) => {
+            // toggler-for
+            const withAttr = () => {};
+
+            return {
+                withAttr: ['[show]', withAttr],
+                attrs: {
+                    '[toggler-for]': () => {},
+                },
+            };
+        },
+    };
+
+    let test = b.actions('element', 'changes');
+    console.log(Object.getOwnPropertyNames(b.actions));
+    console.log(Object.getOwnPropertyNames(test));
+
+    console.log({ test });
+
+    /* detectAndAct('.application-container', {
+        attributes: ['data-action', 'class', 'style'],
+        trackCharacterData: false,
+        trackChildList: false,
+        trackResize: false,
+    }).actions((element, changes) => { 
+        changes?.onResize;
+        console.log('.application-container', element, changes);
+    }); */
 
     type DetectAndActCallback = (
         element: Element,
@@ -107,11 +144,7 @@
         mutation?: MutationRecord
     ) => void;
 
-    export function detectAndAct(selector: string, attributes?: string[] | boolean) {
-        let trackResize = false;
-        let trackChildList = false;
-        let trackCharacterData = false;
-
+    export function detectAndAct(selector: string, { attributes, trackChildList, trackCharacterData, trackResize }) {
         const api = {
             resize: () => {
                 trackResize = true;
@@ -142,7 +175,12 @@
                         characterData: mutation?.type === 'characterData',
                     };
                     console.log(element, changes, mutation);
-                    callback(element, changes, mutation);
+                    callback(element, {
+                        attributes: mutation,
+                        childList: mutation,
+                        characterData: mutation,
+                        resize: changes.resize,
+                    });
                 });
 
                 return {

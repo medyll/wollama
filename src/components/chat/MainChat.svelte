@@ -132,7 +132,7 @@
                 <ChatOptions />
                 <div class="flex-1"></div>
                 {#if $aiState == 'done'}
-                    <IconButton width="tiny" icon="mdi:send" type="submit" form="prompt-form" disabled={disableSubmit} />
+                    <IconButton rounded={true} width="tiny" icon="mdi:send" type="submit" form="prompt-form" disabled={disableSubmit} />
                 {:else}
                     <IconButton width="tiny" icon="mdi:stop" form="prompt-form" />
                 {/if}

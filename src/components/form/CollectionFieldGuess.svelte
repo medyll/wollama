@@ -1,7 +1,7 @@
 <!-- CollectionFieldGuess.svelte -->
 <script lang="ts">
     import { Guesser } from '$lib/tools/Guesser ';
-    import type { TplCollectionName } from '@medyll/idbql';
+    import type { TplCollectionName } from '@medyll/idae-idbql';
     import { IconButton } from '@medyll/slot-ui';
      
 

@@ -18,7 +18,7 @@ import type { DBMessage } from '$types/db';
 import type { OllamaResponse } from '$types/ollama';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
-import { createIdbqDb, type IdbqModel, type Tpl, type DbFieldTypes, type TplFieldType } from '@medyll/idbql';
+import { createIdbqDb, type IdbqModel, type Tpl, type DbFieldTypes, type TplFieldType } from '@medyll/idae-idbql';
 
 export const schemeModel: IdbqModel = {
     agent: {
@@ -307,25 +307,31 @@ export const schemeModel: IdbqModel = {
             fields: {
                 id: 'id (readonly)',
                 bookId: 'id',
-                characterLinkId: 'array-of-fk-characterLink.id',
+                characterLinkIds: 'array-of-fk-characterLink.id (private)',
+                characterAttributesIds: 'array-of-fk-characterAttributes.id (private)',
                 firstName: 'text (required)',
                 lastName: 'text',
                 nickname: 'text',
-                role: 'text',
-                description: 'text-area',
-                backstory: 'text-area',
                 age: 'number',
                 gender: 'text',
                 occupation: 'text',
+                role: 'text',
+                description: 'text-area',
+                backstory: 'text-area',
                 physicalDescription: 'text-area',
                 personalityTraits: 'array-of-text',
                 goals: 'text-area',
                 conflicts: 'text-area',
-                created_at: 'date (readonly)',
-                updated_at: 'date',
+                created_at: 'date (readonly private)',
+                updated_at: 'date (readonly private)',
                 ia_lock: 'boolean (private)',
             },
             fks: {
+                characterAttributes: {
+                    code: 'characterAttributes',
+                    multiple: true,
+                    rules: '',
+                },
                 book: {
                     code: 'book',
                     multiple: false,
@@ -337,6 +343,23 @@ export const schemeModel: IdbqModel = {
                     rules: '',
                 },
             },
+        },
+    },
+    characterAttributes: {
+        keyPath: '++id',
+        model: {} as DbCharacter,
+        ts: {} as DbCharacter,
+        template: {
+            index: 'id',
+            presentation: 'name',
+            fields: {
+                id: 'id (readonly)',
+                attribute: 'text',
+                name: 'text',
+                created_at: 'date (readonly)',
+                updated_at: 'date',
+            },
+            fks: {},
         },
     },
     characterLink: {
@@ -425,7 +448,7 @@ export const schemeModel: IdbqModel = {
 } as const;
 
 //type test = DbTemplateModel<typeof idbqModel>;
-const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 12);
+const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 13);
 export const { idbql, idbqlState, idbDatabase, idbqModel } = idbqStore.create('woolama');
 
 // idbql.agent.where({ $eq: { id: 3 } });

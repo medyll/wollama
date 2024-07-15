@@ -7,6 +7,7 @@
     import ChatList from './ChatList.svelte';
     import { Icon, MenuList, MenuListItem } from '@medyll/slot-ui';
     import { settings } from '$lib/stores/settings.svelte';
+    import { goto } from '$app/navigation';
 
     const openCloseConfig = async () => {
         if ($page.route.id?.includes('/configuration')) {
@@ -22,20 +23,22 @@
     };
 
     const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books') => {
+        let goTo;
         switch (link) {
             case 'settings':
-                return `${window.location.origin}/settings`;
+                goTo= `${window.location.origin}/settings`;
             case 'chat':
-                return `chat/${link}`;
+                goTo= `chat/${link}`;
             case 'newChat':
-                return `${window.location.origin}/chat`;
+                goTo= `${window.location.origin}/chat`;
             case 'lib':
-                return `${window.location.origin}/lib`;
+                goTo= `${window.location.origin}/lib`;
             case 'explore':
-                return `${window.location.origin}/explore`;
+                goTo= `${window.location.origin}/explore`;
             default:
-                return `${window.location.origin}/${link}`;
+                goTo= `${window.location.origin}/${link}`;
         }
+        goto(goTo)
     };
 </script>
 
@@ -52,11 +55,11 @@
     </div>
     <div class="application-sideBar-menu">
         <MenuList tall="kind" class="flex flex-col h-full">
-            <MenuListItem selectable={false} href={getChatLink('newChat')} title={$t('ui.newChat')}>
+            <MenuListItem selectable={false} onclick={getChatLink('newChat')} title={$t('ui.newChat')}>
                 <Icon icon="mdi:plus" alt={$t('ui.newChat')} />
                 <span>{$t('ui.newChat')}</span>
             </MenuListItem>
-            <MenuListItem href={getChatLink('lib')} title={$t('ui.mylib')}>
+            <MenuListItem onclick={getChatLink('lib')} title={$t('ui.mylib')}>
                 <Icon icon="fluent:library-20-filled" alt={$t('ui.mylib')} />
                 <span>{$t('ui.myLib')}</span>
             </MenuListItem>
@@ -68,15 +71,15 @@
                 <Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
             </MenuListItem>
             <hr />
-            <MenuListItem title={$t('ui.books')} href={getChatLink('books')}>
+            <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
                 <Icon icon="settings" alt={$t('ui.books')} />
                 <span>{$t('ui.books')}</span>
             </MenuListItem>
-            <MenuListItem title={$t('ui.settings')} href={getChatLink('explore')}>
+            <MenuListItem title={$t('ui.settings')} onclick={getChatLink('explore')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
             </MenuListItem>
-            <MenuListItem title={$t('ui.settings')} href={getChatLink('settings')}>
+            <MenuListItem title={$t('ui.settings')} onclick={getChatLink('settings')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
             </MenuListItem>

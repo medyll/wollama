@@ -2,7 +2,7 @@
 <!-- Component: CollectionFieldValue.svelte (ancien nom CollectionFieldInput.svelte) -->
 <script lang="ts">
     import { IDbCollectionFieldForge } from '$lib/db/dbFields';
-    import type { TplCollectionName } from '@medyll/idbql';
+    import type { TplCollectionName } from '@medyll/idae-idbql';
     import { IconButton } from '@medyll/slot-ui';
     import CollectionFieldGuess from './CollectionFieldGuess.svelte';
     type LabelPosition = 'before' | 'above' | 'after' | 'below' | boolean;

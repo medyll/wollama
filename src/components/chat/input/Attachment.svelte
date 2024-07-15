@@ -41,6 +41,7 @@
     class="mx-auto"
     width="auto"
     icon="heroicons:paper-clip-solid"
+    variant="naked"
 	value="Attach"
     {disabled}
     {...rest}>

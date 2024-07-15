@@ -2,7 +2,7 @@
     path: D:\boulot\python\wollama\src\lib\db\dbFields.ts
  */
 
-import type { CollectionModel, IdbqModel, TplCollectionName, Tpl, TplFields } from '@medyll/idbql';
+import type { CollectionModel, IdbqModel, TplCollectionName, Tpl, TplFields } from '@medyll/idae-idbql';
 import { schemeModel } from './dbSchema';
 
 export enum enumPrimitive {

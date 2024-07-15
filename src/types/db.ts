@@ -1,4 +1,4 @@
-import type { TplFieldType } from '@medyll/idbql';
+import type { TplFieldType } from '@medyll/idae-idbql';
 import type { OllamaChat } from './ollama';
 
 /**
