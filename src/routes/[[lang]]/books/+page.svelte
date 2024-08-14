@@ -1,6 +1,6 @@
 <script lang="ts">
     import { idbqlState } from '$lib/db/dbSchema';
-    import { Button, Looper, openWindow } from '@medyll/slot-ui';
+    import { Button, Looper, openWindow } from '@medyll/idae-slotui-svelte';
     import { IDbCollectionValues } from '$lib/db/dbFields';
     import PageTitle from '$components/ui/PageTitle.svelte';
     import CreateUpdate from '$components/form/CreateUpdate.svelte';

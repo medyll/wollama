@@ -1,7 +1,7 @@
 <script lang="ts">
     import {  idbQuery } from '$lib/db/dbQuery';
     import Message from './Message.svelte';
-    import { Looper } from '@medyll/slot-ui';
+    import { Looper } from '@medyll/idae-slotui-svelte';
 
     let { chatId }:{chatId: string} = $props();
 

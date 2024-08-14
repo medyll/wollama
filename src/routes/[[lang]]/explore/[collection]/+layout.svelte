@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, openWindow } from '@medyll/slot-ui';
+    import { Button, openWindow } from '@medyll/idae-slotui-svelte';
     import type { LayoutData } from './$types';
     import CreateUpdate from '$components/form/CreateUpdate.svelte';
     import { page } from '$app/stores';

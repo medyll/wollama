@@ -7,9 +7,9 @@
     import { engine } from '$lib/tools/engine';
     import { groupMessages } from '$lib/tools/chatMenuList.svelte';
     import { idbqlState } from '$lib/db/dbSchema';
-    import { Confirm, Looper, TitleBar } from '@medyll/slot-ui';
+    import { Confirm, Looper, TitleBar } from '@medyll/idae-slotui-svelte';
     import { idbQuery } from '$lib/db/dbQuery';
-    import { Button, Icon, Menu, Popper, MenuItem } from '@medyll/slot-ui';
+    import { Button, Icon, Menu, Popper, MenuItem } from '@medyll/idae-slotui-svelte';
     import { chatMetadata } from '$lib/tools/promptSystem'; 
  
     let loadingStae = $state<Record<string, any>>({});

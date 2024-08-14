@@ -3,7 +3,7 @@
     D:\boulot\python\wollama\src\components\form\CollectionButton.svelte
  -->
 <script lang="ts" generics="COL">
-    import { Button,  openWindow } from '@medyll/slot-ui';
+    import { Button,  openWindow } from '@medyll/idae-slotui-svelte';
     import CreateUpdate from '$components/form/CreateUpdate.svelte';
     import { type CreateUpdateProps } from './types';
 

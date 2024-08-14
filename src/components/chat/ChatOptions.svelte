@@ -7,7 +7,7 @@
     import { ui } from '$lib/stores/ui';
     import { chatParams } from '$lib/states/chat.svelte';
     import Model from './input/Model.svelte';
-    import { Button, ButtonMenu, MenuListItem, Popper } from '@medyll/slot-ui';
+    import { Button, ButtonMenu, MenuListItem, Popper } from '@medyll/idae-slotui-svelte';
     import Attachment from './input/Attachment.svelte';
     import { idbQuery } from '$lib/db/dbQuery';
     import CrudCollectionList from '$components/form/CollectionListMenu.svelte';
@@ -29,19 +29,24 @@
     let style = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
 </script>
 
- 
- 
+{#snippet listItemBottom({ item, itemIndex })}
+    <MenuListItem icon="material-symbols-light:post-add-sharp" data={item}>
+         {$t('prompt.createPrompt')}
+    </MenuListItem>
+{/snippet}
+
 <ButtonMenu
     tall="small"
-    width="med"
+    width="auto"
     icon="material-symbols-light:post-add-sharp"
     value={chatParams.promptSystem?.code ?? $t('prompt.systemPrompt')}
-    popperProps={{ stickToHookWidth: true, position: 'TL', flow: 'fixed' }}
+    popperProps={{ stickToHookWidth: true, position: 'TL', flow: 'fixed', autoClose: true }}
     variant="naked"
     menuProps={{
-        data: promptList, 
+        data: promptList,
         grid: 3,
-        onclick: (event) => {  
+        listItemBottom: listItemBottom,
+        onclick: (event) => {
             chatParams.promptSystem = event;
         },
     }}>

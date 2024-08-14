@@ -1,5 +1,5 @@
 <script lang="ts" generics="COL = Record<string,any>">
-    import { type MenuListProps, Button, MenuList, MenuListItem, openWindow, type Props } from '@medyll/slot-ui';
+    import { type MenuListProps, Button, MenuList, MenuListItem, openWindow, type Props } from '@medyll/idae-slotui-svelte';
     import CreateUpdate from '$components/form/CreateUpdate.svelte';
     import { idbqlState } from '$lib/db/dbSchema';
     import { IDbCollections, IDbCollectionValues } from '$lib/db/dbFields';

@@ -7,7 +7,7 @@
 <script lang="ts">
     import { IDbCollections as DbFields, IDbCollectionValues, IDbFormValidate } from '$lib/db/dbFields';
     import { schemeModel, idbqlState, idbql } from '$lib/db/dbSchema';
-    import { IconButton } from '@medyll/slot-ui';
+    import { IconButton } from '@medyll/idae-slotui-svelte';
     import type { CreateUpdateProps } from './types';
     import CollectionReverseFks from './CollectionReverseFks.svelte';
     import CollectionFieldInput from './CollectionFieldValue.svelte';

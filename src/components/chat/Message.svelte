@@ -10,7 +10,7 @@
     import 'prismjs/themes/prism-tomorrow.css';
     import { format } from 'date-fns';
     import { idbQuery } from '$lib/db/dbQuery';
-    import { Looper } from '@medyll/slot-ui';
+    import { Looper } from '@medyll/idae-slotui-svelte';
 
     interface Props {
         messageId: string;
@@ -102,7 +102,7 @@
             <div class="soft-title">{format(new Date(message?.createdAt), 'dd MMMM y hh:mm')}</div>
             <div class="soft-title">{dd}</div>
         </div>
-        <div style="user-select:all;" class="speech-bubble theme-border">
+        <div style="user-select:all;" class="speech-bubble theme-border preserve-line-breaks">
             {#if message.urls?.length}
                 <Looper class="flex-h" data={message.urls}>
                     {#snippet children({ item })}
@@ -135,6 +135,9 @@
 </div>
 
 <style lang="postcss">
+    .preserve-line-breaks {
+            white-space: pre-wrap;
+        }
     .skeletonLine {
         @apply h-2 bg-gray-200 dark:bg-gray-600 rounded-md col-span-2 mb-1 animate-pulse;
         white-space: pre-wrap;

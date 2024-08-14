@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { MenuList, MenuListItem, ListTitle } from '@medyll/slot-ui';
+    import { MenuList, MenuListItem, ListTitle } from '@medyll/idae-slotui-svelte';
     import { getTimeTitle, groupChatMessages, groupMessages } from '$lib/tools/chatMenuList.svelte.js';
     import ChatMenuItem from '$components/ui/ChatMenuItem.svelte';
     import { t } from '$lib/stores/i18n';

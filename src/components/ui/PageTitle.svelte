@@ -1,6 +1,6 @@
 <script lang="ts">
     import { t } from "$lib/stores/i18n";
-    import { Icon, type Props } from "@medyll/slot-ui";
+    import { Icon, type Props } from "@medyll/idae-slotui-svelte";
 
 interface Props {
     title: string;

@@ -5,7 +5,7 @@
     import { ui } from '$lib/stores/ui.js';
     import { engine } from '$lib/tools/engine';
     import ChatList from './ChatList.svelte';
-    import { Icon, MenuList, MenuListItem } from '@medyll/slot-ui';
+    import { Icon, MenuList, MenuListItem } from '@medyll/idae-slotui-svelte';
     import { settings } from '$lib/stores/settings.svelte';
     import { goto } from '$app/navigation';
 

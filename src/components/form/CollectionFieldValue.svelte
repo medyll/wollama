@@ -3,7 +3,7 @@
 <script lang="ts">
     import { IDbCollectionFieldForge } from '$lib/db/dbFields';
     import type { TplCollectionName } from '@medyll/idae-idbql';
-    import { IconButton } from '@medyll/slot-ui';
+    import { IconButton } from '@medyll/idae-slotui-svelte';
     import CollectionFieldGuess from './CollectionFieldGuess.svelte';
     type LabelPosition = 'before' | 'above' | 'after' | 'below' | boolean;
 

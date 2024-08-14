@@ -9,7 +9,7 @@
     import { clickAway } from '$lib/tools/clickAwayt';
     import Frame from '$components/fragments/Frame.svelte';
     import PromptForm from './PromptForm.svelte';
-    import { Menu, MenuList, MenuListItem, onEvent } from '@medyll/slot-ui';
+    import { Menu, MenuList, MenuListItem, onEvent } from '@medyll/idae-slotui-svelte';
 
     let { prompt, activePrompt = $bindable() } = $props();
 

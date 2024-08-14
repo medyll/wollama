@@ -6,7 +6,7 @@
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
     import Icon from '@iconify/svelte';
-    import { Button, Menu, Popper, MenuItem } from '@medyll/slot-ui';
+    import { Button, Menu, Popper, MenuItem } from '@medyll/idae-slotui-svelte';
 
     import { chatUtils } from '$lib/tools/chatUtils';
 

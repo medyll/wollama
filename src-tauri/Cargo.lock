@@ -5378,6 +5378,7 @@ version = "0.1.0"
 dependencies = [
  "actix-web",
  "anyhow",
+ "glob",
  "ollama-rs",
  "qdrant-client",
  "reqwest",

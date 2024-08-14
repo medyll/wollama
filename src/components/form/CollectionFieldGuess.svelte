@@ -2,7 +2,7 @@
 <script lang="ts">
     import { Guesser } from '$lib/tools/Guesser ';
     import type { TplCollectionName } from '@medyll/idae-idbql';
-    import { IconButton } from '@medyll/slot-ui';
+    import { IconButton } from '@medyll/idae-slotui-svelte';
      
 
     let { collection, collectionId, fieldName, data, onGuess } = $props<{

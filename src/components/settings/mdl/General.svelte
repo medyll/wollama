@@ -7,7 +7,7 @@
 	import Selector from '$components/fragments/Selector.svelte';
 	import { engine } from '$lib/tools/engine';
 
-	import {Switch} from "@medyll/slot-ui"
+	import {Switch} from "@medyll/idae-slotui-svelte"
 	settings.subscribe((o) => {
 		// if($settings.theme != o.theme)
 		engine.applyTheme(o.theme);

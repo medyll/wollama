@@ -5,7 +5,7 @@
     import { t } from '$lib/stores/i18n.js';
     import General from './mdl/General.svelte';
     import Addons from './mdl/Addons.svelte';
-    import { Cartouche, Looper } from '@medyll/slot-ui';
+    import { Cartouche, Looper } from '@medyll/idae-slotui-svelte';
     import Options from './mdl/Options.svelte';
     import PageTitle from '$components/ui/PageTitle.svelte';
 

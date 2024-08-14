@@ -1,7 +1,7 @@
 <script lang="ts">
     import { IDbCollections } from '$lib/db/dbFields';
     import { schemeModel } from '$lib/db/dbSchema';
-    import { Looper } from '@medyll/slot-ui';
+    import { Looper } from '@medyll/idae-slotui-svelte';
     import type { PageData } from './$types';
     import PageTitle from '$components/ui/PageTitle.svelte';
     import CrudZone from '$components/form/CrudZone.svelte';

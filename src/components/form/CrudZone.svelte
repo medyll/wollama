@@ -1,5 +1,5 @@
 <script lang="ts" generics="T = Record<string, any>">
-    import { Button, openWindow, type Props } from '@medyll/slot-ui';
+    import { Button, openWindow, type Props } from '@medyll/idae-slotui-svelte';
     import CreateUpdate from '$components/form/CreateUpdate.svelte';
     import { idbqlState } from '$lib/db/dbSchema';
     import CrudCollectionList from './CollectionListMenu.svelte';

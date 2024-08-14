@@ -12,7 +12,7 @@
     import Images from './input/Images.svelte'; 
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import { chatParams, type ChatGenerate } from '$lib/states/chat.svelte';
-    import {   IconButton } from '@medyll/slot-ui';
+    import {   IconButton } from '@medyll/idae-slotui-svelte';
     import MessagesList from './MessagesList.svelte';
     import { chatMetadata } from '$lib/tools/promptSystem'; 
     import AgentPick from '$components/agents/AgentPick.svelte';

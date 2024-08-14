@@ -19,10 +19,10 @@
     import '$lib/playground.js';
     import { idbql } from '$lib/db/dbSchema';
     import { init } from '$lib/init/init';
-    import { Backdrop } from '@medyll/slot-ui';
+    import { Backdrop, SlotuiSheet } from '@medyll/idae-slotui-svelte';
     import { connectionTimer } from '$lib/stores/timer.svelte';
     import { notifierState } from '$lib/stores/notifications';
-    import { cssDom, HtmluDom } from '@medyll/htmludom';
+    import { cssDom } from '@medyll/idae-dom-events';
     let { children } = $props();
 
     let initiated: boolean = $state(false);
@@ -75,6 +75,7 @@
             (data) => {
                 loadModels();
                 notifierState.notify('success', `Connection successfully established to ${data.url}`);
+                console.log({ data });
             },
             (data) => {
                 notifierState.notify('error', `Connection failure on ollama endpoint ${data.url}`);
@@ -198,7 +199,7 @@
 <svelte:head>
     <title>wOOllama !</title>
 </svelte:head>
-
+<SlotuiSheet breakpoints={{}} />
 <Backdrop isLoading={false} isOpen={false}>
     <Settings />
 </Backdrop>
@@ -207,6 +208,38 @@
     <Sidebar />
     <div class="application-content">
         <TopBar />
+        <!-- xs
+        <div class="hide-more-xs">hide-more-xs</div>
+        <div class="show-more-xs">show-more-xs</div>
+        <div class="hide-less-xs">hide-less-xs</div>
+        <div class="show-less-xs">show-less-xs</div>
+sm
+        <div class="hide-more-sm">hide-more-sm</div>
+        <div class="show-more-sm">show-more-sm</div>
+        <div class="hide-less-sm">hide-less-sm</div>
+        <div class="show-less-sm">show-less-sm</div>
+md
+        <div class="hide-more-md">hide-more-md</div>
+        <div class="show-more-md">show-more-md</div>
+        <div class="hide-less-md">hide-less-md</div>
+        <div class="show-less-md">show-less-md</div>
+lg
+        <div class="hide-more-lg">hide-more-lg</div>
+        <div class="show-more-lg">show-more-lg</div>
+        <div class="hide-less-lg">hide-less-lg</div>
+        <div class="show-less-lg">show-less-lg</div>
+xl
+        <div class="hide-more-xl">hide-more-xl</div>
+        <div class="show-more-xl">show-more-xl</div>
+        <div class="hide-less-xl">hide-less-xl</div>
+        <div class="show-less-xl">show-less-xl</div>
+xxl
+        <div class="hide-more-xxl">hide-more-xxl</div>
+        <div class="show-more-xxl">show-more-xxl</div>
+        <div class="hide-less-xxl">hide-less-xxl</div>
+        <div class="show-less-xxl">show-less-xxl</div> -->
+
+
         <main class="application-main">
             {@render children?.()}
         </main>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { idbqlState, schemeModel } from '$lib/db/dbSchema';
-    import { Icon, Looper, openWindow, Window } from '@medyll/slot-ui';
+    import { Icon, Looper, openWindow, Window } from '@medyll/idae-slotui-svelte';
     import { IDbCollections } from '$lib/db/dbFields';
     import CrudZone from '$components/form/CrudZone.svelte';
 

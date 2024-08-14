@@ -71,7 +71,6 @@ export class OllamaApiCore {
         return fetch(`${url}/api/tags/`, {
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
             },
             method: 'GET',
         })
@@ -143,7 +142,6 @@ class OllamaApiFetch {
         let headers: RequestInit['headers'] = {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            'Access-Control-Allow-Origin': '*',
         };
 
         return fetch(`${this.config.ollama_endpoint}/${url}`, {

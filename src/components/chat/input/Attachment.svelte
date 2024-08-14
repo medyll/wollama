@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { MessageImageType } from '$types/db';
     import Icon from '@iconify/svelte';
-    import { Button } from '@medyll/slot-ui';
+    import { Button } from '@medyll/idae-slotui-svelte';
 
     interface Props {
         disabled?: boolean;

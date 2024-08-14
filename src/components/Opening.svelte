@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { TextField } from '@medyll/slot-ui';
+    import { TextField } from '@medyll/idae-slotui-svelte';
 import { onMount } from 'svelte';
 
     let showOpener: boolean = true;
