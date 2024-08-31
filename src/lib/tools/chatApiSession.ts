@@ -2,6 +2,21 @@ import { idbQuery } from '$lib/db/dbQuery';
 import type { DBMessage, DbChat, MessageImageType, PromptType } from '$types/db';
 import { OllamaChatMessageRole, type OllamaChatMessage, type OllamaResponse } from '$types/ollama';
 import { chatUtils } from './chatUtils';
+import { invoke } from '@tauri-apps/api/tauri';
+
+/**
+ * Fetches the content of a given URL.
+ * @param url The URL to fetch content from.
+ * @returns A promise that resolves to the text content of the URL.
+ */
+async function fetchUrlContent(url: string): Promise<string> {
+    try {
+        return await invoke('fetch_url_content', { url });
+    } catch (error) {
+        console.error(`Error fetching content from ${url}:`, error);
+        return `Failed to fetch content from ${url}`;
+    }
+}
 
 /**
  * Represents a class that manages a chat session.
@@ -100,13 +115,18 @@ export class ChatApiSession {
 
         if (urs) {
             for (const url of urs) {
-                // Téléchargez le contenu de l'URL
-                const urlContent = ''; //await fetchUrlContent(url);
-                // Ajoutez le contenu téléchargé au message
-                content += `\n\nContent from ${url}:\n\n${urlContent}`;
-                urls.push({ url, image: '', order: 0, title: 'Web page' });
+                try {
+                    // Téléchargez le contenu de l'URL
+                    console.log('fetchUrlContent', url);
+                    const urlContent = await fetchUrlContent(url);
+                    // Ajoutez le contenu téléchargé au message
+                    content += `\n\nContent from ${url}:\n\n${urlContent}`;
+                    urls.push({ url, image: '', order: 0, title: 'Web page' });
 
-                console.log('red');
+                    console.log('fetchUrlContent done');
+                } catch (e) {
+                    console.error(`Error fetching content from ${url}:`, e);
+                }
             }
         }
         this.userDbMessage = await idbQuery.insertMessage(

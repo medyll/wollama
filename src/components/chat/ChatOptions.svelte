@@ -36,7 +36,7 @@
 {/snippet}
 
 <ButtonMenu
-    tall="small"
+    tall="mini"
     width="auto"
     icon="material-symbols-light:post-add-sharp"
     value={chatParams.promptSystem?.code ?? $t('prompt.systemPrompt')}

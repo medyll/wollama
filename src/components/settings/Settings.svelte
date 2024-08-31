@@ -27,21 +27,21 @@
 <div class="flex w-full settings p-4 px-8">
     <div class="flex flex-col gap-4 w-348">
         <div class="soft-title">{$t(`settings.general`)}</div>
-        <Cartouche  isOpen={false} classes={{ content: 'px-4' }} icon={{ icon: 'mdi:wrench' }} primary={'general'}>
+        <Cartouche tall="kind"  isOpen={false}  icon={{ icon: 'mdi:wrench' }} primary={'general'}>
             <General />
         </Cartouche>
-        <Cartouche  isOpen={false} classes={{ content: 'px-4' }} iconProps={{ icon: 'mdi:wrench' }} primary={'addons'}>
+        <Cartouche tall="kind"  isOpen={false}   icon={{ icon: 'mdi:wrench' }} primary={'addons'}>
             <Addons />
         </Cartouche>
         <div class="soft-title">{$t(`settings.ollama`)}</div>
-        <Cartouche  isOpen={false} classes={{ content: 'px-4' }} icon={{ icon: 'mdi:wrench' }} primary={'models'}>
+        <Cartouche tall="kind"  isOpen={false}  icon={{ icon: 'mdi:wrench' }} primary={'models'}>
             <Models />
         </Cartouche>
-        <Cartouche isOpen={false}  classes={{ content: 'px-4' }} icon={{ icon: 'mdi:wrench' }} primary={'options'}>
+        <Cartouche tall="kind" isOpen={false}   icon={{ icon: 'mdi:wrench' }} primary={'options'}>
             <Options />
         </Cartouche>
         <div class="soft-title">{$t(`settings.more`)}</div>
-        <Cartouche isOpen={false}  classes={{ content: 'px-4' }} icon="mdi:wrench" primary={$t(`settings.modules.more`)}>
+        <Cartouche tall="kind" isOpen={false}  icon="mdi:wrench" primary={$t(`settings.modules.more`)}>
             <Infos />
         </Cartouche>  
     </div>

@@ -66,19 +66,19 @@
             <div class="application-sideBar-content flex-1 overflow-auto">
                 <ChatList />
             </div>
-            <MenuListItem iconLast={{ icon: 'settings' }} selectable={false} width="full" title={$t('ui.settings')} onclick={openLibgs}>
+            <MenuListItem  selectable={false} width="full" title={$t('ui.settings')} onclick={openLibgs}>
                 <span>{$t('ui.expand')}</span>
                 <Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
             </MenuListItem>
             <hr />
-            <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
+           <!--  <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
                 <Icon icon="settings" alt={$t('ui.books')} />
                 <span>{$t('ui.books')}</span>
             </MenuListItem>
             <MenuListItem title={$t('ui.settings')} onclick={getChatLink('explore')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
-            </MenuListItem>
+            </MenuListItem> -->
             <MenuListItem title={$t('ui.settings')} onclick={getChatLink('settings')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>

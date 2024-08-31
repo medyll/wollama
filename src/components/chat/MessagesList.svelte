@@ -1,9 +1,9 @@
 <script lang="ts">
-    import {  idbQuery } from '$lib/db/dbQuery';
+    import { idbQuery } from '$lib/db/dbQuery';
     import Message from './Message.svelte';
     import { Looper } from '@medyll/idae-slotui-svelte';
 
-    let { chatId }:{chatId: string} = $props();
+    let { chatId }: { chatId: string } = $props();
 
     let chat = $derived(chatId ? idbQuery.getChat(chatId) : []);
     let messages = $derived(chatId ? idbQuery.getMessages(chatId) : []);
@@ -18,12 +18,20 @@
             });
         }
     });
-
+    $inspect(chat?.tags);
 </script>
+
 <!-- corecteur orthographique -->
-{chat?.tags}
+
 <div class="flex flex-col w-full gap-4 flex-1">
-    <Looper data={messages ?? []}>
+    <div class="pad-2 flex justify-center gap-2 borde pad-2">
+        {@html (chat?.tags ?? [])
+            .map((t) => {
+                return `<span class="border px-2 rounded-md">${t}</span>`;
+            })
+            .join(' ')}
+    </div>
+    <Looper data={messages as [] ?? []}>
         {#snippet children({ item })}
             <Message messageId={item.messageId} />
         {/snippet}

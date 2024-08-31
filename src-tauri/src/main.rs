@@ -1,40 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-// mod files;
-
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
-use anyhow::{anyhow, Result};
-use reqwest;
-use scraper::{Html, Selector};
-use serde::{Deserialize, Serialize};
-use tauri::Manager;
-use url::Url;
-
 fn main() {
     wollama::run();
-    tauri::Builder::default()
-        .setup(|app| {
-            let window = app.get_webview_window("main").unwrap();
-            server();
-            // window.open_devtools();
-
-            /* #[cfg(target_os = "macos")]
-            apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None)
-              .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
-
-            #[cfg(target_os = "windows")]
-                  apply_mica(&window, dark)
-                    .expect("Unsupported platform! 'apply_mica' is only supported on Windows"); */
-
-            Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![close_splashscreen])
-        .run(tauri::generate_context!())
-        .expect("failed to run app");
 }
 
-#[tauri::command]
+/* #[tauri::command]
 async fn close_splashscreen(window: tauri::WebviewWindow) {
     // Close splashscreen
     if let Some(splashscreen) = window.get_webview_window("splashscreen") {
@@ -42,7 +13,7 @@ async fn close_splashscreen(window: tauri::WebviewWindow) {
     }
     // Show main window
     window.get_webview_window("main").unwrap().show().unwrap();
-}
+} */
 
 // create the error type that represents all errors possible in our program
 /* #[derive(Debug, thiserror::Error)]
@@ -61,20 +32,20 @@ async fn search_google(search_param: &str) -> Result<(), String> {
     Ok(search_result)
 } */
 
-#[derive(Serialize, Deserialize)]
+/* #[derive(Serialize, Deserialize)]
 struct Message {
     content: String,
-}
+} */
 
-async fn hello() -> impl Responder {
+/* async fn hello() -> impl Responder {
     HttpResponse::Ok().body("Hello, World!")
-}
+} */
 
-async fn echo(msg: web::Json<Message>) -> impl Responder {
+/* async fn echo(msg: web::Json<Message>) -> impl Responder {
     HttpResponse::Ok().json(msg.0)
-}
+} */
 
-async fn server() -> std::io::Result<()> {
+/* async fn server() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .route("/", web::get().to(hello))
@@ -83,17 +54,17 @@ async fn server() -> std::io::Result<()> {
     .bind("127.0.0.1:8080")?
     .run()
     .await
-}
+} */
 
-#[derive(Serialize, Deserialize)]
+/* #[derive(Serialize, Deserialize)]
 struct SearchResult {
     title: String,
     content: String,
     url: String,
     host: String,
-}
+} */
 
-async fn search_google_and_browse_results(search_param: &str) -> Result<Vec<SearchResult>> {
+/* async fn search_google_and_browse_results(search_param: &str) -> Result<Vec<SearchResult>> {
     // Initialiser un vecteur pour stocker les résultats de la recherche
     let mut results = Vec::new();
 
@@ -135,9 +106,9 @@ async fn search_google_and_browse_results(search_param: &str) -> Result<Vec<Sear
     }
 
     Ok(results)
-}
+} */
 
-fn get_page_title(html: &str) -> Result<String> {
+/* fn get_page_title(html: &str) -> Result<String> {
     let document = Html::parse_document(html);
     let title_selector = Selector::parse("title").map_err(|e| anyhow!("Selector error: {}", e))?;
     let title = document
@@ -147,4 +118,4 @@ fn get_page_title(html: &str) -> Result<String> {
         .unwrap_or("Aucun titre trouvé")
         .to_string();
     Ok(title)
-}
+} */

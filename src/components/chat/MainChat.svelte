@@ -111,7 +111,7 @@
         chatParams.mode = $settings.request_mode;
         chatParams.models = [$settings.defaultModel];
     });
-    $inspect(chatApiSession);
+
 </script>
 
 {#snippet input()}

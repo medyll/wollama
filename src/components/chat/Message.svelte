@@ -83,7 +83,7 @@
     let order = $derived(`order: ${dd};`);
 </script>
 
-<div style={order} class="{place}   relative flex w-auto gap-1 elative overflow-hidden mb-1">
+<div  class="{place}   relative flex w-auto gap-1 elative overflow-hidden mb-1">
     {#if message.role == 'user'}<div class="p-1">
             <div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
                 <Icon style="font-size:1.6em" {icon} />
@@ -96,11 +96,11 @@
             <div class="soft-title">
                 {#if message?.status == 'streaming'}<Icon style="font-size:1.6em" icon="mdi:reload" class="spin" />{/if}
             </div>
-            <div class="soft-title">{message?.model ?? ''}</div>
+           <!--  <div class="soft-title">{message?.model ?? ''}</div> -->
             <div class="flex-1"></div>
             <div class="soft-title">{message?.status != 'done' ? message?.status : ''}</div>
             <div class="soft-title">{format(new Date(message?.createdAt), 'dd MMMM y hh:mm')}</div>
-            <div class="soft-title">{dd}</div>
+            <!-- <div class="soft-title">{dd}</div> -->
         </div>
         <div style="user-select:all;" class="speech-bubble theme-border preserve-line-breaks">
             {#if message.urls?.length}
