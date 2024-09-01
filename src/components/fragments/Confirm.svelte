@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
 
     interface Props {
 		collection: string;
@@ -45,7 +45,7 @@
     {/if}
 </div>
 
-<style lang="postcss">
+<style lang="scss">
     svg {
         > path {
             color: red !important;

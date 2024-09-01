@@ -1,6 +1,6 @@
 <script lang="ts">
     import { chatParams } from '$lib/states/chat.svelte'; 
-	import Icon from '@iconify/svelte';
+	import {Icon} from '@medyll/idae-slotui-svelte';
 
 	function deleteImage(fileIdx: number) {
 		chatParams.images = undefined;

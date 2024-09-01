@@ -1,7 +1,7 @@
 <script lang="ts">
     import Models from '$components/settings/mdl/Models.svelte';
     import Infos from './mdl/Infos.svelte';
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import { t } from '$lib/stores/i18n.js';
     import General from './mdl/General.svelte';
     import Addons from './mdl/Addons.svelte';

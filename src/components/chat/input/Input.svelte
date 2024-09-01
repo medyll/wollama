@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { timeRetry } from '$lib/stores/timeRetry';
-    import Icon from '@iconify/svelte';
+    import { timeRetry } from '$lib/stores/timeRetry'; 
 
     interface Props {
         value: string;

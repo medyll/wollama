@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { settings } from '$lib/stores/settings.svelte';
-	import Icon from '@iconify/svelte';
+	import {Icon} from '@medyll/idae-slotui-svelte';
 
 	export let activeModels: string[] ;
 

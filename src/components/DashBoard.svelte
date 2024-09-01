@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ui } from '$lib/stores/ui';
-    import Icon from '@iconify/svelte'; 
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import type { Snippet } from 'svelte';
 
     let { showList=$bindable(false),children, home }: { showList:boolean,children: Snippet; home?: Snippet } = $props();

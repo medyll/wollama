@@ -1,13 +1,13 @@
 <script lang="ts">
     import { t } from '$lib/stores/i18n';
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import StatusBar from '../settings/StatusBar.svelte';
     import { ui } from '$lib/stores/ui';
     import { engine } from '$lib/tools/engine'; 
     import { idbQuery } from '$lib/db/dbQuery';
     import { page } from '$app/stores';
 
-    import { getCurrent } from '@tauri-apps/api/window';
+    // import { getCurrent } from '@tauri-apps/api/window';
 
     new Date().getSeconds();
 
@@ -34,8 +34,8 @@
     </div>
     <full />
     <StatusBar />
-    {#if typeof window.__TAURI__ !== 'undefined'}
-        <button
+    {#if typeof window?.__TAURI__ !== 'undefined'}
+        <!-- <button
             on:click={() => {
                 getCurrent().minimize();
             }}
@@ -58,7 +58,7 @@
             class="titlebar-button titlebar-button-close"
             id="titlebar-close">
             <Icon icon="fluent-mdl2:chrome-close" alt="close" />
-        </button>
+        </button> -->
     {/if}
 </div>
 

@@ -1,27 +1,10 @@
 .DS_Store
-# Dependency directories
-node_modules/
-jspm_packages/
-
-# Typescript v1 declaration files
-typings/
-
-# Optional npm cache directory
-.npm
-
-# Optional yarn cache directory
-.yarn
-
+node_modules
 /build
 /.svelte-kit
 /package
-# dotenv environment variables file
 .env
 .env.*
 !.env.example
-
-src-tauri/gen/
-
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-venv
