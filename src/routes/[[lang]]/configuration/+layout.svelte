@@ -3,7 +3,7 @@
 	import Selector from '$components/fragments/Selector.svelte';
 	import { t } from '$lib/stores/i18n';
 	import { engine } from '$lib/tools/engine';
-	import Icon from '@iconify/svelte';
+	import {Icon} from '@medyll/idae-slotui-svelte';
 
 	const tabs = ['ollama', 'model', 'create'];
 

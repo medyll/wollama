@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import type { DBMessage } from '$types/db';
 
     import { marked } from 'marked';

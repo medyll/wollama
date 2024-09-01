@@ -3,7 +3,7 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import { OllamaOptionsDefaults, ollamaOptionsCatalog, ollamaOptionsInfo } from '$configuration/configuration';
 	import List from '$components/fragments/List.svelte';
-	import Icon from '@iconify/svelte';
+	import {Icon} from '@medyll/idae-slotui-svelte';
 	import { OllamaApi } from '$lib/db/ollamaApi';
 	import { notifierState } from '$lib/stores/notifications';
 	import Confirm from '$components/fragments/Confirm.svelte';

@@ -1,11 +1,11 @@
-<svelte:options runes accessors />
+
 
 <script lang="ts">
     import Confirm from '$components/fragments/Confirm.svelte';
     import { idbQuery } from '$lib/db/dbQuery';
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import { Button, Menu, Popper, MenuItem } from '@medyll/idae-slotui-svelte';
 
     import { chatUtils } from '$lib/tools/chatUtils';
@@ -86,7 +86,10 @@
 </div>
 
 <style lang="postcss">
-    .button {
+
+
+    button {
         @apply block w-full text-left flex   items-center px-1 py-1 gap-2 transition whitespace-nowrap text-ellipsis  dark:hover:bg-gray-800;
-    }
+    }  
+
 </style>

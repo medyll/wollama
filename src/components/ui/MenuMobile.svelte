@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ui } from '$lib/stores/ui';
-	import Icon from '@iconify/svelte';
+	import {Icon} from '@medyll/idae-slotui-svelte';
 	import Sidebar from './Sidebar.svelte';
 	import { engine } from '$lib/tools/engine';
 </script>

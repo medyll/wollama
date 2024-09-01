@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { MessageImageType } from '$types/db';
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import { Button } from '@medyll/idae-slotui-svelte';
 
     interface Props {

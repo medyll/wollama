@@ -4,7 +4,7 @@
     import { idbQuery } from '$lib/db/dbQuery';
     import { t } from '$lib/stores/i18n';
     import type { PromptType } from '$types/db.js';
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import { ui } from '$lib/stores/ui';
     import { clickAway } from '$lib/tools/clickAwayt';
     import Frame from '$components/fragments/Frame.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { notifierState } from '$lib/stores/notifications';
-	import Icon from '@iconify/svelte';
+	import {Icon} from '@medyll/idae-slotui-svelte';
 </script>
 
 <div class="gauge tr fixed flex flex-col gap-2 w-96 p-4 z-50">

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { settings } from '$lib/stores/settings.svelte';
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import Selector from '$components/fragments/Selector.svelte';
     import Prompts from '$components/settings/prompts/Prompts.svelte';
     import { t } from '$lib/stores/i18n';
@@ -101,10 +101,8 @@
     {/snippet}
 </ButtonMenu>
 
-<style lang="postcss">
-    .gauge {
-        @apply p-1  shadow shadow-gray-400 dark:shadow-black/80 rounded-md dark:bg-white/5;
-    }
+<style lang="postcss">  
+    
     .button-temp {
         @apply rounded-md;
         @apply p-1 px-2;
@@ -114,4 +112,4 @@
             @apply text-white;
         }
     }
-</style>
+</style> 

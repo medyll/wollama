@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n';
-	import Icon from '@iconify/svelte';
+	import {Icon} from '@medyll/idae-slotui-svelte';
 	import InfoLine from '$components/fragments/InfoLine.svelte';
 	import { settings } from '$lib/stores/settings.svelte';
 	import {translations} from '../../../locales/translations';

@@ -2,7 +2,7 @@
     import { t } from '$lib/stores/i18n';
     import { connectionChecker } from '$lib/stores/connection';
     import { pullModelState } from '$lib/stores';
-    import Icon from '@iconify/svelte';
+    import {Icon} from '@medyll/idae-slotui-svelte';
     import { connectionTimer } from '$lib/stores/timer.svelte';
 
     let printCountDown: boolean;
