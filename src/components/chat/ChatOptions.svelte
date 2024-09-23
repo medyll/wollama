@@ -15,7 +15,8 @@
 
     let component = $ui.showPrompt ? Prompts : undefined;
 
-    let promptList = $derived(idbQuery.getPrompts());
+    // let promptList = $derived(idbQuery.getPrompts());
+    let promptList = idbQuery.getPrompts()
 
     function setTemperature(temperature: number) {
         chatParams.temperature = temperature;

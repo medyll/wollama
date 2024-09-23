@@ -6,7 +6,7 @@
     let { chatId }: { chatId: string } = $props();
 
     let chat = $derived(chatId ? idbQuery.getChat(chatId) : []);
-    let messages = $derived(chatId ? idbQuery.getMessages(chatId) : []);
+    let messages =  $derived(chatId ? idbQuery.getMessages(chatId) : [] )
     let element: HTMLElement;
 
     $effect.pre(() => {
@@ -18,7 +18,7 @@
             });
         }
     });
-    $inspect(chat?.tags);
+
 </script>
 
 <!-- corecteur orthographique -->

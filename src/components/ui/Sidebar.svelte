@@ -23,26 +23,35 @@
     };
 
     const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books') => {
+       
         let goTo;
         switch (link) {
             case 'settings':
                 goTo= `${window.location.origin}/settings`;
+                break;
             case 'chat':
                 goTo= `chat/${link}`;
+                break;
             case 'newChat':
                 goTo= `${window.location.origin}/chat`;
+                break;
             case 'lib':
                 goTo= `${window.location.origin}/lib`;
+                break;
             case 'explore':
                 goTo= `${window.location.origin}/explore`;
+                break;
             default:
                 goTo= `${window.location.origin}/${link}`;
         }
+   
         goto(goTo)
     };
+
 </script>
 
 <div class="application-sideBar" aria-expanded={$settings.menuExpanded}>
+
     <div class="not-expanded">
         <div class="not-expanded line-gap-2 p-4">
             <img alt="logo" class="iconify" width="32" src="/assets/svg/lama.svg" style="transform: scaleX(-1)" />
@@ -55,11 +64,11 @@
     </div>
     <div class="application-sideBar-menu">
         <MenuList tall="kind" class="flex flex-col h-full">
-            <MenuListItem selectable={false} onclick={getChatLink('newChat')} title={$t('ui.newChat')}>
+            <MenuListItem selectable={false} onclick={()=>getChatLink('newChat')} title={$t('ui.newChat')}>
                 <Icon icon="mdi:plus" alt={$t('ui.newChat')} />
                 <span>{$t('ui.newChat')}</span>
             </MenuListItem>
-            <MenuListItem onclick={getChatLink('lib')} title={$t('ui.mylib')}>
+            <MenuListItem selected={$page?.route?.id==='/[[lang]]/lib'}  onclick={()=>getChatLink('lib')} title={$t('ui.mylib')}>
                 <Icon icon="fluent:library-20-filled" alt={$t('ui.mylib')} />
                 <span>{$t('ui.myLib')}</span>
             </MenuListItem>
@@ -67,7 +76,6 @@
                 <ChatList />
             </div>
             <MenuListItem  selectable={false} width="full" title={$t('ui.settings')} onclick={openLibgs}>
-                <span>{$t('ui.expand')}</span>
                 <Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
             </MenuListItem>
             <hr />
@@ -79,7 +87,7 @@
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
             </MenuListItem> -->
-            <MenuListItem title={$t('ui.settings')} onclick={getChatLink('settings')}>
+            <MenuListItem selected={$page?.route?.id==='/[[lang]]/settings'} title={$t('ui.settings')} onclick={()=>getChatLink('settings')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
             </MenuListItem>

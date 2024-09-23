@@ -13,7 +13,7 @@
     import { chatMetadata } from '$lib/tools/promptSystem';
 
     let loadingStae = $state<Record<string, any>>({});
-    let chatList = $derived(idbqlState.chat.getAll());
+    let chatList = idbqlState.chat.getAll();
     let chatMenuList = $derived(groupMessages(chatList));
 
     const openCloseConfig = async () => {
@@ -86,17 +86,6 @@
                         <!-- {item.tags} -->
                         <div class="p-2" style="content-visibility:auto">
                             <div class="flex gap-2">
-                                <div>- category : {item?.category}</div>
-                                <div class="flex gap-2">
-                                    <Icon icon="fluent:clock-16-regular" />
-                                    {item?.createdAt ? format(new Date(item?.createdAt), 'dd MMMM y hh:mm') : ''}
-                                </div>
-                                <div class="flex gap-2">
-                                    <div>tags</div>
-                                    {item.tags}
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
                                 <div class="line-clamp-1 break-all transition duration-300 font-bold py-2 flex-1">
                                     <a title={item?.title} href={`/chat/${item.chatId}`}>{item?.title}</a>
                                 </div>
@@ -108,12 +97,14 @@
                                         secondary="guess"
                                         data={item.chatId as string}
                                         action={guess}
-                                        tall="mini" />
+                                        tall="mini"
+                                        variant="naked" />
                                     <Confirm
                                         primaryInitial={$t('chat.delete_chat')}
                                         primaryConfirm={$t('chat.delete_chat')}
                                         iconInitial="mdi:trash"
                                         tall="mini"
+                                        variant="naked" 
                                         value="delete"
                                         data={item.chatId as string}
                                         action={deleteCha1tHandler} />
@@ -122,6 +113,7 @@
                                         primaryConfirm={$t('chat.categorize')} 
                                         iconInitial="mdi:trash"
                                         tall="mini"
+                                        variant="naked" 
                                         value="categorize"
                                         data={item.chatId as string}
                                         action={categorize} />
@@ -130,6 +122,7 @@
                                         primaryConfirm={$t('chat.describe')}
                                         iconInitial="mdi:trash"
                                         tall="mini"
+                                        variant="naked" 
                                         value="describe"
                                         data={item.chatId as string}
                                         action={describe} />
@@ -138,9 +131,21 @@
                                         primaryConfirm={$t('chat.tags')}
                                         iconInitial="mdi:tags"
                                         tall="mini"
+                                        variant="naked" 
                                         value="tags"
                                         data={item.chatId as string}
                                         action={describe} />
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <div>- category : {item?.category}</div>
+                                <div class="flex gap-2">
+                                    <Icon icon="fluent:clock-16-regular" />
+                                    {item?.createdAt ? format(new Date(item?.createdAt), 'dd MMMM y hh:mm') : ''}
+                                </div>
+                                <div class="flex gap-2">
+                                    <div>tags</div>
+                                    {item.tags}
                                 </div>
                             </div>
                             <div class="text-ellipsis overflow-hidden" style="user-select:text">

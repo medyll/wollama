@@ -6,6 +6,7 @@
     import { ui } from '$lib/stores/ui';
     import { engine } from '$lib/tools/engine';
     import { idbqlState } from '$lib/db/dbSchema';
+  import { page } from '$app/stores';
 
     const loadChat = async (id: string) => {
         ui.showHideMenu(false);
@@ -15,7 +16,7 @@
     let chatMenuList = $derived(groupMessages(idbqlState.chat.getAll()));
  
 </script>
-
+ 
 <MenuList style="width:100%" selectorField="code" data={chatMenuList ?? []}>
     {#snippet children({ item, itemIndex })}
         <ListTitle class="soft-title">
@@ -23,10 +24,10 @@
         </ListTitle>
         <MenuList tall="mini" style="width:100%;" data={item?.items ?? []}>
             {#snippet children({ item })} 
-                <MenuListItem selected={item.chatId === $ui.activeChatId} data={item}>
+                <MenuListItem selected={item.chatId === $page?.params?.id} data={item}>
                     <ChatMenuItem
                         chatId={item.chatId}
-                        selected={item.chatId === $ui.activeChatId}
+                        selected={item.chatId === $page?.params?.id}
                         on:click={() => {
                             loadChat(item.chatId);
                         }} />
