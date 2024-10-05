@@ -15,6 +15,7 @@
 
 </script>
 
+<div style="padding: 1rem">
 <InfoLine title={$t('settings.lang')}>
 	<div class="flex-align-middle gap-4">
 		<Selector values={Object.keys(translations)} value={$settings.locale} let:item let:active>
@@ -39,3 +40,4 @@
 		settings.setSetting('authHeader', !$settings.authHeader)
 	}} checked={$settings.authHeader}  />  
 </InfoLine>
+</div>

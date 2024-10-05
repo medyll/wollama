@@ -1,7 +1,7 @@
 <script lang="ts">
     import { t } from '$lib/stores/i18n.js';
     import { page } from '$app/stores';
-    import { getTimeTitle } from '$lib/tools/chatMenuList.svelte.js';
+    import { getDatePeriod, getTimeTitle } from '$lib/tools/chatMenuList.svelte.js';
     import { format } from 'date-fns';
     import { ui } from '$lib/stores/ui.js';
     import { engine } from '$lib/tools/engine';
@@ -71,80 +71,85 @@
             {$t('ui.threads')}
         </div>
         <div class=" flex-1 gap-4">
-            <Button width="auto" icon="mdi:chat-plus-outline" title={$t('ui.newChat')} onclick={createChat}>
+            <Button variant="naked" width="auto" icon="mdi:chat-plus-outline" title={$t('ui.newChat')} onclick={createChat}>
                 {$t('ui.newChat')}
             </Button>
         </div>
     </div>
     <div class="flex flex-col gap-4">
-        <Looper data={chatMenuList}>
-            {#snippet children({ item })}
-                <div class="text-lg">{$t(getTimeTitle(item?.code))}</div> 
-                <Looper data={item?.items} class="flex flex-col gap-4  ">
+       <Looper groupBy={(item) => {return getDatePeriod(new Date(item?.createdAt))}} data={chatList} class="flex flex-col gap-5  ">
+                    {#snippet loopGroupTitle(item)} 
+                        <div class="text-lg ">{item?.data?.title}</div>
+                    {/snippet}
                     {#snippet children({ item })}
-                        <hr />
                         <!-- {item.tags} -->
-                        <div class="p-2" style="content-visibility:auto">
-                            <div class="flex gap-2">
+                        <div class="flex flex-v gap-4" style="content-visibility:auto">
+                            <div class="flex gap-4">
                                 <div class="line-clamp-1 break-all transition duration-300 font-bold py-2 flex-1">
-                                    <a title={item?.title} href={`/chat/${item.chatId}`}>{item?.title}</a>
+                                    <a class="uppercase" title={item?.title} href={`/chat/${item.chatId}`}>- {item?.title}</a>
                                 </div>
                                 <div class="flex flex-1 gap-2">
-                                    <Confirm
-                                        primaryInitial={$t('chat.guess_chat_title')}
-                                        primaryConfirm={$t('chat.guess_chat_title')}
-                                        iconInitial="question-mark"
-                                        secondary="guess"
+                                    <Confirm 
+                                        title={$t('chat.guess_chat_title')}
+                                        primaryConfirm={$t('chat.guess_chat_title')} 
+                                        buttonInitial={
+                                            {icon:{icon:'material-symbols-light:title'}}
+                                        }  
                                         data={item.chatId as string}
                                         action={guess}
                                         tall="mini"
                                         variant="naked" />
                                     <Confirm
-                                        primaryInitial={$t('chat.delete_chat')}
-                                        primaryConfirm={$t('chat.delete_chat')}
-                                        iconInitial="mdi:trash"
-                                        tall="mini"
-                                        variant="naked" 
-                                        value="delete"
-                                        data={item.chatId as string}
-                                        action={deleteCha1tHandler} />
-                                    <Confirm
-                                        primaryInitial={$t('chat.categorize')}
+                                        title={$t('chat.categorize')}
                                         primaryConfirm={$t('chat.categorize')} 
-                                        iconInitial="mdi:trash"
+                                        buttonInitial={
+                                            {icon:{icon:'icon-park-outline:folder-one'}}
+                                        }  
                                         tall="mini"
-                                        variant="naked" 
-                                        value="categorize"
+                                        variant="naked"  
                                         data={item.chatId as string}
                                         action={categorize} />
                                     <Confirm
-                                        primaryInitial={$t('chat.describe')}
-                                        primaryConfirm={$t('chat.describe')}
-                                        iconInitial="mdi:trash"
+                                        title={$t('chat.describe')}
+                                        primaryConfirm={$t('chat.describe')} 
+                                        buttonInitial={
+                                            {icon:{icon:'fluent-mdl2:edit-note'}}
+                                        }  
                                         tall="mini"
-                                        variant="naked" 
-                                        value="describe"
+                                        variant="naked"  
                                         data={item.chatId as string}
                                         action={describe} />
                                     <Confirm
-                                        primaryInitial={$t('chat.tags')}
+                                        title={$t('chat.tags')}
                                         primaryConfirm={$t('chat.tags')}
-                                        iconInitial="mdi:tags"
+                                        buttonInitial={
+                                            {icon:{icon:'mdi:tags'}}
+                                        }   
                                         tall="mini"
-                                        variant="naked" 
-                                        value="tags"
+                                        variant="naked"  
                                         data={item.chatId as string}
                                         action={describe} />
+                                    <Confirm
+                                        title={$t('chat.delete_chat')}
+                                        primaryConfirm={$t('chat.delete_chat')}
+                                        buttonInitial={
+                                            {icon:{icon:'material-symbols:delete-outline-sharp',color:'red'}}
+                                        } 
+                                        tall="mini"
+                                        variant="naked"  
+                                        data={item.chatId as string}
+                                        action={deleteCha1tHandler} />
                                 </div>
                             </div>
-                            <div class="flex gap-2">
-                                <div>- category : {item?.category}</div>
+                            <div class="flex gap-4">
                                 <div class="flex gap-2">
                                     <Icon icon="fluent:clock-16-regular" />
                                     {item?.createdAt ? format(new Date(item?.createdAt), 'dd MMMM y hh:mm') : ''}
                                 </div>
+                                 <div class="flex gap-2">
+                                    <Icon icon="icon-park-outline:folder-one" />{item?.category}</div>
                                 <div class="flex gap-2">
-                                    <div>tags</div>
+                                    <Icon icon="hugeicons:tags" /> 
                                     {item.tags}
                                 </div>
                             </div>
@@ -154,7 +159,5 @@
                         </div>
                     {/snippet}
                 </Looper>
-            {/snippet}
-        </Looper>
     </div>
 </div>

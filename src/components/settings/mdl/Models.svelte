@@ -40,7 +40,7 @@
 			});
 	}
 </script>
-
+<div style="padding: 1rem">
 <InfoLine title={$t('settings.default_model')}>
 	<select class="w-full" bind:value={$settings.defaultModel}>
 		<option>{$t('settings.default_model')}</option>
@@ -85,3 +85,4 @@
 		</div>
 	</List>
 </InfoLine>
+</div>

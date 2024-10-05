@@ -27,7 +27,7 @@
 <div class="flex w-full settings p-4 px-8">
     <div class="flex flex-col gap-4 w-348">
         <div class="soft-title">{$t(`settings.general`)}</div>
-        <Cartouche tall="kind"  isOpen={false}  icon={{ icon: 'mdi:wrench' }} primary={'general'}>
+        <Cartouche class="pad" tall="kind"  isOpen={false}  icon={{ icon: 'mdi:wrench' }} primary={'general'}>
             <General />
         </Cartouche>
         <Cartouche tall="kind"  isOpen={false}   icon={{ icon: 'mdi:wrench' }} primary={'addons'}>

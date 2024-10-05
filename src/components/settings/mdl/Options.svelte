@@ -28,7 +28,7 @@
 <div class="soft-title p-2 py-4">
 	{$t('settings.server_url')}
 </div>
-
+<div style="padding: 1rem">
 <form
 	on:submit|preventDefault={(e) => {
 		setEndPoint(ollama_server);
@@ -98,3 +98,4 @@
 	<hr />
 </List>
 
+</div>

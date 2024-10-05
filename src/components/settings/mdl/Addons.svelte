@@ -4,6 +4,7 @@
 	import { settings } from '$lib/stores/settings.svelte';
 </script>
 
+<div style="padding: 1rem">
 <InfoLine title={$t('settings.title_auto')}>
 	<button
 		on:click={() => {
@@ -21,3 +22,4 @@
 <InfoLine title={$t('settings.avatar')} vertical>
 	<input type="text" class="w-full" bind:value={$settings.avatar_email} placeholder={$t('settings.avatar_email')} />
 </InfoLine>
+</div>

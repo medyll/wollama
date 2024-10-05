@@ -59,11 +59,11 @@
             <full />
         </div>
         <div class="px-2 w-full">
-            <input class="w-full" type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
+            <input class="w-full input" type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
         </div>
     </div>
     <div class="application-sideBar-menu">
-        <MenuList tall="kind" class="flex flex-col h-full">
+        <MenuList tall="med" class="flex flex-col h-full">
             <MenuListItem selectable={false} onclick={()=>getChatLink('newChat')} title={$t('ui.newChat')}>
                 <Icon icon="mdi:plus" alt={$t('ui.newChat')} />
                 <span>{$t('ui.newChat')}</span>

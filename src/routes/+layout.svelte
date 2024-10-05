@@ -23,6 +23,8 @@
     import { connectionTimer } from '$lib/stores/timer.svelte';
     import { notifierState } from '$lib/stores/notifications';
     import { cssDom } from '@medyll/idae-dom-events';
+
+    
     let { children } = $props();
 
     let initiated: boolean = $state(false);

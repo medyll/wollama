@@ -147,6 +147,17 @@
 @layer components {
     /* inputs */
     .application {
+        input,
+        .input,
+        input[type='search'],
+        input[type='submit'],
+        input[type='reset'],
+        input[type='number'],
+        input[type='text']
+          {
+            min-height: 2.5rem;
+            padding: 0.5rem!important; 
+        }
         .input,
         input[type='search'],
         input[type='submit'],
