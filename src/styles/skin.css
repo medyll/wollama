@@ -3,14 +3,34 @@
 @tailwind base;
 
 @layer base {
+
+ 
   :popover-open { 
     width: 200px;
     position: absolute;
     inset: unset;
     margin: 0;
     color: var(--cfab-foreground);
-    background-color: var(--cfab-bg);
+    background-color: var(--cfab-bg); 
   }
+
+.anchor {
+	anchor-name: --myAnchor;
+	display: inline-flex;  
+}
+
+.popover {
+	position-anchor: --myAnchor;
+	position: fixed;
+	left: anchor(left);
+	bottom: anchor(top);  
+	padding: 10px;
+	z-index:9000;
+	width: auto;
+	text-align:left;  
+    box-shadow: 0 0.5em 1em -0.125em #0a0a0a1a, 0 0 0 1px #0a0a0a05; /* Light shadow for depth */
+    @apply drop-shadow-xl;
+}
 
   .theme-gradient-from {
     background-color: var(--cfab-gradient-from);

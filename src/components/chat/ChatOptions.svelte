@@ -45,7 +45,7 @@
     {chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}
 </button>
 <div popover class="popover " id="popover" style="position-anchor : --anchor;"> 
-    <div class="flex-col flex gap-1">
+    <div class="flex-col flex gap-1  ">
         {#each promptList as prompt}
         <button value={prompt.name} onclick={() => chatParamsState.promptSystem = prompt} >{prompt.name}</button>  
         {/each}
@@ -74,19 +74,5 @@
         }
     } 
 
-.anchor {
-	anchor-name: --myAnchor;
-	display: inline-flex;  
-}
 
-.popover {
-	position-anchor: --myAnchor;
-	position: fixed;
-	left: anchor(left);
-	bottom: anchor(top);  
-	padding: 10px;
-	z-index:9000;
-	width: auto;
-	text-align:left;
-}
 </style>

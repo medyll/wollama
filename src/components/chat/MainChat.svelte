@@ -12,7 +12,7 @@
     import Images from './input/Images.svelte'; 
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import { chatParamsState, type ChatGenerate } from '$lib/states/chat.svelte';
-    import {   Icon, IconButton } from '@medyll/idae-slotui-svelte';
+    import {   Icon,   } from '@medyll/idae-slotui-svelte';
     import MessagesList from './MessagesList.svelte';
     import { chatMetadata } from '$lib/tools/promptSystem'; 
     import AgentPick from '$components/agents/AgentPick.svelte';
@@ -119,14 +119,14 @@
 {#snippet input()}
     <div class="chatZone">
     <div class=" ">
-        <div class="inputTextarea flex flex-col gap-3 px-3 pt-3 flex-1 ">
+        <div class="inputTextarea flex flex-col gap-3 px-3 pt-3 flex-1  ">
                 <!-- <Images />
                 <hr /> -->
                 <div class="flex justify-center absolute -top-10 left-0 w-full">
                     <Speech onEnd={submitHandler} bind:prompt={chatParamsState.prompt} bind:voiceListening={chatParamsState.voiceListening} />
                 </div>
                 <!-- <hr /> -->
-                <div class="flex-1  ">
+                <div class="flex-1   relative  ">
                 <Input
                     disabled={!connectionTimer.connected}
                     onkeypress={keyPressHandler}
@@ -134,20 +134,22 @@
                     bind:requestStop={$aiState}
                     {placeholder}
                     form="prompt-form" />
+                    <div class="absolute right-3 h-10  w-10 top-[50%] -mt-5 border-4   rounded-full place-content-center flex flex-col">
+                        {#if $aiState == 'done'}
+                            <button   class="rounded-full border block btn  border-5 flex place-content-center "     type="submit" form="prompt-form" disabled={disableSubmit} >
+                                <Icon icon="mdi:send"   />                   
+                            </button>
+                        {:else}
+                            <button   class="rounded-full border  border-1"    form="prompt-form" >
+                                <Icon icon="mdi:stop" />
+                            </button>
+                        {/if}                    
+                    </div>
                     <!-- <hr /> -->
                 </div>
                 <div class="flex  ">
                     <ChatOptions />
                     <div class="flex-1"></div>
-                    {#if $aiState == 'done'}
-                        <button   class="rounded-full border  border-5"     type="submit" form="prompt-form" disabled={disableSubmit} >
-                            <Icon icon="mdi:send" />                    
-                        </button>
-                    {:else}
-                        <button   class="rounded-full border  border-1"    form="prompt-form" >
-                            <Icon icon="mdi:stop" />
-                        </button>
-                    {/if}
                 </div>
             </div>
         </div>        

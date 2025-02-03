@@ -34,19 +34,13 @@
 		<div class="line-gap-2 border-b">
 			<div class="flex-1">
 				<button class="anchor" popovertarget="popover-{index}"  style="anchor-name: --anchor-{index};" >{chatParamsState?.models}</button>
-				<!-- <input id="model-{index}" type="text" value=""   list="model-options-{index}"    oninput={changeHandler(index)} />			 
-				<select id="model-options-{index}">
-					{#each filteredOptions as model}
-						<option value={model.name} />
-					{/each}
-				</select> -->
-				<div popover class="popover " id="popover-{index}" style="position-anchor : --anchor-{index};"> 
-				<div class="flex-col flex gap-1">
-				
-					{#each filteredOptions as model}
-						<button  onclick={changeHandler(index)}  value={model.name} >{model.name}</button>  
-					{/each}
-				</div>
+			 	<div popover class="popover " id="popover-{index}" style="position-anchor : --anchor-{index};"> 
+					<div class="flex-col flex gap-1">
+					
+						{#each filteredOptions as model}
+							<button  onclick={changeHandler(index)}  value={model.name} >{model.name}</button>  
+						{/each}
+					</div>
 				</div>
 			</div>
 			<!-- <div class="line-gap-2">
@@ -64,28 +58,4 @@
 			</div> -->
 		</div>
 	{/each}
-</div>
-<style>
-:popover-open {
-	width: 200px; 
-	position: absolute;
-	inset: unset; 
-	margin: 0; 
-}
-.anchor {
-	anchor-name: --myAnchor;
-	display: inline-block;  
-}
-
-.popover {
-	position-anchor: --myAnchor;
-	position: fixed;
-	left: anchor(left);
-	bottom: anchor(top);  
-	padding: 10px;
-	z-index:9000;
-	width: auto;
-	text-align:left;
-}
- 
-</style>
+</div> 
