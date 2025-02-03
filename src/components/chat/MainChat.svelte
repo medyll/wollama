@@ -173,10 +173,12 @@ hr {
     margin: 0;
 }
     .chatZone {
-        @apply flex flex-col w-full sticky mb-0 bottom-0 px-8;
-        /* background-image: var(--cfab-gradient);
+        @apply flex flex-col   w-full sticky mb-0 bottom-0 px-8;
+       /*  background-image: var(--cfab-gradient); */
         background-size: 100vh 100vw;
-        background-position: bottom; */
+        background-position: bottom; 
+        color: var(--cfab-foreground);
+    background-color: var(--cfab-bg);
     }
     .inputTextarea { 
         position: relative; 

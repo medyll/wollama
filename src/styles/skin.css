@@ -3,6 +3,15 @@
 @tailwind base;
 
 @layer base {
+  :popover-open { 
+    width: 200px;
+    position: absolute;
+    inset: unset;
+    margin: 0;
+    color: var(--cfab-foreground);
+    background-color: var(--cfab-bg);
+  }
+
   .theme-gradient-from {
     background-color: var(--cfab-gradient-from);
   }

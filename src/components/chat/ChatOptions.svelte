@@ -41,82 +41,26 @@
     {/each}
 </datalist>
 <button class="anchor flex gap-1" popovertarget="popover"  style="anchor-name: --anchor;" >
-<Icon icon="material-symbols-light:post-add-sharp" />
-{chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}</button>
+    <Icon icon="material-symbols-light:post-add-sharp" />
+    {chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}
+</button>
 <div popover class="popover " id="popover" style="position-anchor : --anchor;"> 
     <div class="flex-col flex gap-1">
         {#each promptList as prompt}
         <button value={prompt.name} onclick={() => chatParamsState.promptSystem = prompt} >{prompt.name}</button>  
         {/each}
     </div>
-</div>
-<!-- <ButtonMenu
-    tall="mini"
-    width="auto"
-    icon="material-symbols-light:post-add-sharp"
-    value={chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}
-    popperProps={{ stickToHookWidth: true, position: 'BL', flow: 'fixed', autoClose: true }}
-    variant="naked"
-    menuProps={{
-        data: promptList,
-        grid: 3,
-        listItemBottom: listItemBottom,
-        onclick: (event) => {
-            chatParamsState.promptSystem = event;
-        },
-    }}>
-    {#snippet menuItem({ item })}
-        <MenuListItem data={item}>
-            {item?.name}
-        </MenuListItem>
-    {/snippet}
-</ButtonMenu> -->
-<Attachment form="prompt-form" bind:imageFile={chatParamsState.images} disabled={false} />
-<ButtonMenu popperProps={{ stickToHookWidth: true, position: 'TC', flow: 'fixed' }} tall="tiny" width="auto" variant="naked">
-    <div class="flex-h flex-align-middle gap-2">
-        <Icon icon="mdi:temperature" />
-        {chatParamsState?.temperature}
-        <Icon icon="bx:brain" />
+</div> 
+<Attachment form="prompt-form" bind:imageFile={chatParamsState.images} disabled={false} /> 
+<div class="flex-h flex-align-middle gap-2">
+    <Icon icon="mdi:temperature" />
+    {chatParamsState?.temperature}
+    <Icon icon="bx:brain" />
     <Model bind:activeModels={chatParamsState.models} />
-        <!-- {chatParamsState?.models}
-        <Icon icon="charm:binary" />
-        {chatParamsState?.format} -->
-        
-    </div>
-    {#snippet menuItem({ item })}
-        <!-- <table cellpadding="4">
-            <tbody>
-                <tr>
-                    <td>model</td>
-                    <td><Model bind:activeModels={chatParams.models} /></td>
-                </tr>
-                <tr>
-                    <td>temperature</td>
-                    <td
-                        >{#each Object.keys($settings.temperatures ?? {}) as temperature}
-                            {@const active = chatParams?.temperature == $settings.temperatures[temperature]}
-                            <button
-                                onclick={() => {
-                                    setTemperature($settings.temperatures[temperature]);
-                                }}
-                                class:active
-                                class="button-temp">{temperature}</button>
-                        {/each}</td>
-                </tr>
-                <tr>
-                    <td>mode</td>
-                    <td
-                        ><div class="line-gap-2 flex-1">
-                            <Icon icon="charm:binary" class="sm" />
-                            <Selector values={['json', 'plain']} value={chatParams.format} let:item>
-                                <button onclick={() => setRequestMode(item)}>{item}</button>
-                            </Selector>
-                        </div></td>
-                </tr>
-            </tbody>
-        </table> -->
-    {/snippet}
-</ButtonMenu>
+    <!-- {chatParamsState?.models}
+    <Icon icon="charm:binary" />
+    {chatParamsState?.format} -->    
+</div>  
 
 <style lang="postcss">  
     
@@ -129,12 +73,7 @@
             @apply text-white;
         }
     } 
-    :popover-open {
-	width: 200px; 
-	position: absolute;
-	inset: unset; 
-	margin: 0; 
-}
+
 .anchor {
 	anchor-name: --myAnchor;
 	display: inline-flex;  
