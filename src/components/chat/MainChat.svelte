@@ -11,7 +11,7 @@
     import DashBoard from '$components/DashBoard.svelte';
     import Images from './input/Images.svelte'; 
     import { ChatApiSession } from '$lib/tools/chatApiSession';
-    import { chatParams, type ChatGenerate } from '$lib/states/chat.svelte';
+    import { chatParamsState, type ChatGenerate } from '$lib/states/chat.svelte';
     import {   IconButton } from '@medyll/idae-slotui-svelte';
     import MessagesList from './MessagesList.svelte';
     import { chatMetadata } from '$lib/tools/promptSystem'; 
@@ -29,9 +29,9 @@
 
     chatApiSession.initChat(activeChatId);
 
-    let placeholder: string = $derived(chatParams.voiceListening ? 'Listening...' : 'Message to ai');
+    let placeholder: string = $derived(chatParamsState.voiceListening ? 'Listening...' : 'Message to ai');
 
-    let disableSubmit: boolean = $derived(chatParams.prompt.trim() == '' || chatParams.isPrompting || $aiState == 'running');
+    let disableSubmit: boolean = $derived(chatParamsState.prompt.trim() == '' || chatParamsState.isPrompting || $aiState == 'running');
 
     async function sendPrompt(chatSession: ChatApiSession, chatParams: ChatGenerate) {
         //
@@ -102,16 +102,16 @@
     function keyPressHandler(e: KeyboardEvent) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            submitHandler(activeChatId, $state.snapshot(chatParams));
-            chatParams.images = undefined;
-            chatParams.prompt = '';
+            submitHandler(activeChatId, $state.snapshot(chatParamsState));
+            chatParamsState.images = undefined;
+            chatParamsState.prompt = '';
         }
     }
 
     // retrieve model, temperature, format
     $effect(() => {
-        chatParams.mode = $settings.request_mode;
-        chatParams.models = [$settings.defaultModel];
+        chatParamsState.mode = $settings.request_mode;
+        chatParamsState.models = [$settings.defaultModel];
     });
 
 </script>
@@ -121,12 +121,12 @@
         <div class="input inputTextarea">
             <Images />
             <div class="flex justify-center absolute -top-10 left-0 w-full">
-                <Speech onEnd={submitHandler} bind:prompt={chatParams.prompt} bind:voiceListening={chatParams.voiceListening} />
+                <Speech onEnd={submitHandler} bind:prompt={chatParamsState.prompt} bind:voiceListening={chatParamsState.voiceListening} />
             </div>
             <Input
                 disabled={!connectionTimer.connected}
                 onkeypress={keyPressHandler}
-                bind:value={chatParams.prompt}
+                bind:value={chatParamsState.prompt}
                 bind:requestStop={$aiState}
                 {placeholder}
                 form="prompt-form" />

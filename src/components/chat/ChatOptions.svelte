@@ -5,7 +5,7 @@
     import Prompts from '$components/settings/prompts/Prompts.svelte';
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
-    import { chatParams } from '$lib/states/chat.svelte';
+    import { chatParamsState } from '$lib/states/chat.svelte';
     import Model from './input/Model.svelte';
     import { Button, ButtonMenu, MenuListItem, Popper } from '@medyll/idae-slotui-svelte';
     import Attachment from './input/Attachment.svelte';
@@ -19,11 +19,11 @@
     let promptList = idbQuery.getPrompts()
 
     function setTemperature(temperature: number) {
-        chatParams.temperature = temperature;
+        chatParamsState.temperature = temperature;
     }
 
     function setRequestMode(format: 'json' | 'plain') {
-        chatParams.format = format;
+        chatParamsState.format = format;
     }
 
     let showHide = $state(false);
@@ -35,12 +35,16 @@
          {$t('prompt.createPrompt')}
     </MenuListItem>
 {/snippet}
-
+<datalist id="prompt-list">
+    {#each promptList as prompt}
+        <option value={prompt.name} />        
+    {/each}
+</datalist>
 <ButtonMenu
     tall="mini"
     width="auto"
     icon="material-symbols-light:post-add-sharp"
-    value={chatParams.promptSystem?.code ?? $t('prompt.systemPrompt')}
+    value={chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}
     popperProps={{ stickToHookWidth: true, position: 'TL', flow: 'fixed', autoClose: true }}
     variant="naked"
     menuProps={{
@@ -48,7 +52,7 @@
         grid: 3,
         listItemBottom: listItemBottom,
         onclick: (event) => {
-            chatParams.promptSystem = event;
+            chatParamsState.promptSystem = event;
         },
     }}>
     {#snippet menuItem({ item })}
@@ -57,18 +61,20 @@
         </MenuListItem>
     {/snippet}
 </ButtonMenu>
-<Attachment form="prompt-form" bind:imageFile={chatParams.images} disabled={false} />
+<Attachment form="prompt-form" bind:imageFile={chatParamsState.images} disabled={false} />
 <ButtonMenu popperProps={{ stickToHookWidth: true, position: 'TC', flow: 'fixed' }} tall="tiny" width="auto" variant="naked">
     <div class="flex-h flex-align-middle gap-2">
         <Icon icon="mdi:temperature" />
-        {chatParams?.temperature}
+        {chatParamsState?.temperature}
         <Icon icon="bx:brain" />
-        {chatParams?.models}
+    <Model bind:activeModels={chatParamsState.models} />
+        <!-- {chatParamsState?.models}
         <Icon icon="charm:binary" />
-        {chatParams?.format}
+        {chatParamsState?.format} -->
+        
     </div>
     {#snippet menuItem({ item })}
-        <table cellpadding="4">
+        <!-- <table cellpadding="4">
             <tbody>
                 <tr>
                     <td>model</td>
@@ -98,7 +104,7 @@
                         </div></td>
                 </tr>
             </tbody>
-        </table>
+        </table> -->
     {/snippet}
 </ButtonMenu>
 
@@ -112,5 +118,5 @@
             @apply opacity-100 bg-gradient-to-tl from-gray-600 to-gray-800 shadow shadow-gray-950;
             @apply text-white;
         }
-    }
-</style> 
+    } 
+</style>
