@@ -29,8 +29,7 @@
 	{#each appModels as modelKey, index (index)} 
 		{@const showAdd = index === activeModels.length - 1}
 		{@const showRemove = index === 0}
-		{@const filteredOptions = ($settings?.ollamaModels ?? []).filter((model) => model.name === modelKey || !appModels.includes(model.name))}
-		 
+		{@const filteredOptions = ($settings?.ollamaModels ?? []).filter((model) => model.name === modelKey || !appModels.includes(model.name))}		 
 
 		<div class="line-gap-2 border-b">
 			<div class="flex-1">

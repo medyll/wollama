@@ -12,7 +12,7 @@
     import Images from './input/Images.svelte'; 
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import { chatParamsState, type ChatGenerate } from '$lib/states/chat.svelte';
-    import {   IconButton } from '@medyll/idae-slotui-svelte';
+    import {   Icon, IconButton } from '@medyll/idae-slotui-svelte';
     import MessagesList from './MessagesList.svelte';
     import { chatMetadata } from '$lib/tools/promptSystem'; 
     import AgentPick from '$components/agents/AgentPick.svelte';
@@ -130,13 +130,17 @@
                 bind:requestStop={$aiState}
                 {placeholder}
                 form="prompt-form" />
-            <div class="flex">
+            <div class="flex p-2">
                 <ChatOptions />
                 <div class="flex-1"></div>
                 {#if $aiState == 'done'}
-                    <IconButton rounded={true} width="tiny" icon="mdi:send" type="submit" form="prompt-form" disabled={disableSubmit} />
+                    <button   class="rounded-full border-1"     type="submit" form="prompt-form" disabled={disableSubmit} >
+                        <Icon icon="mdi:send" />                    
+                    </button>
                 {:else}
-                    <IconButton width="tiny" icon="mdi:stop" form="prompt-form" />
+                    <button   class="rounded-full border-1"    form="prompt-form" >
+                        <Icon icon="mdi:stop" />
+                    </button>
                 {/if}
             </div>
         </div>
