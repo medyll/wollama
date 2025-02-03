@@ -118,32 +118,39 @@
 
 {#snippet input()}
     <div class="chatZone">
-        <div class="input inputTextarea">
-            <Images />
-            <div class="flex justify-center absolute -top-10 left-0 w-full">
-                <Speech onEnd={submitHandler} bind:prompt={chatParamsState.prompt} bind:voiceListening={chatParamsState.voiceListening} />
+    <div class=" ">
+        <div class="inputTextarea flex flex-col gap-3 px-3 pt-3 flex-1 ">
+                <!-- <Images />
+                <hr /> -->
+                <div class="flex justify-center absolute -top-10 left-0 w-full">
+                    <Speech onEnd={submitHandler} bind:prompt={chatParamsState.prompt} bind:voiceListening={chatParamsState.voiceListening} />
+                </div>
+                <!-- <hr /> -->
+                <div class="flex-1  ">
+                <Input
+                    disabled={!connectionTimer.connected}
+                    onkeypress={keyPressHandler}
+                    bind:value={chatParamsState.prompt}
+                    bind:requestStop={$aiState}
+                    {placeholder}
+                    form="prompt-form" />
+                    <!-- <hr /> -->
+                </div>
+                <div class="flex  ">
+                    <ChatOptions />
+                    <div class="flex-1"></div>
+                    {#if $aiState == 'done'}
+                        <button   class="rounded-full border  border-5"     type="submit" form="prompt-form" disabled={disableSubmit} >
+                            <Icon icon="mdi:send" />                    
+                        </button>
+                    {:else}
+                        <button   class="rounded-full border  border-1"    form="prompt-form" >
+                            <Icon icon="mdi:stop" />
+                        </button>
+                    {/if}
+                </div>
             </div>
-            <Input
-                disabled={!connectionTimer.connected}
-                onkeypress={keyPressHandler}
-                bind:value={chatParamsState.prompt}
-                bind:requestStop={$aiState}
-                {placeholder}
-                form="prompt-form" />
-            <div class="flex p-2">
-                <ChatOptions />
-                <div class="flex-1"></div>
-                {#if $aiState == 'done'}
-                    <button   class="rounded-full border-1"     type="submit" form="prompt-form" disabled={disableSubmit} >
-                        <Icon icon="mdi:send" />                    
-                    </button>
-                {:else}
-                    <button   class="rounded-full border-1"    form="prompt-form" >
-                        <Icon icon="mdi:stop" />
-                    </button>
-                {/if}
-            </div>
-        </div>
+        </div>        
         <div class="text-xs text-center theme-bg p-2">{$t('ui.aiCautionMessage')}</div>
     </div>
 {/snippet}
@@ -162,16 +169,17 @@
 </div>
 
 <style lang="postcss" global>
+hr {
+    margin: 0;
+}
     .chatZone {
         @apply flex flex-col w-full sticky mb-0 bottom-0 px-8;
         /* background-image: var(--cfab-gradient);
         background-size: 100vh 100vw;
         background-position: bottom; */
     }
-    .inputTextarea {
-        display: block;
-        position: relative;
-        padding: 00.5rem;
+    .inputTextarea { 
+        position: relative; 
         &:has(textarea:focus) {
             border-color: var(--cfab-input-border-color-focus, red);
             border-radius: 0.5em;
