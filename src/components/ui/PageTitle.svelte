@@ -1,14 +1,14 @@
 <script lang="ts">
     import { t } from "$lib/stores/i18n";
-    import { Icon, type Props } from "@medyll/idae-slotui-svelte";
+    import { Icon,   } from "@medyll/idae-slotui-svelte";
 
-interface Props {
+interface PageTitleProps {
     title: string;
     addTitle?: string;
     icon: string;
 }
 
-    let {title,icon,addTitle}:Props = $props();
+    let {title,icon,addTitle}:PageTitleProps = $props();
 
 </script>
 <div class="flex-align-middle justify-between px-5 py-4 gap-4">

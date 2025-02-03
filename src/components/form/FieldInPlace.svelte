@@ -1,7 +1,7 @@
 <script lang="ts">
     import {Icon} from '@medyll/idae-slotui-svelte';
 
-    interface Props {
+    interface FieldInPProps {
 		collection: string;
 		field: string;
         validate: Function;
@@ -10,7 +10,7 @@
         children?: import('svelte').Snippet;
     }
 
-    let { validate, message = undefined, initial, children }: Props = $props();
+    let { validate, message = undefined, initial, children }: FieldInPProps = $props();
 
     let status = $state('default');
 </script>

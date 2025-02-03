@@ -4,13 +4,13 @@
     import { idbqlState } from '$lib/db/dbSchema';
     import CrudCollectionList from './CollectionListMenu.svelte';
 
-    interface Props {
+    interface CrudZoneProps {
         collection: string;
         data?: Record<string, any>;
         style?: ElementCSSInlineStyle;
     }
 
-    let { collection, style }: Props = $props();
+    let { collection, style }: CrudZoneProps = $props();
 
     let qy = idbqlState[collection].getAll();
 </script>

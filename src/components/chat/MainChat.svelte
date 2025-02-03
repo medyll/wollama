@@ -19,11 +19,11 @@
     import { connectionTimer } from '$lib/stores/timer.svelte';
   import { replaceState } from '$app/navigation';
 
-    interface Props {
+    interface MainChatProps {
         activeChatId?: any;
     }
 
-    let { activeChatId }: Props = $props(); 
+    let { activeChatId }: MainChatProps = $props(); 
 
     let chatApiSession: ChatApiSession = new ChatApiSession(activeChatId);
 

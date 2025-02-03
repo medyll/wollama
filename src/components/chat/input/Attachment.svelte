@@ -3,13 +3,13 @@
     import {Icon} from '@medyll/idae-slotui-svelte';
     import { Button } from '@medyll/idae-slotui-svelte';
 
-    interface Props {
+    interface AttachmentInputProps {
         disabled?: boolean;
         form?: string;
         imageFile: MessageImageType | undefined;
     }
 
-    let { disabled = false, form = '', imageFile = $bindable(), ...rest }: Props = $props();
+    let { disabled = false, form = '', imageFile = $bindable(), ...rest }: AttachmentInputProps = $props();
 
     let fileinput: HTMLInputElement;
 

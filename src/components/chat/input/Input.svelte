@@ -1,7 +1,7 @@
 <script lang="ts">
     import { timeRetry } from '$lib/stores/timeRetry'; 
 
-    interface Props {
+    interface ChatInputProps {
         value: string;
         placeholder?: string;
         form?: string;
@@ -21,7 +21,7 @@
         requestStop = $bindable(),
         onkeypress = (e: KeyboardEvent) => {},
         onsubmit = (e: Event) => (requestStop = 'request_stop'),
-    }: Props = $props();
+    }: ChatInputProps = $props();
 
     let element: HTMLTextAreaElement;
 

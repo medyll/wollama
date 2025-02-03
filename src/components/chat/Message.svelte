@@ -12,11 +12,11 @@
     import { idbQuery } from '$lib/db/dbQuery';
     import { Looper } from '@medyll/idae-slotui-svelte';
 
-    interface Props {
+    interface MessageProps {
         messageId: string;
     }
 
-    let { messageId }: Props = $props();
+    let { messageId }: MessageProps = $props();
     let message = $derived<DBMessage>(messageId ? idbQuery.getMessage(messageId) : ({} as DBMessage));
 
     let icon = $derived(message.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one');
