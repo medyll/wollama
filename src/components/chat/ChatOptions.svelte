@@ -40,12 +40,22 @@
         <option value={prompt.name} />        
     {/each}
 </datalist>
-<ButtonMenu
+<button class="anchor flex gap-1" popovertarget="popover"  style="anchor-name: --anchor;" >
+<Icon icon="material-symbols-light:post-add-sharp" />
+{chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}</button>
+<div popover class="popover " id="popover" style="position-anchor : --anchor;"> 
+    <div class="flex-col flex gap-1">
+        {#each promptList as prompt}
+        <button value={prompt.name} onclick={() => chatParamsState.promptSystem = prompt} >{prompt.name}</button>  
+        {/each}
+    </div>
+</div>
+<!-- <ButtonMenu
     tall="mini"
     width="auto"
     icon="material-symbols-light:post-add-sharp"
     value={chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}
-    popperProps={{ stickToHookWidth: true, position: 'TL', flow: 'fixed', autoClose: true }}
+    popperProps={{ stickToHookWidth: true, position: 'BL', flow: 'fixed', autoClose: true }}
     variant="naked"
     menuProps={{
         data: promptList,
@@ -60,7 +70,7 @@
             {item?.name}
         </MenuListItem>
     {/snippet}
-</ButtonMenu>
+</ButtonMenu> -->
 <Attachment form="prompt-form" bind:imageFile={chatParamsState.images} disabled={false} />
 <ButtonMenu popperProps={{ stickToHookWidth: true, position: 'TC', flow: 'fixed' }} tall="tiny" width="auto" variant="naked">
     <div class="flex-h flex-align-middle gap-2">
@@ -119,4 +129,25 @@
             @apply text-white;
         }
     } 
+    :popover-open {
+	width: 200px; 
+	position: absolute;
+	inset: unset; 
+	margin: 0; 
+}
+.anchor {
+	anchor-name: --myAnchor;
+	display: inline-flex;  
+}
+
+.popover {
+	position-anchor: --myAnchor;
+	position: fixed;
+	left: anchor(left);
+	bottom: anchor(top);  
+	padding: 10px;
+	z-index:9000;
+	width: auto;
+	text-align:left;
+}
 </style>
