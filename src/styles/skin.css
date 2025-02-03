@@ -112,10 +112,25 @@
 
     .application-sideBar {
       /* @apply hidden lg:w-[80px] lg:flex ; */
+      @apply hidden w-[80px] lg:flex ; 
+      @apply p-3
       @apply flex h-full;
       @apply flex-col flex-shrink;
       @apply overflow-hidden;
-      @apply shadow-lg;
+      @apply shadow-lg;      
+
+      &[aria-expanded='false'] {
+          @apply lg:w-[80px];
+      }
+      &[aria-expanded='true'] { 
+        /* @apply w-[90%] absolute; */
+        @apply sm:w-[240px] sm:relative;
+        @apply md:w-[340px];
+        @apply lg:w-[340px];
+        @apply xl:w-[340px];
+        @apply 2xl:w-[440px];
+      }
+
       gap: 0.5rem;
       height: 100%;
       transition: width 0.1s ease-in-out;
@@ -123,7 +138,7 @@
       border-right: 1px solid var(--cfab-input-border-color);
       background-color: var(--cfab-paper-bg-color);
       background-image: var(--cfab-gradient);
-    }
+    
     .application-sideBar-title {
       @apply flex items-center justify-end;
       color: var(--cfab-soft-title-text-color);

@@ -134,13 +134,13 @@
                     bind:requestStop={$aiState}
                     {placeholder}
                     form="prompt-form" />
-                    <div class="absolute right-3 h-10  w-10 top-[50%] -mt-5 border-4   rounded-full place-content-center flex flex-col">
+                    <div class="absolute right-3 h-10  w-10 top-[50%] -mt-5     rounded-full place-content-center flex flex-col">
                         {#if $aiState == 'done'}
-                            <button   class="rounded-full border block btn  border-5 flex place-content-center "     type="submit" form="prompt-form" disabled={disableSubmit} >
-                                <Icon icon="mdi:send"   />                   
+                            <button   class="rounded-full border border drop-shadow-lg aspect-ratio-square flex place-content-center"     type="submit" form="prompt-form"  >
+                                <Icon icon="mdi:send"  />                   
                             </button>
                         {:else}
-                            <button   class="rounded-full border  border-1"    form="prompt-form" >
+                            <button   class="rounded-full border border drop-shadow-lg aspect-ratio-square flex place-content-center"    form="prompt-form" >
                                 <Icon icon="mdi:stop" />
                             </button>
                         {/if}                    

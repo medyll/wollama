@@ -62,8 +62,9 @@
             <input class="w-full input" type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
         </div>
     </div>
+     
     <div class="application-sideBar-menu">
-        <MenuList tall="med" class="flex flex-col h-full">
+        <MenuList tall="small" class="flex flex-col h-full  ">
             <MenuListItem selectable={false} onclick={()=>getChatLink('newChat')} title={$t('ui.newChat')}>
                 <Icon icon="mdi:plus" alt={$t('ui.newChat')} />
                 <span>{$t('ui.newChat')}</span>
@@ -79,14 +80,14 @@
                 <Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
             </MenuListItem>
             <hr />
-            <MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
+            <!-- <MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
                 <Icon icon="earth" alt={$t('ui.spaces')} />
                 <span>{$t('ui.spaces')}</span>
             </MenuListItem>
            <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
                 <Icon icon="settings" alt={$t('ui.books')} />
                 <span>{$t('ui.books')}</span>
-            </MenuListItem>
+            </MenuListItem> -->
             <!--  <MenuListItem title={$t('ui.settings')} onclick={getChatLink('explore')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
@@ -103,11 +104,7 @@
     :global(.red) {
         transition: all 1s ease;
     }
-    .application-sideBar {
-        height: 100%;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
+    .application-sideBar { 
 
         .application-sideBar-menu {
             flex: 1;
@@ -117,7 +114,7 @@
             overflow: auto;
         }
         :global(.menu-list-item-text) {
-            @apply flex flex-1 gap-2 items-center;
+            @apply flex flex-1 gap-2 items-center place-items-center;
             @apply overflow-hidden;
             width: 100%;
         }
@@ -129,15 +126,21 @@
             max-width: 100%;
             width: 100%;
         }
-        &[aria-expanded='false'] {
-            @apply lg:w-[80px] lg:flex;
+        &[aria-expanded='false'] { 
+            @apply items-center;
+            :global(li.menu-list-item) {
+               @apply aspect-ratio-square flex items-center place-items-center
+            }
+            :global(.menu-list-item-text) {
+               @apply  w-full text-center;
+               @apply aspect-ratio-square flex place-items-center
+            }
             .not-expanded {
                 display: none;
                 content-visibility: hidden;
             }
         }
-        &[aria-expanded='true'] {
-            @apply lg:w-[240px] lg:flex;
+        &[aria-expanded='true'] { 
             .application-sideBar-content {
                 content-visibility: visible;
             }
@@ -153,9 +156,7 @@
             }
         }
         &[aria-expanded='false'] {
-            /* width: 70px; */
             span {
-                @apply text-lg;
                 display: none;
             }
         }
