@@ -166,13 +166,13 @@
         input[type='text'],
         textarea,
         select {
-            outline: none;
+            /* outline: none; */
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem;
             border-radius: 0.375rem;
-            border: 1px solid var(--cfab-input-border-color);
+            border: 1px solid var(--cfab-input-border-color)!important;
             background: var(--cfab-input-bg-color);
             color: var(--cfab-input-foreground-color);
 

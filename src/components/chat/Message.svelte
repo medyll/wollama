@@ -145,5 +145,6 @@
     }
     .speech-bubble {
         @apply px-2 w-full flex-1 relative overflow-hidden  p-4 py-4 rounded-md;
+       border: 1px solid var(--cfab-input-border-color)!important;
     }
 </style>

@@ -102,7 +102,7 @@
         {:else}
             <input style="width: 100%" class="textfield" bind:value={data[fieldName]} type={fieldForge.htmlInputType} {...finalArgs} />
         {/if}
-        <div><CollectionFieldGuess {collection} {collectionId} fieldNames={fieldName} formData={data} onGuess={handleGuess} /></div>
+        <!-- <div><CollectionFieldGuess {collection} {collectionId} fieldNames={fieldName} formData={data} onGuess={handleGuess} /></div> -->
     </div>
 
     {#if labelPosition === 'after' || labelPosition === 'below'}

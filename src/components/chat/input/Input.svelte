@@ -51,7 +51,8 @@
             visibility: hidden;
         }
         textarea.textarea {
-            border: none;
+            border: none!important;
+            outline: none!important;
             resize: none; 
             font: inherit;
             grid-area: 1 / 1 / 2 / 2;

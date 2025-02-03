@@ -22,7 +22,7 @@
         settings.setSetting('menuExpanded', !$settings.menuExpanded);
     };
 
-    const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books') => {
+    const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books'| 'spaces') => {
        
         let goTo;
         switch (link) {
@@ -79,11 +79,15 @@
                 <Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
             </MenuListItem>
             <hr />
-           <!--  <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
+            <MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
+                <Icon icon="earth" alt={$t('ui.spaces')} />
+                <span>{$t('ui.spaces')}</span>
+            </MenuListItem>
+           <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
                 <Icon icon="settings" alt={$t('ui.books')} />
                 <span>{$t('ui.books')}</span>
             </MenuListItem>
-            <MenuListItem title={$t('ui.settings')} onclick={getChatLink('explore')}>
+            <!--  <MenuListItem title={$t('ui.settings')} onclick={getChatLink('explore')}>
                 <Icon icon="settings" alt={$t('ui.newChat')} />
                 <span>{$t('ui.settings')}</span>
             </MenuListItem> -->

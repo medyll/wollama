@@ -19,7 +19,7 @@
     import '$lib/playground.js';
     import { idbql } from '$lib/db/dbSchema';
     import { init } from '$lib/init/init';
-    import { Backdrop, SlotuiSheet } from '@medyll/idae-slotui-svelte';
+    import { Backdrop, SlotuiSheet, slotuiMinCssCss } from '@medyll/idae-slotui-svelte';
     import { connectionTimer } from '$lib/stores/timer.svelte';
     import { notifierState } from '$lib/stores/notifications';
     import { cssDom } from '@medyll/idae-dom-events';
