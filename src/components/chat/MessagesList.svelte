@@ -31,10 +31,18 @@
             })
             .join(' ')}
     </div>
-    <Looper data={messages as [] ?? []}>
-        {#snippet children({ item })}
-            <Message messageId={item.messageId} />
-        {/snippet}
-    </Looper>
+    <div class="message-list ">
+        <Looper  data={messages as [] ?? []}>
+            {#snippet children({ item })}
+                <Message messageId={item.messageId} />
+            {/snippet}
+        </Looper> 
+    </div>
 </div>
 <div class="p-4" bind:this={element}></div>
+<style >
+    .message-list {
+        @apply flex flex-col flex-wrap gap-3  ;  
+        @apply 2xl:flex-row  2xl:place-content-center ;
+    }
+</style>

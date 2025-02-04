@@ -152,7 +152,7 @@
   }
 
   .application-container {
-    @apply lg:max-w-[55rem] xl:max-w-[65] 2xl:max-w-[75rem] 3xl:max-w-[100rem];
+    @apply lg:max-w-[55rem] xl:max-w-[65] 2xl:max-w-[160rem] 3xl:max-w-[100rem];
     display: flex;
     flex-direction: column;
     flex: 1;

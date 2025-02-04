@@ -82,17 +82,22 @@
     let dd = $derived(message?.createdAt.getTime().toString());
     let order = $derived(`order: ${dd};`);
 </script>
-
-<div  class="{place}   relative flex w-auto gap-1 elative overflow-hidden mb-1">
-    {#if message.role == 'user'}<div class="p-1">
+<!-- {place} -->
+<div  class="message   message-{message.role}">
+    <!-- <div class="p-1">
+        <div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
+            <Icon style="font-size:1.6em" {icon} />
+        </div>
+    </div> -->
+    <!-- {#if message.role == 'user'}<div class="p-1">
             <div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
                 <Icon style="font-size:1.6em" {icon} />
             </div>
         </div>
-    {/if}
+    {/if} -->
     <div class="flex flex-col w-full">
         <div class="line-gap-2 mb-1 p-1 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
-            <div class="font-bold capitalize">{$t(`ui.messageRole_${message.role}`)}</div>
+            
             <div class="soft-title">
                 {#if message?.status == 'streaming'}<Icon style="font-size:1.6em" icon="mdi:reload" class="spin" />{/if}
             </div>
@@ -100,9 +105,11 @@
             <div class="flex-1"></div>
             <div class="soft-title">{message?.status != 'done' ? message?.status : ''}</div>
             <div class="soft-title">{format(new Date(message?.createdAt), 'dd MMMM y hh:mm')}</div>
-            <!-- <div class="soft-title">{dd}</div> -->
+            <div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
+            <Icon style="font-size:1.6em" {icon} />
         </div>
-        <div style="user-select:all;" class="speech-bubble theme-border preserve-line-breaks">
+        </div>
+        <div style="user-select:text;" class="speech-bubble theme-border preserve-line-breaks">
             {#if message.urls?.length}
                 <Looper class="flex-h" data={message.urls}>
                     {#snippet children({ item })}
@@ -119,22 +126,38 @@
                     <Skeleton class="h-full" />
                 {:else if ['streaming', 'done'].includes(message.status)}
                     <!-- {@html assistantCode} -->
-                    <div style="user-select: all;">{@html selectCodeTags(message?.content)}</div>
+                    <div style="user-select: text;">{@html selectCodeTags(message?.content)}</div>
                 {/if}
             {:else if message?.role == 'user'}
                 {@html message?.content}
             {/if}
         </div>
     </div>
-    {#if message.role == 'assistant'}<div class="p-1">
+    <!-- {#if message.role == 'assistant'}<div class="p-1">
             <div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
                 <Icon style="font-size:1.6em" {icon} />
             </div>
         </div>
-    {/if}
+    {/if} -->
 </div>
 
-<style lang="postcss">
+<style lang="scss">
+    .message{ 
+        @apply p-2 gap-3 border;
+        /* @apply bg-gray-100 dark:bg-gray-800; */
+        @apply rounded-md;
+        /* @apply border border-gray-200 dark:border-gray-600; */
+        @apply  relative     gap-1 relative overflow-hidden mb-1;        
+    }
+
+    .message-assistant { 
+        @apply flex-row-reverse  ml-24;
+        @apply 2xl:basis-2/4  2x:ml-0 ;
+    }
+    .message-user { 
+        @apply flex-row mr-24;
+        @apply 2xl:basis-1/4 2x:mr-0;
+    }
     .preserve-line-breaks {
             white-space: pre-wrap;
         }
@@ -144,7 +167,9 @@
         overflow-wrap: break-word;
     }
     .speech-bubble {
-        @apply px-2 w-full flex-1 relative overflow-hidden  p-4 py-4 rounded-md;
-       border: 1px solid var(--cfab-input-border-color)!important;
+        @apply px-2 w-full   relative overflow-hidden  p-4 py-4 rounded-md;
+        border: 1px solid var(--cfab-input-border-color)!important;
     }
+
+  
 </style>
