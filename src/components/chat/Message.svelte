@@ -43,6 +43,7 @@
     }
 
     function selectCodeTags(textString: string) {
+        if(!textString) return '';
         const parser = new DOMParser();
         const htmlString = marked.parse(textString, { async: false }) as string;
         const doc = parser.parseFromString(htmlString, 'text/html');
@@ -95,7 +96,7 @@
             </div>
         </div>
     {/if} -->
-    <div class="flex flex-col w-full">
+    <div class="flex flex-col w-full"> {message?.createdAt}
         <div class="line-gap-2 mb-1 p-1 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
             
             <div class="soft-title">

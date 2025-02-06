@@ -17,8 +17,10 @@
     import { chatMetadata } from '$lib/tools/promptSystem'; 
     import AgentPick from '$components/agents/AgentPick.svelte';
     import { connectionTimer } from '$lib/stores/timer.svelte';
-  import { replaceState } from '$app/navigation';
-
+    import { replaceState } from '$app/navigation';
+    import type { DBMessage } from '$types/db';
+    import { page } from '$app/state';
+    
     interface MainChatProps {
         activeChatId?: any;
     }
@@ -37,20 +39,20 @@
         //
         await chatApiSession.initChat(chatSession.chat.chatId);
 
-        const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
-        const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
-        
         const chat = chatSession.chat;
       
         //  chatSession get unique userDbMessage with model;
-        
         const previousMessages = await chatSession.setPreviousMessages();
         const systemPrompt = chatParams.promptSystem.value; // chat.systemPrompt.content;
 
+        let assistantDbMessage:DBMessage;
         // loop on chatParams.models
         chatParams.models.forEach(async (model: string) => {
             // chatSession create assistantsDbMessage with concerned model;
-            const assistantDbMessage = await chatSession.createAssistantMessage(model);
+            const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
+            const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
+            
+            assistantDbMessage = assistantDbMessage ?? await chatSession.createAssistantMessage(model);
             // get ollamaBody
             const sender = new PromptSender(chat.ollamaBody);
             // declare stream listeners
@@ -87,8 +89,8 @@
             await chatApiSession.createChatDbSession({});
             // set active chat
             activeChatId = chatId = chatApiSession.chat.chatId;
-            // window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`);
-            replaceState( `/chat/${chatApiSession.chat.chatId}`,{});
+            window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`); 
+            // replaceState( `/chat/${chatApiSession.chat.chatId}`,page.params);
         }
 
         await chatApiSession.updateChatSession({
@@ -182,7 +184,7 @@ hr {
         background-size: 100vh 100vw;
         background-position: bottom; 
         color: var(--cfab-foreground);
-    background-color: var(--cfab-bg);
+        background-color: var(--cfab-bg);
     }
     .inputTextarea { 
         position: relative; 

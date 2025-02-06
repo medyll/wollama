@@ -13,11 +13,11 @@
         engine.goto(`/chat/${id}`);
     };
 
-    let chatMenuList = $derived(groupMessages(idbqlState.chat.getAll()));
+    // let chatMenuList = $derived(groupMessages(idbqlState.chat.getAll()));
  
 </script>
  
-<MenuList style="width:100%" selectorField="code" data={chatMenuList ?? []}>
+<!-- <MenuList style="width:100%" selectorField="code" data={chatMenuList ?? []}>
     {#snippet children({ item, itemIndex })}
         <ListTitle class="soft-title">
             {$t(getTimeTitle(item?.code))}
@@ -39,9 +39,5 @@
 {#if Object.keys(chatMenuList)?.length == 0}
     <div class="flex flex-col gap-2 text-center text-neutral-500 dark:text-neutral-400">
         <span class="text-2xl">{$t('ui.noChats')}</span>
-        <!-- <button title={$t('ui.newChat')} on:click={createChat} class="">
-					<Icon icon="mdi:chat-plus-outline" class="md" />
-				</button>
-				<a href="/" class="underline" on:click={createChat}>{$t('ui.newChat')}</a> -->
     </div>
-{/if}
+{/if} -->

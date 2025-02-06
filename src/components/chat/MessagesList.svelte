@@ -33,7 +33,7 @@
     </div>
     <div class="message-list ">
         <Looper  data={messages as [] ?? []}>
-            {#snippet children({ item })}
+            {#snippet children({ item })}{item.id}
                 <Message messageId={item.messageId} />
             {/snippet}
         </Looper> 
