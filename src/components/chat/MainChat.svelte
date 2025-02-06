@@ -37,11 +37,13 @@
         //
         await chatApiSession.initChat(chatSession.chat.chatId);
 
+        const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
+        const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
+        
         const chat = chatSession.chat;
       
         //  chatSession get unique userDbMessage with model;
-        const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
-        const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
+        
         const previousMessages = await chatSession.setPreviousMessages();
         const systemPrompt = chatParams.promptSystem.value; // chat.systemPrompt.content;
 
