@@ -4,6 +4,12 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
+use std::sync::{Arc, Mutex};
+
+mod idb;
+use idb::IdB;
+mod types;
+use types::OperatorType;
 
 #[derive(Debug, Deserialize)]
 pub struct Schema {
@@ -98,7 +104,7 @@ impl Counter {
 }
 
 pub struct Database {
-    db: DB,
+    db: Arc<Mutex<DB>>,
     schema: Schema,
     counter: Counter,
 }
@@ -111,7 +117,7 @@ impl Database {
         }
 
         Database {
-            db,
+            db: Arc::new(Mutex::new(db)),
             schema,
             counter,
         }
@@ -137,26 +143,62 @@ impl Database {
             self.validate_field(field_value, field_schema)?;
         }
 
-        // Modify collection based on action
+        // Define the command strategy
+        let idbqlState = IdB::new(self.db.clone());
+
+        // Execute the command based on action
         match action {
-            "add" => {
-                let id = self.counter.get_next_id(table_name);
-                let key = format!("{}:{}", table_name, id);
-                let value = serde_json::to_string(&data).map_err(|e| e.to_string())?;
-                self.db.put(key, value).map_err(|e| e.to_string())?;
+            "get" => {
+                let id = data["id"].as_u64().ok_or("Invalid ID")?;
+                let result = idbqlState.get_one(id)?;
+                println!("Get result: {:?}", result);
                 Ok(())
             }
-            "remove" => {
+            "getAll" => {
+                let result = idbqlState.get_all()?;
+                println!("GetAll result: {:?}", result);
+                Ok(())
+            }
+            "create" => {
+                idbqlState.add(data)?;
+                Ok(())
+            }
+            "delete" => {
                 let id = data["id"].as_u64().ok_or("Invalid ID")?;
-                let key = format!("{}:{}", table_name, id);
-                self.db.delete(key).map_err(|e| e.to_string())?;
+                idbqlState.delete(id)?;
                 Ok(())
             }
             "update" => {
                 let id = data["id"].as_u64().ok_or("Invalid ID")?;
-                let key = format!("{}:{}", table_name, id);
-                let value = serde_json::to_string(&data).map_err(|e| e.to_string())?;
-                self.db.put(key, value).map_err(|e| e.to_string())?;
+                idbqlState.update(id, data)?;
+                Ok(())
+            }
+            "where" => {
+                let query = data["query"].as_object().ok_or("Invalid query")?;
+                let query: HashMap<String, OperatorType> = query
+                    .iter()
+                    .map(|(k, v)| (k.clone(), serde_json::from_value(v.clone()).unwrap()))
+                    .collect();
+                let result = idbqlState.where_query(&query)?;
+                println!("Where result: {:?}", result);
+                Ok(())
+            }
+            "updateWhere" => {
+                let query = data["query"].as_object().ok_or("Invalid query")?;
+                let query: HashMap<String, OperatorType> = query
+                    .iter()
+                    .map(|(k, v)| (k.clone(), serde_json::from_value(v.clone()).unwrap()))
+                    .collect();
+                idbqlState.update_where(&query, data)?;
+                Ok(())
+            }
+            "deleteWhere" => {
+                let query = data["query"].as_object().ok_or("Invalid query")?;
+                let query: HashMap<String, OperatorType> = query
+                    .iter()
+                    .map(|(k, v)| (k.clone(), serde_json::from_value(v.clone()).unwrap()))
+                    .collect();
+                idbqlState.delete_where(&query)?;
                 Ok(())
             }
             _ => Err(format!("Action {} not supported", action)),
@@ -177,42 +219,13 @@ impl Database {
             "email" => value.as_str().ok_or("Invalid email").map(|_| ())?,
             "password" => value.as_str().ok_or("Invalid password").map(|_| ())?,
             _ => return Err("Unknown field type".to_string()),
-        }
+        };
         Ok(())
     }
 }
 
-pub fn load_schema(file_path: &str) -> Result<Schema, Box<dyn std::error::Error>> {
-    let file = File::open(file_path)?;
-    let reader = BufReader::new(file);
-    let schema: Schema = serde_json::from_reader(reader)?;
+pub fn load_schema() -> Result<Schema, Box<dyn std::error::Error>> {
+    let schema_str = include_str!("../resources/schemas/db_schema.json");
+    let schema: Schema = serde_json::from_str(schema_str)?;
     Ok(schema)
-}
-
-fn main() {
-    let schema = load_schema("src-tauri/schemas/db_schema.json").expect("Failed to load schema");
-
-    let path = "path/to/database";
-    let db = {
-        let mut opts = Options::default();
-        opts.create_if_missing(true);
-        DB::open(&opts, path).expect("Failed to open database")
-    };
-
-    let mut database = Database::new(db, schema);
-
-    let data = serde_json::json!({
-        "id": 1,
-        "name": "Agent 1",
-        "code": "A1",
-        "model": "Model 1",
-        "prompt": "Prompt 1",
-        "created_at": "2023-01-01T00:00:00Z",
-        "ia_lock": true,
-        "agentPromptId": 1
-    });
-
-    database
-        .validate_and_modify_data("agent", "add", data)
-        .expect("Failed to modify data");
 }
