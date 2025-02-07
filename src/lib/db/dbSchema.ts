@@ -479,7 +479,7 @@ export const schemeModelDb =  {
   },
 } satisfies DbDataModel;
 
-export const schemeModel: IdbqModel = {...schemeModelDb} as IdbqModel;
+export const schemeModel: IdbqModel = {...schemeModelDb} as unknown as  IdbqModel<typeof schemeModelDb>;
 
 export type DataModelFinal = DbDataModelTs<typeof schemeModelDb>;
 
