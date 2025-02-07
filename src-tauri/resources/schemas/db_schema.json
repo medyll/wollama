@@ -1,0 +1,415 @@
+{
+    "tables": {
+        "agent": {
+            "keyPath": [
+                "id",
+                "promptId",
+                "created_at"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "name",
+                    "model"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id",
+                        "readonly": true
+                    },
+                    "name": {
+                        "type": "text",
+                        "private": true
+                    },
+                    "code": {
+                        "type": "text"
+                    },
+                    "model": {
+                        "type": "text"
+                    },
+                    "prompt": {
+                        "type": "text-long"
+                    },
+                    "created_at": {
+                        "type": "date",
+                        "private": true
+                    },
+                    "ia_lock": {
+                        "type": "boolean",
+                        "private": true
+                    },
+                    "agentPromptId": {
+                        "type": "fk-agentPrompt.id",
+                        "required": true
+                    }
+                },
+                "fks": {
+                    "agentPrompt": {
+                        "code": "agentPrompt",
+                        "rules": [
+                            "readonly",
+                            "private"
+                        ],
+                        "multiple": true
+                    }
+                }
+            }
+        },
+        "agentPrompt": {
+            "keyPath": [
+                "id",
+                "created_at"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "name"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id",
+                        "readonly": true
+                    },
+                    "created_at": {
+                        "type": "date",
+                        "private": true
+                    },
+                    "value": {
+                        "type": "text-long",
+                        "required": true
+                    },
+                    "name": {
+                        "type": "text",
+                        "required": true
+                    },
+                    "code": {
+                        "type": "text",
+                        "required": true
+                    },
+                    "ia_lock": {
+                        "type": "boolean",
+                        "private": true
+                    }
+                },
+                "fks": {}
+            }
+        },
+        "agentOf": {
+            "keyPath": [
+                "id",
+                "created_at"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "name"
+                ],
+                "fields": {
+                    "code": {
+                        "type": "text"
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "context": {
+                        "type": "array-of-number"
+                    }
+                },
+                "fks": {}
+            }
+        },
+        "chat": {
+            "keyPath": [
+                "chatId",
+                "createdAt",
+                "category",
+                "categoryId",
+                "dateLastMessage"
+            ],
+            "template": {
+                "index": "chatId",
+                "presentation": [
+                    "name"
+                ],
+                "fields": {
+                    "chatId": {
+                        "type": "id"
+                    },
+                    "createdAt": {
+                        "type": "date"
+                    },
+                    "category": {
+                        "type": "text"
+                    },
+                    "categoryId": {
+                        "type": "id"
+                    },
+                    "dateLastMessage": {
+                        "type": "date"
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "description": {
+                        "type": "text"
+                    },
+                    "ia_lock": {
+                        "type": "boolean"
+                    },
+                    "spaceId": {
+                        "type": "fk-space.id",
+                        "required": true
+                    }
+                },
+                "fks": {
+                    "space": {
+                        "code": "text",
+                        "rules": [
+                            "private",
+                            "required"
+                        ],
+                        "multiple": false
+                    }
+                }
+            }
+        },
+        "category": {
+            "keyPath": [
+                "id",
+                "code"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "name"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id"
+                    },
+                    "code": {
+                        "type": "text"
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "ia_lock": {
+                        "type": "boolean",
+                        "private": true
+                    }
+                },
+                "fks": {}
+            }
+        },
+        "space": {
+            "keyPath": [
+                "id",
+                "code"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "name"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id"
+                    },
+                    "code": {
+                        "type": "text"
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "ia_lock": {
+                        "type": "boolean",
+                        "private": true
+                    }
+                },
+                "fks": {}
+            }
+        },
+        "tags": {
+            "keyPath": [
+                "id",
+                "code"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "name"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id"
+                    },
+                    "code": {
+                        "type": "text"
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "ia_lock": {
+                        "type": "boolean",
+                        "private": true
+                    }
+                },
+                "fks": {}
+            }
+        },
+        "messages": {
+            "keyPath": [
+                "messageId",
+                "chatId",
+                "created_at"
+            ],
+            "template": {
+                "index": "messageId",
+                "presentation": [
+                    "resume"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id"
+                    },
+                    "chatId": {
+                        "type": "id"
+                    },
+                    "created_at": {
+                        "type": "date"
+                    },
+                    "content": {
+                        "type": "text-long"
+                    },
+                    "status": {
+                        "type": "text"
+                    },
+                    "context": {
+                        "type": "array-of-number"
+                    },
+                    "resume": {
+                        "type": "text"
+                    },
+                    "model": {
+                        "type": "text"
+                    },
+                    "ia_lock": {
+                        "type": "boolean"
+                    }
+                },
+                "fks": {}
+            }
+        },
+        "prompts": {
+            "keyPath": [
+                "id",
+                "created_at"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "name"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id"
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "code": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "text"
+                    },
+                    "created_at": {
+                        "type": "date"
+                    },
+                    "ia_lock": {
+                        "type": "boolean"
+                    }
+                },
+                "fks": {}
+            }
+        },
+        "settings": {
+            "keyPath": [
+                "id",
+                "userId"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "code"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id"
+                    },
+                    "userId": {
+                        "type": "id"
+                    },
+                    "created_at": {
+                        "type": "date",
+                        "readonly": true
+                    },
+                    "updated_at": {
+                        "type": "date",
+                        "readonly": true
+                    },
+                    "code": {
+                        "type": "text"
+                    },
+                    "value": {
+                        "type": "text"
+                    },
+                    "ia_lock": {
+                        "type": "boolean",
+                        "private": true
+                    }
+                },
+                "fks": {}
+            }
+        },
+        "user": {
+            "keyPath": [
+                "id",
+                "created_at",
+                "email"
+            ],
+            "template": {
+                "index": "id",
+                "presentation": [
+                    "email"
+                ],
+                "fields": {
+                    "id": {
+                        "type": "id"
+                    },
+                    "name": {
+                        "type": "text"
+                    },
+                    "color": {
+                        "type": "text"
+                    },
+                    "created_at": {
+                        "type": "date",
+                        "readonly": true
+                    },
+                    "email": {
+                        "type": "email"
+                    },
+                    "password": {
+                        "type": "password"
+                    },
+                    "ia_lock": {
+                        "type": "boolean",
+                        "private": true
+                    }
+                },
+                "fks": {}
+            }
+        }
+    }
+}
