@@ -37,7 +37,7 @@
     "@medyll/idae-mongo": "file:../../idae/packages/idae-mongo",
     "@medyll/idae-query": "file:../../idae/packages/idae-query",
     "@medyll/idae-slotui-svelte": "file:../../idae/packages/idae-slotui",
-    "@tauri-apps/api": ">=2.2.0",
+    "@tauri-apps/api": "^2.2.0",
     "@tauri-apps/plugin-shell": ">=2.2.0",
     "cheerio": "^1.0.0",
     "date-fns": "^4.1.0",

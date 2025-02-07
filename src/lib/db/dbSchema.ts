@@ -22,13 +22,14 @@ import type { UserType } from "$types/user";
 import {
   createIdbqDb,
   type IdbqModel,
-  type Tpl,
+  type Tpl,s
   type DbFieldTypes,
   type TplFieldType,
 } from "@medyll/idae-idbql";
 import { space } from "postcss/lib/list";
+import type { DbDataModel, DbDataModelTs } from "./dataModel";
 
-export const schemeModel: IdbqModel = {
+export const schemeModelDb =  {
   agent: {
     keyPath: "++id, promptId, created_at",
     model: {} as DBAgent,
@@ -476,9 +477,13 @@ export const schemeModel: IdbqModel = {
       },
     },
   },
-} as const;
+} satisfies DbDataModel;
 
-//type test = DbTemplateModel<typeof idbqModel>;
+export const schemeModel: IdbqModel = {...schemeModelDb} as IdbqModel;
+
+export type DataModelFinal = DbDataModelTs<typeof schemeModelDb>;
+
+//type test = DbTemplasteModel<typeof idbqModel>;
 const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 13);
 export const { idbql, idbqlState, idbDatabase, idbqModel } =
   idbqStore.create("woolama");

@@ -21,7 +21,7 @@
   max_background_flushes=-1
   stats_persist_period_sec=600
   stats_history_buffer_size=1048576
-  max_open_files=-1
+  max_open_files=20
   bytes_per_sync=0
   wal_bytes_per_sync=0
   strict_bytes_per_sync=false
@@ -51,7 +51,7 @@
   enable_thread_tracking=false
   use_fsync=false
   log_file_time_to_roll=0
-  keep_log_file_num=1000
+  keep_log_file_num=1
   follower_catchup_retry_count=10
   is_fd_close_on_exec=true
   paranoid_checks=true

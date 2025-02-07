@@ -123,12 +123,7 @@ impl Database {
         }
     }
 
-    pub fn validate_and_modify_data(
-        &mut self,
-        table_name: &str,
-        action: &str,
-        data: Value,
-    ) -> Result<(), String> {
+    pub fn get_data(&mut self, table_name: &str, action: &str, data: Value) -> Result<(), String> {
         let table_schema = self
             .schema
             .tables
@@ -144,33 +139,33 @@ impl Database {
         }
 
         // Define the command strategy
-        let idbqlState = IdB::new(self.db.clone());
+        let idbql_state = IdB::new(self.db.clone());
 
         // Execute the command based on action
         match action {
-            "get" => {
+            "get_one" => {
                 let id = data["id"].as_u64().ok_or("Invalid ID")?;
-                let result = idbqlState.get_one(id)?;
+                let result = idbql_state.get_one(id)?;
                 println!("Get result: {:?}", result);
                 Ok(())
             }
             "getAll" => {
-                let result = idbqlState.get_all()?;
+                let result = idbql_state.get_all()?;
                 println!("GetAll result: {:?}", result);
                 Ok(())
             }
             "create" => {
-                idbqlState.add(data)?;
+                idbql_state.add(data)?;
                 Ok(())
             }
             "delete" => {
                 let id = data["id"].as_u64().ok_or("Invalid ID")?;
-                idbqlState.delete(id)?;
+                idbql_state.delete(id)?;
                 Ok(())
             }
             "update" => {
                 let id = data["id"].as_u64().ok_or("Invalid ID")?;
-                idbqlState.update(id, data)?;
+                idbql_state.update(id, data)?;
                 Ok(())
             }
             "where" => {
@@ -179,7 +174,7 @@ impl Database {
                     .iter()
                     .map(|(k, v)| (k.clone(), serde_json::from_value(v.clone()).unwrap()))
                     .collect();
-                let result = idbqlState.where_query(&query)?;
+                let result = idbql_state.where_query(&query)?;
                 println!("Where result: {:?}", result);
                 Ok(())
             }
@@ -189,7 +184,7 @@ impl Database {
                     .iter()
                     .map(|(k, v)| (k.clone(), serde_json::from_value(v.clone()).unwrap()))
                     .collect();
-                idbqlState.update_where(&query, data)?;
+                idbql_state.update_where(&query, data)?;
                 Ok(())
             }
             "deleteWhere" => {
@@ -198,7 +193,7 @@ impl Database {
                     .iter()
                     .map(|(k, v)| (k.clone(), serde_json::from_value(v.clone()).unwrap()))
                     .collect();
-                idbqlState.delete_where(&query)?;
+                idbql_state.delete_where(&query)?;
                 Ok(())
             }
             _ => Err(format!("Action {} not supported", action)),
