@@ -4,6 +4,7 @@ use rocksdb::{Options, DB};
 use serde_json::Value;
 use std::env;
 use std::sync::{Arc, Mutex};
+
 #[tauri::command]
 fn modify_collection(
     db: tauri::State<'_, Arc<Mutex<Database>>>,
@@ -20,9 +21,8 @@ fn modify_collection(
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let current_dir = env::current_dir().expect("Failed to get current directory");
-    println!("Current directory: {:?}", current_dir);
     // Charger le schéma JSON
-    let schema = load_schema("src-tauri/schemas/db_schema.json").expect("Failed to load schema");
+    let schema = load_schema().expect("Failed to load schema");
 
     // Initialiser la base de données RocksDB
     let path = "database";
