@@ -22,14 +22,14 @@ import type { UserType } from "$types/user";
 import {
   createIdbqDb,
   type IdbqModel,
-  type Tpl,s
+  type Tpl,
   type DbFieldTypes,
   type TplFieldType,
 } from "@medyll/idae-idbql";
 import { space } from "postcss/lib/list";
 import type { DbDataModel, DbDataModelTs } from "./dataModel";
 
-export const schemeModelDb =  {
+export const schemeModelDb = {
   agent: {
     keyPath: "++id, promptId, created_at",
     model: {} as DBAgent,
@@ -479,7 +479,9 @@ export const schemeModelDb =  {
   },
 } satisfies DbDataModel;
 
-export const schemeModel: IdbqModel = {...schemeModelDb} as unknown as  IdbqModel<typeof schemeModelDb>;
+export const schemeModel: IdbqModel = {
+  ...schemeModelDb,
+} as unknown as IdbqModel<typeof schemeModelDb>;
 
 export type DataModelFinal = DbDataModelTs<typeof schemeModelDb>;
 

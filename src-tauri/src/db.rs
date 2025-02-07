@@ -2,8 +2,7 @@ use rocksdb::{Options, DB};
 use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::BufReader;
+use std::env;
 use std::sync::{Arc, Mutex};
 
 mod idb;
@@ -223,4 +222,21 @@ pub fn load_schema() -> Result<Schema, Box<dyn std::error::Error>> {
     let schema_str = include_str!("../resources/schemas/db_schema.json");
     let schema: Schema = serde_json::from_str(schema_str)?;
     Ok(schema)
+}
+
+pub fn initialize_db(db_path: &str) -> Result<Database, String> {
+    let current_dir = env::current_dir().expect("Failed to get current directory");
+    let database_path = format!("{}/database", current_dir.display());
+    // let database_path = format!("{}/database/{}", current_dir.display(), db_path);
+    let db = {
+        let mut opts = Options::default();
+        opts.create_if_missing(true);
+        opts.set_keep_log_file_num(1);
+        opts.set_max_open_files(10);
+        DB::open(&opts, &database_path).expect("Failed to open database")
+    };
+    let schema = load_schema().expect("Failed to load schema");
+    let database: Database = Database::new(db, schema);
+
+    Ok(database)
 }

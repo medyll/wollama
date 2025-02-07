@@ -10,7 +10,7 @@
     import '../styles/snippets.css';
     import '../styles/skin.css';
     import '@unocss/reset/tailwind.css';
-    import { idbQuery } from '$lib/db/dbQuery';
+    import { idbQuery, ideo } from '$lib/db/dbQuery';
     import Notifications from '$components/ui/Notifications.svelte';
     import Opening from '$components/Opening.svelte';
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
@@ -69,6 +69,9 @@
     }
 
     $effect(() => {
+        ideo("agent").create({ code: "tesst", name: "test" }).then((data) => {
+            console.log(data);
+        });
         connectionTimer.initialize(
             'http://127.0.0.1:11434',
             (data) => {

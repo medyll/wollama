@@ -1,23 +1,48 @@
 import type { DbChat, DBMessage, PromptType } from "$types/db";
 import type { OllamaResponse } from "$types/ollama";
 import { chatUtils } from "$lib/tools/chatUtils";
-import { idbqlState } from "./dbSchema";
+import { idbqlState, schemeModelDb } from "./dbSchema";
 import type { SettingsType } from "$types/settings";
 import type { UserType } from "$types/user";
 import { schemeModel } from "$lib/db/dbSchema";
+import { getClientData } from "$types/getData";
 
-export function ideo(collection: keyof typeof schemeModel) {
+export function ideo(collection: keyof typeof schemeModelDb) {
   if (!idbqlState[collection])
     throw new Error(`Collection ${collection} not found`);
   return {
-    get: idbqlState[collection].getOne,
-    getAll: idbqlState[collection].getAll,
-    create: idbqlState[collection].add,
-    delete: idbqlState[collection].delete,
-    update: idbqlState[collection].update,
-    where: idbqlState[collection].where,
-    updateWhere: idbqlState[collection].updateWhere,
-    deleteWhere: idbqlState[collection].deleteWhere,
+    get: getClientData({ table_name: collection, action: "get_one", data: {} }),
+    getAll: getClientData({
+      table_name: collection,
+      action: "getAll",
+      data: {},
+    }),
+    create: getClientData({
+      table_name: collection,
+      action: "create",
+      data: {},
+    }),
+    delete: getClientData({
+      table_name: collection,
+      action: "delete",
+      data: {},
+    }),
+    deleteWhere: getClientData({
+      table_name: collection,
+      action: "deleteWhere",
+      data: {},
+    }),
+    update: getClientData({
+      table_name: collection,
+      action: "update",
+      data: {},
+    }),
+    where: getClientData({ table_name: collection, action: "where", data: {} }),
+    updateWhere: getClientData({
+      table_name: collection,
+      action: "updateWhere",
+      data: {},
+    }),
   };
 }
 

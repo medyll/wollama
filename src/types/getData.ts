@@ -44,7 +44,8 @@ interface OperatorType {
   btw?: [any, any];
 }
 
-interface GetDataParams<T> {
+// table_name, action, data
+interface GetDataParams<T> extends Record<string, unknown> {
   table_name: string;
   action:
     | "get_one"
@@ -56,10 +57,9 @@ interface GetDataParams<T> {
     | "updateWhere"
     | "deleteWhere";
   data: Record<string, any>;
-  [key: string]: unknown;
 }
 
-async function getData<T>(params: GetDataParams<T>): Promise<void> {
+async function getClientData<T>(params: GetDataParams<T>): Promise<any> {
   try {
     const result = await invoke("get_data", params);
     console.log("Get data result:", result);
@@ -69,7 +69,7 @@ async function getData<T>(params: GetDataParams<T>): Promise<void> {
 }
 
 export {
-  getData,
+  getClientData,
   type GetDataParams,
   type Schema,
   type TableSchema,

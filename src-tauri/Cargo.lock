@@ -5321,6 +5321,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "dirs 6.0.0",
+ "lazy_static",
  "log",
  "reqwest",
  "rocksdb",
