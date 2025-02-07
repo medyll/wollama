@@ -19,10 +19,11 @@ tauri = { version = "2.0.0-rc", features = [] }
 tauri-plugin-shell = "2.0.0-rc"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-scraper = "0.20.0"
+scraper = "0.22.0"
 anyhow = "1.0.86"
 reqwest = "0.12.7"
 log = "0.4.22"
 chrono = { version = "0.4.39", features = ["serde"] }
-rocksdb = "0.23.0"
+rocksdb = { version = "0.23.0", features = ["default"] }
+dirs = "6.0.0"
 

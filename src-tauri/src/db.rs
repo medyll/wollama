@@ -1,13 +1,12 @@
-use rocketdb::{RocketDb, Transaction};
+use rocksdb::{Options, DB};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::any::Any;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 
 #[derive(Debug, Deserialize)]
-struct Schema {
+pub struct Schema {
     tables: HashMap<String, TableSchema>,
 }
 
@@ -98,15 +97,14 @@ impl Counter {
     }
 }
 
-// Structure pour gérer la base de données
-struct Database {
-    db: RocketDb,
+pub struct Database {
+    db: DB,
     schema: Schema,
     counter: Counter,
 }
 
 impl Database {
-    fn new(db: RocketDb, schema: Schema) -> Self {
+    pub fn new(db: DB, schema: Schema) -> Self {
         let mut counter = Counter::new();
         for table_name in schema.tables.keys() {
             counter.counters.insert(table_name.clone(), 0);
@@ -119,7 +117,7 @@ impl Database {
         }
     }
 
-    fn validate_and_modify_data(
+    pub fn validate_and_modify_data(
         &mut self,
         table_name: &str,
         action: &str,
@@ -129,8 +127,8 @@ impl Database {
             .schema
             .tables
             .get(table_name)
-            .ok_or("Table not found")?;
-        let collection = self.db.get_collection::<Value>(table_name)?;
+            .ok_or("Table not found")?
+            .clone();
 
         // Validate data based on schema
         for (field_name, field_schema) in &table_schema.template.fields {
@@ -144,17 +142,22 @@ impl Database {
         match action {
             "add" => {
                 let id = self.counter.get_next_id(table_name);
-                collection.insert(id, data);
+                let key = format!("{}:{}", table_name, id);
+                let value = serde_json::to_string(&data).map_err(|e| e.to_string())?;
+                self.db.put(key, value).map_err(|e| e.to_string())?;
                 Ok(())
             }
             "remove" => {
                 let id = data["id"].as_u64().ok_or("Invalid ID")?;
-                collection.remove(&id);
+                let key = format!("{}:{}", table_name, id);
+                self.db.delete(key).map_err(|e| e.to_string())?;
                 Ok(())
             }
             "update" => {
                 let id = data["id"].as_u64().ok_or("Invalid ID")?;
-                collection.insert(id, data);
+                let key = format!("{}:{}", table_name, id);
+                let value = serde_json::to_string(&data).map_err(|e| e.to_string())?;
+                self.db.put(key, value).map_err(|e| e.to_string())?;
                 Ok(())
             }
             _ => Err(format!("Action {} not supported", action)),
@@ -163,21 +166,24 @@ impl Database {
 
     fn validate_field(&self, value: &Value, field_schema: &FieldSchema) -> Result<(), String> {
         match field_schema.field_type.as_str() {
-            "id" => value.as_u64().ok_or("Invalid ID")?,
-            "text" => value.as_str().ok_or("Invalid text")?,
-            "text-long" => value.as_str().ok_or("Invalid text-long")?,
-            "date" => value.as_str().ok_or("Invalid date")?, // You might want to parse the date
-            "boolean" => value.as_bool().ok_or("Invalid boolean")?,
-            "array-of-number" => value.as_array().ok_or("Invalid array-of-number")?,
-            "email" => value.as_str().ok_or("Invalid email")?,
-            "password" => value.as_str().ok_or("Invalid password")?,
+            "id" => value.as_u64().ok_or("Invalid ID").map(|_| ())?,
+            "text" => value.as_str().ok_or("Invalid text").map(|_| ())?,
+            "text-long" => value.as_str().ok_or("Invalid text-long").map(|_| ())?,
+            "date" => value.as_str().ok_or("Invalid date").map(|_| ())?,
+            "boolean" => value.as_bool().ok_or("Invalid boolean").map(|_| ())?,
+            "array-of-number" => value
+                .as_array()
+                .ok_or("Invalid array-of-number")
+                .map(|_| ())?,
+            "email" => value.as_str().ok_or("Invalid email").map(|_| ())?,
+            "password" => value.as_str().ok_or("Invalid password").map(|_| ())?,
             _ => return Err("Unknown field type".to_string()),
-        };
+        }
         Ok(())
     }
 }
 
-fn load_schema(file_path: &str) -> Result<Schema, Box<dyn std::error::Error>> {
+pub fn load_schema(file_path: &str) -> Result<Schema, Box<dyn std::error::Error>> {
     let file = File::open(file_path)?;
     let reader = BufReader::new(file);
     let schema: Schema = serde_json::from_reader(reader)?;
@@ -187,7 +193,13 @@ fn load_schema(file_path: &str) -> Result<Schema, Box<dyn std::error::Error>> {
 fn main() {
     let schema = load_schema("src-tauri/schemas/db_schema.json").expect("Failed to load schema");
 
-    let db = RocketDb::new("path/to/database").expect("Failed to open database");
+    let path = "path/to/database";
+    let db = {
+        let mut opts = Options::default();
+        opts.create_if_missing(true);
+        DB::open(&opts, path).expect("Failed to open database")
+    };
+
     let mut database = Database::new(db, schema);
 
     let data = serde_json::json!({
