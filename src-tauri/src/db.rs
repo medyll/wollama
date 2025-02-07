@@ -1,5 +1,5 @@
 use rocksdb::{Options, DB};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fs::File;
@@ -127,8 +127,7 @@ impl Database {
             .schema
             .tables
             .get(table_name)
-            .ok_or("Table not found")?
-            .clone();
+            .ok_or("Table not found")?;
 
         // Validate data based on schema
         for (field_name, field_schema) in &table_schema.template.fields {

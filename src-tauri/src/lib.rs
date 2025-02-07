@@ -3,7 +3,6 @@ use db::{load_schema, Database};
 use rocksdb::{Options, DB};
 use serde_json::Value;
 use std::env;
-use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 #[tauri::command]
 fn modify_collection(
