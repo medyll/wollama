@@ -1,5 +1,7 @@
 mod db;
 use db::{initialize_db, Database};
+use serde_json::Value;
+use std::sync::{Arc, Mutex};
 use tauri::State;
 use watcher::FolderWatcher;
 mod chromadb_mod;
@@ -12,7 +14,17 @@ struct AppState {
 }
 
 #[tauri::command]
-fn get_data(path: String, state: State<AppState>) {}
+fn get_data(
+    db: tauri::State<'_, Arc<Mutex<Database>>>,
+    table_name: &str,
+    action: &str,
+    data: Value,
+) -> Result<(), String> {
+    let mut db = db.lock().map_err(|e| e.to_string())?;
+    db.get_data(table_name, action, data)
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub async fn run() {
