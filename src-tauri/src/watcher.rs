@@ -1,7 +1,7 @@
 // src-tauri/src/watcher.rs
 
 use crate::chromadb_mod::{index_file, FileMetadata};
-use chromadb::collection::{ChromaCollection, GetOptions, GetResult};
+use chromadb::collection::ChromaCollection;
 use notify::{recommended_watcher, RecursiveMode, Watcher};
 use std::collections::HashMap;
 use std::fs;

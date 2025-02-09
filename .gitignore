@@ -3,7 +3,7 @@ node_modules
 /build
 /.svelte-kit
 /package
-/database
+/src-tauri/database
 .env
 .env.*
 !.env.example

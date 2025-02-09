@@ -69,9 +69,9 @@
     }
 
     $effect(() => {
-        ideo("agent").create({ code: "tesst", name: "test" }).then((data) => {
+        /* ideo("agent").create({ code: "tesst", name: "test" }).then((data) => {
             console.log(data);
-        });
+        }); */
         connectionTimer.initialize(
             'http://127.0.0.1:11434',
             (data) => {

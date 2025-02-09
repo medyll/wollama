@@ -1,7 +1,7 @@
 // src-tauri/src/chromadb.rs
-use chromadb::client::{ChromaAuthMethod, ChromaClient, ChromaClientOptions, ChromaTokenHeader};
+use chromadb::client::{ChromaAuthMethod, ChromaClient, ChromaClientOptions};
 use chromadb::collection::CollectionEntries;
-use chromadb::collection::{ChromaCollection, GetOptions, GetResult};
+use chromadb::collection::ChromaCollection;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::process::Command;

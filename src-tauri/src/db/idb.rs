@@ -1,6 +1,5 @@
 use crate::db::types::OperatorType;
 use rocksdb::{IteratorMode, DB};
-use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};

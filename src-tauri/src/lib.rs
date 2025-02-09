@@ -1,14 +1,10 @@
 mod db;
 use db::{initialize_db, Database};
-use lazy_static::lazy_static;
-use rocksdb::{Options, DB};
-use serde_json::Value;
-use std::sync::{Arc, Mutex};
 use tauri::State;
 use watcher::FolderWatcher;
 mod chromadb_mod;
 mod watcher;
-use chromadb_mod::{index_file, init_chromadb};
+use chromadb_mod::init_chromadb;
 
 struct AppState {
     folder_watcher: FolderWatcher,
@@ -22,16 +18,16 @@ fn get_data(path: String, state: State<AppState>) {}
 pub async fn run() {
     let database = initialize_db("wollama").expect("Failed to initialize database");
 
-    let collection = init_chromadb().await;
+    /* let collection = init_chromadb().await;
     let path = "./path/to/watch";
-    let folder_watcher = FolderWatcher::new(collection);
+    let folder_watcher = FolderWatcher::new(collection); */
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .manage(AppState {
+        /* .manage(AppState {
             folder_watcher,
             database,
-        })
+        }) */
         .invoke_handler(tauri::generate_handler![get_data])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

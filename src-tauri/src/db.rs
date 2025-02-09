@@ -226,7 +226,7 @@ pub fn load_schema() -> Result<Schema, Box<dyn std::error::Error>> {
 
 pub fn initialize_db(db_path: &str) -> Result<Database, String> {
     let current_dir = env::current_dir().expect("Failed to get current directory");
-    let database_path = format!("{}/database", current_dir.display());
+    let database_path = format!("{}/database/{}", current_dir.display(), db_path);
     // let database_path = format!("{}/database/{}", current_dir.display(), db_path);
     let db = {
         let mut opts = Options::default();
