@@ -23,7 +23,7 @@ impl FolderWatcher {
 
     pub fn add_folder(&self, path: String) {
         let watchers = self.watchers.clone();
-        let collection = self.collection;
+        let collection = &self.collection;
 
         let (tx, rx) = channel();
         let mut watcher = recommended_watcher(tx).unwrap();

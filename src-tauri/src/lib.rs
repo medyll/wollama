@@ -1,5 +1,4 @@
 mod db;
-use anyhow::{Error, Ok};
 use db::{initialize_db, Database};
 use lazy_static::lazy_static;
 use rocksdb::{Options, DB};
@@ -13,7 +12,33 @@ use chromadb_mod::{index_file, init_chromadb};
 
 struct AppState {
     folder_watcher: FolderWatcher,
+    database: Database,
 }
+
+#[tauri::command]
+fn get_data(path: String, state: State<AppState>) {}
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub async fn run() {
+    let database = initialize_db("wollama").expect("Failed to initialize database");
+
+    let collection = init_chromadb().await;
+    let path = "./path/to/watch";
+    let folder_watcher = FolderWatcher::new(collection);
+
+    tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .manage(AppState {
+            folder_watcher,
+            database,
+        })
+        .invoke_handler(tauri::generate_handler![get_data])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}
+
+//.manage(DATABASE.clone())
+// .invoke_handler(tauri::generate_handler![get_data])
 
 /* #[tauri::command]
 fn get_data(
@@ -37,23 +62,3 @@ fn add_watch_folder(path: String, state: State<AppState>) {
 fn remove_watch_folder(path: String, state: State<AppState>) {
     state.folder_watcher.remove_folder(path);
 } */
-
-#[tauri::command]
-fn get_data(path: String, state: State<AppState>) {}
-
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub async fn run() {
-    let database = initialize_db("wollama").expect("Failed to initialize database");
-
-    let collection = init_chromadb().await;
-    let path = "./path/to/watch";
-    let folder_watcher = FolderWatcher::new(collection);
-
-    tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
-        .manage(AppState { folder_watcher })
-        //.manage(DATABASE.clone())
-        // .invoke_handler(tauri::generate_handler![get_data])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-}
