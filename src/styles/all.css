@@ -4,9 +4,9 @@
 @tailwind variants;
 
 @import "./base.css";
-@import "./main.css";
-@import "./theme.css";
 @import "./components.css";
-@import "./snippets.css";
 @import "./utilities.css";
+@import "./theme.css";
+@import "./snippets.css";
 @import "./css-properties.css";
+@import "./main.css";
