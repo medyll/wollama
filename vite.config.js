@@ -1,13 +1,15 @@
 import { defineConfig } from "vite";
 import { sveltekit } from "@sveltejs/kit/vite";
-import tailwindcss from '@tailwindcss/vite'
-// @ts-expect-error process is a nodejs global
+import tailwindcss from '@tailwindcss/vite';
+
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
-  plugins: [tailwindcss(),sveltekit()],
-
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
+    sveltekit(),
+  ],
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent vite from obscuring rust errors
@@ -29,4 +31,4 @@ export default defineConfig(async () => ({
       ignored: ["**/src-tauri/**"],
     },
   },
-}));
+});

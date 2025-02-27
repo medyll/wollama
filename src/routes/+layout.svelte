@@ -1,15 +1,9 @@
-<script lang="ts">
-    import 'virtual:uno.css';
+<script lang="ts"> 
+    import '../styles/all.css';
     import Settings from '$components/settings/Settings.svelte';
     import TopBar from '$components/ui/TopBar.svelte';
     import Sidebar from '$components/ui/Sidebar.svelte';
     import { settings } from '$lib/stores/settings.svelte';
-    import '../styles/css-properties.css';
-    import '../styles/tailwind.css';
-    import '../styles/app.css';
-    import '../styles/snippets.css';
-    import '../styles/skin.css';
-    import '@unocss/reset/tailwind.css';
     import { idbQuery, ideo } from '$lib/db/dbQuery';
     import Notifications from '$components/ui/Notifications.svelte';
     import Opening from '$components/Opening.svelte';
@@ -251,15 +245,3 @@ xxl
     </div>
 </div>
 
-<style>
-    :global(svg) {
-        color: var(--cfab-icon-color);
-    }
-    :global(:root) {
-        --theme-color-foreground-alpha-high: var(--cfab-paper-border-color);
-        --theme-color-background: var(--cfab-bg);
-        --theme-color-primary: var(--cfab-primary);
-        --theme-color-background-alpha: #cccccc;
-        --radius-tiny: 4px;
-    }
-</style>

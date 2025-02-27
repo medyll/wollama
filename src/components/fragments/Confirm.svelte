@@ -45,7 +45,7 @@
     {/if}
 </div>
 
-<style lang="scss">
+<style lang="postcss">
     svg {
         > path {
             color: red !important;

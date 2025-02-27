@@ -1,0 +1,40 @@
+
+
+@layer utilities {
+  .application {
+    color: var(--cfab-foreground);
+    background-color: var(--cfab-bg);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    .application-content {
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      z-index: 0;
+      position: relative;
+
+      .application-topBar {
+        display: flex;
+        align-items: center;
+        z-index: 50;
+        top: 0;
+        gap: 1rem;
+        margin-top: 0px;
+        height: 34px;
+        z-index: 9000;
+      }
+
+      .application-main {
+        position: relative;
+        overflow: auto;
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+}

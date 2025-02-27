@@ -1,0 +1,199 @@
+@layer components {
+  .theme-bg { 
+    @apply dark:bg-gray-800 dark:text-gray-100;
+  }
+  .theme-bg-dark {
+    @apply text-gray-700 bg-gray-200;
+    @apply dark:bg-gray-900 dark:text-gray-100;
+  }
+}
+
+/* src/styles/skin.css */
+
+@layer components {
+  button,
+  input[type="button"],
+  .btn {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    min-height: 24px;
+
+    &.btn-big {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    &.btn-link {
+      border: none;
+      border-bottom: 1px solid red;
+    }
+
+    &:hover {
+      border-color: darken(9);
+    }
+  }
+
+  .btn {
+    @apply rounded-md border border-gray-700;
+    @apply text-gray-700 bg-gray-100;
+    @apply dark:bg-gray-900/40 dark:text-gray-100;
+    @apply flex place-items-center;
+  }
+
+  input,
+  .input,
+  input[type="search"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="number"],
+  input[type="text"] {
+    min-height: 2.5rem;
+    padding: 0.5rem !important;
+  }
+
+  .input,
+  input[type="search"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="number"],
+  input[type="text"],
+  textarea,
+  select {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--cfab-input-border-color) !important;
+    background: var(--cfab-input-bg-color);
+    color: var(--cfab-input-foreground-color);
+    transition: all 0.2s ease-in-out;
+
+    &.naked {
+      border-color: transparent;
+    }
+    &.tight {
+      padding: 0.25rem;
+    }
+    &:hover {
+      border-color: var(--cfab-input-border-color-focus);
+      box-shadow: var(--cfab-shadow);
+    }
+
+    &:active,
+    &:focus {
+      border: 1px solid var(--cfab-input-border-color-focus);
+      box-shadow: var(--cfab-shadow);
+    }
+
+    [disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  select {
+    option {
+      @apply bg-white/80 dark:bg-black p-1 cursor-pointer;
+      @apply text-gray-700 dark:text-gray-100;
+    }
+  }
+
+  textarea {
+    width: 100%;
+  }
+
+  .application-sideBar {
+    @apply hidden w-[80px] lg:flex;
+    @apply p-3 flex h-full flex-col flex-shrink overflow-hidden shadow-lg;
+
+    &[aria-expanded="false"] {
+      @apply lg:w-[80px];
+    }
+    &[aria-expanded="true"] {
+      @apply sm:w-[240px] sm:relative md:w-[340px] lg:w-[340px] xl:w-[340px] 2xl:w-[440px];
+    }
+
+    gap: 0.5rem;
+    height: 100%;
+    transition: width 0.1s ease-in-out;
+    z-index: 30;
+    border-right: 1px solid var(--cfab-input-border-color);
+    background-color: var(--cfab-paper-bg-color);
+    background-image: var(--cfab-gradient);
+
+    .application-sideBar-title {
+      @apply flex items-center justify-end;
+      color: var(--cfab-soft-title-text-color);
+      text-align: right;
+    }
+
+    .application-sideBar-content {
+      @apply px-2 flex-1 w-full;
+      overflow-y: auto;
+    }
+  }
+
+  .application-container {
+    @apply lg:max-w-[55rem] xl:max-w-[65rem] 2xl:max-w-[160rem] 3xl:max-w-[100rem];
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: relative;
+  }
+
+  /* from main.css */
+
+  code.prismDone {
+    @apply bg-neutral-600 dark:bg-neutral-800;
+  }
+
+  .codeFormat {
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1em 0;
+    @apply bg-neutral-200 dark:bg-neutral-800;
+    @apply border border-neutral-400 dark:border-white/10;
+  }
+
+  code[class*="language-"] {
+    border-radius: 0;
+    border: none;
+    display: block !important;
+    overflow-x: auto;
+    padding: 1em;
+    padding: 1em;
+    white-space: pre-wrap;
+    padding-top: 1em;
+    margin: 0;
+
+    display: block !important;
+    overflow-x: auto;
+    white-space: pre-wrap;
+
+    color: white;
+    text-shadow: 0 0.1px rgba(255, 255, 255, 0);
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+
+    @apply bg-neutral-600 dark:bg-neutral-800;
+  }
+
+  :not(pre) > code[class*="language-"],
+  pre[class*="language-"] {
+    background: inherit;
+    @apply bg-neutral-600 dark:bg-neutral-800;
+  }
+}

@@ -140,11 +140,11 @@
                     form="prompt-form" />
                     <div class="absolute right-3 h-10  w-10 top-[50%] -mt-5     rounded-full place-content-center flex flex-col">
                         {#if $aiState == 'done'}
-                            <button   class="rounded-full border border drop-shadow-lg aspect-ratio-square flex place-content-center"     type="submit" form="prompt-form"  >
+                            <button   class="rounded-full border border drop-shadow-lg aspect-square flex place-content-center"     type="submit" form="prompt-form"  >
                                 <Icon icon="mdi:send"  />                   
                             </button>
                         {:else}
-                            <button   class="rounded-full border border drop-shadow-lg aspect-ratio-square flex place-content-center"    form="prompt-form" >
+                            <button   class="rounded-full border border drop-shadow-lg aspect-square flex place-content-center"    form="prompt-form" >
                                 <Icon icon="mdi:stop" />
                             </button>
                         {/if}                    
@@ -174,13 +174,13 @@
     </div>
 </div>
 
-<style lang="postcss" global>
-hr {
-    margin: 0;
-}
+<style lang="postcss" global  >
+    hr {
+        margin: 0;
+    }
     .chatZone {
         @apply flex flex-col   w-full sticky mb-0 bottom-0 px-8;
-       /*  background-image: var(--cfab-gradient); */
+        /*  background-image: var(--cfab-gradient); */
         background-size: 100vh 100vw;
         background-position: bottom; 
         color: var(--cfab-foreground);

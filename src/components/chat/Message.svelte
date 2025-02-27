@@ -142,7 +142,7 @@
     {/if} -->
 </div>
 
-<style lang="scss">
+<style lang="postcss">
     .message{ 
         @apply p-2 gap-3 border;
         /* @apply bg-gray-100 dark:bg-gray-800; */
@@ -153,11 +153,11 @@
 
     .message-assistant { 
         @apply flex-row-reverse  ml-24;
-        @apply 2xl:basis-2/4  2x:ml-0 ;
+        @apply 2xl:basis-2/4  2xl:ml-0 ;
     }
     .message-user { 
         @apply flex-row mr-24;
-        @apply 2xl:basis-1/4 2x:mr-0;
+        @apply 2xl:basis-1/4 2xl:mr-0;
     }
     .preserve-line-breaks {
             white-space: pre-wrap;

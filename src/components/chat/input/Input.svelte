@@ -39,7 +39,7 @@
     </div>
 </div>
 
-<style lang="scss">
+<style lang="postcss">
  
 
     .grower {

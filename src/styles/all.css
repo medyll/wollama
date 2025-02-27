@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+@import "./base.css";
+@import "./main.css";
+@import "./theme.css";
+@import "./components.css";
+@import "./snippets.css";
+@import "./utilities.css";
+@import "./css-properties.css";

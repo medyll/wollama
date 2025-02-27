@@ -100,7 +100,7 @@
     </div>
 </div>
 
-<style lang="scss">
+<style lang="postcss">
     :global(.red) {
         transition: all 1s ease;
     }
@@ -129,11 +129,11 @@
         &[aria-expanded='false'] { 
             @apply items-center;
             :global(li.menu-list-item) {
-               @apply aspect-ratio-square flex items-center place-items-center
+               @apply aspect-square flex items-center place-items-center
             }
             :global(.menu-list-item-text) {
                @apply  w-full text-center;
-               @apply aspect-ratio-square flex place-items-center
+               @apply aspect-square flex place-items-center
             }
             .not-expanded {
                 display: none;
