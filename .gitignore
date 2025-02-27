@@ -3,9 +3,8 @@ node_modules
 /build
 /.svelte-kit
 /package
-/src-tauri/database
-/database
 .env
 .env.*
 !.env.example
 vite.config.js.timestamp-*
+src-tauri/database/*
