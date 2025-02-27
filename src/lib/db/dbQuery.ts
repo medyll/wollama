@@ -6,6 +6,7 @@ import type { SettingsType } from "$types/settings";
 import type { UserType } from "$types/user";
 import { schemeModel } from "$lib/db/dbSchema";
 import { getClientData } from "$types/getData";
+import type { Where } from "@medyll/idae-idbql";
 
 export function ideo(collection: keyof typeof schemeModelDb) {
   if (!idbqlState[collection])
@@ -43,6 +44,22 @@ export function ideo(collection: keyof typeof schemeModelDb) {
       action: "updateWhere",
       data: {},
     }),
+  };
+}
+export function dynQuery(collection: keyof typeof schemeModelDb) {
+  if (!idbqlState[collection])
+    throw new Error(`Collection ${collection} not found`);
+  return {
+    getOne: (id: any) =>
+      idbqlState[collection].getOne(id, schemeModel[collection].keyPath),
+    getAll: () => idbqlState[collection].getAll(),
+    create: (data) => idbqlState[collection].put(data),
+    delete: (id: string | number) => idbqlState[collection].delete(id),
+    deleteWhere: (data) => idbqlState[collection].deleteWhere(data),
+    update: (id: any, data) => idbqlState[collection].update(id, data),
+    where: (where: Where) => idbqlState[collection].where(where),
+    updateWhere: (where: Where, data) =>
+      idbqlState[collection].updateWhere(where, data),
   };
 }
 
