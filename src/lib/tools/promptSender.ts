@@ -99,8 +99,6 @@ export class PromptSender {
       };
     }
 
-    console.log({ context });
-
     return OllamaApi.generate(
       {
         prompt: userMessage.content,
