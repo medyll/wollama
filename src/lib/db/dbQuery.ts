@@ -65,49 +65,48 @@ export function dynQuery(collection: keyof typeof schemeModelDb) {
 
 export class idbQuery {
   /* chat */
-  static getChat(chatId: string) {
-    if (!chatId || !idbqlState?.chat) return undefined; // throw new Error('chatId is required');
-    return idbqlState.chat.where({ chatId: { eq: chatId } })[0];
+  static getChat(id: number) {
+    if (!id || !idbqlState?.chat) return undefined; // throw new Error('id is required');
+    return idbqlState.chat.where({ id: { eq: id } })[0];
   }
 
   static getChats() {
     return idbqlState.chat.getAll();
   }
 
-  static async insertChat(chatData?: DbChat): Promise<DbChat> {
+  static async insertChat(chatData?: Partial<DbChat>): Promise<DbChat> {
     const newChat = chatUtils.getChatDataObject();
 
     await idbqlState.chat.add({ ...newChat, ...chatData });
     return { ...newChat, ...chatData };
   }
 
-  static async deleteChat(chatId?: string): Promise<string> {
-    if (!chatId) throw new Error("chatId is required");
+  static async deleteChat(id?: number): Promise<number> {
+    if (!id) throw new Error("id is required");
 
-    await idbqlState.messages.deleteWhere({ chatId: { eq: chatId } });
-    await idbqlState.chat.delete(chatId);
+    await idbqlState.messages.deleteWhere({ id: { eq: id } });
+    await idbqlState.chat.delete(id);
 
-    return chatId;
+    return id;
   }
 
-  static async updateChat(chatId: string, chatData: Partial<DbChat>) {
-    if (!chatId) throw new Error("chatId is required");
+  static async updateChat(id: number, chatData: Partial<DbChat>) {
+    if (!id) throw new Error("id is required");
 
-    await idbqlState.chat.update(chatId, chatData);
-    return { chatId, ...chatData };
+    await idbqlState.chat.update(id, chatData);
+    return { id, ...chatData };
   }
 
   static async initChat(
-    activeChatId?: string,
+    id?: number,
     chatData: DbChat = {} as DbChat
   ): Promise<DbChat> {
-    if (Boolean(await idbQuery.getChat(activeChatId as string))) {
-      await idbQuery.updateChat(activeChatId as string, chatData);
+    if (Boolean(await idbQuery.getChat(id))) {
+      await idbQuery.updateChat(id, chatData);
     }
 
-    return activeChatId &&
-      Boolean(await idbQuery.getChat(activeChatId as string))
-      ? ((await idbQuery.getChat(activeChatId as string)) as DbChat)
+    return id && Boolean(await idbQuery.getChat(id))
+      ? ((await idbQuery.getChat(id)) as DbChat)
       : ((await idbQuery.insertChat(chatData)) as DbChat);
   }
 
@@ -124,53 +123,40 @@ export class idbQuery {
     return message;
   }
 
-  static async updateMessage(
-    messageId: string,
-    messageData: Partial<DBMessage>
-  ) {
-    if (!messageId) throw new Error("messageId is required");
-    //console.log('updateMessage', messageId);
-    await idbqlState.messages.update(messageId, { messageId, ...messageData });
+  static async updateMessage(id: number, messageData: Partial<DBMessage>) {
+    if (!id) throw new Error("id is required");
+    //console.log('updateMessage', id);
+    await idbqlState.messages.update(id, { id, ...messageData });
   }
 
-  static async updateMessageStream(
-    messageId: string,
-    data: Partial<OllamaResponse>
-  ) {
-    //console.log('updateMessageStream', messageId);
-    if (!messageId) throw new Error("messageId is required");
-    const message = await idbQuery.getMessage(messageId);
+  static async updateMessageStream(id: number, data: Partial<OllamaResponse>) {
+    //console.log('updateMessageStream', id);
+    if (!id) throw new Error("id is required");
+    const message = await idbQuery.getMessage(id);
 
     let content =
       (message?.content ?? "") +
       (data?.message?.content ?? data?.response ?? "");
 
     if (content)
-      await idbQuery.updateMessage(messageId, {
-        messageId,
+      await idbQuery.updateMessage(id, {
         content,
         status: "streaming",
       });
   }
 
-  static getMessage(messageId: string) {
-    if (!messageId) throw new Error("messageId is required");
-    return idbqlState.messages.where({ messageId: { eq: messageId } })[0];
-    // return   idbqlState.messages.get(messageId);
+  static getMessage(id: number) {
+    if (!id) throw new Error("id  is required");
+    return idbqlState.messages.where({ id: { eq: id } })[0];
   }
 
   static getMessages(chatId: string): DBMessage | [] | any {
     if (!chatId) return [];
     return idbqlState.messages
       .where({ chatId: { eq: chatId } })
-      .sortBy({ createdAt: "asc" });
+      .sortBy({ created_at: "asc" });
   }
-  /* MessageStats */
-  static async insertMessageStats(statsData: Partial<OllamaResponse>) {
-    if (!statsData.messageId) throw new Error("messageId is required");
-    const stats = chatUtils.getMessageStatsObject(statsData);
-    await idbqlState.messageStats.add(stats);
-  }
+
   /* Prompt */
   static async getPrompt(promptId: string) {
     if (!promptId) throw new Error("promptId is required");

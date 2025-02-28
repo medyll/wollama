@@ -5,21 +5,22 @@
     import { t } from '$lib/stores/i18n';
     import { ui } from '$lib/stores/ui';
     import ChatOptions from './ChatOptions.svelte';
-    import { PromptSender } from '$lib/tools/promptSender.js';
     import { ollamaBodyStore } from '$lib/stores/prompter';
     import { aiState } from '$lib/stores';
     import DashBoard from '$components/DashBoard.svelte';
-    import Images from './input/Images.svelte'; 
     import { ChatApiSession } from '$lib/tools/chatApiSession';
     import { chatParamsState, type ChatGenerate } from '$lib/states/chat.svelte';
-    import {   Icon,   } from '@medyll/idae-slotui-svelte';
+    import { Icon } from '@medyll/idae-slotui-svelte';
     import MessagesList from './MessagesList.svelte';
     import { chatMetadata } from '$lib/tools/promptSystem'; 
-    import AgentPick from '$components/agents/AgentPick.svelte';
     import { connectionTimer } from '$lib/stores/timer.svelte';
     import { replaceState } from '$app/navigation';
     import type { DBMessage } from '$types/db';
-    import { page } from '$app/state';
+    import { WollamaApi } from '$lib/db/wollamaApi';
+    import { get } from 'svelte/store';
+    import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
+    import type { GenerateRequest } from 'ollama/browser';
+    import { ChatSessionManager } from '$lib/tools/chatSessionManager';
     
     interface MainChatProps {
         activeChatId?: any;
@@ -28,8 +29,12 @@
     let { activeChatId }: MainChatProps = $props(); 
 
     let chatApiSession: ChatApiSession = new ChatApiSession(activeChatId);
-
     chatApiSession.initChat(activeChatId);
+
+
+    let chatSessionManager: ChatSessionManager =   ChatSessionManager.loadSession(); 
+    
+
 
     let placeholder: string = $derived(chatParamsState.voiceListening ? 'Listening...' : 'Message to ai');
 
@@ -53,31 +58,43 @@
             const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
             
             assistantDbMessage = assistantDbMessage ?? await chatSession.createAssistantMessage(model);
-            // get ollamaBody
-            const sender = new PromptSender(chat.ollamaBody);
-            // declare stream listeners
-            sender.onStream = ({ target, data }) => {
-                chatSession.onMessageStream(target, data);
-                // set auto-scroll to false
-                ui.setAutoScroll(target.chatId, false);
+
+            const config = get(settings);
+            const ollamaOptions = get(ollamaApiMainOptionsParams);
+            
+            const request =  {
+                    prompt: userChatMessage.content,
+                    system: `${systemPrompt ?? config?.system_prompt}`,
+                    context : chat.context ?? [],
+                    model: model ?? config?.defaultModel,
+                    options: { ...ollamaOptions,  temperature: chatParams.temperature, },
+                    format:  chatParams.format ,
+                    stream: true,
+                } satisfies GenerateRequest ;
+
+
+            const senderGenerate =  WollamaApi.generate_bis(                
+                request // pass the request object here
+            )
+
+            senderGenerate.onStream = (response) => {
+                const target = assistantDbMessage; 
+                console.log('sender.onStream', { target, response });
+                chatSession.onMessageStream(target, response);
+                ui.setAutoScroll(target.chatId, false);  
             };
 
-            sender.onEnd = ({ data }) => { 
-                chatSession.onMessageDone(assistantDbMessage, data);
+            senderGenerate.onEnd = (response) => { 
+                console.log('senderGenerate.onEnd', { response });
+                chatSession.onMessageDone(assistantDbMessage, response); // Updated to use response instead of data
                 aiState.set('done');
                 chatMetadata.checkTitle(userDbMessage.chatId);
             };
 
-            sender.sendChatMessage({
-                model,
-                systemPrompt,
-                previousMessages,
-                userMessage: userChatMessage,
-                target: assistantDbMessage,
-                temperature: chatParams.temperature,
-                format: chatParams.format,
-                context: chat.context ?? [],
-            });
+
+
+
+           
         });
 
         // set auto-scroll to true

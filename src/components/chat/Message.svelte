@@ -80,7 +80,7 @@
         }
     });
 
-    let dd = $derived(message?.createdAt.getTime().toString());
+    let dd = $derived(message?.created_at.getTime().toString());
     let order = $derived(`order: ${dd};`);
 </script>
 <!-- {place} -->
@@ -96,7 +96,7 @@
             </div>
         </div>
     {/if} -->
-    <div class="flex flex-col w-full"> {message?.createdAt}
+    <div class="flex flex-col w-full"> {message?.created_at}
         <div class="line-gap-2 mb-1 p-1 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
             
             <div class="soft-title">
@@ -105,7 +105,7 @@
            <!--  <div class="soft-title">{message?.model ?? ''}</div> -->
             <div class="flex-1"></div>
             <div class="soft-title">{message?.status != 'done' ? message?.status : ''}</div>
-            <div class="soft-title">{format(new Date(message?.createdAt), 'dd MMMM y hh:mm')}</div>
+            <div class="soft-title">{format(new Date(message?.created_at), 'dd MMMM y hh:mm')}</div>
             <div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
             <Icon style="font-size:1.6em" {icon} />
         </div>

@@ -174,7 +174,7 @@ export class chatUtils {
   static getMessageDataObject(message: Partial<DBMessage>): DBMessage {
     return {
       content: message.content,
-      createdAt: Date.now(), // Utiliser un timestamp en millisecondes
+      created_at: Date.now(), // Utiliser un timestamp en millisecondes
       data: [],
       edit: false,
       editedContent: "",
@@ -188,7 +188,7 @@ export class chatUtils {
     return {
       chatId: crypto.randomUUID(),
       context: [],
-      createdAt: Date.now(), // Utiliser un timestamp en millisecondes
+      created_at: Date.now(), // Utiliser un timestamp en millisecondes
       created_at: Date.now(), // Utiliser un timestamp en millisecondes
       dateLastMessage: Date.now(), // Utiliser un timestamp en millisecondes
       models: [get(settings).defaultModel],

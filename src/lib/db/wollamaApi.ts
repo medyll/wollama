@@ -1,5 +1,5 @@
+import type { WollamaResponse } from "$types/ollama";
 import ollama, {
-  type Options,
   type Config,
   type GenerateRequest,
   type GenerateResponse,
@@ -17,6 +17,9 @@ interface Hook {
     images: string | null;
   };
 }
+
+export interface GenerateResponseHook extends GenerateResponse, Hook {}
+
 class WollamaApiConfig {
   model: string = "llama2";
   host: string = "http://127.0.0.1:11434";
@@ -37,8 +40,55 @@ class WollamaApiConfig {
 }
 
 export const wollamaApiConfig = new WollamaApiConfig();
+export type GgenerateRequestStream = GenerateRequest & {
+  stream: true;
+};
+export type GenerateRequestNoStream = GenerateRequest & {
+  stream: false;
+};
 
+export class WollamaApiEvent {
+  #onStream!: (data: GenerateResponseHook) => void;
+  #onEnd!: (data: GenerateResponseHook) => void;
+  #onData: (data: GenerateResponseHook) => void;
+
+  constructor() {
+    this.#onStream = (data: GenerateResponseHook) => {};
+    this.#onEnd = (data: GenerateResponseHook) => {};
+    this.#onData = (data: GenerateResponseHook) => {};
+
+    return this;
+  }
+
+  static eventApi() {
+    return new WollamaApiEvent();
+  }
+
+  set onStream(callback: (data: GenerateResponseHook) => void) {
+    this.#onStream = callback;
+  }
+  set onEnd(callback: (data: GenerateResponseHook) => void) {
+    this.#onEnd = callback;
+  }
+
+  set onData(callback: (data: GenerateResponseHook) => void) {
+    this.#onData = callback;
+  }
+
+  get onData() {
+    return this.#onData;
+  }
+
+  get onStream() {
+    return this.#onStream;
+  }
+  get onEnd() {
+    return this.#onEnd;
+  }
+}
 export class WollamaApiCore {
+  onStream!: (data: GenerateResponseHook) => void;
+  onEnd!: (data: GenerateResponseHook) => void;
   /**
    * Send chat request using the Ollama generate API.
    * @param generateRequest The generate request object.
@@ -46,26 +96,57 @@ export class WollamaApiCore {
    * @returns The generated data or the response object if the request fails.
    */
   async generate(
-    generateRequest: GenerateRequest & {
-      stream: true;
-    },
-    hook?: (data: GenerateResponse & Hook) => void
+    generateRequest: GenerateRequest,
+    hook?: (data: GenerateResponseHook) => void
   ) {
-    const response = await ollama.generate(generateRequest);
+    let response;
+
     if (generateRequest.stream) {
-      for await (const part of response) {
-        if (hook)
-          hook({
-            ...part,
-            messageId: "",
-            message: { role: "", content: "", images: null },
-          });
-      }
+      response = await ollama.generate({
+        ...generateRequest,
+        stream: true,
+      });
+
+      console.log({ response });
+      await this.stream(response, hook, "generate");
+      //
     } else {
-      return response;
+      response = await ollama.generate({
+        ...generateRequest,
+        stream: false,
+      });
     }
+
+    return response;
   }
 
+  generate_bis(generateRequest: GenerateRequest): WollamaApiEvent {
+    const event = WollamaApiEvent.eventApi();
+
+    let response;
+    /* let _onStream: (data: GenerateResponseHook) => void = () => {};
+    let _onEnd: (data: GenerateResponseHook) => void = () => {}; */
+
+    if (generateRequest.stream) {
+      response = ollama
+        .generate({
+          ...generateRequest,
+          stream: true,
+        })
+        .then((response) => {
+          this.stream(response, event.onStream, "generate");
+        });
+    } else {
+      response = ollama
+        .generate({
+          ...generateRequest,
+          stream: false,
+        })
+        .then((response) => response);
+    }
+
+    return event;
+  }
   /**
    * Sends a chat request using the chat API.
    *
@@ -79,18 +160,24 @@ export class WollamaApiCore {
     },
     hook?: (data: ChatResponse & Hook) => void
   ) {
-    const response = await ollama.chat(chatRequest);
+    let response;
     if (chatRequest.stream) {
-      for await (const part of response) {
-        if (hook)
-          hook({
-            ...part,
-            messageId: "",
-            message: { role: "", content: "", images: [] },
-          });
-      }
+      response = await ollama.chat({ ...chatRequest, stream: true });
+      console.log({ response });
+      this.stream(response, hook, "chat");
     } else {
+      response = await ollama.chat({ ...chatRequest, stream: false });
       return response;
+    }
+  }
+
+  async stream(
+    response: AsyncGenerator,
+    hook?: (data: OllamaResponse) => void,
+    type: "generate" | "chat"
+  ) {
+    for await (const part of response) {
+      if (hook) hook(part);
     }
   }
 
@@ -137,73 +224,5 @@ export class WollamaApiCore {
     return await response.json();
   }
 }
-
-/* class OllamaApiFetch {
-  config = wollamaApiConfig;
-  requestStop = false;
-
-  constructor() {}
-
-  fetch = async (
-    method: "GET" | "POST" | "DELETE",
-    url: string,
-    body?: string
-  ): Promise<any> => {
-    let headers: RequestInit["headers"] = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-
-    return fetch(`${this.config.host}/${url}`, {
-      headers,
-      method,
-      body,
-    })
-      .then(async (res) => {
-        if (!res?.ok) throw await res.json(); 
-        return res.body instanceof ReadableStream ? res : await res.json();
-      })
-      .then(async (res) => {
-        return res;
-      })
-      .catch((error) => {
-        throw new Error("{ failed: true }");
-      });
-  };
-
-  async stream(response: Response, hook?: (data: OllamaResponse) => void) {
-    if (response?.body && response?.ok) {
-      const streamReader = response.body
-        .pipeThrough(new TextDecoderStream())
-        .pipeThrough(this.splitStream("\n"))
-        .getReader();
-
-      while (true) {
-        const { value, done } = await streamReader.read();
-
-        if (Boolean(done) || this.requestStop) break;
-        if (value) {
-          const data: OllamaResponse = JSON.parse(value);
-
-          if (hook) hook(data);
-        }
-      }
-    }
-  }
-  private splitStream(separator: string) {
-    let buffer = "";
-    return new TransformStream({
-      flush(controller) {
-        if (buffer) controller.enqueue(buffer);
-      },
-      transform(chunk, controller) {
-        buffer += chunk;
-        const parts = buffer.split(separator);
-        parts.slice(0, -1).forEach((part) => controller.enqueue(part));
-        buffer = parts[parts.length - 1];
-      },
-    });
-  }
-} */
 
 export const WollamaApi = new WollamaApiCore();

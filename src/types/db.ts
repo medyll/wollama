@@ -5,13 +5,13 @@ import type { OllamaChat } from "./ollama";
  * Represents a chat.
  */
 export type DbChat = {
-  id: string;
+  id: number;
   chatId: string;
   categoryId: number;
   title: string;
   description: string;
   models: string[];
-  createdAt: Date;
+  created_at: Date;
   category: string;
   dateLastMessage: Date;
   tags: DbTags[];
@@ -45,11 +45,11 @@ export interface ChatListType {
  * Represents a message.
  */
 export type DBMessage = {
-  id: string;
-  chatId: string;
+  id: number;
   messageId?: string;
+  chatId: string;
   content: string;
-  createdAt: Date;
+  created_at: Date;
   images?: MessageImageType;
   status: "idle" | "done" | "sent" | "streaming" | "error";
   context: number[];

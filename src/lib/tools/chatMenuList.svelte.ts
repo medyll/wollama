@@ -19,7 +19,8 @@ type GroupItem = {
 
 function sortList(list: DbChat[]): DbChat[] {
   return list.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 }
 
@@ -148,8 +149,8 @@ export function groupChatMessages(
     // loop chats
     for (const item of sortedList) {
       if (
-        new Date(item.createdAt).getTime() >= week.start &&
-        new Date(item.createdAt).getTime() <= week.end
+        new Date(item.created_at).getTime() >= week.start &&
+        new Date(item.created_at).getTime() <= week.end
       ) {
         if (!groups.byMonth[idx]) groups.byMonth[idx] = [];
         group.items.push(item);
@@ -169,8 +170,8 @@ export function groupChatMessages(
     // loop chats
     for (const item of sortedList) {
       if (
-        new Date(item.createdAt).getTime() >= month.start &&
-        new Date(item.createdAt).getTime() <= month.end
+        new Date(item.created_at).getTime() >= month.start &&
+        new Date(item.created_at).getTime() <= month.end
       ) {
         if (!groups.byMonth[idx]) groups.byMonth[idx] = [];
         group.items.push(item);

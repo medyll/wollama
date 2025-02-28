@@ -28,6 +28,7 @@ async function fetchUrlContent(url: string): Promise<string> {
 }
 
 /**
+ * @deprecated
  * Represents a class that manages a chat session.
  * using api/chat endpoint
  * @class ChatApiSession
@@ -58,8 +59,8 @@ export class ChatApiSession {
     this.chatId = chatId;
   }
   async initChat(chatId?: string) {
-    if (this.chatId) {
-      let chat = idbQuery.getChat(this.chatId);
+    if (chatId ?? this.chatId) {
+      let chat = idbQuery.getChat(chatId ?? this.chatId);
       if (chat) {
         this.chat = chat;
         this.chatId = this.chat.chatId;
@@ -236,7 +237,7 @@ export class ChatApiSession {
   ) {
     await Promise.all([
       idbQuery.updateChat(assistantMessage.chatId, { context: data?.context }),
-      idbQuery.updateMessage(assistantMessage.messageId, { status: "done" }),
+      idbQuery.updateMessage(assistantMessage.id, { status: "done" }),
     ]);
   }
 
@@ -249,6 +250,10 @@ export class ChatApiSession {
     assistantMessage: DBMessage,
     data: OllamaResponse
   ) {
-    idbQuery.updateMessageStream(assistantMessage.messageId, data);
+    await idbQuery.updateMessageStream(assistantMessage.id, data);
+  }
+
+  public async handleError(error: Error) {
+    console.error("An error occurred:", error);
   }
 }

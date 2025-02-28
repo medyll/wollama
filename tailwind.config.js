@@ -18,6 +18,7 @@ export default {
   plugins: [
     require('@tailwindcss/typography'),
     require('autoprefixer'),
-    require('postcss-nesting')
+    require('postcss-nesting'),
+    require('postcss-import'),
   ],
 };

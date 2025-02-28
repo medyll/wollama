@@ -16,7 +16,6 @@ import type {
   DbSpaces,
 } from "$types/db";
 import type { DBMessage } from "$types/db";
-import type { OllamaResponse } from "$types/ollama";
 import type { SettingsType } from "$types/settings";
 import type { UserType } from "$types/user";
 import {
@@ -90,15 +89,16 @@ export const schemeModelDb = {
     },
   },
   chat: {
-    keyPath: "&chatId, createdAt, category, categoryId, dateLastMessage",
+    keyPath: "++id, &chatId, created_at, category, categoryId, dateLastMessage",
     model: {} as DbChat,
     ts: {} as DbChat,
     template: {
-      index: "chatId",
+      index: "id",
       presentation: "name",
       fields: {
-        chatId: "id",
-        createdAt: "date",
+        id: "id",
+        chatId: "fk.chat.id ",
+        created_at: "date",
         category: "text",
         categoryId: "id",
         dateLastMessage: "date",
@@ -165,7 +165,7 @@ export const schemeModelDb = {
     },
   },
   messages: {
-    keyPath: "++id, messageId, &chatId, created_at",
+    keyPath: "++id, messageId, chatId, created_at",
     model: {} as DBMessage,
     ts: {} as DBMessage,
     template: {
@@ -486,9 +486,6 @@ export const schemeModel: IdbqModel = {
 
 export type DataModelFinal = DbDataModelTs<typeof schemeModelDb>;
 
-//type test = DbTemplasteModel<typeof idbqModel>;
 const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 13);
 export const { idbql, idbqlState, idbDatabase, idbqModel } =
   idbqStore.create("woolama");
-
-// idbql.agent.where({ $eq: { id: 3 } });
