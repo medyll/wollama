@@ -88,6 +88,8 @@
       var(--sld-color-foreground),
       transparent 60%
     );
+    --color-bg: var(--bg-gray-800);
+    --color-text: var(--text-gray-700);
   }
 
   :root,
@@ -113,7 +115,6 @@
   }
 
   :root {
-    /* Assombrir --cfab-primary */
     --cfab-primary-darken-0: color-mix(in srgb, var(--cfab-primary), #999 0%);
     --cfab-primary-darken-10: color-mix(in srgb, var(--cfab-primary), #999 10%);
     --cfab-primary-darken-20: color-mix(
@@ -270,267 +271,9 @@
       transparent 0%
     );
   }
-
-  :root {
-    /* Assombrir --cfab-foreground */
-    --cfab-foreground-darken-0: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 0%
-    );
-    --cfab-foreground-darken-10: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 10%
-    );
-    --cfab-foreground-darken-20: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 20%
-    );
-    --cfab-foreground-darken-30: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 30%
-    );
-    --cfab-foreground-darken-40: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 40%
-    );
-    --cfab-foreground-darken-50: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 50%
-    );
-    --cfab-foreground-darken-60: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 60%
-    );
-    --cfab-foreground-darken-70: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 70%
-    );
-    --cfab-foreground-darken-80: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 80%
-    );
-    --cfab-foreground-darken-90: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 90%
-    );
-    --cfab-foreground-darken-100: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      black 100%
-    );
-    /* eclairci --cfab-foreground */
-    --cfab-foreground-lighten-0: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 0%
-    );
-    --cfab-foreground-lighten-10: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 10%
-    );
-    --cfab-foreground-lighten-20: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 20%
-    );
-    --cfab-foreground-lighten-30: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 30%
-    );
-    --cfab-foreground-lighten-40: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 40%
-    );
-    --cfab-foreground-lighten-50: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 50%
-    );
-    --cfab-foreground-lighten-60: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 60%
-    );
-    --cfab-foreground-lighten-70: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 70%
-    );
-    --cfab-foreground-lighten-80: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 80%
-    );
-    --cfab-foreground-lighten-90: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 90%
-    );
-    --cfab-foreground-lighten-100: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      white 100%
-    );
-
-    /* opacity --cfab-foreground */
-    --cfab-foreground-opacity-0: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 100%
-    );
-    --cfab-foreground-opacity-5: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 95%
-    );
-    --cfab-foreground-opacity-10: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 90%
-    );
-    --cfab-foreground-opacity-20: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 80%
-    );
-    --cfab-foreground-opacity-30: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 70%
-    );
-    --cfab-foreground-opacity-40: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 60%
-    );
-    --cfab-foreground-opacity-50: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 90%
-    );
-    --cfab-foreground-opacity-60: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 40%
-    );
-    --cfab-foreground-opacity-70: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 30%
-    );
-    --cfab-foreground-opacity-80: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 20%
-    );
-    --cfab-foreground-opacity-90: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 10%
-    );
-    --cfab-foreground-opacity-100: color-mix(
-      in srgb,
-      var(--cfab-foreground),
-      transparent 0%
-    );
-  }
-
-  /** --cfab-bg */
-  :root {
-    /** darkens --cfab-bg */
-    --cfab-bg-darken-0: color-mix(in srgb, var(--cfab-bg), black 0%);
-    --cfab-bg-darken-10: color-mix(in srgb, var(--cfab-bg), #ededed 10%);
-    --cfab-bg-darken-20: color-mix(in srgb, var(--cfab-bg), black 20%);
-    --cfab-bg-darken-30: color-mix(in srgb, var(--cfab-bg), black 30%);
-    --cfab-bg-darken-40: color-mix(in srgb, var(--cfab-bg), black 40%);
-    --cfab-bg-darken-50: color-mix(in srgb, var(--cfab-bg), black 50%);
-    --cfab-bg-darken-60: color-mix(in srgb, var(--cfab-bg), black 60%);
-    --cfab-bg-darken-70: color-mix(in srgb, var(--cfab-bg), black 70%);
-    --cfab-bg-darken-80: color-mix(in srgb, var(--cfab-bg), black 80%);
-    --cfab-bg-darken-90: color-mix(in srgb, var(--cfab-bg), black 90%);
-    --cfab-bg-darken-100: color-mix(in srgb, var(--cfab-bg), black 100%);
-    /* eclairci --cfab-bg */
-    --cfab-bg-lighten-0: color-mix(in srgb, var(--cfab-bg), white 0%);
-    --cfab-bg-lighten-5: color-mix(in srgb, var(--cfab-bg), white 5%);
-    --cfab-bg-lighten-10: color-mix(in srgb, var(--cfab-bg), white 10%);
-    --cfab-bg-lighten-20: color-mix(in srgb, var(--cfab-bg), white 20%);
-    --cfab-bg-lighten-30: color-mix(in srgb, var(--cfab-bg), white 30%);
-    --cfab-bg-lighten-40: color-mix(in srgb, var(--cfab-bg), white 40%);
-    --cfab-bg-lighten-50: color-mix(in srgb, var(--cfab-bg), white 50%);
-    --cfab-bg-lighten-60: color-mix(in srgb, var(--cfab-bg), white 60%);
-    --cfab-bg-lighten-70: color-mix(in srgb, var(--cfab-bg), white 70%);
-    --cfab-bg-lighten-80: color-mix(in srgb, var(--cfab-bg), white 80%);
-    --cfab-bg-lighten-90: color-mix(in srgb, var(--cfab-bg), white 90%);
-    --cfab-bg-lighten-100: color-mix(in srgb, var(--cfab-bg), white 100%);
-
-    /* opacity --cfab-bg */
-    --cfab-bg-opacity-0: color-mix(in srgb, var(--cfab-bg), transparent 100%);
-    --cfab-bg-opacity-10: color-mix(in srgb, var(--cfab-bg), transparent 90%);
-    --cfab-bg-opacity-20: color-mix(in srgb, var(--cfab-bg), transparent 80%);
-    --cfab-bg-opacity-30: color-mix(in srgb, var(--cfab-bg), transparent 70%);
-    --cfab-bg-opacity-40: color-mix(in srgb, var(--cfab-bg), transparent 60%);
-    --cfab-bg-opacity-50: color-mix(in srgb, var(--cfab-bg), transparent 50%);
-    --cfab-bg-opacity-60: color-mix(in srgb, var(--cfab-bg), transparent 40%);
-    --cfab-bg-opacity-70: color-mix(in srgb, var(--cfab-bg), transparent 30%);
-    --cfab-bg-opacity-80: color-mix(in srgb, var(--cfab-bg), transparent 20%);
-    --cfab-bg-opacity-90: color-mix(in srgb, var(--cfab-bg), transparent 10%);
-    --cfab-bg-opacity-90: color-mix(in srgb, var(--cfab-bg), transparent 10%);
-    --cfab-bg-opacity-95: color-mix(in srgb, var(--cfab-bg), transparent 5%);
-    --cfab-bg-opacity-100: color-mix(in srgb, var(--cfab-bg), transparent 0%);
-  }
-
-  /** gradients */
-  :root {
-    --cfab-gradient-from: var(--cfab-bg);
-    --cfab-gradient-to: var(--cfab-bg-darken-20);
-    --cfab-gradient: linear-gradient(
-      to bottom,
-      var(--cfab-gradient-from),
-      var(--cfab-gradient-to) 90%
-    );
-  }
-
-  /* Couleurs de bordure */
-  :root {
-    --cfab-border-color: var(--cfab-foreground-opacity-10);
-    --cfab-border-color-hover: var(--cfab-foreground-opacity-90);
-    --cfab-border-color-focus: var(--cfab-foreground-opacity-90);
-  }
-
-  /* inputs */
-  :root {
-    --cfab-input-foreground-color: var(--cfab-foreground);
-    --cfab-input-bg-color: var(--sld-color-background);
-    --cfab-input-border-color: var(--cfab-foreground-opacity-20);
-    --cfab-input-border-color-focus: var(--cfab-primary-opacity-60);
-    --cfab-input-shadow-hover: rgba(0, 0, 0, 0.1);
-  }
-  /** shadow */
-  :root {
-    --cfab-shadow:
-      0 1px 3px 0 var(--cfab-shadow-color),
-      0 1px 2px -1px var(--cfab-shadow-color);
-    --cfab-shadow-color: var(--cfab-bg-darken-20);
-    --cfab-shadow-color-hover: var(--cfab-foreground-darken-40);
-
-    --cfab-soft-title-text-color: rgb(107, 114, 128);
-  }
 }
 
-/* @theme {
+@theme {
   --color-bg: var(--bg-gray-50);
   --color-text: var(--text-gray-700);
 
@@ -540,7 +283,254 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 96rem;
+  --breakpoint-3xl: 112rem;
   --breakpoint-hd: 120rem;
   --breakpoint-2k: 160rem;
   --breakpoint-4k: 230rem;
-} */
+  /** shadow */
+  --cfab-shadow:
+    0 1px 3px 0 var(--cfab-shadow-color),
+    0 1px 2px -1px var(--cfab-shadow-color);
+  --cfab-shadow-color: var(--cfab-bg-darken-20);
+  --cfab-shadow-color-hover: var(--cfab-foreground-darken-40);
+
+  --cfab-soft-title-text-color: rgb(107, 114, 128);
+  /* inputs */
+  --cfab-input-foreground-color: var(--cfab-foreground);
+  --cfab-input-bg-color: var(--sld-color-background);
+  --cfab-input-border-color: var(--cfab-foreground-opacity-20);
+  --cfab-input-border-color-focus: var(--cfab-primary-opacity-60);
+  --cfab-input-shadow-hover: rgba(0, 0, 0, 0.1);
+
+  /* Couleurs de bordure */
+  --cfab-border-color: var(--cfab-foreground-opacity-10);
+  --cfab-border-color-hover: var(--cfab-foreground-opacity-90);
+  --cfab-border-color-focus: var(--cfab-foreground-opacity-90);
+  /** gradients */
+
+  --cfab-gradient-from: var(--cfab-bg);
+  --cfab-gradient-to: var(--cfab-bg-darken-20);
+  --cfab-gradient: linear-gradient(
+    to bottom,
+    var(--cfab-gradient-from),
+    var(--cfab-gradient-to) 90%
+  );
+
+  /** --cfab-bg */
+
+  /** darkens --cfab-bg */
+  --cfab-bg-darken-0: color-mix(in srgb, var(--cfab-bg), black 0%);
+  --cfab-bg-darken-10: color-mix(in srgb, var(--cfab-bg), #ededed 10%);
+  --cfab-bg-darken-20: color-mix(in srgb, var(--cfab-bg), black 20%);
+  --cfab-bg-darken-30: color-mix(in srgb, var(--cfab-bg), black 30%);
+  --cfab-bg-darken-40: color-mix(in srgb, var(--cfab-bg), black 40%);
+  --cfab-bg-darken-50: color-mix(in srgb, var(--cfab-bg), black 50%);
+  --cfab-bg-darken-60: color-mix(in srgb, var(--cfab-bg), black 60%);
+  --cfab-bg-darken-70: color-mix(in srgb, var(--cfab-bg), black 70%);
+  --cfab-bg-darken-80: color-mix(in srgb, var(--cfab-bg), black 80%);
+  --cfab-bg-darken-90: color-mix(in srgb, var(--cfab-bg), black 90%);
+  --cfab-bg-darken-100: color-mix(in srgb, var(--cfab-bg), black 100%);
+  /* eclairci --cfab-bg */
+  --cfab-bg-lighten-0: color-mix(in srgb, var(--cfab-bg), white 0%);
+  --cfab-bg-lighten-5: color-mix(in srgb, var(--cfab-bg), white 5%);
+  --cfab-bg-lighten-10: color-mix(in srgb, var(--cfab-bg), white 10%);
+  --cfab-bg-lighten-20: color-mix(in srgb, var(--cfab-bg), white 20%);
+  --cfab-bg-lighten-30: color-mix(in srgb, var(--cfab-bg), white 30%);
+  --cfab-bg-lighten-40: color-mix(in srgb, var(--cfab-bg), white 40%);
+  --cfab-bg-lighten-50: color-mix(in srgb, var(--cfab-bg), white 50%);
+  --cfab-bg-lighten-60: color-mix(in srgb, var(--cfab-bg), white 60%);
+  --cfab-bg-lighten-70: color-mix(in srgb, var(--cfab-bg), white 70%);
+  --cfab-bg-lighten-80: color-mix(in srgb, var(--cfab-bg), white 80%);
+  --cfab-bg-lighten-90: color-mix(in srgb, var(--cfab-bg), white 90%);
+  --cfab-bg-lighten-100: color-mix(in srgb, var(--cfab-bg), white 100%);
+
+  /* opacity --cfab-bg */
+  --cfab-bg-opacity-0: color-mix(in srgb, var(--cfab-bg), transparent 100%);
+  --cfab-bg-opacity-10: color-mix(in srgb, var(--cfab-bg), transparent 90%);
+  --cfab-bg-opacity-20: color-mix(in srgb, var(--cfab-bg), transparent 80%);
+  --cfab-bg-opacity-30: color-mix(in srgb, var(--cfab-bg), transparent 70%);
+  --cfab-bg-opacity-40: color-mix(in srgb, var(--cfab-bg), transparent 60%);
+  --cfab-bg-opacity-50: color-mix(in srgb, var(--cfab-bg), transparent 50%);
+  --cfab-bg-opacity-60: color-mix(in srgb, var(--cfab-bg), transparent 40%);
+  --cfab-bg-opacity-70: color-mix(in srgb, var(--cfab-bg), transparent 30%);
+  --cfab-bg-opacity-80: color-mix(in srgb, var(--cfab-bg), transparent 20%);
+  --cfab-bg-opacity-90: color-mix(in srgb, var(--cfab-bg), transparent 10%);
+  --cfab-bg-opacity-90: color-mix(in srgb, var(--cfab-bg), transparent 10%);
+  --cfab-bg-opacity-95: color-mix(in srgb, var(--cfab-bg), transparent 5%);
+  --cfab-bg-opacity-100: color-mix(in srgb, var(--cfab-bg), transparent 0%);
+
+  /* Assombrir --cfab-foreground */
+  --cfab-foreground-darken-0: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 0%
+  );
+  --cfab-foreground-darken-10: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 10%
+  );
+  --cfab-foreground-darken-20: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 20%
+  );
+  --cfab-foreground-darken-30: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 30%
+  );
+  --cfab-foreground-darken-40: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 40%
+  );
+  --cfab-foreground-darken-50: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 50%
+  );
+  --cfab-foreground-darken-60: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 60%
+  );
+  --cfab-foreground-darken-70: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 70%
+  );
+  --cfab-foreground-darken-80: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 80%
+  );
+  --cfab-foreground-darken-90: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 90%
+  );
+  --cfab-foreground-darken-100: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    black 100%
+  );
+  /* eclairci --cfab-foreground */
+  --cfab-foreground-lighten-0: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 0%
+  );
+  --cfab-foreground-lighten-10: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 10%
+  );
+  --cfab-foreground-lighten-20: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 20%
+  );
+  --cfab-foreground-lighten-30: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 30%
+  );
+  --cfab-foreground-lighten-40: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 40%
+  );
+  --cfab-foreground-lighten-50: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 50%
+  );
+  --cfab-foreground-lighten-60: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 60%
+  );
+  --cfab-foreground-lighten-70: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 70%
+  );
+  --cfab-foreground-lighten-80: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 80%
+  );
+  --cfab-foreground-lighten-90: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 90%
+  );
+  --cfab-foreground-lighten-100: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    white 100%
+  );
+
+  /* opacity --cfab-foreground */
+  --cfab-foreground-opacity-0: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 100%
+  );
+  --cfab-foreground-opacity-5: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 95%
+  );
+  --cfab-foreground-opacity-10: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 90%
+  );
+  --cfab-foreground-opacity-20: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 80%
+  );
+  --cfab-foreground-opacity-30: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 70%
+  );
+  --cfab-foreground-opacity-40: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 60%
+  );
+  --cfab-foreground-opacity-50: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 90%
+  );
+  --cfab-foreground-opacity-60: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 40%
+  );
+  --cfab-foreground-opacity-70: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 30%
+  );
+  --cfab-foreground-opacity-80: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 20%
+  );
+  --cfab-foreground-opacity-90: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 10%
+  );
+  --cfab-foreground-opacity-100: color-mix(
+    in srgb,
+    var(--cfab-foreground),
+    transparent 0%
+  );
+}

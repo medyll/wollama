@@ -48,6 +48,7 @@
 </div>
 
 <style lang="postcss">
+    @reference "../../styles/all.css";
     .settings {
         height: auto;
         overflow: auto;

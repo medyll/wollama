@@ -1,14 +1,9 @@
 <script lang="ts">
-    import { TextField } from '@medyll/idae-slotui-svelte';
-import { onMount } from 'svelte';
+    import { TextField } from '@medyll/idae-slotui-svelte'; 
 
     let showOpener: boolean = true;
 
-    /* onMount(() => {
-		setTimeout(() => {
-			showOpener = false;
-		}, 500);
-	}); */
+ 
 </script>
 
 {#if showOpener}
@@ -21,9 +16,10 @@ import { onMount } from 'svelte';
 
 <slot />
 
-<style>
+<style lang="postcss">
+    @reference "../styles/all.css";
     .ss {
-		position:fixed;
+        position:fixed;
         border: 10px solid red;
         left: 0;
         z-index: 3000;

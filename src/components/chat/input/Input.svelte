@@ -40,8 +40,7 @@
 </div>
 
 <style lang="postcss">
- 
-
+    @reference "../../../styles/all.css";
     .grower {
         display: grid;
 

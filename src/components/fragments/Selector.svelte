@@ -13,11 +13,14 @@
 	<slot name="selectorFallback" />
 {/if}
 
-<style>
-	.active {
-		@apply border-b-2 border-neutral-500;
+<style lang="postcss">
+	@reference "../../styles/all.css";
+	.active{
+		@apply  border border-b-2 border-neutral-500; /* active */
 	}
-	.inactive {
-		@apply opacity-60 border-b-2 border-transparent;
+	.inactive{
+		@apply  opacity-60 border border-b-2 border-transparent; /* inactive */
 	}
+	/* @apply  border border-b-2 border-neutral-500; 
+	@apply  opacity-60 border border-b-2 border-transparent;   */
 </style>

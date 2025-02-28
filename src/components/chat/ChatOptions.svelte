@@ -63,16 +63,14 @@
 </div>  
 
 <style lang="postcss">  
-    
+    @reference "../../styles/all.css";
     .button-temp {
         @apply rounded-md;
         @apply p-1 px-2;
         @apply opacity-50;
         &.active {
-            @apply opacity-100 bg-gradient-to-tl from-gray-600 to-gray-800 shadow shadow-gray-950;
+            @apply opacity-100 bg-linear-to-tl from-gray-600 to-gray-800 shadow shadow-gray-950;
             @apply text-white;
         }
     } 
-
-
 </style>

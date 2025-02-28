@@ -110,7 +110,8 @@
     {/if}
 {/if}
 
-<style>
+<style lang="postcss">
+    @reference "../../styles/all.css";
     .field-label {
         padding: 0.5rem;
         display: block;

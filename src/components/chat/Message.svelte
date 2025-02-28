@@ -143,6 +143,7 @@
 </div>
 
 <style lang="postcss">
+    @reference "../../styles/all.css";
     .message{ 
         @apply p-2 gap-3 border;
         /* @apply bg-gray-100 dark:bg-gray-800; */
@@ -171,6 +172,4 @@
         @apply px-2 w-full   relative overflow-hidden  p-4 py-4 rounded-md;
         border: 1px solid var(--cfab-input-border-color)!important;
     }
-
-  
 </style>

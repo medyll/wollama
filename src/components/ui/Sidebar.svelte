@@ -101,6 +101,7 @@
 </div>
 
 <style lang="postcss">
+    @reference "../../styles/all.css";
     :global(.red) {
         transition: all 1s ease;
     }

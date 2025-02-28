@@ -38,10 +38,11 @@
 	</div>
 </div>
 <style lang="postcss">
-.header {
-		@apply sticky top-2 z-10;
-		background-image: var(--cfab-gradient);
-		background-size: 100vh 100vw;
-		background-position: top;
-	}
+    @reference "../../styles/all.css";
+    .header {
+        @apply sticky top-2 z-10;
+        background-image: var(--cfab-gradient);
+        background-size: 100vh 100vw;
+        background-position: top;
+    }
 </style>

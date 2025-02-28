@@ -1,11 +1,9 @@
 /* base.css */
 
-@custom-variant dark {
-  &:where(.dark, .dark *) {
-    --color-bg: var(--bg-gray-800);
-    --color-text: var(--text-gray-700);
-  }
-}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
 
 @layer base {
   /* skin.css */

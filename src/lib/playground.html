@@ -1,73 +1,100 @@
 <row container>
-    <column sideBar>
-        <row><logo :figure /><h /><full /> </row>
-        <row search>
-            <input />
+  <column sideBar>
+    <row>
+      <logo :figure />
+      <h />
+      <full />
+    </row>
+    <row search>
+      <input />
+    </row>
+    <sep />
+    <row>
+      <h />
+      <full />
+      <button />
+    </row>
+    <sep />
+    <column :nav chatMenuList>
+      <row><h /></row>
+      <column :nav chatMenuListGroup>
+        <row><h /></row>
+        <row><button /></row>
+      </column>
+    </column>
+    <sep />
+    <column>
+      <button settings />
+    </column>
+  </column>
+  <column main>
+    <row topBar>
+      <full />
+      <h />
+      <full />
+      <button />
+      <button />
+      <button />
+    </row>
+    <column chatZone>
+      <column chatMessage>
+        <row>
+          <text user />
+          <text date />
         </row>
-        <sep />
-        <row> <h /><full /><button /> </row>
-        <sep />
-        <column :nav chatMenuList>
-            <row> <h /></row>
-            <column :nav chatMenuListGroup>
-                <row> <h /></row>
-                <row><button /></row>
-            </column>
-        </column>
-        <sep />
+        <row><text message /></row>
         <column>
-            <button settings />
+          <code />
         </column>
+      </column>
+      <column inputZone>
+        <row>
+          <full />
+          <row><button temperature /></row>
+          <full />
+        </row>
+        <row>
+          <button attach></button>
+          <full><input prompt /></full>
+          <button speech />
+          <button send />
+        </row>
+      </column>
     </column>
-    <column main>
-        <row topBar><full /><h /><full /><button /><button /><button /></row>
-        <column chatZone>
-            <column chatMessage>
-                <row><text user /><text date /></row>
-                <row><text message /></row>
-                <column>
-                    <code />
-                </column>
-            </column>
-            <column inputZone>
-                <row>
-                    <full /><row><button temperature /></row><full />
-                </row>
-                <row>
-                    <button attach></button><full><input prompt /></full><button speech /><button send />
-                </row>
-            </column>
-        </column>
-    </column>
+  </column>
 </row>
 
-<!-- <style>
-    [container] {
-        [sideBar] {
-            gap: 0.5rem;
-            [vendor] {}
-            [search] {}
-            [chatMenuList] {}
-        }
+<style lang="postcss">
+  @reference "../../styles/all.css";
+  [container] {
+    [sideBar] {
+      gap: 0.5rem;
+      [vendor] {
+      }
+      [search] {
+      }
+      [chatMenuList] {
+      }
     }
-    row {
-        display: grid;
-        grid-auto-flow: row;
-        align-items: stretch;
-        justify-content: start;
-        full {
-            flex: 1;
-        }
+  }
+  row {
+    display: grid;
+    grid-auto-flow: row;
+    align-items: stretch;
+    justify-content: start;
+    full {
+      flex: 1;
     }
+  }
 
-    column {
-        display: grid;
-        grid-auto-flow: column;
-        align-items: stretch;
-        justify-content: start;
-        grid-auto-rows: auto; /* 1fr */
-        full {
-            flex: 1;
-        }
+  column {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: stretch;
+    justify-content: start;
+    grid-auto-rows: auto; /* 1fr */
+    full {
+      flex: 1;
     }
-</style> -->
+  }
+</style>
