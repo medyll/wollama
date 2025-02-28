@@ -1,5 +1,3 @@
-
-
 <script lang="ts">
     import Confirm from '$components/fragments/Confirm.svelte';
     import { idbQuery } from '$lib/db/dbQuery';
@@ -86,10 +84,8 @@
 </div>
 
 <style lang="postcss">
-
-
+    @reference "../../styles/all.css";
     button {
         @apply block w-full text-left flex   items-center px-1 py-1 gap-2 transition whitespace-nowrap text-ellipsis  dark:hover:bg-gray-800;
     }  
-
 </style>

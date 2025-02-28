@@ -232,6 +232,7 @@
 </div>
 <button><div class="button-start">svg icon</div><div class="button-central"></div><div class="button-action">icon</div></button>
 <style lang="postcss">
+    @reference "../../styles/all.css";
     .input-error {
         border: 10px solid red;
     }

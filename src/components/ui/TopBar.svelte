@@ -63,6 +63,7 @@
 </div>
 
 <style lang="postcss">
+    @reference "../../styles/all.css";
     .titlebar {
         user-select: none;
         display: flex;
