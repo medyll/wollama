@@ -1,7 +1,7 @@
 import type { DbChat } from "$types/db";
 import type { DBMessage } from "$types/db";
 import { get } from "svelte/store";
-import { OllamaApi } from "../db/ollamaApi";
+import { WollamaApi } from "../db/wollamaApi";
 import { settings } from "$lib/stores/settings.svelte";
 import { idbQuery } from "$lib/db/dbQuery";
 import type { OllApiGenerate, OllamaResponse } from "$types/ollama";
@@ -60,7 +60,7 @@ export async function guessChatMetadata(
     options: { ...ollamaOptions, temperature: 0.1 },
   } as OllApiGenerate;
 
-  return await OllamaApi.generate(defaultOptions, () => {});
+  return await WollamaApi.generate(defaultOptions, () => {});
 }
 export async function guessChatCategorie(
   message: string
@@ -100,7 +100,7 @@ Rappel : Ta réponse doit être UN SEUL MOT.
     options: { ...ollamaOptions, temperature: 0.1 },
   } as OllApiGenerate;
 
-  return await OllamaApi.generate(defaultOptions, () => {});
+  return await WollamaApi.generate(defaultOptions, () => {});
 }
 
 export async function guessChatDescription(
@@ -133,7 +133,7 @@ Résumé :`;
     options: { ...ollamaOptions, temperature: 0.1 },
   } as OllApiGenerate;
 
-  return await OllamaApi.generate(defaultOptions, () => {});
+  return await WollamaApi.generate(defaultOptions, () => {});
 }
 
 export class chatUtils {

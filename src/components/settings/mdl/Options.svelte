@@ -4,7 +4,7 @@
 	import { OllamaOptionsDefaults, ollamaOptionsCatalog, ollamaOptionsInfo } from '$configuration/configuration';
 	import List from '$components/fragments/List.svelte';
 	import {Icon} from '@medyll/idae-slotui-svelte';
-	import { OllamaApi } from '$lib/db/ollamaApi';
+	import { WollamaApi } from '$lib/db/wollamaApi';
 	import { notifierState } from '$lib/stores/notifications';
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
@@ -12,7 +12,7 @@
 	let ollama_server = $settings.ollama_server;
 
 	function setEndPoint(url: string) {
-		OllamaApi.ping(url)
+		WollamaApi.ping(url)
 			.then((res) => {
 				notifierState.notify('success', $t('settings.server_url_success'), 'server-url');
 				settings.setSetting('ollama_server', url);

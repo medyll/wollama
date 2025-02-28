@@ -1,22 +1,23 @@
-import { OllamaApi } from "$lib/db/ollamaApi";
+import { WollamaApi } from "$lib/db/wollamaApi";
 import { ollamaApiMainOptionsParams } from "$lib/stores/ollamaParams";
 import { settings } from "$lib/stores/settings.svelte";
 import type { DBMessage } from "$types/db";
 import {
   type OllamaChatMessage,
   type OllamaChat,
-  type OllamaOptions,
   type OllamaResponse,
   type OllamaFormat,
   OllamaChatMessageRole,
 } from "$types/ollama";
+import { type Options } from "ollama/browser";
 import { get } from "svelte/store";
+
 export type PromptSenderType = {
   prompt: string;
   context: number[];
   models: string[];
   images?: string[];
-  options: OllamaOptions;
+  options: Options;
   format: OllamaFormat;
 };
 
@@ -99,7 +100,7 @@ export class PromptSender {
       };
     }
 
-    return OllamaApi.generate(
+    return WollamaApi.generate(
       {
         prompt: userMessage.content,
         system: `${systemPrompt ?? config?.system_prompt}`,
@@ -119,7 +120,7 @@ export class PromptSender {
     );
 
     // send chat user message
-    return OllamaApi.chat(
+    return WollamaApi.chat(
       {
         messages: [...previousMessages, system, userMessage].filter((m) => m),
         model: model ?? config?.defaultModel,

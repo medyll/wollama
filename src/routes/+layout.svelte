@@ -8,7 +8,7 @@
     import Notifications from '$components/ui/Notifications.svelte';
     import Opening from '$components/Opening.svelte';
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-    import { OllamaApi, ollamaApiConfig } from '$lib/db/ollamaApi';
+    import { WollamaApi, wollamaApiConfig } from '$lib/db/wollamaApi';
 
     import '$lib/playground.js';
     import { idbql } from '$lib/db/dbSchema';
@@ -25,7 +25,7 @@
     // load models into store
     async function loadModels() {
         try {
-            let tags = (await OllamaApi.tags()) ?? {};
+            let tags = (await WollamaApi.tags()) ?? {};
             if (!tags || !tags.models) return;
             let models = tags.models;
             settings.setSetting('ollamaModels', [...models]);
@@ -51,7 +51,7 @@
     }
 
     async function loadConfig() {
-        if (!initiated) ollamaApiConfig.setOptions({ ollama_endpoint: $settings.ollama_server, model: $settings.defaultModel });
+        if (!initiated) wollamaApiConfig.setOptions({ host: $settings.ollama_server, model: $settings.defaultModel });
     }
 
     async function loader() {
