@@ -1,6 +1,24 @@
 // Type definitions for Ollama API
 
-import type { Options, GenerateRequest, ChatRequest } from "ollama/browser";
+import {
+  type Options,
+  type GenerateRequest,
+  type ChatRequest,
+  type GenerateResponse,
+  type ChatResponse,
+} from "ollama/browser";
+
+/* type OllamaType<T extends object> = typeof AbortableAsyncIterator<T>; */
+
+export type WollamaResponse =
+  | {
+      generateResponse: GenerateResponse;
+      type: "generate";
+    }
+  | {
+      chatResponse: ChatResponse;
+      type: "chat";
+    };
 
 /** @deprecated */
 export enum OllamaFormatKeys {

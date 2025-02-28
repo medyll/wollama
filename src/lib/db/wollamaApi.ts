@@ -1,3 +1,4 @@
+import type { WollamaResponse } from "$types/ollama";
 import ollama, {
   type Options,
   type Config,
@@ -17,6 +18,9 @@ interface Hook {
     images: string | null;
   };
 }
+
+interface GenerateResponseHook extends GenerateResponse, Hook {}
+
 class WollamaApiConfig {
   model: string = "llama2";
   host: string = "http://127.0.0.1:11434";
@@ -49,18 +53,41 @@ export class WollamaApiCore {
     generateRequest: GenerateRequest & {
       stream: true;
     },
-    hook?: (data: GenerateResponse & Hook) => void
+    hook?: (data: GenerateResponseHook) => void
   ) {
-    const response = await ollama.generate(generateRequest);
+    const response = await ollama.generate(generateRequest).then((res) => {
+      console.log({ res });
+      return res;
+    });
+    const wollamaResponse: WollamaResponse = {
+      generateResponse: response,
+      chatResponse: null,
+      type: "generate",
+    };
     if (generateRequest.stream) {
-      for await (const part of response) {
-        if (hook)
+      console.log({ response });
+      // this.stream(response, hook);
+
+      /* for await (const part of response) {
+        console.log({ part });
+        if (hook) {
+          hook({
+            ...part,
+            messageId: "",
+            message: { role: "", content: part.response, images: null },
+          });
+        }
+      } */
+      /*  this.stream(response, hook); */
+      /*  for await (const part of response) {
+        if (hook) {
           hook({
             ...part,
             messageId: "",
             message: { role: "", content: "", images: null },
           });
-      }
+        }
+      } */
     } else {
       return response;
     }
@@ -81,17 +108,47 @@ export class WollamaApiCore {
   ) {
     const response = await ollama.chat(chatRequest);
     if (chatRequest.stream) {
-      for await (const part of response) {
+      console.log({ response });
+      this.stream(response, hook);
+      /* for await (const part of response) {
         if (hook)
           hook({
             ...part,
             messageId: "",
             message: { role: "", content: "", images: [] },
           });
-      }
+      } */
     } else {
       return response;
     }
+  }
+
+  async stream(response: Response, hook?: (data: OllamaResponse) => void) {
+    //if (response?.body && response?.ok) {
+    for await (const part of response) {
+      if (hook)
+        hook({
+          ...part,
+          messageId: "",
+          message: { role: "", content: "", images: [] },
+        });
+    }
+    /*  const streamReader = response.body
+        .pipeThrough(new TextDecoderStream())
+        .pipeThrough(this.splitStream("\n"))
+        .getReader();
+
+      while (true) {
+        const { value, done } = await streamReader.read();
+
+        if (Boolean(done) || this.requestStop) break;
+        if (value) {
+          const data: OllamaResponse = JSON.parse(value);
+
+          if (hook) hook(data);
+        }
+      } */
+    // }
   }
 
   async pull(model: string, hook: (args: any) => void) {

@@ -57,6 +57,7 @@
             const sender = new PromptSender(chat.ollamaBody);
             // declare stream listeners
             sender.onStream = ({ target, data }) => {
+                console.log('sender.onStream', target.chatId);
                 chatSession.onMessageStream(target, data);
                 // set auto-scroll to false
                 ui.setAutoScroll(target.chatId, false);

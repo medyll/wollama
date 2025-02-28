@@ -100,7 +100,7 @@ export class PromptSender {
       };
     }
 
-    return WollamaApi.generate(
+    return await WollamaApi.generate(
       {
         prompt: userMessage.content,
         system: `${systemPrompt ?? config?.system_prompt}`,
@@ -112,24 +112,7 @@ export class PromptSender {
         stream: true,
       },
       async (data: OllamaResponse) => {
-        this.onResponseMessageStream({
-          data,
-          target,
-        });
-      }
-    );
-
-    // send chat user message
-    return WollamaApi.chat(
-      {
-        messages: [...previousMessages, system, userMessage].filter((m) => m),
-        model: model ?? config?.defaultModel,
-        stream: true,
-        format: format ?? undefined,
-        options: { ...ollamaOptions, temperature },
-        template: null,
-      } as OllamaChat,
-      async (data: OllamaResponse) => {
+        console.log({ data });
         this.onResponseMessageStream({
           data,
           target,
