@@ -47,8 +47,7 @@ export interface ChatListType {
 export type DBMessage = {
   id: string;
   chatId: string;
-  /** @deprecated */
-  messageId: string;
+  messageId?: string;
   content: string;
   createdAt: Date;
   images?: MessageImageType;

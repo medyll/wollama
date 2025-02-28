@@ -18,7 +18,7 @@ function ollamaOptionStorage() {
         localStorage.getItem("ollamaOptions") ?? "{}"
       );
       const options: Partial<Options> = Object.keys(
-        OllamaOptionsDefaults
+        OllamaOptionsDefaults as unknown as Options
       ).reduce((acc: Partial<Options>, key) => {
         acc[key] = OllamaOptionsDefaults[key].default ?? null;
         return acc;

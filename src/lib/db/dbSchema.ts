@@ -165,15 +165,16 @@ export const schemeModelDb = {
     },
   },
   messages: {
-    keyPath: "&messageId, chatId, created_at",
+    keyPath: "++id, messageId, &chatId, created_at",
     model: {} as DBMessage,
     ts: {} as DBMessage,
     template: {
-      index: "messageId",
+      index: "id",
       presentation: "resume",
       fields: {
         id: "id",
         chatId: "id",
+        messageId: "id",
         created_at: "date",
         content: "text-long",
         status: "text",
