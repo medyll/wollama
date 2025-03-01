@@ -189,7 +189,7 @@ export class chatMetadata {
     if (res?.response !== "" && fr?.category) upd.category = fr.category;
     return idbQuery.updateChat(chatId, upd);
   }
-  static async checkTitle(chatId: string) {
+  static async checkTitle(chatId: number) {
     const resume = await doResume(chatId, 15);
     const res = await guessChatMetadata(resume);
 

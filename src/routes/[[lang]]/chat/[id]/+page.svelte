@@ -6,5 +6,5 @@
 </script>
 
 {#key $page.params.id}
-	<MainChat activeChatId={$page.params.id} />
+	<MainChat activeChatId={$page.params.id} chatPassKey={$page.params.id} />
 {/key}

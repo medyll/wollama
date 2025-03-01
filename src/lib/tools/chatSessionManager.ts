@@ -1,16 +1,21 @@
 import { idbQuery } from "$lib/db/dbQuery";
-import type { DbChat, DBMessage } from "$types/db";
+import type { DbChat, DBMessage, MessageImageType } from "$types/db";
+import { OllamaChatMessageRole, type OllamaChatMessage } from "$types/ollama";
 
 export class ChatSessionManager {
   #sessionId?: number;
   #SessionDB: {
     dbChat: Partial<DbChat>;
+    userChatMessage?: OllamaChatMessage;
+    userDbMessage?: DBMessage;
     messageAssistant: DBMessage[];
     messageUser: Partial<DBMessage>;
   } = {
     dbChat: {},
     messageAssistant: [],
     messageUser: {},
+    userChatMessage: {} as OllamaChatMessage,
+    userDbMessage: {} as DBMessage,
   };
   #sessionConfig: { apiType: "generate" | "chat"; useContext: boolean } = {
     apiType: "generate",
@@ -25,6 +30,91 @@ export class ChatSessionManager {
     }
   }
 
+  public async setPreviousMessages(): Promise<Partial<DBMessage>[]> {
+    let chatList = await idbQuery.getMessages(this.sessionId);
+
+    this.previousMessages = chatList.map((e) => ({
+      content: e.content,
+      role: e.role,
+      images: e?.images?.base64,
+    }));
+
+    return this.previousMessages;
+  }
+  /**
+   * Creates a user message in the chat session.
+   *
+   * @param content - The content of the message.
+   * @param images - Optional images to be attached to the message.
+   * @returns A Promise that resolves to the created user message.
+   */
+  async createUserDbMessage({
+    content,
+    images,
+    model,
+  }: {
+    model?: string;
+    content: string;
+    images?: MessageImageType;
+  }) {
+    const urlRegex = /https?:\/\/[^\s]+/g;
+    const urs = content.match(urlRegex);
+    let urls: DBMessage["urls"] = urs ? urs : [];
+
+    const messageData = {
+      chatId: this.sessionId,
+      content,
+      images,
+      role: "user",
+      status: "done",
+      urls,
+      //
+      model: model ?? this.#SessionDB.dbChat.models?.[0],
+    };
+
+    this.#SessionDB.userDbMessage = await idbQuery.insertMessage(
+      this.#sessionId,
+      messageData
+    );
+
+    return this.#SessionDB.userDbMessage;
+  }
+
+  async createAssistantMessage(model: string) {
+    const messageData = {
+      chatId: this.#sessionId,
+      model,
+      role: "assistant",
+      status: "idle",
+    };
+    const assistantsDbMessages = await idbQuery.insertMessage(
+      this.#sessionId,
+      messageData
+    );
+
+    console.log("created :", assistantsDbMessages);
+
+    return assistantsDbMessages;
+  }
+
+  async createUserChatMessage({
+    content,
+    images,
+    model,
+  }: {
+    model?: string;
+    content: string;
+    images?: MessageImageType;
+  }) {
+    // format message for chat send
+    this.#SessionDB.userChatMessage = {
+      content: content,
+      role: OllamaChatMessageRole.USER,
+      images: images?.base64 ? [images?.base64] : undefined,
+    };
+
+    return this.#SessionDB.userChatMessage;
+  }
   #loadChatSessionFromDB = (id: number) => {
     idbQuery
       .getChat(id)
@@ -70,6 +160,32 @@ export class ChatSessionManager {
     }
   }
 
+  /**
+   * Handles the completion of a message in the chat session.
+   * @param assistantMessage - The assistant message object.
+   * @param data - The response data from the assistant.
+   */
+  public async onMessageDone(
+    assistantMessage: DBMessage,
+    data: OllamaResponse
+  ) {
+    await Promise.all([
+      //idbQuery.updateChat(assistantMessage.chatId, { context: data?.context }),
+      idbQuery.updateMessage(assistantMessage.id, { status: "done" }),
+    ]);
+  }
+
+  /**
+   * Handles the incoming message stream from the assistant.
+   * @param assistantMessage - The message object received from the assistant.
+   * @param data - The response data received from the assistant.
+   */
+  public async onMessageStream(
+    assistantMessage: DBMessage,
+    data: OllamaResponse
+  ) {
+    await idbQuery.updateMessageStream(assistantMessage.id, data);
+  }
   async #initChatDb(
     sessionId?: number,
     chatData: DbChat = {} as DbChat

@@ -124,8 +124,6 @@ export class WollamaApiCore {
     const event = WollamaApiEvent.eventApi();
 
     let response;
-    /* let _onStream: (data: GenerateResponseHook) => void = () => {};
-    let _onEnd: (data: GenerateResponseHook) => void = () => {}; */
 
     if (generateRequest.stream) {
       response = ollama

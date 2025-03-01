@@ -7,6 +7,7 @@ import type { OllamaChat } from "./ollama";
 export type DbChat = {
   id: number;
   chatId: string;
+  chatPassKey: string;
   categoryId: number;
   title: string;
   description: string;
