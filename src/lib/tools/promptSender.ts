@@ -111,7 +111,7 @@ export class PromptSender {
         format: format ?? undefined,
         stream: true,
       },
-      (data: OllamaResponse) => {
+      async (data: OllamaResponse) => {
         console.log({ data });
         this.onResponseMessageStream({
           data,
