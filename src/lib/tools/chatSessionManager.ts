@@ -12,8 +12,10 @@ export class ChatSessionManager {
     messageAssistant: [],
     messageUser: {},
   };
-  #type: "generate" | "chat" = "chat";
-  #useContext = false;
+  #sessionConfig: { apiType: "generate" | "chat"; useContext: boolean } = {
+    apiType: "generate",
+    useContext: false,
+  };
 
   public previousMessages: DBMessage[] = [];
 
@@ -40,19 +42,21 @@ export class ChatSessionManager {
     return new ChatSessionManager();
   }
 
-  get getChatSessionDB() {
+  get ChatSessionDB() {
     return {
-      create: this.#createChatSessionInDB.bind(this),
-      updateChat: this.#updateChatSessionInDB.bind(this),
+      createSession: this.#createChatSessionInDB.bind(this),
+      updateSession: this.#updateChatSessionInDB.bind(this),
+      /*  init: this.#initChatDb.bind(this), */
     };
   }
 
   async #createChatSessionInDB(chatData: Partial<DbChat> = {} as DbChat) {
-    this.#SessionDB.dbChat = await this.initChatDb(
+    this.#SessionDB.dbChat = await this.#initChatDb(
       this.#sessionId,
       chatData as DbChat
     );
     this.#sessionId = this.#SessionDB.dbChat.id;
+    return { sessionId: this.#sessionId, dbChat: this.#SessionDB.dbChat };
   }
 
   async #updateChatSessionInDB(chatData: Partial<DbChat> = {} as DbChat) {
@@ -63,12 +67,10 @@ export class ChatSessionManager {
           ...(chatData as DbChat),
         } as DbChat
       );
-    } else {
-      throw new Error("Chat ID is undefined");
     }
   }
 
-  async initChatDb(
+  async #initChatDb(
     sessionId?: number,
     chatData: DbChat = {} as DbChat
   ): Promise<DbChat> {
@@ -83,5 +85,17 @@ export class ChatSessionManager {
 
   get Db() {
     return this.#SessionDB;
+  }
+  get sessionId() {
+    return this.#sessionId;
+  }
+
+  clearSession() {
+    this.#SessionDB = {
+      dbChat: {},
+      messageAssistant: [],
+      messageUser: {},
+    };
+    this.#sessionId = undefined;
   }
 }
