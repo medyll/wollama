@@ -24,6 +24,7 @@
     
     interface MainChatProps {
         activeChatId?: any;
+        sessionChatId?: number;
     }
 
     let { activeChatId }: MainChatProps = $props(); 
@@ -40,9 +41,9 @@
 
     let disableSubmit: boolean = $derived(chatParamsState.prompt.trim() == '' || chatParamsState.isPrompting || $aiState == 'running');
 
-    async function sendPrompt(chatSession: ChatApiSession, chatParams: ChatGenerate) {
+    async function sendPrompt(chatSession: ChatApiSession, sessionManager: ChatSessionManager, chatParams: ChatGenerate) {
         //
-        await chatApiSession.initChat(chatSession.chat.chatId);
+        //await chatApiSession.initChat(chatSession.chat.chatId);
 
         const chat = chatSession.chat;
       
@@ -102,12 +103,23 @@
     }
 
     async function submitHandler(chatId: string | undefined, chatParams: ChatGenerate) {
-        if (!chatId) {
+
+        if(!chatSessionManager.sessionId){ 
+          await chatSessionManager.ChatSessionDB.createSession({});
+        }
+
+         await chatSessionManager.ChatSessionDB.updateSession({ 
+            models: [...chatParams?.models],
+            systemPrompt: chatParams.promptSystem,
+            /* ollamaBody: ollamaBodyStore, */
+        });
+        
+        sendPrompt(chatApiSession, chatSessionManager,chatParams);
+
+       /*  if (!chatId) {
             await chatApiSession.createChatDbSession({});
-            // set active chat
             activeChatId = chatId = chatApiSession.chat.chatId;
             window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`); 
-            // replaceState( `/chat/${chatApiSession.chat.chatId}`,page.params);
         }
 
         await chatApiSession.updateChatSession({
@@ -115,9 +127,8 @@
             models: [...chatParams?.models],
             systemPrompt: chatParams.promptSystem,
             ollamaBody: $ollamaBodyStore,
-        });
+        });  */
 
-        sendPrompt(chatApiSession, chatParams);
     }
 
     function keyPressHandler(e: KeyboardEvent) {
