@@ -3,10 +3,10 @@
     import Message from './Message.svelte';
     import { Looper } from '@medyll/idae-slotui-svelte';
 
-    let { chatId }: { chatId: string } = $props();
+    let { id }: { id?: number } = $props();
 
-    let chat = $derived(chatId ? idbQuery.getChat(chatId) : []);
-    let messages =  $derived(chatId ? idbQuery.getMessages(chatId) : [] )
+    let chat = $derived(id ? idbQuery.getChat(id) : []);
+    let messages =  $derived(id ? idbQuery.getMessages(id) : [] )
     let element: HTMLElement;
 
     $effect.pre(() => {
@@ -33,8 +33,8 @@
     </div>
     <div class="message-list ">
         <Looper  data={messages as [] ?? []}>
-            {#snippet children({ item })}{item.id}
-                <Message messageId={item.messageId} />
+            {#snippet children({ item })} 
+                <Message messageId={item.id} />
             {/snippet}
         </Looper> 
     </div>
