@@ -66,7 +66,7 @@
                 } satisfies GenerateRequest ;
 
 
-            const senderGenerate =  WollamaApi.generate_bis(                
+            const senderGenerate = await  WollamaApi.chat(                
                 request // pass the request object here
             )
 

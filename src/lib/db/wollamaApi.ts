@@ -47,7 +47,7 @@ export type GenerateRequestNoStream = GenerateRequest & {
   stream: false;
 };
 
-export class WollamaApiEvent {
+export class ApiEvent {
   #onStream!: (data: GenerateResponseHook) => void;
   #onEnd!: (data: GenerateResponseHook) => void;
   #onData: (data: GenerateResponseHook) => void;
@@ -61,7 +61,7 @@ export class WollamaApiEvent {
   }
 
   static eventApi() {
-    return new WollamaApiEvent();
+    return new ApiEvent();
   }
 
   set onStream(callback: (data: GenerateResponseHook) => void) {
@@ -120,15 +120,15 @@ export class WollamaApiCore {
     return response;
   }
 
-  generate_bis(generateRequest: GenerateRequest): WollamaApiEvent {
-    const event = WollamaApiEvent.eventApi();
+  generate_bis(request: GenerateRequest): ApiEvent {
+    const event = ApiEvent.eventApi();
 
     let response;
 
-    if (generateRequest.stream) {
+    if (request.stream) {
       response = ollama
         .generate({
-          ...generateRequest,
+          ...request,
           stream: true,
         })
         .then((response) => {
@@ -137,7 +137,7 @@ export class WollamaApiCore {
     } else {
       response = ollama
         .generate({
-          ...generateRequest,
+          ...request,
           stream: false,
         })
         .then((response) => response);
@@ -145,32 +145,40 @@ export class WollamaApiCore {
 
     return event;
   }
+
   /**
-   * Sends a chat request using the chat API.
+   * Handles a chat request and returns an event.
    *
-   * @param chatRequest - The chat request object.
-   * @param hook - Optional callback function to handle the response data.
-   * @returns A Promise that resolves to the response data from the Ollama API.
+   * @param {ChatRequest} request - The chat request object containing the necessary parameters.
+   * @returns {Promise<ApiEvent>} - A promise that resolves to an ApiEvent.
+   *
+   * The function checks if the request should be streamed. If `request.stream` is true,
+   * it initiates a streaming chat and processes the response using the `stream` method.
+   * Otherwise, it performs a non-streaming chat request.
    */
-  async chat(
-    chatRequest: ChatRequest & {
-      stream: true;
-    },
-    hook?: (data: ChatResponse & Hook) => void
-  ) {
+  async chat(request: ChatRequest) {
+    const event = ApiEvent.eventApi();
+
     let response;
-    if (chatRequest.stream) {
-      response = await ollama.chat({ ...chatRequest, stream: true });
-      console.log({ response });
-      this.stream(response, hook, "chat");
+
+    if (request.stream) {
+      response = await ollama.chat({
+        ...request,
+        stream: true,
+      });
+      this.stream(response, event.onStream, "chat");
     } else {
-      response = await ollama.chat({ ...chatRequest, stream: false });
-      return response;
+      response = await ollama.chat({
+        ...request,
+        stream: false,
+      });
     }
+
+    return event;
   }
 
-  async stream(
-    response: AsyncGenerator,
+  async stream<T>(
+    response: AsyncIterator<T>,
     hook?: (data: OllamaResponse) => void,
     type: "generate" | "chat"
   ) {
