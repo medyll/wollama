@@ -89,7 +89,8 @@ export const schemeModelDb = {
     },
   },
   chat: {
-    keyPath: "++id, &chatId, created_at, category, categoryId, dateLastMessage",
+    keyPath:
+      "++id, &chatId, &chatPassKey, created_at, category, categoryId, dateLastMessage",
     model: {} as DbChat,
     ts: {} as DbChat,
     template: {
@@ -98,6 +99,7 @@ export const schemeModelDb = {
       fields: {
         id: "id",
         chatId: "fk.chat.id ",
+        chatPassKey: "text",
         created_at: "date",
         category: "text",
         categoryId: "id",

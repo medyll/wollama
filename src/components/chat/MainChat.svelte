@@ -8,7 +8,6 @@
     import { ollamaBodyStore } from '$lib/stores/prompter';
     import { aiState } from '$lib/stores';
     import DashBoard from '$components/DashBoard.svelte';
-    import { ChatApiSession } from '$lib/tools/chatApiSession';
     import { chatParamsState, type ChatGenerate } from '$lib/states/chat.svelte';
     import { Icon } from '@medyll/idae-slotui-svelte';
     import MessagesList from './MessagesList.svelte';
@@ -19,105 +18,110 @@
     import { WollamaApi } from '$lib/db/wollamaApi';
     import { get } from 'svelte/store';
     import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-    import type { GenerateRequest } from 'ollama/browser';
+    import type { ChatRequest, GenerateRequest, Message } from 'ollama/browser';
     import { ChatSessionManager } from '$lib/tools/chatSessionManager';
+    import { OllamaChatMessageRole } from '$types/ollama';
     
     interface MainChatProps {
-        activeChatId?: any;
+        chatPassKey?: string;
     }
 
-    let { activeChatId }: MainChatProps = $props(); 
+    let { chatPassKey }: MainChatProps = $props(); 
 
-    let chatApiSession: ChatApiSession = new ChatApiSession(activeChatId);
-    chatApiSession.initChat(activeChatId);
+    let activeChatId: number | undefined  = $state()
+    let chatSessionManager: ChatSessionManager = ChatSessionManager.loadSession();     
 
 
-    let chatSessionManager: ChatSessionManager =   ChatSessionManager.loadSession(); 
-    
-
+    $inspect(chatPassKey, 'chatPassKey');
+    $inspect(chatSessionManager, 'chatSessionManager');
 
     let placeholder: string = $derived(chatParamsState.voiceListening ? 'Listening...' : 'Message to ai');
 
     let disableSubmit: boolean = $derived(chatParamsState.prompt.trim() == '' || chatParamsState.isPrompting || $aiState == 'running');
 
-    async function sendPrompt(chatSession: ChatApiSession, chatParams: ChatGenerate) {
-        //
-        await chatApiSession.initChat(chatSession.chat.chatId);
 
-        const chat = chatSession.chat;
-      
-        //  chatSession get unique userDbMessage with model;
-        const previousMessages = await chatSession.setPreviousMessages();
-        const systemPrompt = chatParams.promptSystem.value; // chat.systemPrompt.content;
+    async function sendPrompt(sessionManager: ChatSessionManager, chatParams: ChatGenerate) {
+        const config = get(settings);
+        const ollamaOptions = get(ollamaApiMainOptionsParams);
 
-        let assistantDbMessage:DBMessage;
-        // loop on chatParams.models
-        chatParams.models.forEach(async (model: string) => {
-            // chatSession create assistantsDbMessage with concerned model;
-            const userChatMessage = await chatSession.createUserChatMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
-            const userDbMessage = await chatSession.createUserDbMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
-            
-            assistantDbMessage = assistantDbMessage ?? await chatSession.createAssistantMessage(model);
+        const systemPrompt = chatParams.promptSystem.value ?? config?.system_prompt;
 
-            const config = get(settings);
-            const ollamaOptions = get(ollamaApiMainOptionsParams);
-            
-            const request =  {
-                    prompt: userChatMessage.content,
-                    system: `${systemPrompt ?? config?.system_prompt}`,
-                    context : chat.context ?? [],
-                    model: model ?? config?.defaultModel,
-                    options: { ...ollamaOptions,  temperature: chatParams.temperature, },
-                    format:  chatParams.format ,
-                    stream: true,
-                } satisfies GenerateRequest ;
+        const chat = sessionManager.Db.dbChat;
+        console.log('sendPrompt', { chat, chatParams, systemPrompt });
+        // check chatId !!
+        let userChatMessage: Message = await sessionManager.createUserChatMessage({ content: chatParams.prompt, images: chatParams.images, model: chatParams.models[0] });
+        let systemMessage = await sessionManager.createSystemMessage({ content: systemPrompt, role: OllamaChatMessageRole.SYSTEM, status: 'idle', model: chatParams.models[0] });
+        let previousMessages = await sessionManager.getPreviousMessages();
+        let userDbMessage = await sessionManager.createDbMessage(OllamaChatMessageRole.USER, userChatMessage);
 
+        // Add additional logging for the messages
+        console.log('User DB Message created:', userDbMessage);
 
-            const senderGenerate =  WollamaApi.generate_bis(                
-                request // pass the request object here
-            )
+        let assistantDbMessage: DBMessage | undefined;
+        await Promise.all(chatParams.models.map(async (model: string) => {
+            assistantDbMessage = assistantDbMessage ?? await sessionManager.createDbMessage(OllamaChatMessageRole.ASSISTANT, { status: 'idle', role: OllamaChatMessageRole.ASSISTANT, content: '', model: model, tool_calls: [] });
+
+            const request: ChatRequest = {
+                model: model ?? config?.defaultModel,
+                options: { ...ollamaOptions, temperature: chatParams.temperature },
+                format: chatParams.format,
+                stream: true,
+                messages: [systemMessage,...previousMessages, userChatMessage],
+            } satisfies ChatRequest;
+
+            const senderGenerate = await WollamaApi.chat(request);
 
             senderGenerate.onStream = (response) => {
-                const target = assistantDbMessage; 
+                const target = assistantDbMessage;
                 console.log('sender.onStream', { target, response });
-                chatSession.onMessageStream(target, response);
-                ui.setAutoScroll(target.chatId, false);  
+                sessionManager.onMessageStream(target, response);
+                ui.setAutoScroll(target.chatId, false);
             };
 
-            senderGenerate.onEnd = (response) => { 
+            senderGenerate.onEnd = (response) => {
                 console.log('senderGenerate.onEnd', { response });
-                chatSession.onMessageDone(assistantDbMessage, response); // Updated to use response instead of data
+                sessionManager.onMessageDone(assistantDbMessage, response);
                 aiState.set('done');
-                chatMetadata.checkTitle(userDbMessage.chatId);
+                chatMetadata.checkTitle(sessionManager.sessionId);
+                console.log('Message processing completed for session:', sessionManager.sessionId);
+                // Log response to monitor message completion
+                console.log('Response from assistant:', response);
             };
+        }));
 
-
-
-
-           
-        });
-
-        // set auto-scroll to true
-        ui.setAutoScroll(chatSession.chat.chatId, true);
+        ui.setAutoScroll(chatSessionManager?.sessionId, true);
     }
 
     async function submitHandler(chatId: string | undefined, chatParams: ChatGenerate) {
-        if (!chatId) {
-            await chatApiSession.createChatDbSession({});
-            // set active chat
-            activeChatId = chatId = chatApiSession.chat.chatId;
-            window.history.replaceState(history.state, '', `/chat/${chatApiSession.chat.chatId}`); 
-            // replaceState( `/chat/${chatApiSession.chat.chatId}`,page.params);
+
+        if(!chatSessionManager.sessionId){ 
+            const session = await chatSessionManager.ChatSessionDB.createSession({});  
+            window.history.replaceState(history.state, '', `/chat/${session.dbChat.chatId}`); 
         }
+
+        const updatedSession = await chatSessionManager.ChatSessionDB.updateSession({ 
+            models: [...chatParams?.models],
+            systemPrompt: chatParams.promptSystem,
+            /* ollamaBody: ollamaBodyStore, */
+        }); 
+         
+ 
+        await sendPrompt(chatSessionManager, chatParams).catch((error) => {
+            console.error('Error sending prompt:', error);
+        });
+
+        // Ensure new session ID is saved in activeChatId
+        activeChatId = chatSessionManager.sessionId; 
+
+        /*  
 
         await chatApiSession.updateChatSession({
             chatId,
             models: [...chatParams?.models],
             systemPrompt: chatParams.promptSystem,
             ollamaBody: $ollamaBodyStore,
-        });
+        });  */
 
-        sendPrompt(chatApiSession, chatParams);
     }
 
     function keyPressHandler(e: KeyboardEvent) {
@@ -185,7 +189,7 @@
             {#snippet home()}
                 {@render input()}
             {/snippet}
-            <MessagesList chatId={activeChatId} />
+            <MessagesList id={activeChatId} />
             {@render input()}
         </DashBoard>
     </div>

@@ -32,6 +32,7 @@ export enum OllamaChatMessageRole {
   USER = "user",
   SYSTEM = "system",
   ASSISTANT = "assistant",
+  TOOL = "tool",
 }
 
 /** @deprecated */
