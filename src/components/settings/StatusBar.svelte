@@ -14,7 +14,6 @@
     let icon = $derived(connectionTimer.connected ? 'uil:wifi' : 'uil:wifi-slash');
     let color = $derived(connectionTimer.connected ? 'green' : 'red');
 
-	$inspect(connectionTimer)
 </script>
 
 <div class="line-gap-2">
