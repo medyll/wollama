@@ -177,8 +177,10 @@ export class chatUtils {
 	}
 
 	static getChatDataObject(chatData: DbChat = {} as DbChat): DbChat {
+		const rd = crypto.randomUUID();
 		return {
-			chatId: crypto.randomUUID(),
+			chatId: rd,
+			chatPassKey: rd,
 			context: [],
 			created_at: Date.now(), // Utiliser un timestamp en millisecondes
 			created_at: Date.now(), // Utiliser un timestamp en millisecondes

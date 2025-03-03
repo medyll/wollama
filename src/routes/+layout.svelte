@@ -88,7 +88,7 @@
         initiated = true;
     });
 
-    let a = {
+    /* let a = {
         name: 'toggler',
         selector: 'data-toggler',
         actions: (element, changes) => {
@@ -121,7 +121,7 @@
     console.log(Object.getOwnPropertyNames(b.actions));
     console.log(Object.getOwnPropertyNames(test));
 
-    console.log({ test });
+    console.log({ test }); */
 
     /* detectAndAct('.application-container', {
         attributes: ['data-action', 'class', 'style'],

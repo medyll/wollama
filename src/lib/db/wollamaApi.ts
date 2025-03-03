@@ -153,22 +153,27 @@ export class WollamaApiCore {
 	 * it initiates a streaming chat and processes the response using the `stream` method.
 	 * Otherwise, it performs a non-streaming chat request.
 	 */
-	async chat(request: ChatRequest) {
+	async chat(request: ChatRequest): Promise<ApiEvent> {
 		const event = ApiEvent.eventApi();
 
 		let response;
-		console.log({ request });
+
 		if (request.stream) {
-			response = await ollama.chat({
-				...request,
-				stream: true
-			});
-			this.stream(response, event.onStream, 'chat');
+			response = await ollama
+				.chat({
+					...request,
+					stream: true
+				})
+				.then((response) => {
+					this.stream(response, event.onStream, 'chat');
+				});
 		} else {
-			response = await ollama.chat({
-				...request,
-				stream: false
-			});
+			response = await ollama
+				.chat({
+					...request,
+					stream: false
+				})
+				.then((response) => response);
 		}
 
 		return event;

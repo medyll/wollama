@@ -1,7 +1,7 @@
 import type { DbChat, DBMessage, PromptType } from '$types/db';
 import { OllamaChatMessageRole, type OllamaResponse } from '$types/ollama';
 import { chatUtils } from '$lib/tools/chatUtils';
-import { idbqlState, schemeModelDb } from './dbSchema';
+import { idbql, idbqlState, schemeModelDb } from './dbSchema';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
 import { schemeModel } from '$lib/db/dbSchema';
@@ -63,7 +63,15 @@ export class idbQuery {
 	/* chat */
 	static getChat(id: number) {
 		if (!id || !idbqlState?.chat) return undefined; // throw new Error('id is required');
+
 		return idbqlState.chat.where({ id: { eq: id } })[0];
+	}
+	static async getChatByPassKey(chatPassKey: string) {
+		if (!chatPassKey || !idbqlState?.chat) return undefined; // throw new Error('id is required');
+
+		const ret = await idbql.chat.where({ chatPassKey: { eq: chatPassKey } });
+
+		return ret[0];
 	}
 
 	static getChats() {

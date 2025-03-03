@@ -1,26 +1,26 @@
 import { idbQuery } from '$lib/db/dbQuery';
+import type { ChatGenerate } from '$lib/states/chat.svelte';
 import type { DbChat, DBMessage, MessageImageType } from '$types/db';
-import { OllamaChatMessageRole, type OllamaChatMessage } from '$types/ollama';
+import { OllamaChatMessageRole, type OllamaChatMessage, type OllamaResponse } from '$types/ollama';
+import type { SettingsType } from '$types/settings';
 import type { Message, ToolCall } from 'ollama/browser';
 
 export class ChatSessionManager {
 	#SessionDB: {
 		sessionId?: number;
 		dbChat: Partial<DbChat>;
+		models?: string[];
 		userChatMessage?: OllamaChatMessage;
 		userDbMessage?: DBMessage;
 		messageAssistant: DBMessage[];
 		messageUser: Partial<DBMessage>;
 	} = {
 		dbChat: {},
+		models: [],
 		messageAssistant: [],
 		messageUser: {},
 		userChatMessage: {} as OllamaChatMessage,
 		userDbMessage: {} as DBMessage
-	};
-	#sessionConfig: { apiType: 'generate' | 'chat'; useContext: boolean } = {
-		apiType: 'generate',
-		useContext: false
 	};
 
 	public previousMessages: DBMessage[] = [];
@@ -127,18 +127,20 @@ export class ChatSessionManager {
 		return this.createDbMessage(OllamaChatMessageRole.SYSTEM, message);
 	}
 
-	#loadChatSessionFromDB = (id: number) => {
-		idbQuery
-			.getChat(id)
-			.then((dbChat: DbChat | undefined) => {
-				this.#SessionDB.dbChat = dbChat ?? ({} as Partial<DbChat>);
-				this.#SessionDB.sessionId = dbChat?.id;
-			})
-			.catch((error) => {
-				console.error('Error loading chat:', error);
-			});
+	#loadChatSessionFromDB = async (id: number) => {
+		const dbChat = await idbQuery.getChat(id);
+		this.#SessionDB.dbChat = dbChat ?? ({} as Partial<DbChat>);
+		this.#SessionDB.sessionId = dbChat?.id;
 	};
 
+	async loadFromPathKey(pathKey?: string) {
+		const dbChat = await idbQuery.getChatByPassKey(pathKey);
+
+		this.#SessionDB.dbChat = dbChat ?? ({} as Partial<DbChat>);
+		this.#SessionDB.sessionId = dbChat?.id;
+		await this.#loadChatSessionFromDB(dbChat?.id);
+		return dbChat;
+	}
 	static loadSession() {
 		return new ChatSessionManager();
 	}
@@ -269,5 +271,33 @@ export class ChatSessionManager {
 			messageAssistant: [],
 			messageUser: {}
 		};
+	}
+
+	public async buildMessages(
+		chatParams: ChatGenerate,
+		config: SettingsType | undefined
+	): Promise<{
+		systemMessage: DBMessage;
+		previousMessages: Partial<DBMessage>[];
+		userChatMessage: Message;
+	}> {
+		const systemPrompt = chatParams.promptSystem.value ?? config?.system_prompt;
+
+		const userChatMessage: Message = await this.createUserChatMessage({
+			content: chatParams.prompt,
+			images: chatParams.images,
+			model: chatParams.models[0]
+		});
+
+		const systemMessage = await this.createSystemMessage({
+			content: systemPrompt,
+			role: OllamaChatMessageRole.SYSTEM,
+			status: 'idle',
+			model: chatParams.models[0]
+		});
+
+		const previousMessages = await this.getPreviousMessages();
+
+		return { systemMessage, previousMessages, userChatMessage };
 	}
 }
