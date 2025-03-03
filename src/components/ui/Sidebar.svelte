@@ -80,11 +80,11 @@
                 <Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
             </MenuListItem>
             <hr />
-            <!-- <MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
+            <MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
                 <Icon icon="earth" alt={$t('ui.spaces')} />
                 <span>{$t('ui.spaces')}</span>
             </MenuListItem>
-           <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
+           <!-- <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
                 <Icon icon="settings" alt={$t('ui.books')} />
                 <span>{$t('ui.books')}</span>
             </MenuListItem> -->

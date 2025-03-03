@@ -88,8 +88,8 @@ export class idbQuery {
 	static async deleteChat(id?: number): Promise<number> {
 		if (!id) throw new Error('id is required');
 
-		await idbqlState.messages.deleteWhere({ id: { eq: id } });
-		await idbqlState.chat.delete(id);
+		await idbql.messages.deleteWhere({ chatId: { eq: id } });
+		await idbql.chat.delete(id);
 
 		return id;
 	}

@@ -13,8 +13,8 @@
     import { chatMetadata } from '$lib/tools/promptSystem';
 
     let loadingStae = $state<Record<string, any>>({});
-    let chatList = idbqlState.chat.getAll();
-    let chatMenuList = $derived(groupMessages(chatList));
+    let chatList = $derived(idbqlState.chat.getAll());
+    let chatMenuList = $derived(groupMessages(chatList)); 
 
     const openCloseConfig = async () => {
         if ($page.route.id?.includes('/configuration')) {
@@ -45,7 +45,7 @@
         engine.goto(`/chat/${id}`);
     };
 
-    function deleteCha1tHandler(chatId: any) {
+    function deleteCha1tHandler(chatId: number) {
         return idbQuery.deleteChat(chatId);
     }
     async function guess(chatId: any) {
@@ -86,7 +86,7 @@
                         <div class="flex flex-v gap-4" style="content-visibility:auto">
                             <div class="flex gap-4">
                                 <div class="line-clamp-1 break-all transition duration-300 font-bold py-2 flex-1">
-                                    <a class="uppercase" title={item?.title} href={`/chat/${item.chatId}`}>- {item?.title}</a>
+                                    <a class="uppercase" title={item?.title} href={`/chat/${item.chatPassKey}`}>- {item?.title}</a>
                                 </div>
                                 <div class="flex flex-1 gap-2">
                                     <Confirm 
@@ -95,7 +95,7 @@
                                         buttonInitial={
                                             {icon:{icon:'material-symbols-light:title'}}
                                         }  
-                                        data={item.chatId as string}
+                                        data={item.id as string}
                                         action={guess}
                                         tall="mini"
                                         variant="naked" />
@@ -107,7 +107,7 @@
                                         }  
                                         tall="mini"
                                         variant="naked"  
-                                        data={item.chatId as string}
+                                        data={item.id as string}
                                         action={categorize} />
                                     <Confirm
                                         title={$t('chat.describe')}
@@ -117,7 +117,7 @@
                                         }  
                                         tall="mini"
                                         variant="naked"  
-                                        data={item.chatId as string}
+                                        data={item.id as string}
                                         action={describe} />
                                     <Confirm
                                         title={$t('chat.tags')}
@@ -127,7 +127,7 @@
                                         }   
                                         tall="mini"
                                         variant="naked"  
-                                        data={item.chatId as string}
+                                        data={item.id as string}   
                                         action={describe} />
                                     <Confirm
                                         title={$t('chat.delete_chat')}
@@ -137,7 +137,7 @@
                                         } 
                                         tall="mini"
                                         variant="naked"  
-                                        data={item.chatId as string}
+                                        data={item.id as string}
                                         action={deleteCha1tHandler} />
                                 </div>
                             </div>

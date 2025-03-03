@@ -11,9 +11,9 @@
     import { idbqlState } from '$lib/db/dbSchema';
     import { chatMetadata } from '$lib/tools/promptSystem';
 
-    const { chatId = '', selected = false } = $props();
+    const { id = '', selected = false } = $props();
 
-    let chat = $derived(idbQuery.getChat(chatId));
+    let chat = $derived(idbQuery.getChat(id));
 
     let editChat: boolean = $state(false);
     let isOpen: boolean = $state(false);
@@ -21,8 +21,8 @@
     // $: title = chat?.title;
 
     function deleteCha1tHandler() {
-        idbQuery.deleteChat(chatId);
-        if ($ui.activeChatId === chatId) {
+        idbQuery.deleteChat(id);
+        if ($ui.activeChatId === id) {
             ui.setActiveChatId(undefined);
         }
     }
@@ -47,7 +47,7 @@
         const { title } = event.currentTarget as HTMLFormElement;
         isOpen = false;
         toggleEdit(false);
-        idbQuery.updateChat(chatId, { title: title.value });
+        idbQuery.updateChat(id, { title: title.value });
     }
 </script>
 

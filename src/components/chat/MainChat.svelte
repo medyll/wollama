@@ -132,7 +132,7 @@
 
 {#snippet input()}
 	<div class="chatZone">
-		<div class=" ">
+		<div class="input  ">
 			<div class="inputTextarea flex flex-col gap-3 px-3 pt-3 flex-1">
 				<!-- <Images />
                 <hr /> -->
