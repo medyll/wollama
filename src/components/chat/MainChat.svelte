@@ -73,6 +73,7 @@
 					messages: [systemMessage, ...previousMessages, userChatMessage]
 				} satisfies ChatRequest;
 
+				console.log(systemMessage);
 				const senderGenerate = await WollamaApi.chat(request);
 
 				senderGenerate.onStream = (response) => {

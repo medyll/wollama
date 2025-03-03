@@ -124,7 +124,8 @@ export class ChatSessionManager {
 		if (existingSystemMessage) {
 			return existingSystemMessage;
 		}
-		return this.createDbMessage(OllamaChatMessageRole.SYSTEM, message);
+		const createdMessage = await this.createDbMessage(OllamaChatMessageRole.SYSTEM, message);
+		return await ChatSessionManager.dbMessageToMessage(createdMessage);
 	}
 
 	#loadChatSessionFromDB = async (id: number) => {
@@ -247,7 +248,8 @@ export class ChatSessionManager {
 		return {
 			role: dbMessage.role,
 			content: dbMessage.content,
-			images: dbMessage.images ? [dbMessage.images.base64] : undefined
+			images: dbMessage.images?.base64 ? [dbMessage.images.base64] : [],
+			tool_calls: []
 		};
 	}
 
@@ -277,8 +279,8 @@ export class ChatSessionManager {
 		chatParams: ChatGenerate,
 		config: SettingsType | undefined
 	): Promise<{
-		systemMessage: DBMessage;
-		previousMessages: Partial<DBMessage>[];
+		systemMessage: Message;
+		previousMessages: Partial<Message>[];
 		userChatMessage: Message;
 	}> {
 		const systemPrompt = chatParams.promptSystem.value ?? config?.system_prompt;
@@ -293,11 +295,18 @@ export class ChatSessionManager {
 			content: systemPrompt,
 			role: OllamaChatMessageRole.SYSTEM,
 			status: 'idle',
-			model: chatParams.models[0]
+			model: chatParams.models[0],
+			images: []
 		});
 
 		const previousMessages = await this.getPreviousMessages();
-
-		return { systemMessage, previousMessages, userChatMessage };
+		console.log({ systemMessage });
+		return {
+			systemMessage: ChatSessionManager.dbMessageToMessage(systemMessage),
+			previousMessages: previousMessages
+				.map((e) => ChatSessionManager.dbMessageToMessage(e))
+				.filter((e) => e.role !== 'system'),
+			userChatMessage
+		};
 	}
 }
