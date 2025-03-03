@@ -6,7 +6,7 @@
     let { id }: { id?: number } = $props();
 
     let chat = $derived(id ? idbQuery.getChat(id) : []);
-    let messages =  $derived(id ? idbQuery.getMessages(id) : [] )
+    let messages =  $derived(id ? idbQuery.getMessages(id).filter((m) => !m.system) : [] )
     let element: HTMLElement;
 
     $effect.pre(() => {
