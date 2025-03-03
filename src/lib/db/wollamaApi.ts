@@ -156,19 +156,18 @@ export class WollamaApiCore {
 	async chat(request: ChatRequest): Promise<ApiEvent> {
 		const event = ApiEvent.eventApi();
 
-		let response;
-
 		if (request.stream) {
-			response = await ollama
+			ollama
 				.chat({
 					...request,
 					stream: true
 				})
 				.then((response) => {
+					console.log({ response });
 					this.stream(response, event.onStream, 'chat');
 				});
 		} else {
-			response = await ollama
+			ollama
 				.chat({
 					...request,
 					stream: false

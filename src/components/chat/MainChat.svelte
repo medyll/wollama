@@ -5,7 +5,6 @@
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import ChatOptions from './ChatOptions.svelte';
-	import { ollamaBodyStore } from '$lib/stores/prompter';
 	import { aiState } from '$lib/stores';
 	import DashBoard from '$components/DashBoard.svelte';
 	import { chatParamsState, type ChatGenerate } from '$lib/states/chat.svelte';
@@ -13,12 +12,11 @@
 	import MessagesList from './MessagesList.svelte';
 	import { chatMetadata } from '$lib/tools/promptSystem';
 	import { connectionTimer } from '$lib/stores/timer.svelte';
-	import { replaceState } from '$app/navigation';
 	import type { DBMessage } from '$types/db';
 	import { WollamaApi } from '$lib/db/wollamaApi';
 	import { get } from 'svelte/store';
 	import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-	import type { ChatRequest, GenerateRequest, Message } from 'ollama/browser';
+	import type { ChatRequest,  } from 'ollama/browser';
 	import { ChatSessionManager } from '$lib/tools/chatSessionManager';
 	import { OllamaChatMessageRole } from '$types/ollama';
 
@@ -30,7 +28,7 @@
 
 	let activeChatId: number | undefined = $state();
 	let chatSessionManager: ChatSessionManager = ChatSessionManager.loadSession();
- 
+
 	chatSessionManager.loadFromPathKey(chatPassKey).then((chat) => (activeChatId = chat?.id));
 
 	let placeholder: string = $derived(
@@ -73,13 +71,12 @@
 					messages: [systemMessage, ...previousMessages, userChatMessage]
 				} satisfies ChatRequest;
 
-				console.log(systemMessage);
 				const senderGenerate = await WollamaApi.chat(request);
 
 				senderGenerate.onStream = (response) => {
 					const target = assistantDbMessage;
 					console.log('sender.onStream', { target, response });
-					sessionManager.onMessageStream(target, response);
+					sessionManager.onMessageStream(assistantDbMessage, response);
 					ui.setAutoScroll(target.chatId, false);
 				};
 
@@ -96,32 +93,31 @@
 		ui.setAutoScroll(chatSessionManager?.sessionId, true);
 	}
 
-	async function submitHandler(chatId: string | undefined, chatParams: ChatGenerate) {
+	async function submitHandler(chatParams: ChatGenerate) {
 		if (!chatSessionManager.sessionId) {
 			const session = await chatSessionManager.ChatSessionDB.createSession({
 				models: [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 			});
-			window.history.replaceState(history.state, '', `/chat/${session.dbChat.chatId}`);
+			window.history.replaceState(history.state, '', `/chat/${session.dbChat.chatPassKey}`);
+		} else {
+			await chatSessionManager.ChatSessionDB.updateSession({
+				models: [...chatParams?.models],
+				systemPrompt: chatParams.promptSystem
+				/* ollamaBody: ollamaBodyStore, */
+			});
 		}
-
-		const updatedSession = await chatSessionManager.ChatSessionDB.updateSession({
-			models: [...chatParams?.models],
-			systemPrompt: chatParams.promptSystem
-			/* ollamaBody: ollamaBodyStore, */
-		});
+		activeChatId = chatSessionManager.sessionId;
 
 		await sendPrompt(chatSessionManager, chatParams).catch((error) => {
 			console.error('Error sending prompt:', error);
 		});
-
-		activeChatId = chatSessionManager.sessionId;
 	}
 
 	function keyPressHandler(e: KeyboardEvent) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
-			submitHandler(activeChatId, $state.snapshot(chatParamsState));
+			submitHandler($state.snapshot(chatParamsState));
 			chatParamsState.images = undefined;
 			chatParamsState.prompt = '';
 		}

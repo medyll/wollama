@@ -113,19 +113,19 @@ export class ChatSessionManager {
 		return await idbQuery.insertMessage(this.sessionId, messageData);
 	}
 
-	async createSystemMessage(
+	async createDbSystemMessage(
 		message: Message & {
 			chatId?: number;
 			status: DBMessage['status'];
 			model: string;
 		}
-	) {
+	): Promise<DBMessage> {
 		const existingSystemMessage = await idbQuery.getSystemMessage(this.sessionId);
 		if (existingSystemMessage) {
 			return existingSystemMessage;
 		}
 		const createdMessage = await this.createDbMessage(OllamaChatMessageRole.SYSTEM, message);
-		return await ChatSessionManager.dbMessageToMessage(createdMessage);
+		return createdMessage;
 	}
 
 	#loadChatSessionFromDB = async (id: number) => {
@@ -280,10 +280,12 @@ export class ChatSessionManager {
 		config: SettingsType | undefined
 	): Promise<{
 		systemMessage: Message;
-		previousMessages: Partial<Message>[];
+		previousMessages: Message[];
 		userChatMessage: Message;
 	}> {
 		const systemPrompt = chatParams.promptSystem.value ?? config?.system_prompt;
+
+		const previousMessages = await this.getPreviousMessages();
 
 		const userChatMessage: Message = await this.createUserChatMessage({
 			content: chatParams.prompt,
@@ -291,7 +293,7 @@ export class ChatSessionManager {
 			model: chatParams.models[0]
 		});
 
-		const systemMessage = await this.createSystemMessage({
+		const systemMessage = await this.createDbSystemMessage({
 			content: systemPrompt,
 			role: OllamaChatMessageRole.SYSTEM,
 			status: 'idle',
@@ -299,8 +301,6 @@ export class ChatSessionManager {
 			images: []
 		});
 
-		const previousMessages = await this.getPreviousMessages();
-		console.log({ systemMessage });
 		return {
 			systemMessage: ChatSessionManager.dbMessageToMessage(systemMessage),
 			previousMessages: previousMessages

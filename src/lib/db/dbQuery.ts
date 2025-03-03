@@ -116,8 +116,7 @@ export class idbQuery {
 	static async insertMessage(chatId: number, messageData: Partial<DBMessage>): Promise<DBMessage> {
 		if (!chatId) throw new Error('chatId is required');
 		const message = chatUtils.getMessageDataObject({ chatId, ...messageData });
-		await idbqlState.messages.add(message);
-		return message;
+		return await idbqlState.messages.add(message);
 	}
 
 	static async updateMessage(id: number, messageData: Partial<DBMessage>) {
