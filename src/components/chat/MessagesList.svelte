@@ -6,7 +6,7 @@
     let { id }: { id?: number } = $props();
 
     let chat = $derived(id ? idbQuery.getChat(id) : []);
-    let messages =  $derived(id ? idbQuery.getMessages(id).filter((m) => !m.system) : [] )
+    let messages =  $derived(id ? idbQuery.getMessages(id).filter((m) => !m.role || m.role !== 'system') : [] );
     let element: HTMLElement;
 
     $effect.pre(() => {
@@ -24,7 +24,7 @@
 <!-- corecteur orthographique -->
 
 <div class="flex flex-col w-full gap-4 flex-1">
-    <div class="pad-2 flex justify-center gap-2 borde pad-2">
+    <div class="pad-2 flex justify-center gap-2   pad-2">
         {@html (chat?.tags ?? [])
             .map((t) => {
                 return `<span class="border px-2 rounded-md">${t}</span>`;

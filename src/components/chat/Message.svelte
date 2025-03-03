@@ -146,7 +146,7 @@
 <style lang="postcss">
     @reference "../../styles/all.css";
     .message{ 
-        @apply p-2 gap-3 border;
+        @apply p-2 gap-3  ;
         /* @apply bg-gray-100 dark:bg-gray-800; */
         @apply rounded-md;
         /* @apply border border-gray-200 dark:border-gray-600; */
