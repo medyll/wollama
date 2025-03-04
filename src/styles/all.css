@@ -1,17 +1,13 @@
-@import "tailwindcss";
+@import "./app.css";
 
+@import "./references.css";
 @import "./base.css";
 @import "./components.css";
-@import "./utilities.css";
-@import "./theme.css";
-@import "./snippets.css";
-@import "./css-properties.css";
 @import "./main.css";
 
-@plugin '@tailwindcss/typography';
-@plugin 'postcss-nesting';
 
-@source '../**/*.css';
+
+/*@source '..!**!*.css';*/
 
 
 

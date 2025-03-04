@@ -23,7 +23,7 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/all.css";
+    @reference "../../styles/references.css";
     .gauge {
         left: 50%;
         transform: translate(-50%, 0);

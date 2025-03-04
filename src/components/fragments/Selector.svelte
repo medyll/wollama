@@ -14,7 +14,7 @@
 {/if}
 
 <style lang="postcss">
-	@reference "../../styles/all.css";
+	@reference "../../styles/references.css";
 	.active{
 		@apply  border border-b-2 border-neutral-500; /* active */
 	}

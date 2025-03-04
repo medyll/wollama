@@ -63,7 +63,7 @@
 </div>  
 
 <style lang="postcss">  
-    @reference "../../styles/all.css";
+    @reference "../../styles/references.css";
     .button-temp {
         @apply rounded-md;
         @apply p-1 px-2;

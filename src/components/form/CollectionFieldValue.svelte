@@ -4,7 +4,6 @@
     import { IDbCollectionFieldForge } from '$lib/db/dbFields';
     import type { TplCollectionName } from '@medyll/idae-idbql';
     import { IconButton } from '@medyll/idae-slotui-svelte';
-    import CollectionFieldGuess from './CollectionFieldGuess.svelte';
     type LabelPosition = 'before' | 'above' | 'after' | 'below' | boolean;
 
     let {
@@ -111,7 +110,7 @@
 {/if}
 
 <style lang="postcss">
-    @reference "../../styles/all.css";
+    @reference "../../styles/references.css";
     .field-label {
         padding: 0.5rem;
         display: block;

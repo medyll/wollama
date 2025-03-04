@@ -199,7 +199,7 @@
 </div>
 
 <style lang="postcss">
-	@reference "../../styles/all.css";
+	@reference "../../styles/references.css";
 	hr {
 		margin: 0;
 	}

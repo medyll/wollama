@@ -38,7 +38,7 @@
 	</div>
 </div>
 <style lang="postcss">
-    @reference "../../styles/all.css";
+    @reference "../../styles/references.css";
     .header {
         @apply sticky top-2 z-10;
         background-image: var(--cfab-gradient);

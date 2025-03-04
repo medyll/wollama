@@ -84,7 +84,7 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/all.css";
+    @reference "../../styles/references.css";
     button {
         @apply block w-full text-left flex   items-center px-1 py-1 gap-2 transition whitespace-nowrap text-ellipsis  dark:hover:bg-gray-800;
     }  

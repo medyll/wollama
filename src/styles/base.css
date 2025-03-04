@@ -1,10 +1,4 @@
 /* base.css */
-
-
-@custom-variant dark (&:where(.dark, .dark *));
-
-
-
 @layer base {
   /* skin.css */
 

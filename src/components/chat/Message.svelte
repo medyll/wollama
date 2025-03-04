@@ -144,7 +144,7 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/all.css";
+    @reference "../../styles/references.css";
     .message{ 
         @apply p-2 gap-3  ;
         /* @apply bg-gray-100 dark:bg-gray-800; */

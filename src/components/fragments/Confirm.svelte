@@ -46,7 +46,7 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/all.css";
+    @reference "../../styles/references.css";
     svg {
         > path {
             color: red !important;
