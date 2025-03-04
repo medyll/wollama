@@ -1,6 +1,4 @@
-svg {
-    color: var(--cfab-icon-color);
-}
+
 
 @font-face {
     font-family: "Arimo";
@@ -50,6 +48,10 @@ body {
     /* word-break: break-word; */
     font-size: 0.875rem;
     background: transparent;
+}
+
+svg {
+    color: var(--cfab-icon-color);
 }
 
 .spin {

@@ -2,14 +2,7 @@
 @layer base {
   /* skin.css */
 
-  :popover-open {
-    width: 200px;
-    position: absolute;
-    inset: unset;
-    margin: 0;
-    color: var(--cfab-foreground);
-    background-color: var(--cfab-bg);
-  }
+
   *,
   ::after,
   ::before,
@@ -28,10 +21,7 @@
     color: var(--cfab-input-foreground-color);
   }
 
-  .anchor {
-    anchor-name: --myAnchor;
-    display: inline-flex;
-  }
+
 
   .theme-gradient-from {
     background-color: var(--cfab-gradient-from);
