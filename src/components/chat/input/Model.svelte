@@ -58,4 +58,21 @@
 			</div> -->
 		</div>
 	{/each}
-</div> 
+</div>
+<style>
+		@reference "../../../styles/references.css";
+    :popover-open {
+        position-anchor: --anchor;
+        bottom: anchor(--anchor top);
+        left: anchor(--anchor left);
+        right: anchor(--anchor right);
+
+        background-color: var(--cfab-bg);
+        color: var(--cfab-foreground);
+
+        width: 200px;
+        @apply shadow-md;
+        @apply rounded-md;
+    }
+
+</style>
