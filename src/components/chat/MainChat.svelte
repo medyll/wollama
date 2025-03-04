@@ -7,7 +7,7 @@
 	import ChatOptions from './ChatOptions.svelte';
 	import { aiState } from '$lib/stores';
 	import DashBoard from '$components/DashBoard.svelte';
-	import { chatParamsState, type ChatGenerate } from '$lib/states/chat.svelte';
+	import { type ChatGenerate, chatParamsState } from '$lib/states/chat.svelte';
 	import { Icon } from '@medyll/idae-slotui-svelte';
 	import MessagesList from './MessagesList.svelte';
 	import { chatMetadata } from '$lib/tools/promptSystem';
@@ -16,9 +16,10 @@
 	import { WollamaApi } from '$lib/db/wollamaApi';
 	import { get } from 'svelte/store';
 	import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-	import type { ChatRequest,  } from 'ollama/browser';
+	import type { ChatRequest } from 'ollama/browser';
 	import { ChatSessionManager } from '$lib/tools/chatSessionManager';
 	import { OllamaChatMessageRole } from '$types/ollama';
+	import { preventDefault } from 'svelte/legacy';
 
 	interface MainChatProps {
 		chatPassKey?: string;
@@ -26,7 +27,7 @@
 
 	let { chatPassKey }: MainChatProps = $props();
 
-	let activeChatId: number | undefined = $state();
+	let activeChatId: number | undefined       = $state();
 	let chatSessionManager: ChatSessionManager = ChatSessionManager.loadSession();
 
 	chatSessionManager.loadFromPathKey(chatPassKey).then((chat) => (activeChatId = chat?.id));
@@ -40,7 +41,7 @@
 	);
 
 	async function sendPrompt(sessionManager: ChatSessionManager, chatParams: ChatGenerate) {
-		const config = get(settings);
+		const config        = get(settings);
 		const ollamaOptions = get(ollamaApiMainOptionsParams);
 
 		const { systemMessage, previousMessages, userChatMessage } = await sessionManager.buildMessages(
@@ -56,18 +57,18 @@
 				assistantDbMessage =
 					assistantDbMessage ??
 					(await sessionManager.createDbMessage(OllamaChatMessageRole.ASSISTANT, {
-						status: 'idle',
-						role: OllamaChatMessageRole.ASSISTANT,
-						content: '',
-						model: model,
+						status    : 'idle',
+						role      : OllamaChatMessageRole.ASSISTANT,
+						content   : '',
+						model     : model,
 						tool_calls: []
 					}));
 
 				const request: ChatRequest = {
-					model: model ?? config?.defaultModel,
-					options: { ...ollamaOptions, temperature: chatParams.temperature },
-					format: chatParams.format,
-					stream: true,
+					model   : model ?? config?.defaultModel,
+					options : { ...ollamaOptions, temperature: chatParams.temperature },
+					format  : chatParams.format,
+					stream  : true,
 					messages: [systemMessage, ...previousMessages, userChatMessage]
 				} satisfies ChatRequest;
 
@@ -96,13 +97,13 @@
 	async function submitHandler(chatParams: ChatGenerate) {
 		if (!chatSessionManager.sessionId) {
 			const session = await chatSessionManager.ChatSessionDB.createSession({
-				models: [...chatParams?.models],
+				models      : [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 			});
 			window.history.replaceState(history.state, '', `/chat/${session.dbChat.chatPassKey}`);
 		} else {
 			await chatSessionManager.ChatSessionDB.updateSession({
-				models: [...chatParams?.models],
+				models      : [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 				/* ollamaBody: ollamaBodyStore, */
 			});
@@ -125,13 +126,13 @@
 
 	// retrieve model, temperature, format
 	$effect(() => {
-		chatParamsState.mode = $settings.request_mode;
+		chatParamsState.mode   = $settings.request_mode;
 		chatParamsState.models = [$settings.defaultModel];
 	});
 </script>
 
 {#snippet input()}
-	<div class="chatZone">
+	<div class="application-chat-zone">
 		<div class="input  ">
 			<div class="inputTextarea flex flex-col gap-3 px-3 pt-3 flex-1">
 				<!-- <Images />
@@ -158,7 +159,7 @@
 					>
 						{#if $aiState == 'done'}
 							<button
-								class="rounded-full border border drop-shadow-lg aspect-square flex place-content-center"
+								class="rounded-full input   drop-shadow-lg aspect-square   items-center "
 								type="submit"
 								form="prompt-form"
 							>
@@ -185,7 +186,10 @@
 	</div>
 {/snippet}
 <!-- <div class="absolute right-4"><AgentPick /></div> -->
-<form hidden id="prompt-form" on:submit|preventDefault={submitHandler} />
+<form hidden id="prompt-form" onsubmit={(event)=>{
+	event.preventDefault();
+	submitHandler($state.snapshot(chatParamsState));
+}} ></form>
 <div class="h-full w-full">
 	<div class="application-container flex-v h-full mx-auto">
 		<DashBoard showList={Boolean(activeChatId)}>
@@ -199,23 +203,14 @@
 </div>
 
 <style lang="postcss">
-	@reference "../../styles/references.css";
-	hr {
-		margin: 0;
-	}
-	.chatZone {
-		@apply flex flex-col;
-		@apply w-full sticky mb-0 bottom-0 px-8;
-		background-size: 100vh 100vw;
-		background-position: bottom;
-		color: var(--cfab-foreground);
-		background-color: var(--cfab-bg);
-	}
-	.inputTextarea {
-		position: relative;
-		&:has(textarea:focus) {
-			border-color: var(--cfab-input-border-color-focus, red);
-			border-radius: 0.5em;
-		}
-	}
+    @reference "../../styles/references.css";
+
+    .inputTextarea {
+        position: relative;
+
+        &:has(textarea:focus) {
+            border-color: var(--cfab-input-border-color-focus, red);
+            border-radius: 0.5em;
+        }
+    }
 </style>
