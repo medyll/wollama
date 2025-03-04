@@ -35,7 +35,7 @@
 <!-- {value} -->
 <div class="relative flex-1 flex-align-middle">
     <div class="grower flex-1" data-replicated-value={value}>
-        <textarea rows="3" class="textarea p-3" bind:this={element} {disabled} {form} {placeholder} bind:value {onkeypress}></textarea>
+        <textarea rows="3" class=" textarea application-chet-textarea p-3" style="border:none" bind:this={element} {disabled} {form} {placeholder} bind:value {onkeypress}></textarea>
     </div>
 </div>
 

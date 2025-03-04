@@ -1,36 +1,31 @@
 svg {
-  color: var(--cfab-icon-color);
+    color: var(--cfab-icon-color);
 }
 
 @font-face {
-  font-family: "Arimo";
-  src: url("../assets/fonts/Arimo-Variable.ttf");
-  font-display: swap;
+    font-family: "Arimo";
+    src: url("../assets/fonts/Arimo-Variable.ttf");
+    font-display: swap;
 }
 
 @font-face {
-  font-family: "Mona Sans";
-  src: url("../assets/fonts/Mona-Sans.woff2");
-  font-display: swap;
+    font-family: "Mona Sans";
+    src: url("../assets/fonts/Mona-Sans.woff2");
+    font-display: swap;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: url("../assets/fonts/Roboto-Regular.ttf");
-  font-display: swap;
+    font-family: "Roboto";
+    src: url("../assets/fonts/Roboto-Regular.ttf");
+    font-display: swap;
 }
 
-html,
-body {
-  background: transparent;
-}
 
 html {
-  /* word-break: break-word; */
-  height: 100%;
-  min-height: 100%;
-  font-family:
-    Mona-Sans,
+    /* word-break: break-word; */
+    height: 100%;
+    min-height: 100%;
+    font-family: Mona-Sans,
     "ui-sans-serif",
     "system-ui",
     -apple-system,
@@ -46,144 +41,60 @@ html {
     "Segoe UI Emoji",
     "Segoe UI Symbol",
     "Noto Color Emoji";
-  font-size: 0.875rem;
+    font-size: 0.875rem;
 }
 
 body {
-  height: 100%;
-  min-height: 100%;
-  /* word-break: break-word; */
-  font-size: 0.875rem;
+    height: 100%;
+    min-height: 100%;
+    /* word-break: break-word; */
+    font-size: 0.875rem;
+    background: transparent;
 }
 
 .spin {
-  animation-name: spin;
-  animation-duration: 2000ms;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
+    animation-name: spin;
+    animation-duration: 2000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 pre[class*="language-"] {
-  padding: 0em;
-  margin: 0 !important;
-  overflow: auto;
-  border: none;
+    padding: 0em;
+    margin: 0 !important;
+    overflow: auto;
+    border: none;
 }
 
 code[class*="language-none"] {
-  padding: 1em !important;
-  margin: 1em 0;
+    padding: 1em !important;
+    margin: 1em 0;
 }
 
-
-.application {
-  color: var(--cfab-foreground);
-  background-color: var(--cfab-bg);
-  display: flex;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-
-  .application-content {
-    user-select: none;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-    z-index: 0;
-    position: relative;
-
-    .application-topBar {
-      display: flex;
-      align-items: center;
-      z-index: 50;
-      top: 0;
-      gap: 1rem;
-      margin-top: 0px;
-      height: 34px;
-      z-index: 9000;
-    }
-
-    .application-main {
-      position: relative;
-      overflow: auto;
-      height: 100%;
-      width: 100%;
-    }
-  }
-}
-
-.theme-bg {
-  @apply dark:bg-gray-800 dark:text-gray-100;
-}
-
-.theme-bg-dark {
-  @apply text-gray-700 bg-gray-200;
-  @apply dark:bg-gray-900 dark:text-gray-100;
-}
-
-
-.application-sideBar {
-  @apply hidden w-[80px] lg:flex;
-  @apply p-3 flex h-full flex-col shrink overflow-hidden shadow-lg;
-
-  &[aria-expanded="false"] {
-    @apply lg:w-[80px];
-  }
-  &[aria-expanded="true"] {
-    @apply sm:w-[240px] sm:relative md:w-[340px] lg:w-[340px] xl:w-[340px] 2xl:w-[440px];
-  }
-
-  gap: 0.5rem;
-  height: 100%;
-  transition: width 0.1s ease-in-out;
-  z-index: 30;
-  border-right: 1px solid var(--cfab-input-border-color);
-  background-color: var(--cfab-paper-bg-color);
-  background-image: var(--cfab-gradient);
-
-  .application-sideBar-title {
-    @apply flex items-center justify-end;
-    color: var(--cfab-soft-title-text-color);
-    text-align: right;
-  }
-
-  .application-sideBar-content {
-    @apply px-2 flex-1 w-full;
-    overflow-y: auto;
-  }
-}
-
-.application-container {
-  @apply lg:max-w-[55rem] xl:max-w-[65rem] 2xl:max-w-[160rem] 3xl:max-w-[100rem];
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  position: relative;
-}
 
 .prismDone {
-  /* from main.css */
-
-  &code {
-    @apply bg-neutral-600 dark:bg-neutral-800;
-  }
+    /* from main.css */
+    
+    
+    & code {
+        @apply bg-neutral-600 dark:bg-neutral-800;
+    }
 }
 
 .codeFormat {
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 1em 0;
-  @apply bg-neutral-200 dark:bg-neutral-800;
-  @apply border border-neutral-400 dark:border-white/10;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1em 0;
+    @apply bg-neutral-200 dark:bg-neutral-800;
+    @apply border border-neutral-400 dark:border-white/10;
 }

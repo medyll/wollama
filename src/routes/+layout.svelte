@@ -202,7 +202,7 @@
 <Backdrop isLoading={false} isOpen={false}>
     <Settings />
 </Backdrop>
-<div class="application">
+<div class="application-body">
     <Notifications />
     <Sidebar />
     <div class="application-content">
