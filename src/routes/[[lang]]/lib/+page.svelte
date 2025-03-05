@@ -26,7 +26,6 @@
 	};
 
 	const createChat = async () => {
-		// $ui.activeChatId = undefined;
 		ui.setActiveChatId();
 		engine.goto('/');
 		engine.goto('/');
