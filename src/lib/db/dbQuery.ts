@@ -11,50 +11,50 @@ import type { Where } from '@medyll/idae-idbql';
 export function ideo(collection: keyof typeof schemeModelDb) {
 	if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
 	return {
-		get: getClientData({ table_name: collection, action: 'get_one', data: {} }),
-		getAll: getClientData({
+		get:         getClientData({ table_name: collection, action: 'get_one', data: {} }),
+		getAll:      getClientData({
 			table_name: collection,
-			action: 'getAll',
-			data: {}
+			action:     'getAll',
+			data:       {}
 		}),
-		create: getClientData({
+		create:      getClientData({
 			table_name: collection,
-			action: 'create',
-			data: {}
+			action:     'create',
+			data:       {}
 		}),
-		delete: getClientData({
+		delete:      getClientData({
 			table_name: collection,
-			action: 'delete',
-			data: {}
+			action:     'delete',
+			data:       {}
 		}),
 		deleteWhere: getClientData({
 			table_name: collection,
-			action: 'deleteWhere',
-			data: {}
+			action:     'deleteWhere',
+			data:       {}
 		}),
-		update: getClientData({
+		update:      getClientData({
 			table_name: collection,
-			action: 'update',
-			data: {}
+			action:     'update',
+			data:       {}
 		}),
-		where: getClientData({ table_name: collection, action: 'where', data: {} }),
+		where:       getClientData({ table_name: collection, action: 'where', data: {} }),
 		updateWhere: getClientData({
 			table_name: collection,
-			action: 'updateWhere',
-			data: {}
+			action:     'updateWhere',
+			data:       {}
 		})
 	};
 }
 export function dynQuery(collection: keyof typeof schemeModelDb) {
 	if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
 	return {
-		getOne: (id: any) => idbqlState[collection].getOne(id, schemeModel[collection].keyPath),
-		getAll: () => idbqlState[collection].getAll(),
-		create: (data) => idbqlState[collection].put(data),
-		delete: (id: string | number) => idbqlState[collection].delete(id),
+		getOne:      (id: any) => idbqlState[collection].getOne(id, schemeModel[collection].keyPath),
+		getAll:      () => idbqlState[collection].getAll(),
+		create:      (data) => idbqlState[collection].put(data),
+		delete:      (id: string | number) => idbqlState[collection].delete(id),
 		deleteWhere: (data) => idbqlState[collection].deleteWhere(data),
-		update: (id: any, data) => idbqlState[collection].update(id, data),
-		where: (where: Where) => idbqlState[collection].where(where),
+		update:      (id: any, data) => idbqlState[collection].update(id, data),
+		where:       (where: Where) => idbqlState[collection].where(where),
 		updateWhere: (where: Where, data) => idbqlState[collection].updateWhere(where, data)
 	};
 }

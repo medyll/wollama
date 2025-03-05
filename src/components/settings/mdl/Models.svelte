@@ -9,19 +9,19 @@
 	import Confirm from '$components/fragments/Confirm.svelte';
 	import { notifierState } from '$lib/stores/notifications';
 
-	let pullStatus       = '';
-	let addModel         = '';
+	let pullStatus = '';
+	let addModel = '';
 	let progress: number = 0;
-	let progressMax      = 100;
+	let progressMax = 100;
 
 	function pullModel() {
 		if (addModel.trim() == '') return;
 
 		WollamaApi.pull(addModel, (res) => {
 			$pullModelState = res;
-			pullStatus      = res?.status ?? res?.error;
+			pullStatus = res?.status ?? res?.error;
 			if (res.digest) {
-				progress    = res.completed;
+				progress = res.completed;
 				progressMax = res.total;
 			}
 		});
@@ -29,17 +29,22 @@
 
 	function deleteModel(model: string) {
 		WollamaApi.delete(model.trim())
-							.then(async () => {
-								notifierState.notify('success', $t('settings.delete_model_success'), 'delete-model');
-								let models = (await ollamaFetcher.listModels()) ?? [];
-								settings.setSetting('ollamaModels', [...models]);
-							})
-							.catch((e) => {
-								console.log(e);
-								notifierState.notify('error', e?.error ?? $t('settings.delete_model_error'), 'delete-model');
-							});
+			.then(async () => {
+				notifierState.notify('success', $t('settings.delete_model_success'), 'delete-model');
+				let models = (await ollamaFetcher.listModels()) ?? [];
+				settings.setSetting('ollamaModels', [...models]);
+			})
+			.catch((e) => {
+				console.log(e);
+				notifierState.notify(
+					'error',
+					e?.error ?? $t('settings.delete_model_error'),
+					'delete-model'
+				);
+			});
 	}
 </script>
+
 <div style="padding: 1rem">
 	<InfoLine title={$t('settings.default_model')}>
 		<select bind:value={$settings.defaultModel} class="w-full">
@@ -58,7 +63,13 @@
 		<form name="pull-form" on:submit|preventDefault={(e) => pullModel} />
 		<progress class="w-full" hidden={progress === 0} max={progressMax} value={progress}></progress>
 		<div class="flex gap-2">
-			<input bind:value={addModel} class="w-full" form="pull-form" placeholder={$t('settings.enter_model')} type="text" />
+			<input
+				bind:value={addModel}
+				class="w-full"
+				form="pull-form"
+				placeholder={$t('settings.enter_model')}
+				type="text"
+			/>
 			<button disabled={addModel.trim() == ''} form="pull-form" on:click={pullModel}>
 				<Icon icon="mdi:download" />
 			</button>
@@ -74,8 +85,8 @@
 					<Confirm
 						message={$t('settings.delete_model_message')}
 						validate={() => {
-						deleteModel(item.name);
-					}}
+							deleteModel(item.name);
+						}}
 					>
 						<button class="btn btn-red" title={$t('settings.delete_model')}>
 							<Icon icon="mdi:delete" />
@@ -86,6 +97,7 @@
 		</List>
 	</InfoLine>
 </div>
+
 <style lang="postcss">
 	@reference "../../../styles/references.css";
 </style>

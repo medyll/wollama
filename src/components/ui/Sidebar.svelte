@@ -22,8 +22,9 @@
 		settings.setSetting('menuExpanded', !$settings.menuExpanded);
 	};
 
-	const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books' | 'spaces') => {
-
+	const getChatLink = (
+		link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books' | 'spaces'
+	) => {
 		let goTo;
 		switch (link) {
 			case 'settings':
@@ -47,29 +48,46 @@
 
 		goto(goTo);
 	};
-
 </script>
 
 <div class="application-sideBar" aria-expanded={$settings.menuExpanded}>
-
 	<div class="not-expanded">
 		<div class="not-expanded line-gap-2 p-4">
-			<img alt="logo" class="iconify" width="32" src="/assets/svg/lama.svg" style="transform: scaleX(-1)" />
+			<img
+				alt="logo"
+				class="iconify"
+				width="32"
+				src="/assets/svg/lama.svg"
+				style="transform: scaleX(-1)"
+			/>
 			<div class="text-md">wOollama !</div>
 			<full />
 		</div>
-		<div class="px-2 w-full">
-			<input class="w-full input" type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
+		<div class="w-full px-2">
+			<input
+				class="input w-full"
+				type="search"
+				placeholder={$t('ui.searchChats')}
+				bind:value={$ui.searchString}
+			/>
 		</div>
 	</div>
 
 	<div class="application-sideBar-menu">
-		<MenuList tall="small" class="flex flex-col h-full  ">
-			<MenuListItem selectable={false} onclick={()=>getChatLink('newChat')} title={$t('ui.newChat')}>
+		<MenuList tall="small" class="flex h-full flex-col  ">
+			<MenuListItem
+				selectable={false}
+				onclick={() => getChatLink('newChat')}
+				title={$t('ui.newChat')}
+			>
 				<Icon icon="mdi:plus" alt={$t('ui.newChat')} />
 				<span>{$t('ui.newChat')}</span>
 			</MenuListItem>
-			<MenuListItem selected={$page?.route?.id==='/[[lang]]/lib'} onclick={()=>getChatLink('lib')} title={$t('ui.mylib')}>
+			<MenuListItem
+				selected={$page?.route?.id === '/[[lang]]/lib'}
+				onclick={() => getChatLink('lib')}
+				title={$t('ui.mylib')}
+			>
 				<Icon icon="fluent:library-20-filled" alt={$t('ui.mylib')} />
 				<span>{$t('ui.myLib')}</span>
 			</MenuListItem>
@@ -92,7 +110,11 @@
 					<Icon icon="settings" alt={$t('ui.newChat')} />
 					<span>{$t('ui.settings')}</span>
 			</MenuListItem> -->
-			<MenuListItem selected={$page?.route?.id==='/[[lang]]/settings'} title={$t('ui.settings')} onclick={()=>getChatLink('settings')}>
+			<MenuListItem
+				selected={$page?.route?.id === '/[[lang]]/settings'}
+				title={$t('ui.settings')}
+				onclick={() => getChatLink('settings')}
+			>
 				<Icon icon="settings" alt={$t('ui.newChat')} />
 				<span>{$t('ui.settings')}</span>
 			</MenuListItem>
@@ -101,75 +123,74 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/references.css";
-    :global(.red) {
-        transition: all 1s ease;
-    }
+	@reference "../../styles/references.css";
+	:global(.red) {
+		transition: all 1s ease;
+	}
 
-    .application-sideBar {
+	.application-sideBar {
+		.application-sideBar-menu {
+			flex: 1;
+		}
 
-        .application-sideBar-menu {
-            flex: 1;
-        }
+		.application-sideBar-content {
+			content-visibility: hidden;
+			overflow: auto;
+		}
 
-        .application-sideBar-content {
-            content-visibility: hidden;
-            overflow: auto;
-        }
+		:global(.menu-list-item-text) {
+			@apply flex flex-1 place-items-center items-center gap-2;
+			@apply overflow-hidden;
+			width: 100%;
+		}
 
-        :global(.menu-list-item-text) {
-            @apply flex flex-1 gap-2 items-center place-items-center;
-            @apply overflow-hidden;
-            width: 100%;
-        }
+		span {
+			@apply overflow-hidden text-ellipsis;
+			/* @apply flex flex-1 gap-2 items-center; */
+			text-align: center;
+			max-width: 100%;
+			/*width: 100%;*/
+		}
 
-        span {
-            @apply text-ellipsis overflow-hidden ;
-            /* @apply flex flex-1 gap-2 items-center; */
-            text-align: center;
-            max-width: 100%;
-            /*width: 100%;*/
-        }
+		&[aria-expanded='false'] {
+			@apply items-center;
 
-        &[aria-expanded='false'] {
-            @apply items-center;
+			:global(li.menu-list-item) {
+				@apply flex aspect-square place-items-center items-center;
+			}
 
-            :global(li.menu-list-item) {
-                @apply aspect-square flex items-center place-items-center;
-            }
+			:global(.menu-list-item-text) {
+				@apply w-full text-center;
+				@apply flex aspect-square place-items-center;
+			}
 
-            :global(.menu-list-item-text) {
-                @apply w-full text-center;
-                @apply aspect-square flex place-items-center;
-            }
+			.not-expanded {
+				display: none;
+				content-visibility: hidden;
+			}
+		}
 
-            .not-expanded {
-                display: none;
-                content-visibility: hidden;
-            }
-        }
+		&[aria-expanded='true'] {
+			.application-sideBar-content {
+				content-visibility: visible;
+			}
 
-        &[aria-expanded='true'] {
-            .application-sideBar-content {
-                content-visibility: visible;
-            }
+			span {
+				@apply text-sm;
+				text-align: left;
+				/*width: 100%;*/
+			}
 
-            span {
-                @apply text-sm;
-                text-align: left;
-                /*width: 100%;*/
-            }
+			:global(.red) {
+				transition: all 1s ease;
+				rotate: 180deg;
+			}
+		}
 
-            :global(.red) {
-                transition: all 1s ease;
-                rotate: 180deg;
-            }
-        }
-
-        &[aria-expanded='false'] {
-            span {
-                display: none;
-            }
-        }
-    }
+		&[aria-expanded='false'] {
+			span {
+				display: none;
+			}
+		}
+	}
 </style>

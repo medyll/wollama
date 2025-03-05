@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { notifierState } from '$lib/stores/notifications';
-	import {Icon} from '@medyll/idae-slotui-svelte';
+	import { Icon } from '@medyll/idae-slotui-svelte';
 </script>
 
-<div class="gauge tr fixed flex flex-col gap-2 w-96 p-4 z-50">
+<div class="gauge tr fixed z-50 flex w-96 flex-col gap-2 p-4">
 	{#each Object.values($notifierState) as notification, idx}
-		<div class="line-gap-2 {notification.status} w-full theme-bg rounded-md p-1 theme-border shadow-xs">
+		<div
+			class="line-gap-2 {notification.status} theme-bg theme-border w-full rounded-md p-1 shadow-xs"
+		>
 			<div class="">
 				<Icon icon="mdi:information-outline" style="font-size:1.6em" />
 			</div>
@@ -23,21 +25,21 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/references.css";
-    .gauge {
-        left: 50%;
-        transform: translate(-50%, 0);
-    }
-    .success {
-        @apply bg-green-200 text-green-700;
-    }
-    .error {
-        @apply bg-red-200 text-red-700;
-    }
-    .info {
-        @apply bg-blue-200 text-blue-700;
-    }
-    .warning {
-        @apply bg-yellow-200 text-yellow-700;
-    }
+	@reference "../../styles/references.css";
+	.gauge {
+		left: 50%;
+		transform: translate(-50%, 0);
+	}
+	.success {
+		@apply bg-green-200 text-green-700;
+	}
+	.error {
+		@apply bg-red-200 text-red-700;
+	}
+	.info {
+		@apply bg-blue-200 text-blue-700;
+	}
+	.warning {
+		@apply bg-yellow-200 text-yellow-700;
+	}
 </style>

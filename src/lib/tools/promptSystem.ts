@@ -31,11 +31,11 @@ function promptOptions({ system, prompt }: Partial<OllApiGenerate>): OllApiGener
 	const config = get(settings);
 	const ollamaOptions = get(ollamaApiMainOptionsParams);
 	return {
-		model: config?.defaultModel,
+		model:   config?.defaultModel,
 		system,
 		prompt,
-		stream: false,
-		format: 'json',
+		stream:  false,
+		format:  'json',
 		options: { ...ollamaOptions, temperature: 0.1 }
 	} as OllApiGenerate;
 }

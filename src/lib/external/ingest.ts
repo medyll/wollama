@@ -10,7 +10,11 @@ import path from 'path';
  * @returns A promise that resolves to an array of collected document paths.
  * @throws {Error} If the directory parameter is missing.
  */
-export async function ingest(directory: string | string[], extensions?: string | string[], fn?: (filePath: string) => void): Promise<string[]> {
+export async function ingest(
+	directory: string | string[],
+	extensions?: string | string[],
+	fn?: (filePath: string) => void
+): Promise<string[]> {
 	if (directory === null || directory === undefined) {
 		throw new Error('Missing directory parameter');
 	}

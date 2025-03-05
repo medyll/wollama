@@ -1,4 +1,3 @@
-<link href="../../styles/components.css" rel="stylesheet">
 <script lang="ts">
 	import { settings } from '$lib/stores/settings.svelte';
 	import Speech from '$components/chat/input/Speech.svelte';
@@ -27,7 +26,7 @@
 
 	let { chatPassKey }: MainChatProps = $props();
 
-	let activeChatId: number | undefined       = $state();
+	let activeChatId: number | undefined = $state();
 	let chatSessionManager: ChatSessionManager = ChatSessionManager.loadSession();
 
 	chatSessionManager.loadFromPathKey(chatPassKey).then((chat) => (activeChatId = chat?.id));
@@ -41,7 +40,7 @@
 	);
 
 	async function sendPrompt(sessionManager: ChatSessionManager, chatParams: ChatGenerate) {
-		const config        = get(settings);
+		const config = get(settings);
 		const ollamaOptions = get(ollamaApiMainOptionsParams);
 
 		const { systemMessage, previousMessages, userChatMessage } = await sessionManager.buildMessages(
@@ -57,18 +56,18 @@
 				assistantDbMessage =
 					assistantDbMessage ??
 					(await sessionManager.createDbMessage(OllamaChatMessageRole.ASSISTANT, {
-						status    : 'idle',
-						role      : OllamaChatMessageRole.ASSISTANT,
-						content   : '',
-						model     : model,
+						status:     'idle',
+						role:       OllamaChatMessageRole.ASSISTANT,
+						content:    '',
+						model:      model,
 						tool_calls: []
 					}));
 
 				const request: ChatRequest = {
-					model   : model ?? config?.defaultModel,
-					options : { ...ollamaOptions, temperature: chatParams.temperature },
-					format  : chatParams.format,
-					stream  : true,
+					model:    model ?? config?.defaultModel,
+					options:  { ...ollamaOptions, temperature: chatParams.temperature },
+					format:   chatParams.format,
+					stream:   true,
 					messages: [systemMessage, ...previousMessages, userChatMessage]
 				} satisfies ChatRequest;
 
@@ -97,13 +96,13 @@
 	async function submitHandler(chatParams: ChatGenerate) {
 		if (!chatSessionManager.sessionId) {
 			const session = await chatSessionManager.ChatSessionDB.createSession({
-				models      : [...chatParams?.models],
+				models:       [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 			});
 			window.history.replaceState(history.state, '', `/chat/${session.dbChat.chatPassKey}`);
 		} else {
 			await chatSessionManager.ChatSessionDB.updateSession({
-				models      : [...chatParams?.models],
+				models:       [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 				/* ollamaBody: ollamaBodyStore, */
 			});
@@ -126,10 +125,12 @@
 
 	// retrieve model, temperature, format
 	$effect(() => {
-		chatParamsState.mode   = $settings.request_mode;
+		chatParamsState.mode = $settings.request_mode;
 		chatParamsState.models = [$settings.defaultModel];
 	});
 </script>
+
+<link href="../../styles/components.css" rel="stylesheet" />
 
 {#snippet input()}
 	<div class="application-chat-main">
@@ -137,7 +138,7 @@
 			<!-- <Images />
 							<hr /> -->
 			<div class="application-chat-room">
-				<div class="flex justify-center absolute -top-10 left-0 w-full">
+				<div class="absolute -top-10 left-0 flex w-full justify-center">
 					<Speech
 						onEnd={submitHandler}
 						bind:prompt={chatParamsState.prompt}
@@ -145,7 +146,7 @@
 					/>
 				</div>
 				<!-- <hr /> -->
-				<div class="flex-1 relative ">
+				<div class="relative flex-1">
 					<Input
 						disabled={!connectionTimer.connected}
 						onkeypress={keyPressHandler}
@@ -155,11 +156,11 @@
 						form="prompt-form"
 					/>
 					<div
-						class="absolute right-3 h-10 w-10 top-[50%] -mt-5 rounded-full place-content-center flex flex-col"
+						class="absolute top-[50%] right-3 -mt-5 flex h-10 w-10 flex-col place-content-center rounded-full"
 					>
 						{#if $aiState == 'done'}
 							<button
-								class="rounded-full input   drop-shadow-lg aspect-square   items-center "
+								class="input aspect-square items-center rounded-full drop-shadow-lg"
 								type="submit"
 								form="prompt-form"
 							>
@@ -167,7 +168,7 @@
 							</button>
 						{:else}
 							<button
-								class="rounded-full border border drop-shadow-lg aspect-square flex place-content-center"
+								class="flex aspect-square place-content-center rounded-full border border drop-shadow-lg"
 								form="prompt-form"
 							>
 								<Icon icon="mdi:stop" />
@@ -186,10 +187,14 @@
 	</div>
 {/snippet}
 <!-- <div class="absolute right-4"><AgentPick /></div> -->
-<form hidden id="prompt-form" onsubmit={(event)=>{
-	event.preventDefault();
-	submitHandler($state.snapshot(chatParamsState));
-}}></form>
+<form
+	hidden
+	id="prompt-form"
+	onsubmit={(event) => {
+		event.preventDefault();
+		submitHandler($state.snapshot(chatParamsState));
+	}}
+></form>
 <DashBoard showList={Boolean(activeChatId)}>
 	{#snippet home()}
 		{@render input()}
@@ -197,4 +202,3 @@
 	<MessagesList id={activeChatId} />
 	{@render input()}
 </DashBoard>
-

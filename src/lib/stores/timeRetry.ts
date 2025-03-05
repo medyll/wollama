@@ -2,18 +2,18 @@ import type { get } from 'http';
 import { writable } from 'svelte/store';
 
 type UiStoreType = {
-	connectionRetryCount: number;
-	connectionStatus: 'connected' | 'error' | 'connecting';
-	connectionRetryTimeout: number;
+	connectionRetryCount:       number;
+	connectionStatus:           'connected' | 'error' | 'connecting';
+	connectionRetryTimeout:     number;
 	connectionRemainingSeconds: number;
 };
 
 export function timeRetryStore() {
 	const { subscribe, set, update } = writable<UiStoreType>({
 		connectionRemainingSeconds: 0,
-		connectionRetryCount: 0,
-		connectionRetryTimeout: 0,
-		connectionStatus: 'connecting'
+		connectionRetryCount:       0,
+		connectionRetryTimeout:     0,
+		connectionStatus:           'connecting'
 	} as UiStoreType);
 
 	let currentStore = {} as UiStoreType;
@@ -41,11 +41,14 @@ export function timeRetryStore() {
 	});
 
 	return {
-		get: (key: keyof UiStoreType) => currentStore[key],
-		incrementConnectionRetryCount: () => update((state) => ({ ...state, connectionRetryCount: state.connectionRetryCount + 1 })),
+		get:                           (key: keyof UiStoreType) => currentStore[key],
+		incrementConnectionRetryCount: () =>
+			update((state) => ({ ...state, connectionRetryCount: state.connectionRetryCount + 1 })),
 		set,
-		setConnectionStatus: (status: UiStoreType['connectionStatus']) => update((state) => ({ ...state, connectionStatus: status })),
-		setParameterValue: (key: keyof UiStoreType, value: any) => update((state) => ({ ...state, [key]: value })),
+		setConnectionStatus:           (status: UiStoreType['connectionStatus']) =>
+			update((state) => ({ ...state, connectionStatus: status })),
+		setParameterValue:             (key: keyof UiStoreType, value: any) =>
+			update((state) => ({ ...state, [key]: value })),
 		subscribe,
 		update
 	};

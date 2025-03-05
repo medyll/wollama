@@ -5,14 +5,14 @@
 	export let panelMode: 'expanded' | 'reduced' = 'expanded';
 </script>
 
-<div class="flex  gap-4 h-full relative">
+<div class="relative flex h-full gap-4">
 	{#if showPanel}
-		<div transition:slide={{ axis: 'x' }} class="w-64 overflow-auto overflow-x-hidden paper h-64">
+		<div transition:slide={{ axis: 'x' }} class="paper h-64 w-64 overflow-auto overflow-x-hidden">
 			<slot name="leftNav" />
 		</div>
 	{/if}
 	<div class="flex-1">
-		<div class="w-96 h-full flex-col flex gap-1">
+		<div class="flex h-full w-96 flex-col gap-1">
 			<slot />
 		</div>
 	</div>

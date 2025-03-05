@@ -3,4 +3,5 @@
 </script>
 
 <div style="padding: 1rem">
-<InfoLine title={'AiUi'}>version: 1.0.0</InfoLine></div>
+	<InfoLine title={'AiUi'}>version: 1.0.0</InfoLine>
+</div>

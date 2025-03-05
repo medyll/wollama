@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { settings } from '$lib/stores/settings.svelte';
-	import {Icon} from '@medyll/idae-slotui-svelte';
+	import { Icon } from '@medyll/idae-slotui-svelte';
 	import { chatParamsState } from '$lib/states/chat.svelte';
 
-	let {activeModels = $bindable([])}: {
+	let {
+		activeModels = $bindable([])
+	}: {
 		activeModels: string[];
-	} = $props()
+	} = $props();
 
 	let appModels: string[] = $settings.defaultModel ? [$settings.defaultModel] : [];
 
@@ -14,31 +16,41 @@
 	};
 
 	function addModelKey() {
-		const newModel = ($settings?.ollamaModels ?? []).filter((model) => !activeModels.includes(model.name))?.[0];
+		const newModel = ($settings?.ollamaModels ?? []).filter(
+			(model) => !activeModels.includes(model.name)
+		)?.[0];
 		activeModels = [...activeModels, newModel?.name ?? '...'];
 	}
 
 	function removeModelKey(index: number) {
 		activeModels = activeModels.filter((_, i) => i !== index);
 	}
- 
-  
 </script>
 
-<div class=" flex-wrap"> 
-	{#each appModels as modelKey, index (index)} 
+<div class=" flex-wrap">
+	{#each appModels as modelKey, index (index)}
 		{@const showAdd = index === activeModels.length - 1}
 		{@const showRemove = index === 0}
-		{@const filteredOptions = ($settings?.ollamaModels ?? []).filter((model) => model.name === modelKey || !appModels.includes(model.name))}		 
+		{@const filteredOptions = ($settings?.ollamaModels ?? []).filter(
+			(model) => model.name === modelKey || !appModels.includes(model.name)
+		)}
 
 		<div class="line-gap-2 border-b">
 			<div class="flex-1">
-				<button class="anchor" popovertarget="popover-{index}"  style="anchor-name: --anchor-{index};" >{chatParamsState?.models}</button>
-			 	<div popover class="popover " id="popover-{index}" style="position-anchor : --anchor-{index};"> 
-					<div class="flex-col flex gap-1">
-					
+				<button
+					class="anchor"
+					popovertarget="popover-{index}"
+					style="anchor-name: --anchor-{index};">{chatParamsState?.models}</button
+				>
+				<div
+					popover
+					class="popover"
+					id="popover-{index}"
+					style="position-anchor : --anchor-{index};"
+				>
+					<div class="flex flex-col gap-1">
 						{#each filteredOptions as model}
-							<button  onclick={changeHandler(index)}  value={model.name} >{model.name}</button>  
+							<button onclick={changeHandler(index)} value={model.name}>{model.name}</button>
 						{/each}
 					</div>
 				</div>
@@ -59,20 +71,20 @@
 		</div>
 	{/each}
 </div>
+
 <style>
-		@reference "../../../styles/references.css";
-    :popover-open {
-        position-anchor: --anchor;
-        bottom: anchor(--anchor top);
-        left: anchor(--anchor left);
-        right: anchor(--anchor right);
+	@reference "../../../styles/references.css";
+	:popover-open {
+		position-anchor: --anchor;
+		bottom: anchor(--anchor top);
+		left: anchor(--anchor left);
+		right: anchor(--anchor right);
 
-        background-color: var(--cfab-bg);
-        color: var(--cfab-foreground);
+		background-color: var(--cfab-bg);
+		color: var(--cfab-foreground);
 
-        width: 200px;
-        @apply shadow-md;
-        @apply rounded-md;
-    }
-
+		width: 200px;
+		@apply shadow-md;
+		@apply rounded-md;
+	}
 </style>

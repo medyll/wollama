@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { speechRecognitionHandler, type SpeechReturn } from '$lib/tools/speech';
 	import { ui } from '$lib/stores/ui';
-	import {Icon} from '@medyll/idae-slotui-svelte';
+	import { Icon } from '@medyll/idae-slotui-svelte';
 	import { notifierState } from '$lib/stores/notifications';
 
 	export let voiceListening = false;
@@ -39,7 +39,7 @@
 	}
 </script>
 
-<div class="place-items-center ">
+<div class="place-items-center">
 	<button
 		type="button"
 		{disabled}

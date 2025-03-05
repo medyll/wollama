@@ -4,9 +4,9 @@ export const activeModels = writable<string[]>([]);
 export const aiState = writable<'request_stop' | 'running' | 'done'>('done');
 
 export const pullModelState = writable<{
-	status?: string;
+	status?:    string;
 	completed?: number;
-	total?: number;
-	error?: string;
-	digest?: string;
+	total?:     number;
+	error?:     string;
+	digest?:    string;
 }>({});

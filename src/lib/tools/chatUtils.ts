@@ -49,12 +49,12 @@ export async function guessChatMetadata(message: string): Promise<OllamaResponse
     [INST]`;
 
 	const defaultOptions = {
-		model: config?.defaultModel,
+		model:   config?.defaultModel,
 		system:
 			'Tu es un assistant de génération de titres. Ceux-ci doivent appraitre dans une liste. Tu réponds toujours en un maximum de trois seul mot.Tu ne fais jamais de phrases longues. Tes  reponse font entre un et dix mots',
 		prompt,
-		stream: false,
-		format: 'json',
+		stream:  false,
+		format:  'json',
 		options: { ...ollamaOptions, temperature: 0.1 }
 	} as OllApiGenerate;
 
@@ -88,10 +88,10 @@ Rappel : Ta réponse doit être UN SEUL MOT.
 [/INST]`;
 
 	const defaultOptions = {
-		model: config?.defaultModel,
-		system: 'Tu es un assistant de catégorisation précis. Tu réponds toujours en un seul mot.',
+		model:   config?.defaultModel,
+		system:  'Tu es un assistant de catégorisation précis. Tu réponds toujours en un seul mot.',
 		prompt,
-		stream: false,
+		stream:  false,
 		options: { ...ollamaOptions, temperature: 0.1 }
 	} as OllApiGenerate;
 
@@ -119,10 +119,10 @@ Conversation :
 \r\n
 Résumé :`;
 	const defaultOptions = {
-		model: config?.defaultModel,
-		system: config?.system_prompt,
+		model:   config?.defaultModel,
+		system:  config?.system_prompt,
 		prompt,
-		stream: false,
+		stream:  false,
 		options: { ...ollamaOptions, temperature: 0.1 }
 	} as OllApiGenerate;
 
@@ -165,13 +165,13 @@ export class chatUtils {
 
 	static getMessageDataObject(message: Partial<DBMessage>): Partial<DBMessage> {
 		return {
-			content: message.content,
-			created_at: Date.now(), // Utiliser un timestamp en millisecondes
-			data: [],
-			edit: false,
+			content:       message.content,
+			created_at:    Date.now(), // Utiliser un timestamp en millisecondes
+			data:          [],
+			edit:          false,
 			editedContent: '',
-			messageId: crypto.randomUUID(),
-			role: message.role,
+			messageId:     crypto.randomUUID(),
+			role:          message.role,
 			...message
 		};
 	}
@@ -179,14 +179,14 @@ export class chatUtils {
 	static getChatDataObject(chatData: DbChat = {} as DbChat): DbChat {
 		const rd = crypto.randomUUID();
 		return {
-			chatId: rd,
-			chatPassKey: rd,
-			context: [],
-			created_at: Date.now(), // Utiliser un timestamp en millisecondes
-			created_at: Date.now(), // Utiliser un timestamp en millisecondes
+			chatId:          rd,
+			chatPassKey:     rd,
+			context:         [],
+			created_at:      Date.now(), // Utiliser un timestamp en millisecondes
+			created_at:      Date.now(), // Utiliser un timestamp en millisecondes
 			dateLastMessage: Date.now(), // Utiliser un timestamp en millisecondes
-			models: [get(settings).defaultModel],
-			title: 'New Chat',
+			models:          [get(settings).defaultModel],
+			title:           'New Chat',
 			...chatData
 		};
 	}

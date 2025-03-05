@@ -36,11 +36,15 @@ async function startLog(minimumInterval: number = 60000, fn?: () => void) {
 		if (fn) fn();
 		createFileAsync();
 		const elapsedTime = Date.now() - now;
-		if (elapsedTime < minimumInterval) await new Promise((resolve) => setTimeout(resolve, minimumInterval));
+		if (elapsedTime < minimumInterval)
+			await new Promise((resolve) => setTimeout(resolve, minimumInterval));
 	}
 }
 
-let conc: string = '--------------------------- \n  Date et heure :  ' + format(new Date(), 'dd/MM/yyyy HH:mm:ss') + '\nA Paul a 60 secondes pour prendre une decision, puis il prend cette decision. \n ----------------------------\n';
+let conc: string =
+	'--------------------------- \n  Date et heure :  ' +
+	format(new Date(), 'dd/MM/yyyy HH:mm:ss') +
+	'\nA Paul a 60 secondes pour prendre une decision, puis il prend cette decision. \n ----------------------------\n';
 
 startLog(logInterval, async () => {
 	console.log('Log', Date.now());
@@ -53,7 +57,12 @@ startLog(logInterval, async () => {
         Que fait Paul ?.`
 	);
 
-	conc = '--------------------------- \n  Date et heure : ' + nowDate + '\n' + red + '\n ----------------------------\n';
+	conc =
+		'--------------------------- \n  Date et heure : ' +
+		nowDate +
+		'\n' +
+		red +
+		'\n ----------------------------\n';
 	console.log(conc);
 	fs.appendFileSync(lockFilePath, conc);
 });
@@ -62,7 +71,7 @@ createLockFile();
 
 const timerObj = {
 	currentTime: Date.now(),
-	startTime: Date.now()
+	startTime:   Date.now()
 };
 
 function setCurrentTime() {

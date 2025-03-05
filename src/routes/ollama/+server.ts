@@ -23,9 +23,9 @@ export const POST: RequestHandler = async (req) => {
 
 	return req
 		.fetch(`http;//127.0.0.1:11434/${req.params.api}`, {
-			body: JSON.stringify(req),
+			body:    JSON.stringify(req),
 			headers: req.request.headers,
-			method: 'POST'
+			method:  'POST'
 		})
 		.then((res) => {
 			return res.json();

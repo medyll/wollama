@@ -2,17 +2,17 @@ import { idbQuery } from '$lib/db/dbQuery';
 import type { DbChat, DBMessage } from '$types/db';
 
 export class ChatSessionManager {
-	#sessionId?: number;
-	#SessionDB: {
-		dbChat: Partial<DbChat>;
+	#sessionId?:             number;
+	#SessionDB:              {
+		dbChat:           Partial<DbChat>;
 		messageAssistant: DBMessage[];
-		messageUser: Partial<DBMessage>;
+		messageUser:      Partial<DBMessage>;
 	} = {
-		dbChat: {},
+		dbChat:           {},
 		messageAssistant: [],
-		messageUser: {}
+		messageUser:      {}
 	};
-	#type: 'generate' | 'chat' = 'chat';
+	#type:                   'generate' | 'chat' = 'chat';
 	#useContext = false;
 
 	public previousMessages: DBMessage[] = [];
@@ -44,7 +44,7 @@ export class ChatSessionManager {
 		return {
 			create: this.#createChatDbSession.bind(this),
 			update: this.#updateChatDB.bind(this),
-			init: this.#initChatDb.bind(this)
+			init:   this.#initChatDb.bind(this)
 		};
 	}
 

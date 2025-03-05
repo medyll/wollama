@@ -11,21 +11,21 @@ import ollama, {
 
 interface Hook {
 	messageId: string;
-	message: {
-		role: string;
+	message:   {
+		role:    string;
 		content: string;
-		images: string | null;
+		images:  string | null;
 	};
 }
 
 export interface GenerateResponseHook extends GenerateResponse, Hook {}
 
 class WollamaApiConfig {
-	model: string = 'llama2';
-	host: string = 'http://127.0.0.1:11434';
+	model:    string = 'llama2';
+	host:     string = 'http://127.0.0.1:11434';
 	headers?: HeadersInit = {
 		'Content-Type': 'application/json',
-		Accept: 'application/json'
+		Accept:         'application/json'
 	};
 
 	setOptions(
@@ -49,8 +49,8 @@ export type GenerateRequestNoStream = GenerateRequest & {
 
 export class ApiEvent {
 	#onStream!: (data: GenerateResponseHook) => void;
-	#onEnd!: (data: GenerateResponseHook) => void;
-	#onData: (data: GenerateResponseHook) => void;
+	#onEnd!:    (data: GenerateResponseHook) => void;
+	#onData:   (data: GenerateResponseHook) => void;
 
 	constructor() {
 		this.#onStream = (data: GenerateResponseHook) => {};
@@ -88,7 +88,7 @@ export class ApiEvent {
 }
 export class WollamaApiCore {
 	onStream!: (data: GenerateResponseHook) => void;
-	onEnd!: (data: GenerateResponseHook) => void;
+	onEnd!:    (data: GenerateResponseHook) => void;
 	/**
 	 * Send chat request using the Ollama generate API.
 	 * @param generateRequest The generate request object.
@@ -225,7 +225,7 @@ export class WollamaApiCore {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			method: 'GET'
+			method:  'GET'
 		});
 		if (!response.ok) throw await response.json();
 		return await response.json();

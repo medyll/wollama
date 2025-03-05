@@ -6,12 +6,12 @@
 </script>
 
 {#if $$slots.input && !title}
-	<div class="w-full font-semibold py-2 text-sm">
+	<div class="w-full py-2 text-sm font-semibold">
 		{title}
 	</div>
 {/if}
 <div class="{vertical ? 'flex-v' : 'flex-align-middle'} gap-4 py-4">
-	<div class="flex-1 flex text-sm">
+	<div class="flex flex-1 text-sm">
 		<div class="flex-1 font-semibold"><slot name="input">- {title}</slot></div>
 		<slot name="titleButton" />
 	</div>

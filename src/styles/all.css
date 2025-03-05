@@ -1,16 +1,12 @@
-@import "./app.css";
+@import './app.css';
 
-@import "./base.css";
-@import "./components.css";
-@import "./main.css";
-@import "./skin.css";
-@import "./references.css";
-
-
+@import './base.css';
+@import './components.css';
+@import './main.css';
+@import './skin.css';
+@import './references.css';
 
 /*@source '..!**!*.css';*/
-
-
 
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
@@ -21,11 +17,11 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
 }

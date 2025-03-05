@@ -1,18 +1,17 @@
 <script lang="ts">
-    import { page } from '$app/stores';
-    import { idbqlState, schemeModel } from '$lib/db/dbSchema';
-    import { Icon, Looper, openWindow, Window } from '@medyll/idae-slotui-svelte';
-    import { IDbCollections } from '$lib/db/dbFields';
-    import CrudZone from '$components/form/CrudZone.svelte';
+	import { page } from '$app/stores';
+	import { idbqlState, schemeModel } from '$lib/db/dbSchema';
+	import { Icon, Looper, openWindow, Window } from '@medyll/idae-slotui-svelte';
+	import { IDbCollections } from '$lib/db/dbFields';
+	import CrudZone from '$components/form/CrudZone.svelte';
 
-    let collection = $page.params.collection;
+	let collection = $page.params.collection;
 
-    let list = idbqlState[collection].getAll();
+	let list = idbqlState[collection].getAll();
 
-    let test = new IDbCollections(schemeModel);
-    let index = test.getCollection(collection)?.template?.index;
+	let test = new IDbCollections(schemeModel);
+	let index = test.getCollection(collection)?.template?.index;
 </script>
-
 
 <CrudZone {collection} style="height:100%;" />
 <!-- {#key index}

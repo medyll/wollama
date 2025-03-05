@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { ui } from '$lib/stores/ui';
-	import {Icon} from '@medyll/idae-slotui-svelte';
+	import { Icon } from '@medyll/idae-slotui-svelte';
 	import Sidebar from './Sidebar.svelte';
 	import { engine } from '$lib/tools/engine';
 </script>
 
-<div class="lg:hidden flex shadow-sm lg:w-full theme-bg-dark">
-	<div class="flex-v gap-4 px-4 py-2 theme-bg-dark">
+<div class="theme-bg-dark flex shadow-sm lg:hidden lg:w-full">
+	<div class="flex-v theme-bg-dark gap-4 px-4 py-2">
 		<button on:click={async () => ui.showHideMenu()} class="aspect-square">
 			<Icon icon="mdi:menu-{$ui.showMenu ? 'open' : 'close'}" class="md" />
 		</button>
@@ -24,7 +24,7 @@
 	</div>
 </div>
 {#if $ui.showMenu}
-	<div class="lg:hidden fixed right-0 left-14 flex-1 theme-bg z-300 h-full shadow-sm">
-		<div class="  mr-2 theme-bg h-full"><Sidebar /></div>
+	<div class="theme-bg fixed right-0 left-14 z-300 h-full flex-1 shadow-sm lg:hidden">
+		<div class="  theme-bg mr-2 h-full"><Sidebar /></div>
 	</div>
 {/if}

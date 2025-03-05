@@ -5,7 +5,12 @@
 	export { className as class };
 
 	function skeletonLine() {
-		return [...Array(Math.ceil(Math.random() * 5))].map(() => '<div class="h-2  bg-gray-200 dark:bg-gray-600 rounded-md  p-1   col-span-2  animate-pulse    flex-auto" ></div>').join('');
+		return [...Array(Math.ceil(Math.random() * 5))]
+			.map(
+				() =>
+					'<div class="h-2  bg-gray-200 dark:bg-gray-600 rounded-md  p-1   col-span-2  animate-pulse    flex-auto" ></div>'
+			)
+			.join('');
 	}
 </script>
 

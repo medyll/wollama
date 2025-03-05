@@ -3,24 +3,30 @@
     D:\boulot\python\wollama\src\components\form\CollectionButton.svelte
  -->
 <script lang="ts" generics="COL">
-    import { Button,  openWindow } from '@medyll/idae-slotui-svelte';
-    import CreateUpdate from '$components/form/CreateUpdate.svelte';
-    import { type CreateUpdateProps } from './types';
+	import { Button, openWindow } from '@medyll/idae-slotui-svelte';
+	import CreateUpdate from '$components/form/CreateUpdate.svelte';
+	import { type CreateUpdateProps } from './types';
 
-    type CollectionButtonProps = {
-        collection: string;
-        withData?: Record<string, any>;
-    } & CreateUpdateProps;
+	type CollectionButtonProps = {
+		collection: string;
+		withData?:  Record<string, any>;
+	} & CreateUpdateProps;
 
-    let { collection = 'book', withData, ...rest }: CollectionButtonProps = $props();
+	let { collection = 'book', withData, ...rest }: CollectionButtonProps = $props();
 
-    function openCrud(collection: string) {
-        openWindow(`create-${collection}`, {
-            component: CreateUpdate,
-            componentProps: { collection: collection,  withData, ...rest },
-            hideCloseButton: false,
-        });
-    }
+	function openCrud(collection: string) {
+		openWindow(`create-${collection}`, {
+			component:       CreateUpdate,
+			componentProps:  { collection: collection, withData, ...rest },
+			hideCloseButton: false
+		});
+	}
 </script>
 
-<Button class="ellipsis" onclick={() => openCrud(collection)} width="auto" icon="mdi:add" value="ui.{rest.mode}-{collection}" />
+<Button
+	class="ellipsis"
+	onclick={() => openCrud(collection)}
+	width="auto"
+	icon="mdi:add"
+	value="ui.{rest.mode}-{collection}"
+/>

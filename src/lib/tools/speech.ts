@@ -6,29 +6,31 @@ export interface RecognitionHandler {
 
 export interface SpeechReturn {
 	speechEvent?: 'onresult' | 'onend' | 'onerror'; // Specifies the type of speech recognition event.
-	results?: SpeechRecognitionResultList; // Contains the list of speech recognition results.
-	message?: string; // Specifies an error message for speech recognition errors.
-	transcript?: string; // Contains the transcribed speech.
-	bribe?: string; // Contains the last captured speech.
+	results?:     SpeechRecognitionResultList; // Contains the list of speech recognition results.
+	message?:     string; // Specifies an error message for speech recognition errors.
+	transcript?:  string; // Contains the transcribed speech.
+	bribe?:       string; // Contains the last captured speech.
 }
 
 export type DefaultOptions = {
-	autoStart?: boolean; // Specifies whether speech recognition should automatically start.
+	autoStart?:  boolean; // Specifies whether speech recognition should automatically start.
 	continuous?: boolean; // Specifies whether speech recognition should continue listening after each recognition result.
-	lang?: string; // Specifies the language for speech recognition.
-	stopDelay?: number; // Specifies the time to wait before stopping speech recognition after the last recognition result.
+	lang?:       string; // Specifies the language for speech recognition.
+	stopDelay?:  number; // Specifies the time to wait before stopping speech recognition after the last recognition result.
 	stopOnWord?: string; // Specifies the word to stop speech recognition on.
 };
 
 const defaultOptions = {
-	autoStart: true,
+	autoStart:  true,
 	continuous: true,
-	lang: 'fr-FR',
-	stopDelay: 4,
+	lang:       'fr-FR',
+	stopDelay:  4,
 	stopOnWord: 'Stop.'
 };
 
-const speechRecognition = browser ? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : () => {};
+const speechRecognition = browser
+	? new (window.SpeechRecognition || window.webkitSpeechRecognition)()
+	: () => {};
 
 export const speechRecognitionTracker = {
 	isListening: false
@@ -40,7 +42,10 @@ export const speechRecognitionTracker = {
  * @param options - The options for speech recognition.
  * @returns An object with methods to start and stop speech recognition.
  */
-export const speechRecognitionHandler = (speechHandler: (args: SpeechReturn) => void, options: DefaultOptions = defaultOptions) => {
+export const speechRecognitionHandler = (
+	speechHandler: (args: SpeechReturn) => void,
+	options: DefaultOptions = defaultOptions
+) => {
 	let waiterTimer: any;
 	const speechOptions = { ...defaultOptions, ...options };
 
@@ -48,7 +53,7 @@ export const speechRecognitionHandler = (speechHandler: (args: SpeechReturn) => 
 		handler();
 	} else {
 		speechHandler({
-			message: 'SpeechRecognition is not supported.',
+			message:     'SpeechRecognition is not supported.',
 			speechEvent: 'onerror'
 		});
 	}

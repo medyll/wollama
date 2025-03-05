@@ -39,57 +39,59 @@ import type { SettingsType } from '$types/settings';
 export const settings = new Settings(); */
 // set to indexedDB
 const settingStore = () => {
-    const { subscribe, set, update } = writable<SettingsType>({
-        ...defaultSettings,
-    } as SettingsType);
+	const { subscribe, set, update } = writable<SettingsType>({
+		...defaultSettings
+	} as SettingsType);
 
-    let currentStore = {} as SettingsType;
-    let dataStoreTimer: NodeJS.Timeout;
+	let currentStore = {} as SettingsType;
+	let dataStoreTimer: NodeJS.Timeout;
 
-    subscribe((o) => {
-        currentStore = o;
-        storeData();
-    });
+	subscribe((o) => {
+		currentStore = o;
+		storeData();
+	});
 
-    function initSettings() {
-        if (browser) {
-            const actualSettings = JSON.parse(localStorage.getItem('settings') ?? '{}');
-            update((n) => ({ ...n, ...actualSettings }));
-        }
-    }
+	function initSettings() {
+		if (browser) {
+			const actualSettings = JSON.parse(localStorage.getItem('settings') ?? '{}');
+			update((n) => ({ ...n, ...actualSettings }));
+		}
+	}
 
-    function storeData() {
-        clearTimeout(dataStoreTimer);
-        dataStoreTimer = setTimeout(() => {
-            if (browser) {
-                localStorage.settings = JSON.stringify(currentStore);
-                localStorage.theme = currentStore.theme;
-            }
-        }, 500);
-    }
+	function storeData() {
+		clearTimeout(dataStoreTimer);
+		dataStoreTimer = setTimeout(() => {
+			if (browser) {
+				localStorage.settings = JSON.stringify(currentStore);
+				localStorage.theme = currentStore.theme;
+			}
+		}, 500);
+	}
 
-    initSettings();
+	initSettings();
 
-    function setSetting(key: keyof SettingsType, value: any) {
-        update((n) => {
-            const newSettings = { ...n, [key]: value };
-            return newSettings;
-        });
-    }
+	function setSetting(key: keyof SettingsType, value: any) {
+		update((n) => {
+			const newSettings = { ...n, [key]: value };
+			return newSettings;
+		});
+	}
 
-    return {
-        initSettings,
-        set,
-        setSetting,
-        subscribe,
-        update,
-    };
+	return {
+		initSettings,
+		set,
+		setSetting,
+		subscribe,
+		update
+	};
 };
 type ResolverPathType<T> = T extends object
-    ? {
-          [K in keyof T]: T[K] extends null | undefined ? K & string : `${K & string}${'' extends ResolverPathType<T[K]> ? '' : '.'}${ResolverPathType<T[K]>}`;
-      }[keyof T]
-    : '';
+	? {
+			[K in keyof T]: T[K] extends null | undefined
+				? K & string
+				: `${K & string}${'' extends ResolverPathType<T[K]> ? '' : '.'}${ResolverPathType<T[K]>}`;
+		}[keyof T]
+	: '';
 
 export const settings = settingStore();
 

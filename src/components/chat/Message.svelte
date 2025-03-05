@@ -14,14 +14,16 @@
 	}
 
 	let { messageId }: MessageProps = $props();
-	let message                     = $derived<DBMessage>(messageId ? idbQuery.getMessage(messageId) : ({} as DBMessage));
+	let message = $derived<DBMessage>(messageId ? idbQuery.getMessage(messageId) : ({} as DBMessage));
 
-	let icon  = $derived(message?.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one');
+	let icon = $derived(
+		message?.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one'
+	);
 	let place = $derived(message?.role === 'user' ? 'mr-24' : 'ml-24');
 
 	marked.use({
-		async   : false,
-		gfm     : true,
+		async:    false,
+		gfm:      true,
 		pedantic: false
 	});
 
@@ -41,20 +43,25 @@
 
 	function selectCodeTags(textString: string) {
 		if (!textString) return '';
-		const parser     = new DOMParser();
+		const parser = new DOMParser();
 		const htmlString = marked.parse(textString, { async: false }) as string;
-		const doc        = parser.parseFromString(htmlString, 'text/html');
+		const doc = parser.parseFromString(htmlString, 'text/html');
 
 		const codeElements = doc.querySelectorAll('code');
 
 		codeElements.forEach(async (codeElement) => {
-			const lang = codeElement.classList?.[0] ? codeElement.classList[0].replace('language-', '').trim() : undefined;
+			const lang = codeElement.classList?.[0]
+				? codeElement.classList[0].replace('language-', '').trim()
+				: undefined;
 			if (!lang) return;
 			const wrapper = document.createElement('div');
 			const toolbar = document.createElement('div');
-			const pre     = document.createElement('pre');
+			const pre = document.createElement('pre');
 
-			if (codeElement.parentElement?.tagName === 'PRE' && codeElement.parentElement.childNodes.length == 1) {
+			if (
+				codeElement.parentElement?.tagName === 'PRE' &&
+				codeElement.parentElement.childNodes.length == 1
+			) {
 				codeElement.parentElement.replaceWith(codeElement);
 			}
 			wrapper.className = 'codeFormat';
@@ -62,7 +69,7 @@
 			wrap(codeElement, wrapper);
 			wrapper.insertBefore(toolbar, codeElement);
 			wrap(codeElement, pre);
-			toolbar.innerHTML        = `<div class="flex-1 p-1 soft-title">${lang}</div><div class="p-1"><button copyPaste >copy</button></div>`;
+			toolbar.innerHTML = `<div class="flex-1 p-1 soft-title">${lang}</div><div class="p-1"><button copyPaste >copy</button></div>`;
 			codeElement.dataset.lang = lang;
 			Prism.highlightElement(codeElement);
 			await tick();
@@ -81,12 +88,12 @@
 
 	const messageRoleVariant = {
 		'assistant': 'message-assistant',
-		'user'     : 'message-user',
-		'system'   : 'message-system',
-		'tool'     : 'message-tool'
+		'user':      'message-user',
+		'system':    'message-system',
+		'tool':      'message-tool'
 	};
-
 </script>
+
 <!-- {place} -->
 <div class={`application-message    ${messageRoleVariant[message?.role]}`}>
 	<!-- <div class="p-1">
@@ -100,9 +107,8 @@
 					</div>
 			</div>
 	{/if} -->
-	<div class="flex flex-col w-full">
+	<div class="flex w-full flex-col">
 		<div class="line-gap-2 mb-1 p-1 {message?.role == 'assistant' ? 'flex-row-reverse' : ''}">
-
 			<div class="soft-title">
 				{#if message?.status == 'streaming'}
 					<Icon style="font-size:1.6em" icon="mdi:reload" class="spin" />
@@ -112,7 +118,7 @@
 			<div class="flex-1"></div>
 			<div class="soft-title">{message?.status != 'done' ? message?.status : ''}</div>
 			<div class="soft-title">{message?.created_at}</div>
-			<div class="p-2 rounded-full shadow-md theme-border bg-gray-50/10">
+			<div class="theme-border rounded-full bg-gray-50/10 p-2 shadow-md">
 				<Icon {icon} style="font-size:1.6em" />
 			</div>
 		</div>
@@ -149,31 +155,29 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/references.css";
+	@reference "../../styles/references.css";
 
+	.message-assistant {
+		@apply flex-row-reverse;
+		@variant 2xl {
+			@apply ml-0 basis-2/3;
+			@apply mt-16;
+		}
+	}
 
-    .message-assistant {
-        @apply flex-row-reverse ;
-				@variant 2xl {
-						@apply basis-2/3 ml-0;
-            @apply mt-16;
-				}
-    }
+	.message-user {
+		@apply flex-row;
+		@variant 2xl {
+			@apply mr-0 basis-1/3;
+		}
+	}
 
-    .message-user {
-        @apply flex-row ;
-        @variant 2xl {
-           @apply basis-1/3 mr-0;
-        }
-    }
+	.preserve-line-breaks {
+		white-space: pre-wrap;
+	}
 
-
-    .preserve-line-breaks {
-        white-space: pre-wrap;
-    }
-
-    .speech-bubble {
-        @apply px-2 w-full   relative overflow-hidden  p-4 py-4 rounded-md;
-        border: 1px solid var(--cfab-input-border-color) !important;
-    }
+	.speech-bubble {
+		@apply relative w-full overflow-hidden rounded-md p-4 px-2 py-4;
+		border: 1px solid var(--cfab-input-border-color) !important;
+	}
 </style>

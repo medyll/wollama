@@ -6,21 +6,21 @@ import type { SettingsType } from '$types/settings';
 import type { Message, ToolCall } from 'ollama/browser';
 
 export class ChatSessionManager {
-	#SessionDB: {
-		sessionId?: number;
-		dbChat: Partial<DbChat>;
-		models?: string[];
+	#SessionDB:              {
+		sessionId?:       number;
+		dbChat:           Partial<DbChat>;
+		models?:          string[];
 		userChatMessage?: OllamaChatMessage;
-		userDbMessage?: DBMessage;
+		userDbMessage?:   DBMessage;
 		messageAssistant: DBMessage[];
-		messageUser: Partial<DBMessage>;
+		messageUser:      Partial<DBMessage>;
 	} = {
-		dbChat: {},
-		models: [],
+		dbChat:           {},
+		models:           [],
 		messageAssistant: [],
-		messageUser: {},
-		userChatMessage: {} as OllamaChatMessage,
-		userDbMessage: {} as DBMessage
+		messageUser:      {},
+		userChatMessage:  {} as OllamaChatMessage,
+		userDbMessage:    {} as DBMessage
 	};
 
 	public previousMessages: DBMessage[] = [];
@@ -50,7 +50,7 @@ export class ChatSessionManager {
 		images,
 		model
 	}: {
-		model?: string;
+		model?:  string;
 		content: string;
 		images?: MessageImageType;
 	}) {
@@ -62,11 +62,11 @@ export class ChatSessionManager {
 			chatId: this.sessionId,
 			content,
 			images,
-			role: 'user',
+			role:   'user',
 			status: 'done',
 			urls,
 			//
-			model: model ?? this.#SessionDB.dbChat.models?.[0]
+			model:  model ?? this.#SessionDB.dbChat.models?.[0]
 		};
 
 		this.#SessionDB.userDbMessage = await idbQuery.insertMessage(this.sessionId, messageData);
@@ -79,15 +79,15 @@ export class ChatSessionManager {
 		images,
 		model
 	}: {
-		model?: string;
+		model?:  string;
 		content: string;
 		images?: MessageImageType;
 	}) {
 		// format message for chat send
 		this.#SessionDB.userChatMessage = {
 			content: content,
-			role: OllamaChatMessageRole.USER,
-			images: images?.base64 ? [images?.base64] : []
+			role:    OllamaChatMessageRole.USER,
+			images:  images?.base64 ? [images?.base64] : []
 		};
 
 		return this.#SessionDB.userChatMessage;
@@ -98,16 +98,16 @@ export class ChatSessionManager {
 		message: Message & {
 			chatId?: number;
 			status?: DBMessage['status'];
-			model?: string;
+			model?:  string;
 		}
 	) {
 		const { status, chatId, model } = message;
 		const messageData: Partial<DBMessage> = {
 			...ChatSessionManager.convertMessage('MessageToDbMessage', message),
-			role: role as OllamaChatMessageRole,
+			role:   role as OllamaChatMessageRole,
 			chatId: chatId ?? this.sessionId,
 			status: status ?? 'idle',
-			model: model ?? this.#SessionDB.dbChat.models?.[0]
+			model:  model ?? this.#SessionDB.dbChat.models?.[0]
 		};
 
 		return await idbQuery.insertMessage(this.sessionId, messageData);
@@ -116,8 +116,8 @@ export class ChatSessionManager {
 	async createDbSystemMessage(
 		message: Message & {
 			chatId?: number;
-			status: DBMessage['status'];
-			model: string;
+			status:  DBMessage['status'];
+			model:   string;
 		}
 	): Promise<DBMessage> {
 		const existingSystemMessage = await idbQuery.getSystemMessage(this.sessionId);
@@ -210,15 +210,15 @@ export class ChatSessionManager {
 			return {
 				...msg,
 				created_at: new Date(),
-				images: msg.images ? { base64: msg.images[0] } : undefined,
-				role: msg.role as 'system' | 'user' | 'tool' | 'assistant'
+				images:     msg.images ? { base64: msg.images[0] } : undefined,
+				role:       msg.role as 'system' | 'user' | 'tool' | 'assistant'
 			} as unknown as T extends 'MessageToDbMessage' ? DBMessage : Message;
 		} else {
 			const dbMsg = message as DBMessage;
 			return {
-				role: dbMsg.role,
+				role:    dbMsg.role,
 				content: dbMsg.content,
-				images: dbMsg.images ? [dbMsg.images.base64] : undefined
+				images:  dbMsg.images ? [dbMsg.images.base64] : undefined
 			} as unknown as T extends 'MessageToDbMessage' ? DBMessage : Message;
 		}
 	}
@@ -230,25 +230,25 @@ export class ChatSessionManager {
 		model: string
 	): DBMessage {
 		return {
-			id: 0, // This should be set by the database
-			chatId: chatId,
-			content: message.content,
+			id:         0, // This should be set by the database
+			chatId:     chatId,
+			content:    message.content,
 			created_at: new Date(),
-			images: message.images ? { base64: message.images[0] } : undefined,
-			status: status,
-			context: [],
-			resume: '',
-			model: model,
-			ia_lock: false,
-			role: message.role as 'system' | 'user' | 'tool' | 'assistant'
+			images:     message.images ? { base64: message.images[0] } : undefined,
+			status:     status,
+			context:    [],
+			resume:     '',
+			model:      model,
+			ia_lock:    false,
+			role:       message.role as 'system' | 'user' | 'tool' | 'assistant'
 		};
 	}
 
 	static dbMessageToMessage(dbMessage: DBMessage): Message {
 		return {
-			role: dbMessage.role,
-			content: dbMessage.content,
-			images: dbMessage.images?.base64 ? [dbMessage.images.base64] : [],
+			role:       dbMessage.role,
+			content:    dbMessage.content,
+			images:     dbMessage.images?.base64 ? [dbMessage.images.base64] : [],
 			tool_calls: []
 		};
 	}
@@ -268,10 +268,10 @@ export class ChatSessionManager {
 	 */
 	clearSession() {
 		this.#SessionDB = {
-			sessionId: undefined,
-			dbChat: {},
+			sessionId:        undefined,
+			dbChat:           {},
 			messageAssistant: [],
-			messageUser: {}
+			messageUser:      {}
 		};
 	}
 
@@ -279,9 +279,9 @@ export class ChatSessionManager {
 		chatParams: ChatGenerate,
 		config: SettingsType | undefined
 	): Promise<{
-		systemMessage: Message;
+		systemMessage:    Message;
 		previousMessages: Message[];
-		userChatMessage: Message;
+		userChatMessage:  Message;
 	}> {
 		const systemPrompt = chatParams.promptSystem.value ?? config?.system_prompt;
 
@@ -289,20 +289,20 @@ export class ChatSessionManager {
 
 		const userChatMessage: Message = await this.createUserChatMessage({
 			content: chatParams.prompt,
-			images: chatParams.images,
-			model: chatParams.models[0]
+			images:  chatParams.images,
+			model:   chatParams.models[0]
 		});
 
 		const systemMessage = await this.createDbSystemMessage({
 			content: systemPrompt,
-			role: OllamaChatMessageRole.SYSTEM,
-			status: 'idle',
-			model: chatParams.models[0],
-			images: []
+			role:    OllamaChatMessageRole.SYSTEM,
+			status:  'idle',
+			model:   chatParams.models[0],
+			images:  []
 		});
 
 		return {
-			systemMessage: ChatSessionManager.dbMessageToMessage(systemMessage),
+			systemMessage:    ChatSessionManager.dbMessageToMessage(systemMessage),
 			previousMessages: previousMessages
 				.map((e) => ChatSessionManager.dbMessageToMessage(e))
 				.filter((e) => e.role !== 'system'),

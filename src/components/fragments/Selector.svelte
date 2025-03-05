@@ -15,11 +15,11 @@
 
 <style lang="postcss">
 	@reference "../../styles/references.css";
-	.active{
-		@apply  border border-b-2 border-neutral-500; /* active */
+	.active {
+		@apply border border-b-2 border-neutral-500; /* active */
 	}
-	.inactive{
-		@apply  opacity-60 border border-b-2 border-transparent; /* inactive */
+	.inactive {
+		@apply border border-b-2 border-transparent opacity-60; /* inactive */
 	}
 	/* @apply  border border-b-2 border-neutral-500; 
 	@apply  opacity-60 border border-b-2 border-transparent;   */

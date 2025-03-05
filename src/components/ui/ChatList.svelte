@@ -17,15 +17,14 @@
 		engine.goto(`/chat/${chatPassKey}`);
 	};
 
-	let chatMenuList = $derived(idbqlState.chat.getAll()) ;
+	let chatMenuList = $derived(idbqlState.chat.getAll());
 	let groupedMenuList = $state({});
 	$effect(() => {
-        chatMenuList
+		chatMenuList;
 		groupedMenuList = groupMessages(chatMenuList);
 	});
 
-    $inspect(groupedMenuList,'groupedMenuList') 
-
+	$inspect(groupedMenuList, 'groupedMenuList');
 </script>
 
 <MenuList style="width:100%" selectorField="code" data={groupedMenuList ?? []}>

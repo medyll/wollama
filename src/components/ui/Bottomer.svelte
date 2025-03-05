@@ -6,22 +6,20 @@
 
 	$: if (element && $ui.activeChatId && $ui.autoScroll?.[$ui.activeChatId]) scrollDown();
 
-
 	ui.subscribe((chat) => {
 		scrollDown();
 	});
-
 
 	function scrollDown() {
 		if (element && $ui.autoScroll?.[$ui.activeChatId])
 			setTimeout(() => {
 				element?.scrollIntoView({
 					behavior: 'smooth',
-					block: 'end'
+					block:    'end'
 				});
 			}, 0);
 	}
 </script>
 
 <div class="flex-1" />
-<div class="p-4 h-32" bind:this={element} />
+<div class="h-32 p-4" bind:this={element} />

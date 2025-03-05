@@ -2,20 +2,20 @@ import type { DbChat } from '$types/db';
 import { startOfDay, endOfDay, isThisWeek, format } from 'date-fns';
 
 type Group<T = any> = {
-	code: string;
-	name: string;
-	order: number;
-	items: T[];
+	code:   string;
+	name:   string;
+	order:  number;
+	items:  T[];
 	period: { start: Date; end: Date };
 };
 
 type GroupList<T = any> = Record<string, Group<T>>;
 
 export class ChatDataGrouper<T = DbChat> {
-	data: T[];
-	fieldName: keyof T;
+	data:         T[];
+	fieldName:    keyof T;
 
-	currentYear: number;
+	currentYear:  number;
 	currentMonth: number;
 
 	constructor(data: T[], opt: { fieldName: keyof T } = { fieldName: 'createdAt' }) {
@@ -55,10 +55,10 @@ export class ChatDataGrouper<T = DbChat> {
 					endDate.setHours(23, 59, 59, 999);
 
 					groups[`D${day}`] = {
-						code: `D${day}`,
-						items: [],
-						name: itemDate.toLocaleString('default', { weekday: 'long' }),
-						order: day,
+						code:   `D${day}`,
+						items:  [],
+						name:   itemDate.toLocaleString('default', { weekday: 'long' }),
+						order:  day,
 						period: { end: endDate, start: startDate }
 					};
 				}
@@ -91,10 +91,10 @@ export class ChatDataGrouper<T = DbChat> {
 					endDate.setDate(itemDate.getDate() + 6);
 
 					groups[`W${weeks}`] = {
-						code: `W${weeks}`,
-						items: [],
-						name: this.getWeekGroupTitle(weeks),
-						order: weeks,
+						code:   `W${weeks}`,
+						items:  [],
+						name:   this.getWeekGroupTitle(weeks),
+						order:  weeks,
 						period: { end: endDate, start: startDate }
 					};
 				}
@@ -126,10 +126,10 @@ export class ChatDataGrouper<T = DbChat> {
 					const startDate = new Date(itemYear, itemMonth - 1, 1);
 					const endDate = new Date(itemYear, itemMonth, 0);
 					groups[`M${itemMonth}`] = {
-						code: `M${itemMonth}`,
-						items: [],
-						name: startDate.toLocaleString('default', { month: 'long' }),
-						order: itemMonth,
+						code:   `M${itemMonth}`,
+						items:  [],
+						name:   startDate.toLocaleString('default', { month: 'long' }),
+						order:  itemMonth,
 						period: { end: endDate, start: startDate }
 					};
 				}

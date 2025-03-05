@@ -26,14 +26,13 @@
 {/if}
 
 <style lang="postcss">
-    @reference "../../styles/references.css";
-    .modal {
-        @apply fixed top-0 right-0 left-0 bottom-0 bg-gray-900/50 w-full min-h-screen 
-        h-screen flex justify-center z-50 overflow-hidden overscroll-contain;
-    }
-    .inModal {
-        @apply m-auto rounded-xl max-w-full mx-2 bg-linear-to-b;
-        @apply from-neutral-100 to-neutral-200;
-        @apply dark:from-gray-800 dark:to-gray-900;
-    }
+	@reference "../../styles/references.css";
+	.modal {
+		@apply fixed top-0 right-0 bottom-0 left-0 z-50 flex h-screen min-h-screen w-full justify-center overflow-hidden overscroll-contain bg-gray-900/50;
+	}
+	.inModal {
+		@apply m-auto mx-2 max-w-full rounded-xl bg-linear-to-b;
+		@apply from-neutral-100 to-neutral-200;
+		@apply dark:from-gray-800 dark:to-gray-900;
+	}
 </style>

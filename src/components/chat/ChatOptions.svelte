@@ -7,7 +7,6 @@
 	import { idbQuery } from '$lib/db/dbQuery';
 	import ChatSystemPrompt from '$components/chat/ChatSystemPrompt.svelte';
 
-
 	// let promptList = $derived(idbQuery.getPrompts());
 	let promptList = idbQuery.getPrompts();
 
@@ -20,20 +19,23 @@
 	 }*/
 
 	let showHide = $state(false);
-	let style    = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
+	let style = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
 </script>
 
 <!--<ChatSystemPrompt/>-->
-
 
 <button class="flex gap-1" popovertarget="popover" style="anchor-name: --anchor;position:relative">
 	<Icon icon="material-symbols-light:post-add-sharp" />
 	{chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}
 </button>
-<div class="popover " id="popover" popover style="position-anchor : --anchor;">
-	<div class="slotui-menulist " tall="med">
+<div class="popover" id="popover" popover style="position-anchor : --anchor;">
+	<div class="slotui-menulist" tall="med">
 		{#each promptList as prompt}
-			<button class="menulist-item" value={prompt.name} onclick={() => chatParamsState.promptSystem = prompt}>{prompt.name}</button>
+			<button
+				class="menulist-item"
+				value={prompt.name}
+				onclick={() => (chatParamsState.promptSystem = prompt)}>{prompt.name}</button
+			>
 		{/each}
 		<button class="menulist-item">
 			<Icon icon="mdi:plus" />
@@ -53,31 +55,27 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/references.css";
+	@reference "../../styles/references.css";
 
+	[popover] {
+		inset: unset;
+		border: 0;
+		margin: 0;
+		padding: 0;
+		position: fixed;
+	}
 
+	:popover-open {
+		position-anchor: --anchor;
+		bottom: anchor(--anchor top);
+		left: anchor(--anchor left);
+		right: anchor(--anchor right);
 
-    [popover] {
-        inset: unset;
-        border: 0;
-        margin: 0;
-        padding: 0;
-        position: fixed;
-    }
+		background-color: var(--cfab-bg);
+		color: var(--cfab-foreground);
 
-    :popover-open {
-        position-anchor: --anchor;
-        bottom: anchor(--anchor top);
-        left: anchor(--anchor left);
-        right: anchor(--anchor right);
-
-        background-color: var(--cfab-bg);
-        color: var(--cfab-foreground);
-
-        width: 200px;
-        @apply shadow-md;
-        @apply rounded-md;
-    }
-
-
+		width: 200px;
+		@apply shadow-md;
+		@apply rounded-md;
+	}
 </style>
