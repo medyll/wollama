@@ -132,7 +132,7 @@ Résumé :`;
 export class chatUtils {
 	static async checkCategorie(chatId: string) {
 		const chat = await dbQuery('chat').getOne(chatId);
-		const chatMessages = await idbQuery.getMessages(chatId);
+		const chatMessages = await dbQuery('messages').getBy(chatId,'chatId');
 		const resume = chatMessages
 			.slice(0, 15)
 			.map((message: DBMessage) => message.content)
@@ -144,24 +144,7 @@ export class chatUtils {
 		if (res?.response !== '' && fr?.category) upd.category = fr.category;
 		return idbQuery.updateChat(chatId, upd);
 	}
-	static async checkTitle(chatId: string) {
-		
-		const chatMessages = await idbQuery.getMessages(chatId);
-
-		const resume = chatMessages
-			.slice(0, 15)
-			.map((message: DBMessage) => message.content)
-			.join('\n\n\n-------\n\n\n');
-
-		const res = await guessChatMetadata(resume);
-
-		const upd = {} as DbChat;
-		let fr = JSON.parse(res.response);
-		if (res?.response !== '' && fr?.title) upd.title = fr?.title; //  idbQuery.updateChat(chatId, { title: res.response });
-		if (res?.response !== '' && fr?.description) upd.description = fr.description; // idbQuery.updateChat(chatId, { : resd.response });
-
-		return idbQuery.updateChat(chatId, upd);
-	}
+ 
 
 	static getMessageDataObject(message: Partial<DBMessage>): Partial<DBMessage> {
 		return {

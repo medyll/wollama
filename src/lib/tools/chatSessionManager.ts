@@ -195,7 +195,7 @@ export class ChatSessionManager {
 	}
 
 	public async getPreviousMessages(): Promise<Partial<DBMessage>[]> {
-		const chatList = await idbQuery.getMessages(this.sessionId);
+		const chatList = await dbQuery('messages').getBy(this.sessionId,'chatId');
 
 		this.previousMessages = chatList.map((e) => e);
 
