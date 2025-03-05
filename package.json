@@ -32,6 +32,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@huggingface/prettier-plugin-vertical-align": "^0.2.3",
     "@medyll/idae-api": "file:../../../idae/packages/idae-api",
     "@medyll/idae-be": "file:../../../idae/packages/idae-be",
     "@medyll/idae-data-tpl": "file:../../../idae/packages/idae-data-tpl",
