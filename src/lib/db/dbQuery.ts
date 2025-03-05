@@ -116,7 +116,7 @@ export class idbQuery {
 
 	static async updateMessageStream(id: number, data: Partial<OllamaResponse>) {
 		if (!id) throw new Error('id is required');
-		const message = await idbQuery.getMessage(id);
+		const message = await dbQuery('messages').getOne(id);
 
 		let content = (message?.content ?? '') + (data?.message?.content ?? data?.response ?? '');
 
@@ -127,10 +127,6 @@ export class idbQuery {
 			});
 	}
 
-	static getMessage(id: number) {
-		if (!id) throw new Error('id  is required');
-		return idbqlState.messages.where({ id: { eq: id } })[0];
-	}
 
 	static getMessages(chatId: number): DBMessage | [] | any {
 		if (!chatId) return [];
