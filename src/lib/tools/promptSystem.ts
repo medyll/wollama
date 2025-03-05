@@ -189,7 +189,7 @@ export class chatMetadata {
 		if (res?.response !== '' && fr?.tags) upd.title = fr?.title; //  idbQuery.updateChat(chatId, { title: res.response });
 		if (res?.response !== '' && fr?.tags) upd.tags = fr?.tags; //  idbQuery.updateChat(chatId, { title: res.response });
 
-		return idbQuery.updateChat(chatId, upd);
+		return idbQuery.updateChat(id, upd);
 	}
 	static async checkDescription(chatId: number) {
 		const resume = await doResume(chatId, 15);

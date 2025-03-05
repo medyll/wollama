@@ -6,8 +6,9 @@ import ollama, {
 	type ChatRequest,
 	type ChatResponse,
 	type PushRequest,
-	type CreateRequest
+	type CreateRequest, type Message
 } from 'ollama/browser';
+import type { DBMessage } from '$types/db';
 
 interface Hook {
 	messageId: string;
@@ -105,7 +106,7 @@ export class WollamaApiCore {
 			});
 
 			console.log({ response });
-			await this.stream(response, hook, 'generate');
+			await this.stream(response, hook );
 			//
 		} else {
 			response = await ollama.generate({
@@ -129,7 +130,7 @@ export class WollamaApiCore {
 					stream: true
 				})
 				.then((response) => {
-					this.stream(response, event.onStream, 'generate');
+					this.stream(response, event.onStream );
 				});
 		} else {
 			response = ollama
@@ -164,7 +165,7 @@ export class WollamaApiCore {
 				})
 				.then((response) => {
 					console.log({ response });
-					this.stream(response, event.onStream, 'chat');
+					this.stream(response, event);
 				});
 		} else {
 			ollama
@@ -178,13 +179,18 @@ export class WollamaApiCore {
 		return event;
 	}
 
-	async stream<T>(
-		response: AsyncIterator<T>,
-		hook?: (data: OllamaResponse) => void,
-		type: 'generate' | 'chat'
+	async stream<T = Message[]>(
+		response: AsyncIterator<T,Message[]>,
+		event?: ApiEvent,
 	) {
+		const hook = event?.onStream ;
 		for await (const part of response) {
-			if (hook) hook(part);
+			if (part.done) {
+				event?.onEnd(part);
+			} else {
+				if (hook) hook(part);
+			
+			}
 		}
 	}
 
