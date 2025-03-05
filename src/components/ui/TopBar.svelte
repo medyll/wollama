@@ -3,13 +3,13 @@
 	import StatusBar from '../settings/StatusBar.svelte';
 	import { ui } from '$lib/stores/ui';
 	import { engine } from '$lib/tools/engine';
-	import { idbQuery } from '$lib/db/dbQuery';
+	import { dbQuery } from '$lib/db/dbQuery';
 	import { page } from '$app/stores';
 
 
 	new Date().getSeconds();
 
-	$: chat = idbQuery.getChat($ui.activeChatId);
+	$: chat = dbQuery('chat').getOne($ui.activeChatId);
 
 	$: showConfigClose = $page.route.id?.includes('/configuration');
 

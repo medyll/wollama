@@ -1,4 +1,4 @@
-import { idbQuery } from '$lib/db/dbQuery';
+import { dbQuery, idbQuery } from '$lib/db/dbQuery';
 import type { GenerateResponseHook } from '$lib/db/wollamaApi';
 import { type ChatParameters, chatParametersState } from '$lib/states/chat.svelte';
 import type { DbChat, DBMessage } from '$types/db';
@@ -42,14 +42,14 @@ export class ChatSessionManager {
 	}
 
 	async #loadChatSessionFromDB(id: number) {
-		const dbChat = await idbQuery.getChat(id);
+		const dbChat = await dbQuery('chat').getOne(id);
 		this.#SessionDB.dbChat = dbChat ?? ({} as Partial<DbChat>);
 		this.#SessionDB.sessionId = dbChat?.id;
 	}
 
 	async #initChatDb(sessionId?: number, chatData: DbChat = {} as DbChat): Promise<Partial<DbChat>> {
 		let ret: Partial<DbChat>;
-		if (sessionId && Boolean(await idbQuery.getChat(sessionId))) {
+		if (sessionId && Boolean(await dbQuery('chat').getOne(sessionId))) {
 			ret = await idbQuery.updateChat(sessionId, chatData);
 		} else {
 			ret = await idbQuery.insertChat(chatData);

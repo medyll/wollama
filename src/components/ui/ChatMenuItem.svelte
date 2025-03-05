@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Confirm from '$components/fragments/Confirm.svelte';
-	import { idbQuery } from '$lib/db/dbQuery';
+	import { dbQuery, idbQuery } from '$lib/db/dbQuery';
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import { Icon } from '@medyll/idae-slotui-svelte';
@@ -13,7 +13,7 @@
 
 	const { id = '', selected = false } = $props();
 
-	let chat = $derived(idbQuery.getChat(id));
+	let chat = $derived(id ? dbQuery('chat').getOne(id) : {});
 
 	let editChat: boolean = $state(false);
 	let isOpen: boolean = $state(false);

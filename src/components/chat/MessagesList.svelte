@@ -5,11 +5,9 @@
 
 	let { id }: { id?: number } = $props();
 
-	let chats = $derived(id ? dbQuery('chat').getOne(id) : []);
+	let chat = $derived(id ? dbQuery('chat').getOne(id) : []);
 	let messages = $derived(id ? dbQuery('messages').where({ chatId: { eq: id }, role :{ neq: 'system'} }) : []);
 
-	let chat = $derived(id ? idbQuery.getChat(id) : []);
-	//let messages = $derived(id ? idbQuery.getMessages(id).filter((m) => !m.role || m.role !== 'system') : []);
 	let element: HTMLElement;
 
 	$effect.pre(() => {

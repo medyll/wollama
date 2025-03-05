@@ -102,12 +102,12 @@ export class idbQuery {
 	}
 
 	static async initChat(id?: number, chatData: DbChat = {} as DbChat): Promise<DbChat> {
-		if (Boolean(await idbQuery.getChat(id))) {
+		if (Boolean(await dbQuery('chat').getOne(id))) {
 			await idbQuery.updateChat(id, chatData);
 		}
 
-		return id && Boolean(await idbQuery.getChat(id))
-			? ((await idbQuery.getChat(id)) as DbChat)
+		return id && Boolean(await dbQuery('chat').getOne(id))
+			? ((await dbQuery('chat').getOne(id)) as DbChat)
 			: ((await idbQuery.insertChat(chatData)) as DbChat);
 	}
 
