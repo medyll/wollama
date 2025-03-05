@@ -127,7 +127,7 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../../styles/all.css";
+    @reference "../../../styles/references.css";
     .promptZone {
         @apply w-96  z-50 bottom-20  p-4 shadow-md rounded-md;
         max-height: 560px;
