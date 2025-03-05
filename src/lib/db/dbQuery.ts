@@ -59,17 +59,13 @@ export function dbQuery(collection: keyof typeof schemeModelDb) {
 	};
 }
 
-export class idbQuery { 
+export class idbQuery {
 	static async getChatByPassKey(chatPassKey: string) {
 		if (!chatPassKey || !idbqlState?.chat) return undefined; // throw new Error('id is required');
 
 		const ret = await idbql.chat.where({ chatPassKey: { eq: chatPassKey } });
 
 		return ret[0];
-	}
-
-	static getChats() {
-		return idbqlState.chat.getAll();
 	}
 
 	static async insertChat(chatData?: Partial<DbChat>): Promise<DbChat> {
