@@ -74,23 +74,8 @@
         z-index: 9000;
         gap: 0;
         position: relative;
-        button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 45px;
-            height: 100%;
-            transition: all 0.2s;
 
-            &:hover {
-                background: #ededed;
-            }
-        }
 
-        .titlebar-button-close:hover {
-            background: rgb(232, 17, 35);
-            color: white;
-        }
 
         :global(svg) {
             color: rgb(139, 148, 158);

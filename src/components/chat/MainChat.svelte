@@ -1,3 +1,4 @@
+<link href="../../styles/components.css" rel="stylesheet">
 <script lang="ts">
 	import { settings } from '$lib/stores/settings.svelte';
 	import Speech from '$components/chat/input/Speech.svelte';
@@ -19,7 +20,6 @@
 	import type { ChatRequest } from 'ollama/browser';
 	import { ChatSessionManager } from '$lib/tools/chatSessionManager';
 	import { OllamaChatMessageRole } from '$types/ollama';
-	import { preventDefault } from 'svelte/legacy';
 
 	interface MainChatProps {
 		chatPassKey?: string;
@@ -132,11 +132,11 @@
 </script>
 
 {#snippet input()}
-	<div class="application-chat-zone">
-		<div class="input  ">
-			<div class="inputTextarea flex flex-col gap-3 px-3 pt-3 flex-1">
-				<!-- <Images />
-                <hr /> -->
+	<div class="application-chat-main">
+		<div class="application-chat-zone">
+			<!-- <Images />
+							<hr /> -->
+			<div class="application-chat-room">
 				<div class="flex justify-center absolute -top-10 left-0 w-full">
 					<Speech
 						onEnd={submitHandler}
@@ -145,7 +145,7 @@
 					/>
 				</div>
 				<!-- <hr /> -->
-				<div class="flex-1 relative">
+				<div class="flex-1 relative ">
 					<Input
 						disabled={!connectionTimer.connected}
 						onkeypress={keyPressHandler}
@@ -182,35 +182,19 @@
 				</div>
 			</div>
 		</div>
-		<div class="text-xs text-center theme-bg p-2">{$t('ui.aiCautionMessage')}</div>
+		<!--<div class="text-xs text-center theme-bg p-2">{$t('ui.aiCautionMessage')}</div>-->
 	</div>
 {/snippet}
 <!-- <div class="absolute right-4"><AgentPick /></div> -->
 <form hidden id="prompt-form" onsubmit={(event)=>{
 	event.preventDefault();
 	submitHandler($state.snapshot(chatParamsState));
-}} ></form>
-<div class="h-full w-full">
-	<div class="application-container flex-v h-full mx-auto">
-		<DashBoard showList={Boolean(activeChatId)}>
-			{#snippet home()}
-				{@render input()}
-			{/snippet}
-			<MessagesList id={activeChatId} />
-			{@render input()}
-		</DashBoard>
-	</div>
-</div>
+}}></form>
+<DashBoard showList={Boolean(activeChatId)}>
+	{#snippet home()}
+		{@render input()}
+	{/snippet}
+	<MessagesList id={activeChatId} />
+	{@render input()}
+</DashBoard>
 
-<style lang="postcss">
-    @reference "../../styles/references.css";
-
-    .inputTextarea {
-        position: relative;
-
-        &:has(textarea:focus) {
-            border-color: var(--cfab-input-border-color-focus, red);
-            border-radius: 0.5em;
-        }
-    }
-</style>

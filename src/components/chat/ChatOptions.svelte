@@ -24,11 +24,7 @@
 </script>
 
 <!--<ChatSystemPrompt/>-->
-{#snippet listItemBottom({ item, itemIndex })}
-	<MenuListItem icon="material-symbols-light:post-add-sharp" data={item}>
-		{$t('prompt.createPrompt')}
-	</MenuListItem>
-{/snippet}
+
 
 <button class="flex gap-1" popovertarget="popover" style="anchor-name: --anchor;position:relative">
 	<Icon icon="material-symbols-light:post-add-sharp" />

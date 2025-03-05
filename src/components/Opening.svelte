@@ -17,7 +17,7 @@
 <slot />
 
 <style lang="postcss">
-    @reference "../styles/all.css";
+    @reference "../styles/references.css";
     .ss {
         position:fixed;
         border: 10px solid red;
