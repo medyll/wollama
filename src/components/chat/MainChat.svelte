@@ -30,6 +30,7 @@
 	let chatSessionManager: ChatSessionManager = ChatSessionManager.loadSession();
 
 	chatSessionManager.loadFromPathKey(chatPassKey).then((chat) => (activeChatId = chat?.id));
+	chatSessionManager.setParameters(chatParametersState);
 
 	let placeholder: string = $derived(
 		chatParametersState.voiceListening ? 'Listening...' : 'Message to ai'
@@ -48,7 +49,7 @@
 			config
 		);
 
-		await sessionManager.createDbMessage(OllamaChatMessageRole.USER, userChatMessage);
+
 
 		let assistantDbMessage: DBMessage | undefined;
 		aiState.set('running')

@@ -1,6 +1,6 @@
 import { idbQuery } from '$lib/db/dbQuery';
-import type { ChatParameters } from '$lib/states/chat.svelte';
-import type { DbChat, DBMessage, MessageImageType } from '$types/db';
+import { type ChatParameters, chatParametersState } from '$lib/states/chat.svelte';
+import type { DbChat, DBMessage } from '$types/db';
 import { type OllamaChatMessage, OllamaChatMessageRole, type OllamaResponse } from '$types/ollama';
 import type { SettingsType } from '$types/settings';
 import type { Message } from 'ollama/browser';
@@ -23,83 +23,47 @@ export class ChatSessionManager {
 		userChatMessage : {} as OllamaChatMessage,
 		userDbMessage   : {} as DBMessage
 	};
-	
+	chatParametersState!: ChatParameters
 	public previousMessages: DBMessage[] = [];
-	public sessionManagerMessages!: ChatSessionManagerMessages;
 	
 	private constructor(id?: number) {
 		if (id) {
 			this.#loadChatSessionFromDB(id);
-			this.sessionManagerMessages = new ChatSessionManagerMessages(id);
 		}
-	}
-	
-	public async getPreviousMessages(): Promise<Partial<DBMessage>[]> {
-		const chatList = await idbQuery.getMessages(this.sessionId);
-		
-		this.previousMessages = chatList.map((e) => e);
-		
-		return this.previousMessages;
-	}
-	
- 
-	
-	async createDbMessage(
-		role: OllamaChatMessageRole | string,
-		message: Message & {
-			chatId?: number;
-			status?: DBMessage['status'];
-			model?: string;
-		}
-	) {
-		const { status, chatId, model }       = message;
-		const messageData: Partial<DBMessage> = {
-			...ChatSessionManager.convertMessage('MessageToDbMessage', message),
-			role  : role as OllamaChatMessageRole,
-			chatId: chatId ?? this.sessionId,
-			status: status ?? 'idle',
-			model : model ?? this.#SessionDB.dbChat.models?.[0]
-		};
-		
-		return await idbQuery.insertMessage(this.sessionId, messageData);
-	}
-	
- 
-	
-	#loadChatSessionFromDB = async (id: number) => {
-		const dbChat              = await idbQuery.getChat(id);
-		this.#SessionDB.dbChat    = dbChat ?? ({} as Partial<DbChat>);
-		this.#SessionDB.sessionId = dbChat?.id;
-	};
-	
-	async loadFromPathKey(pathKey?: string) {
-		const dbChat = await idbQuery.getChatByPassKey(pathKey);
-		
-		this.#SessionDB.dbChat    = dbChat ?? ({} as Partial<DbChat>);
-		this.#SessionDB.sessionId = dbChat?.id;
-		await this.#loadChatSessionFromDB(dbChat?.id);
-		return dbChat;
 	}
 	
 	static loadSession() {
 		return new ChatSessionManager();
 	}
 	
-	get ChatSessionDB() {
-		return {
-			createSession: this.#createChatSessionInDB.bind(this),
-			updateSession: this.#updateChatSessionInDB.bind(this)
-			/*  init: this.#initChatDb.bind(this), */
-		};
+	
+	setParameters(parameters: ChatParameters) {
+		this.chatParametersState = parameters;
 	}
 	
-	async #createChatSessionInDB(chatData: Partial<DbChat> = {} as DbChat) {
+	async #loadChatSessionFromDB(id: number) {
+		const dbChat              = await idbQuery.getChat(id);
+		this.#SessionDB.dbChat    = dbChat ?? ({} as Partial<DbChat>);
+		this.#SessionDB.sessionId = dbChat?.id;
+	};
+	
+	async #initChatDb(sessionId?: number, chatData: DbChat = {} as DbChat): Promise<Partial<DbChat>> {
+		let ret: Partial<DbChat>;
+		if (sessionId && Boolean(await idbQuery.getChat(sessionId))) {
+			ret = await idbQuery.updateChat(sessionId, chatData);
+		} else {
+			ret = await idbQuery.insertChat(chatData);
+		}
+		return ret;
+	}
+	
+	async #createChatSessionDB(chatData: Partial<DbChat> = {} as DbChat) {
 		this.#SessionDB.dbChat    = await this.#initChatDb(this.sessionId, chatData as DbChat);
 		this.#SessionDB.sessionId = this.#SessionDB.dbChat.id;
 		return { sessionId: this.sessionId, dbChat: this.#SessionDB.dbChat };
 	}
 	
-	async #updateChatSessionInDB(chatData: Partial<DbChat> = {} as DbChat) {
+	async #updateChatSessionDB(chatData: Partial<DbChat> = {} as DbChat) {
 		if (this.#SessionDB.dbChat.id !== undefined) {
 			this.#SessionDB.dbChat    = await idbQuery.updateChat(this.#SessionDB.dbChat.id, {
 				...(chatData as DbChat)
@@ -110,38 +74,16 @@ export class ChatSessionManager {
 		return undefined;
 	}
 	
-	/**
-	 * Handles the completion of a message in the chat session.
-	 * @param assistantMessage - The assistant message object.
-	 * @param data - The response data from the assistant.
-	 */
-	public async onMessageDone(assistantMessage: DBMessage, data: OllamaResponse) {
-		await Promise.all([
-			//idbQuery.updateChat(assistantMessage.chatId, { context: data?.context }),
-			idbQuery.updateMessage(assistantMessage.id, { status: 'done' })
-		]);
+	async loadFromPathKey(pathKey?: string) {
+		const dbChat = await idbQuery.getChatByPassKey(pathKey);
+		
+		this.#SessionDB.dbChat    = dbChat ?? ({} as Partial<DbChat>);
+		this.#SessionDB.sessionId = dbChat?.id;
+		await this.#loadChatSessionFromDB(dbChat?.id);
+		return dbChat;
 	}
 	
-	/**
-	 * Handles the incoming message stream from the assistant.
-	 * @param assistantMessage - The message object received from the assistant.
-	 * @param data - The response data received from the assistant.
-	 */
-	public async onMessageStream(assistantMessage: DBMessage, data: OllamaResponse) {
-		await idbQuery.updateMessageStream(assistantMessage.id, data);
-	}
-	
-	async #initChatDb(sessionId?: number, chatData: DbChat = {} as DbChat): Promise<DbChat> {
-		let ret: DbChat;
-		if (sessionId && Boolean(await idbQuery.getChat(sessionId))) {
-			ret = await idbQuery.updateChat(sessionId, chatData);
-		} else {
-			ret = await idbQuery.insertChat(chatData);
-		}
-		return ret;
-	}
-	
-	static convertMessage<T extends 'MessageToDbMessage' | 'DbMessageToMessage'>(
+	static #convertMessage<T extends 'MessageToDbMessage' | 'DbMessageToMessage'>(
 		from: T,
 		message: T extends 'MessageToDbMessage' ? Message : DBMessage
 	): T extends 'MessageToDbMessage' ? DBMessage : Message {
@@ -163,7 +105,7 @@ export class ChatSessionManager {
 		}
 	}
 	
-	static dbMessageToMessage(dbMessage: DBMessage): Message {
+	static #dbMessageToMessage(dbMessage: DBMessage): Message {
 		return {
 			role      : dbMessage.role,
 			content   : dbMessage.content,
@@ -172,6 +114,14 @@ export class ChatSessionManager {
 		};
 	}
 	
+	
+	get ChatSessionDB() {
+		return {
+			createSession: this.#createChatSessionDB.bind(this),
+			updateSession: this.#updateChatSessionDB.bind(this)
+			/*  init: this.#initChatDb.bind(this), */
+		};
+	}
 	
 	get sessionId() {
 		return this.#SessionDB.sessionId;
@@ -206,24 +156,24 @@ export class ChatSessionManager {
 		const previousMessages = await this.getPreviousMessages();
 		
 		const userChatMessage: Message = {
-			role   : OllamaChatMessageRole.USER,
-			content: chatParams.prompt,
-			images : chatParams.images?.base64 ? [chatParams.images?.base64] : [],
+			role      : OllamaChatMessageRole.USER,
+			content   : chatParams.prompt,
+			images    : chatParams.images?.base64 ? [chatParams.images?.base64] : [],
 			tool_calls: []
 		};
 		
-		let systemMessage: Message = {
-			role   : OllamaChatMessageRole.SYSTEM,
-			content: systemPrompt,
-			images :   [],
+		let systemMessage: Message  = {
+			role      : OllamaChatMessageRole.SYSTEM,
+			content   : systemPrompt,
+			images    : [],
 			tool_calls: []
 		};
 		const existingSystemMessage = await idbQuery.getSystemMessage(this.sessionId);
 		if (existingSystemMessage) {
 			systemMessage = {
-				role   : existingSystemMessage.role,
-				content: existingSystemMessage.content,
-				images :   [],
+				role      : existingSystemMessage.role,
+				content   : existingSystemMessage.content,
+				images    : [],
 				tool_calls: []
 			};
 		}
@@ -231,9 +181,9 @@ export class ChatSessionManager {
 		if (!existingSystemMessage) {
 			await this.createDbMessage(OllamaChatMessageRole.SYSTEM, {
 				...systemMessage,
-				status : 'idle',
-				model  : chatParams.models[0],
-				images : []
+				status: 'idle',
+				model : chatParams.models[0],
+				images: []
 			});
 		}
 		await this.createDbMessage(OllamaChatMessageRole.USER, userChatMessage);
@@ -241,42 +191,18 @@ export class ChatSessionManager {
 		return {
 			systemMessage   : systemMessage,
 			previousMessages: previousMessages
-			.map((e) => ChatSessionManager.dbMessageToMessage(e))
+			.map((e) => ChatSessionManager.#dbMessageToMessage(e))
 			.filter((e) => e.role !== 'system'),
 			userChatMessage
 		};
 	}
-}
-
-
-class ChatSessionManagerMessages extends ChatSessionManager {
 	
-	#SessionDB;
-	
-	constructor(chatID: number) {
-		super(chatID);
+	public async getPreviousMessages(): Promise<Partial<DBMessage>[]> {
+		const chatList = await idbQuery.getMessages(this.sessionId);
 		
-	}
-	
-	async createUserChatMessage({
-									content,
-									images,
-									model
-								}: {
-		model?: string;
-		content: string;
-		images?: MessageImageType;
-	}) {
-		// format message for chat send
-		this.#SessionDB.userChatMessage = {
-			content: content,
-			role   : OllamaChatMessageRole.USER,
-			images : images?.base64 ? [images?.base64] : []
-		};
+		this.previousMessages = chatList.map((e) => e);
 		
-		return this.#SessionDB.userChatMessage;
-		
-		
+		return this.previousMessages;
 	}
 	
 	async createDbMessage(
@@ -289,7 +215,7 @@ class ChatSessionManagerMessages extends ChatSessionManager {
 	) {
 		const { status, chatId, model }       = message;
 		const messageData: Partial<DBMessage> = {
-			...ChatSessionManager.convertMessage('MessageToDbMessage', message),
+			...ChatSessionManager.#convertMessage('MessageToDbMessage', message),
 			role  : role as OllamaChatMessageRole,
 			chatId: chatId ?? this.sessionId,
 			status: status ?? 'idle',
@@ -299,19 +225,25 @@ class ChatSessionManagerMessages extends ChatSessionManager {
 		return await idbQuery.insertMessage(this.sessionId, messageData);
 	}
 	
-	async createDbSystemMessage(
-		message: Message & {
-			chatId?: number;
-			status: DBMessage['status'];
-			model: string;
-		}
-	): Promise<DBMessage> {
-		const existingSystemMessage = await idbQuery.getSystemMessage(this.sessionId);
-		if (existingSystemMessage) {
-			return existingSystemMessage;
-		}
-		const createdMessage = await this.createDbMessage(OllamaChatMessageRole.SYSTEM, message);
-		return createdMessage;
+	/**
+	 * Handles the completion of a message in the chat session.
+	 * @param assistantMessage - The assistant message object.
+	 * @param data - The response data from the assistant.
+	 */
+	public async onMessageDone(assistantMessage: DBMessage, data: OllamaResponse) {
+		await Promise.all([
+			//idbQuery.updateChat(assistantMessage.chatId, { context: data?.context }),
+			idbQuery.updateMessage(assistantMessage.id, { status: 'done' })
+		]);
 	}
 	
+	/**
+	 * Handles the incoming message stream from the assistant.
+	 * @param assistantMessage - The message object received from the assistant.
+	 * @param data - The response data received from the assistant.
+	 */
+	public async onMessageStream(assistantMessage: DBMessage, data: OllamaResponse) {
+		await idbQuery.updateMessageStream(assistantMessage.id, data);
+	}
 }
+
