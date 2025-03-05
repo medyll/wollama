@@ -1,115 +1,134 @@
 /* src/styles/skin.css */
 
 @layer components {
-  select {
-    option {
-      @apply bg-white/80 dark:bg-black p-1 cursor-pointer;
-      @apply text-gray-700 dark:text-gray-100;
+    
+    /*.daButton {
+        @apply inline-flex;
+        @apply items-center;
+        @apply rounded-md;
+        @apply px-3;
+        @apply py-2;
+        @apply text-sm;
+        @apply font-semibold;
+        @apply ring-1;
+        @apply shadow-xs;
+        @apply ring-gray-300;
+        @apply ring-inset;
+        
+        @apply text-gray-900;
+        @apply bg-white;
+        @apply hover: bg-gray-50;
+    }*/
+    
+    select {
+        option {
+            @apply bg-white/80 dark:bg-black p-1 cursor-pointer;
+            @apply text-gray-700 dark:text-gray-100;
+        }
     }
-  }
-
-  textarea {
-    width: 100%;
-  }
-
-  code[class*="language-"] {
-    border-radius: 0;
-    border: none;
-    display: block !important;
-    overflow-x: auto;
-    padding: 1em;
-    padding: 1em;
-    white-space: pre-wrap;
-    padding-top: 1em;
-    margin: 0;
-
-    display: block !important;
-    overflow-x: auto;
-    white-space: pre-wrap;
-
-    color: white;
-    text-shadow: 0 0.1px rgba(255, 255, 255, 0);
-    text-align: left;
-    white-space: pre;
-    word-spacing: normal;
-    word-break: normal;
-    word-wrap: normal;
-
-    -moz-tab-size: 4;
-    -o-tab-size: 4;
-    tab-size: 4;
-
-    -webkit-hyphens: none;
-    -moz-hyphens: none;
-    -ms-hyphens: none;
-    hyphens: none;
-
-    @apply bg-neutral-600 dark:bg-neutral-800;
-  }
-
-  :not(pre) > code[class*="language-"],
-  pre[class*="language-"] {
-    background: inherit;
-    @apply bg-neutral-600 dark:bg-neutral-800;
-  }
-
-  .btn {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    min-height: 24px;
-
-    &.btn-big {
-      padding-left: 2rem;
-      padding-right: 2rem;
+    
+    textarea {
+        width: 100%;
     }
-
-    &.btn-link {
-      border: none;
-      border-bottom: 1px solid red;
+    
+    code[class*="language-"] {
+        border-radius: 0;
+        border: none;
+        display: block !important;
+        overflow-x: auto;
+        padding: 1em;
+        padding: 1em;
+        white-space: pre-wrap;
+        padding-top: 1em;
+        margin: 0;
+        
+        display: block !important;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        
+        color: white;
+        text-shadow: 0 0.1px rgba(255, 255, 255, 0);
+        text-align: left;
+        white-space: pre;
+        word-spacing: normal;
+        word-break: normal;
+        word-wrap: normal;
+        
+        -moz-tab-size: 4;
+        -o-tab-size: 4;
+        tab-size: 4;
+        
+        -webkit-hyphens: none;
+        -moz-hyphens: none;
+        -ms-hyphens: none;
+        hyphens: none;
+        
+        @apply bg-neutral-600 dark:bg-neutral-800;
     }
-
-    &:hover {
-      border-color: darken(9);
+    
+    :not(pre) > code[class*="language-"],
+    pre[class*="language-"] {
+        background: inherit;
+        @apply bg-neutral-600 dark:bg-neutral-800;
     }
-    @apply rounded-md border border-gray-700;
-    @apply text-gray-700 bg-gray-100;
-    @apply dark:bg-gray-900/40 dark:text-gray-100;
-    @apply flex place-items-center;
-  }
-
-  .input,textarea {
-    min-height: 2.5rem;
-    padding: 0.5rem !important;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    border-radius: 0.375rem;
-    border: 1px solid var(--cfab-input-border-color) ;
-    background: var(--cfab-input-bg-color);
-    color: var(--cfab-input-foreground-color);
-    transition: all 0.2s ease-in-out;
-
-    &.naked {
-      border-color: transparent;
+    
+    .btn {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        min-height: 24px;
+        
+        &.btn-big {
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        
+        &.btn-link {
+            border: none;
+            border-bottom: 1px solid red;
+        }
+        
+        
+        
+        @apply rounded-md border border-gray-700;
+        @apply text-gray-700 bg-gray-100;
+        @apply dark:bg-gray-900/40 dark:text-gray-100;
+        @apply flex place-items-center;
     }
-    &.tight {
-      padding: 0.25rem;
+    
+    .input, textarea {
+        min-height: 2.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        border: 1px solid var(--cfab-input-border-color);
+        background: var(--cfab-input-bg-color);
+        color: var(--cfab-input-foreground-color);
+        transition: all 0.2s ease-in-out;
+        
+        &.naked {
+            border-color: transparent;
+        }
+        
+        &.tight {
+            padding: 0.25rem;
+        }
+        
+        &:hover {
+            border-color: var(--cfab-input-border-color-focus);
+            box-shadow: var(--cfab-shadow);
+        }
+        
+        &:active,
+        &:focus {
+            border: 1px solid var(--cfab-input-border-color-focus);
+            box-shadow: var(--cfab-shadow);
+        }
+        
+        [disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     }
-    &:hover {
-      border-color: var(--cfab-input-border-color-focus);
-      box-shadow: var(--cfab-shadow);
-    }
-
-    &:active,
-    &:focus {
-      border: 1px solid var(--cfab-input-border-color-focus);
-      box-shadow: var(--cfab-shadow);
-    }
-
-    [disabled] {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
 }

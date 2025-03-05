@@ -1,102 +1,103 @@
-
-
-@font-face {
-    font-family: "Arimo";
-    src: url("../assets/fonts/Arimo-Variable.ttf");
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Mona Sans";
-    src: url("../assets/fonts/Mona-Sans.woff2");
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Roboto";
-    src: url("../assets/fonts/Roboto-Regular.ttf");
-    font-display: swap;
-}
-
-
-html {
-    /* word-break: break-word; */
-    height: 100%;
-    min-height: 100%;
-    font-family: Mona-Sans,
-    "ui-sans-serif",
-    "system-ui",
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    Ubuntu,
-    Cantarell,
-    "Noto Sans",
-    sans-serif,
-    "Helvetica Neue",
-    Arial,
-    "Apple Color Emoji",
-    "Segoe UI Emoji",
-    "Segoe UI Symbol",
-    "Noto Color Emoji";
-    font-size: 0.875rem;
-}
-
-body {
-    height: 100%;
-    min-height: 100%;
-    /* word-break: break-word; */
-    font-size: 0.875rem;
-    background: transparent;
-}
-
-svg {
-    color: var(--cfab-icon-color);
-}
-
-.spin {
-    animation-name: spin;
-    animation-duration: 2000ms;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
+@layer base {
+    @font-face {
+        font-family: "Arimo";
+        src: url("../assets/fonts/Arimo-Variable.ttf");
+        font-display: swap;
     }
     
-    to {
-        transform: rotate(360deg);
+    @font-face {
+        font-family: "Mona Sans";
+        src: url("../assets/fonts/Mona-Sans.woff2");
+        font-display: swap;
     }
-}
-
-pre[class*="language-"] {
-    padding: 0em;
-    margin: 0 !important;
-    overflow: auto;
-    border: none;
-}
-
-code[class*="language-none"] {
-    padding: 1em !important;
-    margin: 1em 0;
-}
-
-
-.prismDone {
-    /* from main.css */
+    
+    @font-face {
+        font-family: "Roboto";
+        src: url("../assets/fonts/Roboto-Regular.ttf");
+        font-display: swap;
+    }
     
     
-    & code {
-        @apply bg-neutral-600 dark:bg-neutral-800;
+    html {
+        /* word-break: break-word; */
+        height: 100%;
+        min-height: 100%;
+        font-family: Mona-Sans,
+        "ui-sans-serif",
+        "system-ui",
+        -apple-system,
+        "Segoe UI",
+        Roboto,
+        Ubuntu,
+        Cantarell,
+        "Noto Sans",
+        sans-serif,
+        "Helvetica Neue",
+        Arial,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
+        font-size: 0.875rem;
     }
-}
-
-.codeFormat {
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 1em 0;
-    @apply bg-neutral-200 dark:bg-neutral-800;
-    @apply border border-neutral-400 dark:border-white/10;
+    
+    body {
+        height: 100%;
+        min-height: 100%;
+        /* word-break: break-word; */
+        font-size: 0.875rem;
+        background: transparent;
+    }
+    
+    svg {
+        color: var(--cfab-icon-color);
+    }
+    
+    .spin {
+        animation-name: spin;
+        animation-duration: 2000ms;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+    }
+    
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    pre[class*="language-"] {
+        padding: 0em;
+        margin: 0 !important;
+        overflow: auto;
+        border: none;
+    }
+    
+    code[class*="language-none"] {
+        padding: 1em !important;
+        margin: 1em 0;
+    }
+    
+    
+    .prismDone {
+        /* from main.css */
+        
+        
+        & code {
+            @apply bg-neutral-600 dark:bg-neutral-800;
+        }
+    }
+    
+    .codeFormat {
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1em 0;
+        @apply bg-neutral-200 dark:bg-neutral-800;
+        @apply border border-neutral-400 dark:border-white/10;
+    }
+    
 }
