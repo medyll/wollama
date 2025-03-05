@@ -59,13 +59,7 @@ export function dbQuery(collection: keyof typeof schemeModelDb) {
 	};
 }
 
-export class idbQuery {
-	/* chat */
-	static getChat(id: number) {
-		if (!id || !idbqlState?.chat) return undefined; // throw new Error('id is required');
-
-		return idbqlState.chat.where({ id: { eq: id } })[0];
-	}
+export class idbQuery { 
 	static async getChatByPassKey(chatPassKey: string) {
 		if (!chatPassKey || !idbqlState?.chat) return undefined; // throw new Error('id is required');
 
