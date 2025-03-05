@@ -45,17 +45,17 @@ export function ideo(collection: keyof typeof schemeModelDb) {
 		})
 	};
 }
-export function dynQuery(collection: keyof typeof schemeModelDb) {
+export function dbQuery(collection: keyof typeof schemeModelDb) {
 	if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
 	return {
-		getOne:      (id: any) => idbqlState[collection].getOne(id, schemeModel[collection].keyPath),
-		getAll:      () => idbqlState[collection].getAll(),
-		create:      (data) => idbqlState[collection].put(data),
-		delete:      (id: string | number) => idbqlState[collection].delete(id),
-		deleteWhere: (data) => idbqlState[collection].deleteWhere(data),
-		update:      (id: any, data) => idbqlState[collection].update(id, data),
-		where:       (where: Where) => idbqlState[collection].where(where),
-		updateWhere: (where: Where, data) => idbqlState[collection].updateWhere(where, data)
+		getOne:      idbqlState[collection].getOne,
+		getAll:      idbqlState[collection].getAll,
+		create:      idbqlState[collection].put,
+		delete:      idbqlState[collection].delete,
+		deleteWhere: idbqlState[collection].deleteWhere,
+		update:      idbqlState[collection].update,
+		where:       idbqlState[collection].where,
+		updateWhere: idbqlState[collection].updateWhere
 	};
 }
 
