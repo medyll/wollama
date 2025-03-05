@@ -1,4 +1,4 @@
-import type { WollamaResponse } from '$types/ollama';
+import type { AbortableAsyncIterator, WollamaResponse } from '$types/ollama';
 import ollama, {
 	type Config,
 	type GenerateRequest,
@@ -6,7 +6,8 @@ import ollama, {
 	type ChatRequest,
 	type ChatResponse,
 	type PushRequest,
-	type CreateRequest, type Message
+	type CreateRequest,
+	type Message
 } from 'ollama/browser';
 import type { DBMessage } from '$types/db';
 
@@ -87,6 +88,21 @@ export class ApiEvent {
 		return this.#onEnd;
 	}
 }
+
+type generate = {
+	generate(
+		generateRequest: GenerateRequest & {
+			stream: true;
+		},
+		hook?: (data: GenerateResponseHook) => void
+	): Promise<AbortableAsyncIterator<GenerateResponse>>;
+	generate(
+		generateRequest: GenerateRequest & {
+			stream: false;
+		},
+		hook?: (data: GenerateResponseHook) => void
+	): Promise<GenerateResponse>;
+};
 export class WollamaApiCore {
 	onStream!: (data: GenerateResponseHook) => void;
 	onEnd!:    (data: GenerateResponseHook) => void;
@@ -96,17 +112,19 @@ export class WollamaApiCore {
 	 * @param hook An optional callback function to handle the response data.
 	 * @returns The generated data or the response object if the request fails.
 	 */
-	async generate(generateRequest: GenerateRequest, hook?: (data: GenerateResponseHook) => void) {
+	async generate(
+		generateRequest: GenerateRequest,
+		hook?: (data: GenerateResponseHook) => void
+	): Promise<AbortableAsyncIterator<GenerateResponse> | GenerateResponse> {
 		let response;
 
 		if (generateRequest.stream) {
-			response = await ollama.generate({
+			response = (await ollama.generate({
 				...generateRequest,
 				stream: true
-			});
+			})) as unknown as Promise<AbortableAsyncIterator<GenerateResponse>>;
 
-			console.log({ response });
-			await this.stream(response, hook );
+			await this.stream(response, hook);
 			//
 		} else {
 			response = await ollama.generate({
@@ -130,7 +148,7 @@ export class WollamaApiCore {
 					stream: true
 				})
 				.then((response) => {
-					this.stream(response, event.onStream );
+					this.stream(response, event.onStream);
 				});
 		} else {
 			response = ollama
@@ -164,7 +182,6 @@ export class WollamaApiCore {
 					stream: true
 				})
 				.then((response) => {
-					console.log({ response });
 					this.stream(response, event);
 				});
 		} else {
@@ -179,17 +196,13 @@ export class WollamaApiCore {
 		return event;
 	}
 
-	async stream<T = Message[]>(
-		response: AsyncIterator<T,Message[]>,
-		event?: ApiEvent,
-	) {
-		const hook = event?.onStream ;
+	async stream<T = Message[]>(response: AsyncIterator<T, Message[]>, event?: ApiEvent) {
+		const hook = event?.onStream;
 		for await (const part of response) {
 			if (part.done) {
 				event?.onEnd(part);
 			} else {
 				if (hook) hook(part);
-			
 			}
 		}
 	}

@@ -51,7 +51,7 @@
 
 
 
-		let assistantDbMessage: DBMessage | undefined;
+		let assistantDbMessage: DBMessage ;
 		aiState.set('running')
 		await Promise.all(
 			chatParams.models.map(async (model: string) => {
@@ -132,9 +132,7 @@
 		chatParametersState.mode   = $settings.request_mode;
 		chatParametersState.models = [$settings.defaultModel];
 	});
-</script>
-
-<link href="../../styles/components.css" rel="stylesheet" />
+</script> 
 
 {#snippet input()}
 	<div class="application-chat-main">

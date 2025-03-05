@@ -5,10 +5,18 @@ import {
 	type GenerateRequest,
 	type ChatRequest,
 	type GenerateResponse,
-	type ChatResponse
+	type ChatResponse,
+	type ErrorResponse
 } from 'ollama/browser';
 
-/* type OllamaType<T extends object> = typeof AbortableAsyncIterator<T>; */
+export declare class AbortableAsyncIterator<T extends object> {
+	private readonly abortController;
+	private readonly itr;
+	private readonly doneCallback;
+	constructor(abortController: AbortController, itr: AsyncGenerator<T | ErrorResponse>, doneCallback: () => void);
+	abort(): void;
+	[Symbol.asyncIterator](): AsyncGenerator<Awaited<T>, void, unknown>;
+}
 
 export type WollamaResponse =
 	| {
