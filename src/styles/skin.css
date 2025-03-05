@@ -102,7 +102,7 @@
 	}
 
 	&[aria-expanded='true'] {
-		@apply sm:relative sm:w-[240px] md:w-[340px] lg:w-[340px] xl:w-[340px] 2xl:w-[440px];
+		@apply sm:relative sm:w-[270px] md:w-[270px]   2xl:w-[360px];
 	}
 
 	gap: 0.5rem;
