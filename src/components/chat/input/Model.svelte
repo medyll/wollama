@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { settings } from '$lib/stores/settings.svelte';
 	import { Icon } from '@medyll/idae-slotui-svelte';
-	import { chatParamsState } from '$lib/states/chat.svelte';
+	import { chatParametersState } from '$lib/states/chat.svelte';
 
 	let {
 		activeModels = $bindable([])
@@ -40,7 +40,7 @@
 				<button
 					class="anchor"
 					popovertarget="popover-{index}"
-					style="anchor-name: --anchor-{index};">{chatParamsState?.models}</button
+					style="anchor-name: --anchor-{index};">{chatParametersState?.models}</button
 				>
 				<div
 					popover

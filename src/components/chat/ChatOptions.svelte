@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Icon, MenuListItem } from '@medyll/idae-slotui-svelte';
 	import { t } from '$lib/stores/i18n';
-	import { chatParamsState } from '$lib/states/chat.svelte';
+	import { chatParametersState } from '$lib/states/chat.svelte';
 	import Model from './input/Model.svelte';
 	import Attachment from './input/Attachment.svelte';
 	import { idbQuery } from '$lib/db/dbQuery';
@@ -26,7 +26,7 @@
 
 <button class="flex gap-1" popovertarget="popover" style="anchor-name: --anchor;position:relative">
 	<Icon icon="material-symbols-light:post-add-sharp" />
-	{chatParamsState.promptSystem?.code ?? $t('prompt.systemPrompt')}
+	{chatParametersState.promptSystem?.code ?? $t('prompt.systemPrompt')}
 </button>
 <div class="popover" id="popover" popover style="position-anchor : --anchor;">
 	<div class="slotui-menulist" tall="med">
@@ -34,7 +34,7 @@
 			<button
 				class="menulist-item"
 				value={prompt.name}
-				onclick={() => (chatParamsState.promptSystem = prompt)}>{prompt.name}</button
+				onclick={() => (chatParametersState.promptSystem = prompt)}>{prompt.name}</button
 			>
 		{/each}
 		<button class="menulist-item">
@@ -43,12 +43,12 @@
 		</button>
 	</div>
 </div>
-<Attachment bind:imageFile={chatParamsState.images} disabled={false} form="prompt-form" />
+<Attachment bind:imageFile={chatParametersState.images} disabled={false} form="prompt-form" />
 <div class="flex-h flex-align-middle gap-2">
 	<Icon icon="mdi:temperature" />
-	{chatParamsState?.temperature}
+	{chatParametersState?.temperature}
 	<Icon icon="bx:brain" />
-	<Model bind:activeModels={chatParamsState.models} />
+	<Model bind:activeModels={chatParametersState.models} />
 	<!-- {chatParamsState?.models}
 	<Icon icon="charm:binary" />
 	{chatParamsState?.format} -->

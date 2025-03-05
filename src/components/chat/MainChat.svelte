@@ -6,7 +6,7 @@
 	import ChatOptions from './ChatOptions.svelte';
 	import { aiState } from '$lib/stores';
 	import DashBoard from '$components/DashBoard.svelte';
-	import { type ChatGenerate, chatParamsState } from '$lib/states/chat.svelte';
+	import { type ChatParameters, chatParametersState } from '$lib/states/chat.svelte';
 	import { Icon } from '@medyll/idae-slotui-svelte';
 	import MessagesList from './MessagesList.svelte';
 	import { chatMetadata } from '$lib/tools/promptSystem';
@@ -18,6 +18,7 @@
 	import type { ChatRequest } from 'ollama/browser';
 	import { ChatSessionManager } from '$lib/tools/chatSessionManager';
 	import { OllamaChatMessageRole } from '$types/ollama';
+	import Images from '$components/chat/input/Images.svelte';
 
 	interface MainChatProps {
 		chatPassKey?: string;
@@ -31,14 +32,14 @@
 	chatSessionManager.loadFromPathKey(chatPassKey).then((chat) => (activeChatId = chat?.id));
 
 	let placeholder: string = $derived(
-		chatParamsState.voiceListening ? 'Listening...' : 'Message to ai'
+		chatParametersState.voiceListening ? 'Listening...' : 'Message to ai'
 	);
 
 	let disableSubmit: boolean = $derived(
-		chatParamsState.prompt.trim() == '' || chatParamsState.isPrompting || $aiState == 'running'
+		chatParametersState.prompt.trim() == '' || chatParametersState.isPrompting || $aiState == 'running'
 	);
 
-	async function sendPrompt(sessionManager: ChatSessionManager, chatParams: ChatGenerate) {
+	async function sendPrompt(sessionManager: ChatSessionManager, chatParams: ChatParameters) {
 		const config        = get(settings);
 		const ollamaOptions = get(ollamaApiMainOptionsParams);
 
@@ -95,7 +96,7 @@
 		ui.setAutoScroll(chatSessionManager?.sessionId, true);
 	}
 
-	async function submitHandler(chatParams: ChatGenerate) {
+	async function submitHandler(chatParams: ChatParameters) {
 		if (!chatSessionManager.sessionId) {
 			const session = await chatSessionManager.ChatSessionDB.createSession({
 				models      : [...chatParams?.models],
@@ -119,16 +120,16 @@
 	function keyPressHandler(e: KeyboardEvent) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
-			submitHandler($state.snapshot(chatParamsState));
-			chatParamsState.images = undefined;
-			chatParamsState.prompt = '';
+			submitHandler($state.snapshot(chatParametersState));
+			chatParametersState.images = undefined;
+			chatParametersState.prompt = '';
 		}
 	}
 
 	// retrieve model, temperature, format
 	$effect(() => {
-		chatParamsState.mode   = $settings.request_mode;
-		chatParamsState.models = [$settings.defaultModel];
+		chatParametersState.mode   = $settings.request_mode;
+		chatParametersState.models = [$settings.defaultModel];
 	});
 </script>
 
@@ -137,14 +138,13 @@
 {#snippet input()}
 	<div class="application-chat-main">
 		<div class="application-chat-zone">
-			<!-- <Images />
-							<hr /> -->
+			 <Images />
 			<div class="application-chat-room">
 				<div class="absolute -top-10 left-0 flex w-full justify-center">
 					<Speech
 						onEnd={submitHandler}
-						bind:prompt={chatParamsState.prompt}
-						bind:voiceListening={chatParamsState.voiceListening}
+						bind:prompt={chatParametersState.prompt}
+						bind:voiceListening={chatParametersState.voiceListening}
 					/>
 				</div>
 				<!-- <hr /> -->
@@ -152,7 +152,7 @@
 					<Input
 						disabled={!connectionTimer.connected}
 						onkeypress={keyPressHandler}
-						bind:value={chatParamsState.prompt}
+						bind:value={chatParametersState.prompt}
 						bind:requestStop={$aiState}
 						{placeholder}
 						form="prompt-form"
@@ -194,7 +194,7 @@
 	id="prompt-form"
 	onsubmit={(event) => {
 		event.preventDefault();
-		submitHandler($state.snapshot(chatParamsState));
+		submitHandler($state.snapshot(chatParametersState));
 	}}
 ></form>
 <DashBoard showList={Boolean(activeChatId)}>

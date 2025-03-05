@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { idbQuery } from '$lib/db/dbQuery';
-	import { ui } from '$lib/stores/ui';
 
-	let activeChat = $derived($ui.activeChatId ? idbQuery.getChat($ui.activeChatId) : {});
 </script>
 
 <!-- {#if activeChat?.createdAt} -->
