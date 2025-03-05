@@ -198,6 +198,7 @@
 <svelte:head>
     <title>wOOllama !</title>
 </svelte:head>
+<div class="breakpoint-spy"></div>
 <SlotuiSheet breakpoints={{}} />
 <Backdrop isLoading={false} isOpen={false}>
     <Settings />
