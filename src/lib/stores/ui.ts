@@ -1,4 +1,3 @@
-import { chatSession } from '$lib/states/chat.svelte';
 import { writable } from 'svelte/store';
 
 type UiStoreType = {
@@ -30,7 +29,6 @@ const uiStore = () => {
 	const { set, update, subscribe } = writable(defaultUiStoreOptions);
 
 	function setActiveChatId(chatId?: string) {
-		chatSession.chatId = chatId;
 		return update((state) => ({ ...state, activeChatId: chatId }));
 	}
 	function showHideSettings() {

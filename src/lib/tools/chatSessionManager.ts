@@ -1,5 +1,5 @@
 import { idbQuery } from '$lib/db/dbQuery';
-import type { ChatGenerate } from '$lib/states/chat.svelte';
+import type { ChatParameters } from '$lib/states/chat.svelte';
 import type { DbChat, DBMessage, MessageImageType } from '$types/db';
 import { OllamaChatMessageRole, type OllamaChatMessage, type OllamaResponse } from '$types/ollama';
 import type { SettingsType } from '$types/settings';
@@ -276,7 +276,7 @@ export class ChatSessionManager {
 	}
 
 	public async buildMessages(
-		chatParams: ChatGenerate,
+		chatParams: ChatParameters,
 		config: SettingsType | undefined
 	): Promise<{
 		systemMessage:    Message;
