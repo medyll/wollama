@@ -156,30 +156,9 @@ export class idbQuery {
 		return await idbqlState.prompts.delete(promptId);
 	}
 	
-	/* Settings */
-	static async getSettings() {
-		return await idbqlState.settings.getAll();
-	}
-	
-	static async insertSettings(settingsData: Partial<SettingsType>) {
-		return await idbqlState.settings.put(settingsData as SettingsType);
-	}
-	
-	static async updateSettings(id: number, settingsData: Partial<SettingsType>) {
-		if (!id) throw new Error('id is required');
-		return await idbqlState.settings.update(id, settingsData);
-	}
-	
-	static async deleteSettings(id: number) {
-		if (!id) throw new Error('id is required');
-		return await idbqlState.settings.delete(id);
-	}
+ 
 	
 	/* User */
-	static async getUser(id: number) {
-		if (!id) throw new Error('id is required');
-		return idbqlState.user.where({ id: { eq: id } })[0];
-	}
 	
 	static async getUsers() {
 		return await idbqlState.user.getAll();
@@ -189,13 +168,6 @@ export class idbQuery {
 		return await idbqlState.user.put(userData as UserType);
 	}
 	
-	static async updateUser(id: number, userData: Partial<UserType>) {
-		if (!id) throw new Error('id is required');
-		return await idbqlState.user.update(id, userData);
-	}
 	
-	static async deleteUser(id: number) {
-		if (!id) throw new Error('id is required');
-		return await idbqlState.user.delete(id);
-	}
+	
 }
