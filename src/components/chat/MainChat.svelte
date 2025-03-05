@@ -2,7 +2,6 @@
 	import { settings } from '$lib/stores/settings.svelte';
 	import Speech from '$components/chat/input/Speech.svelte';
 	import Input from './input/Input.svelte';
-	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import ChatOptions from './ChatOptions.svelte';
 	import { aiState } from '$lib/stores';
@@ -26,7 +25,7 @@
 
 	let { chatPassKey }: MainChatProps = $props();
 
-	let activeChatId: number | undefined = $state();
+	let activeChatId: number | undefined       = $state();
 	let chatSessionManager: ChatSessionManager = ChatSessionManager.loadSession();
 
 	chatSessionManager.loadFromPathKey(chatPassKey).then((chat) => (activeChatId = chat?.id));
@@ -40,7 +39,7 @@
 	);
 
 	async function sendPrompt(sessionManager: ChatSessionManager, chatParams: ChatGenerate) {
-		const config = get(settings);
+		const config        = get(settings);
 		const ollamaOptions = get(ollamaApiMainOptionsParams);
 
 		const { systemMessage, previousMessages, userChatMessage } = await sessionManager.buildMessages(
@@ -51,23 +50,24 @@
 		await sessionManager.createDbMessage(OllamaChatMessageRole.USER, userChatMessage);
 
 		let assistantDbMessage: DBMessage | undefined;
+		aiState.set('running')
 		await Promise.all(
 			chatParams.models.map(async (model: string) => {
 				assistantDbMessage =
 					assistantDbMessage ??
 					(await sessionManager.createDbMessage(OllamaChatMessageRole.ASSISTANT, {
-						status:     'idle',
-						role:       OllamaChatMessageRole.ASSISTANT,
-						content:    '',
-						model:      model,
+						status    : 'idle',
+						role      : OllamaChatMessageRole.ASSISTANT,
+						content   : '',
+						model     : model,
 						tool_calls: []
 					}));
 
 				const request: ChatRequest = {
-					model:    model ?? config?.defaultModel,
-					options:  { ...ollamaOptions, temperature: chatParams.temperature },
-					format:   chatParams.format,
-					stream:   true,
+					model   : model ?? config?.defaultModel,
+					options : { ...ollamaOptions, temperature: chatParams.temperature },
+					format  : chatParams.format,
+					stream  : true,
 					messages: [systemMessage, ...previousMessages, userChatMessage]
 				} satisfies ChatRequest;
 
@@ -75,17 +75,19 @@
 
 				senderGenerate.onStream = (response) => {
 					const target = assistantDbMessage;
-					console.log('sender.onStream', { target, response });
 					sessionManager.onMessageStream(assistantDbMessage, response);
 					ui.setAutoScroll(target.chatId, false);
 				};
 
+
+				/*{abortController
+					: 	AbortController {signal: AbortSignal},
+					doneCallback : () => {},
+					itr : parseJSON {<closed>}}*/
 				senderGenerate.onEnd = (response) => {
 					sessionManager.onMessageDone(assistantDbMessage, response);
 					aiState.set('done');
 					chatMetadata.checkTitle(sessionManager.sessionId);
-					// Log response to monitor message completion
-					console.log('Response from assistant:', response);
 				};
 			})
 		);
@@ -96,13 +98,13 @@
 	async function submitHandler(chatParams: ChatGenerate) {
 		if (!chatSessionManager.sessionId) {
 			const session = await chatSessionManager.ChatSessionDB.createSession({
-				models:       [...chatParams?.models],
+				models      : [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 			});
 			window.history.replaceState(history.state, '', `/chat/${session.dbChat.chatPassKey}`);
 		} else {
 			await chatSessionManager.ChatSessionDB.updateSession({
-				models:       [...chatParams?.models],
+				models      : [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 				/* ollamaBody: ollamaBodyStore, */
 			});
@@ -125,7 +127,7 @@
 
 	// retrieve model, temperature, format
 	$effect(() => {
-		chatParamsState.mode = $settings.request_mode;
+		chatParamsState.mode   = $settings.request_mode;
 		chatParamsState.models = [$settings.defaultModel];
 	});
 </script>
