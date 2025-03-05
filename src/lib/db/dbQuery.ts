@@ -131,14 +131,6 @@ export class idbQuery {
 	
 	
 	
-	static async getSystemMessage(chatId: number): Promise<DBMessage | undefined> {
-		if (!chatId) throw new Error('chatId  is required');
-		
-		return await idbqlState.messages.where({
-			chatId,
-			role: OllamaChatMessageRole.SYSTEM
-		})[0];
-	}
 	
 	/* Prompt */
 	static async getPrompt(promptId: string) {
