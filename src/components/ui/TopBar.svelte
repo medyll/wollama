@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { t } from '$lib/stores/i18n';
-	import { Icon } from '@medyll/idae-slotui-svelte';
+
 	import StatusBar from '../settings/StatusBar.svelte';
 	import { ui } from '$lib/stores/ui';
 	import { engine } from '$lib/tools/engine';
 	import { idbQuery } from '$lib/db/dbQuery';
 	import { page } from '$app/stores';
 
-	// import { getCurrent } from '@tauri-apps/api/window';
 
 	new Date().getSeconds();
 
