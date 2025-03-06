@@ -72,7 +72,7 @@ export class idbQuery {
 	static async insertChat(chatData?: Partial<DbChat>): Promise<DbChat> {
 		let newChat = chatUtils.getChatDataObject();
 		
-		newChat = await idbqlState.chat.put({ ...newChat, ...chatData });
+		newChat = await idbqlState.chat.put({ ...newChat, ...chatData }); // dbQuery('chat').create({ ...newChat, ...chatData }); //
 		return { ...newChat, ...chatData };
 	}
 	

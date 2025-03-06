@@ -15,7 +15,7 @@ export class ChatSessionManager {
 		userDbMessage?: DBMessage;
 		messageAssistant: DBMessage[];
 		messageUser: Partial<DBMessage>;
-	}                                    = {
+	} = ({
 		sessionId       : undefined,
 		dbChat          : {},
 		models          : [],
@@ -23,7 +23,7 @@ export class ChatSessionManager {
 		messageUser     : {},
 		userChatMessage : {} as OllamaChatMessage,
 		userDbMessage   : {} as DBMessage
-	};
+	});
 	chatParametersState!: ChatParameters;
 	public previousMessages: DBMessage[] = [];
 	
@@ -52,7 +52,7 @@ export class ChatSessionManager {
 		if (sessionId && Boolean(await dbQuery('chat').getOne(sessionId))) {
 			ret = await idbQuery.updateChat(sessionId, chatData);
 		} else {
-			ret = await idbQuery.insertChat(chatData);
+			ret = await idbQuery.insertChat(chatData); // dbQuery('chat').create(chatData) ; //
 		}
 		return ret;
 	}
@@ -76,6 +76,7 @@ export class ChatSessionManager {
 	
 	async loadFromPathKey(pathKey?: string) {
 		const dbChat = await idbQuery.getChatByPassKey(pathKey);
+		// const dbChat = await dbQuery('messages').where({ chatPassKey: { eq: pathKey } })
 		
 		this.#SessionDB.dbChat    = dbChat ?? ({} as Partial<DbChat>);
 		this.#SessionDB.sessionId = dbChat?.id;

@@ -32,6 +32,11 @@
 	chatSessionManager.loadFromPathKey(chatPassKey).then((chat) => (activeChatId = chat?.id));
 	chatSessionManager.setParameters(chatParametersState);
 
+	$effect(() => {
+		console.log(chatSessionManager.session);
+		activeChatId = chatSessionManager.sessionId
+	});
+
 	let placeholder: string = $derived(
 		chatParametersState.voiceListening ? 'Listening...' : 'Message to ai'
 	);
