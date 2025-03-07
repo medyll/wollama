@@ -7,7 +7,7 @@ import { dbQuery, idbQuery } from '$lib/db/dbQuery';
 import type { OllApiGenerate, OllamaResponse } from '$types/ollama';
 import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 
-let categoryPresets = [
+const categoryPresets = [
 	'Coding',
 	'Design',
 	'Development',
@@ -28,7 +28,7 @@ export async function askOllama(prompt: string, model: string) {}
 
 export async function guessChatMetadata(message: string): Promise<OllamaResponse> {
 	const config = get(settings);
-	let categories = categoryPresets.join('\r\n');
+	const categories = categoryPresets.join('\r\n');
 	const ollamaOptions = get(ollamaApiMainOptionsParams);
 	//
 	const prompt = `[INST]    
@@ -98,7 +98,7 @@ Rappel : Ta réponse doit être UN SEUL MOT.
 	return await WollamaApi.generate(defaultOptions, () => {});
 }
 
-export async function guessChatDescription(message: string): Promise<OllamaResponse> {
+export async function guessChatDescription(message: string) {
 	const config = get(settings);
 	const ollamaOptions = get(ollamaApiMainOptionsParams);
 	//
@@ -162,15 +162,14 @@ export class chatUtils {
 	static getChatDataObject(chatData: DbChat = {} as DbChat): DbChat {
 		const rd = crypto.randomUUID();
 		return {
+			...chatData,
 			chatId:          rd,
 			chatPassKey:     rd,
 			context:         [],
 			created_at:      Date.now(), // Utiliser un timestamp en millisecondes
-			created_at:      Date.now(), // Utiliser un timestamp en millisecondes
 			dateLastMessage: Date.now(), // Utiliser un timestamp en millisecondes
 			models:          [get(settings).defaultModel],
 			title:           'New Chat',
-			...chatData
 		};
 	}
 

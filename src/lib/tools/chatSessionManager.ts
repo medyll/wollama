@@ -75,6 +75,9 @@ export class ChatSessionManager {
 	}
 	
 	async loadFromPathKey(pathKey?: string) {
+		if(!pathKey){
+			return undefined;
+		}
 		const dbChat = await idbQuery.getChatByPassKey(pathKey);
 		// const dbChat = await dbQuery('messages').where({ chatPassKey: { eq: pathKey } })
 		
@@ -198,7 +201,7 @@ export class ChatSessionManager {
 		};
 	}
 	
-	public async getPreviousMessages(): Promise<Partial<DBMessage>[]> {
+	public async getPreviousMessages(): Promise<DBMessage[]> {
 		const chatList = await dbQuery('messages').getBy(this.sessionId, 'chatId');
 		
 		this.previousMessages = chatList.map((e) => e);
@@ -214,6 +217,9 @@ export class ChatSessionManager {
 			model?: string;
 		}
 	) {
+		if(!this.sessionId){
+			throw new Error("Session ID is not defined");
+		}
 		const { status, chatId, model }       = message;
 		const messageData: Partial<DBMessage> = {
 			...ChatSessionManager.#convertMessage('MessageToDbMessage', message),
@@ -229,9 +235,8 @@ export class ChatSessionManager {
 	/**
 	 * Handles the completion of a message in the chat session.
 	 * @param assistantMessage - The assistant message object.
-	 * @param data - The response data from the assistant.
 	 */
-	public async onMessageDone(assistantMessage: DBMessage, data: GenerateResponseHook) {
+	public async onMessageDone(assistantMessage: DBMessage) {
 		await Promise.all([
 			//idbQuery.updateChat(assistantMessage.chatId, { context: data?.context }),
 			idbQuery.updateMessage(assistantMessage.id, { status: 'done' })
