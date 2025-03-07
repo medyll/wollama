@@ -6,6 +6,7 @@
 	import Attachment from './input/Attachment.svelte';
 	import { idbQuery } from '$lib/db/dbQuery';
 	import CollectionListMenu from '$components/form/CollectionListMenu.svelte';
+	import CollectionButton from '$components/form/CollectionButton.svelte';
 
 	// let promptList = $derived(idbQuery.getPrompts());
 	let promptList = idbQuery.getPrompts();
@@ -23,7 +24,7 @@
 </script>
 
 <!--<ChatSystemPrompt/>-->
-
+<CollectionButton collection="prompts"   mode="create" />
 <button class="flex gap-1" popovertarget="popover" style="anchor-name: --anchor;position:relative">
 	<Icon icon="material-symbols-light:post-add-sharp" />
 	{chatParametersState.promptSystem?.code ?? $t('prompt.systemPrompt')}
