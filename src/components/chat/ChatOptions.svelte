@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Icon, MenuListItem } from '@medyll/idae-slotui-svelte';
+	import { Icon } from '@medyll/idae-slotui-svelte';
 	import { t } from '$lib/stores/i18n';
 	import { chatParametersState } from '$lib/states/chat.svelte';
 	import Model from './input/Model.svelte';
 	import Attachment from './input/Attachment.svelte';
 	import { idbQuery } from '$lib/db/dbQuery';
-	import ChatSystemPrompt from '$components/chat/ChatSystemPrompt.svelte';
+	import CollectionListMenu from '$components/form/CollectionListMenu.svelte';
 
 	// let promptList = $derived(idbQuery.getPrompts());
 	let promptList = idbQuery.getPrompts();
@@ -19,7 +19,7 @@
 	 }*/
 
 	let showHide = $state(false);
-	let style = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
+	let style    = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
 </script>
 
 <!--<ChatSystemPrompt/>-->
@@ -29,19 +29,7 @@
 	{chatParametersState.promptSystem?.code ?? $t('prompt.systemPrompt')}
 </button>
 <div class="popover" id="popover" popover style="position-anchor : --anchor;">
-	<div class="slotui-menulist" tall="med">
-		{#each promptList as prompt}
-			<button
-				class="menulist-item"
-				value={prompt.name}
-				onclick={() => (chatParametersState.promptSystem = prompt)}>{prompt.name}</button
-			>
-		{/each}
-		<button class="menulist-item">
-			<Icon icon="mdi:plus" />
-			{$t('prompt.createPrompt')}
-		</button>
-	</div>
+	<CollectionListMenu collection="prompts" onclick={(prompt) => (chatParametersState.promptSystem = prompt)} target="collection-list" />
 </div>
 <Attachment bind:imageFile={chatParametersState.images} disabled={false} form="prompt-form" />
 <div class="flex-h flex-align-middle gap-2">
@@ -55,27 +43,27 @@
 </div>
 
 <style lang="postcss">
-	@reference "../../styles/references.css";
+    @reference "../../styles/references.css";
 
-	[popover] {
-		inset: unset;
-		border: 0;
-		margin: 0;
-		padding: 0;
-		position: fixed;
-	}
+    [popover] {
+        border: 0;
+        inset: unset;
+        margin: 0;
+        padding: 0;
+        position: fixed;
+    }
 
-	:popover-open {
-		position-anchor: --anchor;
-		bottom: anchor(--anchor top);
-		left: anchor(--anchor left);
-		right: anchor(--anchor right);
+    :popover-open {
+        background-color: var(--cfab-bg);
+        bottom: anchor(--anchor top);
+        color: var(--cfab-foreground);
+        left: anchor(--anchor left);
 
-		background-color: var(--cfab-bg);
-		color: var(--cfab-foreground);
+        position-anchor: --anchor;
+        right: anchor(--anchor right);
 
-		width: 200px;
-		@apply shadow-md;
-		@apply rounded-md;
-	}
+        width: 200px;
+        @apply shadow-md;
+        @apply rounded-md;
+    }
 </style>
