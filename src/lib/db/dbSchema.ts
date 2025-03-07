@@ -195,7 +195,7 @@ export const schemeModelDb = {
 			index:        'id',
 			presentation: 'name',
 			fields:       {
-				id:         'id ',
+				id:         'id (private)',
 				code:       'text-tiny',
 				name:       'text-medium',
 				value:      'text-area',
