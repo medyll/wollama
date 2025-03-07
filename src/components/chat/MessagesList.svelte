@@ -6,7 +6,7 @@
 	let { id }: { id?: number } = $props();
 
 	let chat = $derived(id ? dbQuery('chat').getOne(id) : []);
-	let messages = $derived(id ? dbQuery('messages').where({ chatId: { eq: id }, role :{ neq: 'system'} }) : []);
+	let messages = $derived(id ? dbQuery('messages').where({ chatId: { eq: id }, role :{ ne: 'system'} }) : []);
 
 	let element: HTMLElement;
 
