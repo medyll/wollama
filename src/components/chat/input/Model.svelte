@@ -16,9 +16,7 @@
 	};
 
 	function addModelKey() {
-		const newModel = ($settings?.ollamaModels ?? []).filter(
-			(model) => !activeModels.includes(model.name)
-		)?.[0];
+		const newModel = ($settings?.ollamaModels ?? []).filter((model) => !activeModels.includes(model.name))?.[0];
 		activeModels = [...activeModels, newModel?.name ?? '...'];
 	}
 
@@ -37,17 +35,10 @@
 
 		<div class="line-gap-2 border-b">
 			<div class="flex-1">
-				<button
-					class="anchor"
-					popovertarget="popover-{index}"
-					style="anchor-name: --anchor-{index};">{chatParametersState?.models}</button
+				<button class="anchor" popovertarget="popover-{index}" style="anchor-name: --anchor-{index};"
+					>{chatParametersState?.models}</button
 				>
-				<div
-					popover
-					class="popover"
-					id="popover-{index}"
-					style="position-anchor : --anchor-{index};"
-				>
+				<div popover class="popover" id="popover-{index}" style="position-anchor : --anchor-{index};">
 					<div class="flex flex-col gap-1">
 						{#each filteredOptions as model}
 							<button onclick={changeHandler(index)} value={model.name}>{model.name}</button>

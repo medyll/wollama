@@ -16,9 +16,7 @@
 	let { messageId }: MessageProps = $props();
 	let message = $derived<DBMessage>(messageId ? dbQuery('messages').getOne(messageId) : ({} as DBMessage));
 
-	let icon = $derived(
-		message?.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one'
-	);
+	let icon = $derived(message?.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one');
 	let place = $derived(message?.role === 'user' ? 'mr-24' : 'ml-24');
 
 	marked.use({
@@ -50,18 +48,13 @@
 		const codeElements = doc.querySelectorAll('code');
 
 		codeElements.forEach(async (codeElement) => {
-			const lang = codeElement.classList?.[0]
-				? codeElement.classList[0].replace('language-', '').trim()
-				: undefined;
+			const lang = codeElement.classList?.[0] ? codeElement.classList[0].replace('language-', '').trim() : undefined;
 			if (!lang) return;
 			const wrapper = document.createElement('div');
 			const toolbar = document.createElement('div');
 			const pre = document.createElement('pre');
 
-			if (
-				codeElement.parentElement?.tagName === 'PRE' &&
-				codeElement.parentElement.childNodes.length == 1
-			) {
+			if (codeElement.parentElement?.tagName === 'PRE' && codeElement.parentElement.childNodes.length == 1) {
 				codeElement.parentElement.replaceWith(codeElement);
 			}
 			wrapper.className = 'codeFormat';

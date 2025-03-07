@@ -50,8 +50,7 @@ export async function guessChatMetadata(message: string): Promise<OllamaResponse
 
 	const defaultOptions = {
 		model:   config?.defaultModel,
-		system:
-			'Tu es un assistant de génération de titres. Ceux-ci doivent appraitre dans une liste. Tu réponds toujours en un maximum de trois seul mot.Tu ne fais jamais de phrases longues. Tes  reponse font entre un et dix mots',
+		system: 'Tu es un assistant de génération de titres. Ceux-ci doivent appraitre dans une liste. Tu réponds toujours en un maximum de trois seul mot.Tu ne fais jamais de phrases longues. Tes  reponse font entre un et dix mots',
 		prompt,
 		stream:  false,
 		format:  'json',
@@ -132,7 +131,7 @@ Résumé :`;
 export class chatUtils {
 	static async checkCategorie(chatId: string) {
 		const chat = await dbQuery('chat').getOne(chatId);
-		const chatMessages = await dbQuery('messages').getBy(chatId,'chatId');
+		const chatMessages = await dbQuery('messages').getBy(chatId, 'chatId');
 		const resume = chatMessages
 			.slice(0, 15)
 			.map((message: DBMessage) => message.content)
@@ -144,7 +143,6 @@ export class chatUtils {
 		if (res?.response !== '' && fr?.category) upd.category = fr.category;
 		return idbQuery.updateChat(chatId, upd);
 	}
- 
 
 	static getMessageDataObject(message: Partial<DBMessage>): Partial<DBMessage> {
 		return {
@@ -169,7 +167,7 @@ export class chatUtils {
 			created_at:      Date.now(), // Utiliser un timestamp en millisecondes
 			dateLastMessage: Date.now(), // Utiliser un timestamp en millisecondes
 			models:          [get(settings).defaultModel],
-			title:           'New Chat',
+			title:           'New Chat'
 		};
 	}
 

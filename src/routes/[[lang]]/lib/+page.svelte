@@ -1,20 +1,16 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n.js';
 	import { page } from '$app/stores';
-	import { getDatePeriod, getTimeTitle } from '$lib/tools/chatMenuList.svelte.js';
+	import { getDatePeriod } from '$lib/tools/chatMenuList.svelte.js';
 	import { format } from 'date-fns';
 	import { ui } from '$lib/stores/ui.js';
 	import { engine } from '$lib/tools/engine';
-	import { groupMessages } from '$lib/tools/chatMenuList.svelte';
 	import { idbqlState } from '$lib/db/dbSchema';
-	import { Confirm, Looper, TitleBar } from '@medyll/idae-slotui-svelte';
+	import { Button, Confirm, Icon, Looper } from '@medyll/idae-slotui-svelte';
 	import { idbQuery } from '$lib/db/dbQuery';
-	import { Button, Icon, Menu, Popper, MenuItem } from '@medyll/idae-slotui-svelte';
 	import { chatMetadata } from '$lib/tools/promptSystem';
 
-	let loadingStae = $state<Record<string, any>>({});
 	let chatList = $derived(idbqlState.chat.getAll());
-	let chatMenuList = $derived(groupMessages(chatList));
 
 	const openCloseConfig = async () => {
 		if ($page.route.id?.includes('/configuration')) {
@@ -47,6 +43,7 @@
 	function deleteCha1tHandler(chatId: number) {
 		return idbQuery.deleteChat(chatId);
 	}
+
 	async function guess(chatId: any) {
 		return chatMetadata.checkTitle(chatId);
 	}
@@ -54,15 +51,18 @@
 	async function categorize(chatId: any) {
 		return chatMetadata.checkCategorie(chatId);
 	}
+
 	async function describe(chatId: any) {
 		return chatMetadata.checkDescription(chatId);
 	}
 </script>
 
 <div class="flex-align-middle flex justify-between gap-4 p-4">
-	<div class=" "><Icon icon="mdi:settings" class="md" /></div>
+	<div class=" ">
+		<Icon class="md" icon="mdi:settings" />
+	</div>
 	<div class="flex-1 self-center text-2xl font-medium capitalize">{$t('ui.myLib')}</div>
-	<input type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
+	<input bind:value={$ui.searchString} placeholder={$t('ui.searchChats')} type="search" />
 </div>
 <div class="flex flex-col gap-4 p-4">
 	<div class="flex-align-middle flex gap-4 border-b py-4">
@@ -70,24 +70,18 @@
 			{$t('ui.threads')}
 		</div>
 		<div class=" flex-1 gap-4">
-			<Button
-				variant="naked"
-				width="auto"
-				icon="mdi:chat-plus-outline"
-				title={$t('ui.newChat')}
-				onclick={createChat}
-			>
+			<Button icon="mdi:chat-plus-outline" onclick={createChat} title={$t('ui.newChat')} variant="naked" width="auto">
 				{$t('ui.newChat')}
 			</Button>
 		</div>
 	</div>
 	<div class="flex flex-col gap-4">
 		<Looper
+			class="flex flex-col gap-5  "
+			data={chatList}
 			groupBy={(item) => {
 				return getDatePeriod(new Date(item?.createdAt));
 			}}
-			data={chatList}
-			class="flex flex-col gap-5  "
 		>
 			{#snippet loopGroupTitle(item)}
 				<div class="text-lg">{item?.data?.title}</div>
@@ -97,9 +91,7 @@
 				<div class="flex-v flex gap-4" style="content-visibility:auto">
 					<div class="flex gap-4">
 						<div class="line-clamp-1 flex-1 py-2 font-bold break-all transition duration-300">
-							<a class="uppercase" title={item?.title} href={`/chat/${item.chatPassKey}`}
-								>- {item?.title}</a
-							>
+							<a class="uppercase" title={item?.title} href={`/chat/${item.chatPassKey}`}>- {item?.title}</a>
 						</div>
 						<div class="flex flex-1 gap-2">
 							<Confirm

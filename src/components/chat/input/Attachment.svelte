@@ -9,12 +9,7 @@
 		imageFile: MessageImageType | undefined;
 	}
 
-	let {
-		disabled = false,
-		form = '',
-		imageFile = $bindable(),
-		...rest
-	}: AttachmentInputProps = $props();
+	let { disabled = false, form = '', imageFile = $bindable(), ...rest }: AttachmentInputProps = $props();
 
 	let fileinput: HTMLInputElement;
 
@@ -52,11 +47,4 @@
 	{...rest}
 ></Button>
 
-<input
-	type="file"
-	{form}
-	accept=".jpg, .jpeg, .png"
-	hidden
-	onchange={(e) => onFileSelected(e)}
-	bind:this={fileinput}
-/>
+<input type="file" {form} accept=".jpg, .jpeg, .png" hidden onchange={(e) => onFileSelected(e)} bind:this={fileinput} />

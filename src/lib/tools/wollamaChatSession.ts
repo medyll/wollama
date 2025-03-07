@@ -2,56 +2,57 @@ import { dbQuery, idbQuery } from '$lib/db/dbQuery';
 import type { DbChat, DBMessage } from '$types/db';
 
 export class ChatSessionManager {
-	#sessionId?: number;
-	#SessionDB: {
-		dbChat: Partial<DbChat>;
+	#sessionId?:             number;
+	#SessionDB:              {
+		dbChat:           Partial<DbChat>;
 		messageAssistant: DBMessage[];
-		messageUser: Partial<DBMessage>;
-	}                          = {
-		dbChat          : {},
+		messageUser:      Partial<DBMessage>;
+	} = {
+		dbChat:           {},
 		messageAssistant: [],
-		messageUser     : {}
+		messageUser:      {}
 	};
-	#type: 'generate' | 'chat' = 'chat';
-	#useContext                = false;
-	
+	#type:                   'generate' | 'chat' = 'chat';
+	#useContext = false;
+
 	public previousMessages: DBMessage[] = [];
-	
+
 	private constructor(id?: number) {
 		if (id) {
 			this.#loadChatDBSession(id);
 		}
 	}
-	
+
 	#loadChatDBSession = (id: number) => {
-		dbQuery('chat').getOne(id)
-					   .then((dbChat: DbChat | undefined) => {
-						   this.#SessionDB.dbChat = dbChat ?? ({} as Partial<DbChat>);
-						   this.#sessionId        = dbChat?.id;
-						   console.log('chat loaded', this.#SessionDB.dbChat);
-					   })
-					   .catch((error) => {
-						   console.error('Error loading chat:', error);
-					   });
+		dbQuery('chat')
+			.getOne(id)
+			.then((dbChat: DbChat | undefined) => {
+				this.#SessionDB.dbChat = dbChat ?? ({} as Partial<DbChat>);
+				this.#sessionId = dbChat?.id;
+				console.log('chat loaded', this.#SessionDB.dbChat);
+			})
+			.catch((error) => {
+				console.error('Error loading chat:', error);
+			});
 	};
-	
+
 	static load() {
 		return new ChatSessionManager();
 	}
-	
+
 	get ChatDBSession() {
 		return {
 			create: this.#createChatDbSession.bind(this),
 			update: this.#updateChatDB.bind(this),
-			init  : this.#initChatDb.bind(this)
+			init:   this.#initChatDb.bind(this)
 		};
 	}
-	
+
 	async #createChatDbSession(chatData: Partial<DbChat> = {} as DbChat) {
 		this.#SessionDB.dbChat = await this.#initChatDb(this.#sessionId, chatData as DbChat);
-		this.#sessionId        = this.#SessionDB.dbChat.id;
+		this.#sessionId = this.#SessionDB.dbChat.id;
 	}
-	
+
 	async #updateChatDB(chatData: Partial<DbChat> = {} as DbChat) {
 		if (this.#SessionDB.dbChat.id !== undefined) {
 			this.#SessionDB.dbChat = await idbQuery.updateChat(this.#SessionDB.dbChat.id, {
@@ -61,17 +62,17 @@ export class ChatSessionManager {
 			throw new Error('Chat ID is undefined');
 		}
 	}
-	
+
 	async #initChatDb(sessionId?: number, chatData: DbChat = {} as DbChat): Promise<DbChat> {
 		if (sessionId && Boolean(await dbQuery('chat').getOne(sessionId))) {
 			await idbQuery.updateChat(sessionId, chatData);
 		}
-		
+
 		return sessionId && Boolean(await dbQuery('chat').getOne(sessionId))
-			   ? ((await dbQuery('chat').getOne(sessionId)) as DbChat)
-			   : ((await idbQuery.insertChat(chatData)) as DbChat);
+			? ((await dbQuery('chat').getOne(sessionId)) as DbChat)
+			: ((await idbQuery.insertChat(chatData)) as DbChat);
 	}
-	
+
 	get Db() {
 		return this.#SessionDB;
 	}

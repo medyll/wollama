@@ -14,29 +14,18 @@ export type ChatParameters = {
 };
 
 
-export const chatParametersState = createChatParams().chatParams;
+export const chatParametersState = $state<ChatParameters>({
+	disabledPrompt: false,
+	isPrompting   : false,
+	images        : undefined,
+	promptSystem  : {} as PromptType,
+	voiceListening: false,
+	temperature   : 0.5,
+	format        : undefined,
+	models        : [],
+	prompt        : '',
+	template      : ''
+});
 
 
-export function createChatParams() {
-	let _chatParams = $state<ChatParameters>({
-		disabledPrompt: false,
-		isPrompting   : false,
-		images        : undefined,
-		promptSystem  : {} as PromptType,
-		voiceListening: false,
-		temperature   : 0.5,
-		format        : undefined,
-		models        : [],
-		prompt        : '',
-		template      : ''
-	});
-	
-	return {
-		get chatParams() {
-			return _chatParams;
-		},
-		set chatParams(parameters: ChatParameters) {
-			_chatParams = { ...parameters, ..._chatParams };
-		}
-	};
-}
+ 

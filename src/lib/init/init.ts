@@ -7,8 +7,8 @@ export async function init() {
 	query = await idbql.agent.where({ code: { eq: 'chat_metadata' } });
 	if (!query?.[0]) {
 		idbql.agent.add({
-			code: 'chat_metadata',
-			name: 'chat_metadata',
+			code:   'chat_metadata',
+			name:   'chat_metadata',
 			prompt: promptLib.chat_metadata.prompt
 		});
 	}
@@ -21,24 +21,24 @@ export async function init() {
 	query = await idbql.prompts.where({ code: { eq: 'project_manager' } });
 	if (!query?.[0]) {
 		idbql.prompts.add({
-			code: 'project_manager',
-			name: 'project_manager',
+			code:  'project_manager',
+			name:  'project_manager',
 			value: promptLib.project_manager.prompt
 		});
 	}
 	query = await idbql.prompts.where({ code: { eq: 'prompt_maker' } });
 	if (!query?.[0]) {
 		idbql.prompts.add({
-			code: 'prompt_maker',
-			name: 'prompt_maker',
+			code:  'prompt_maker',
+			name:  'prompt_maker',
 			value: promptLib.prompt_maker.prompt
 		});
 	}
 	query = await idbql.prompts.where({ code: { eq: 'system_default' } });
 	if (!query?.[0]) {
 		idbql.prompts.add({
-			code: 'system_default',
-			name: 'system_default',
+			code:  'system_default',
+			name:  'system_default',
 			value: promptLib.system_default.prompt
 		});
 	}

@@ -18,13 +18,7 @@ import type {
 import type { DBMessage } from '$types/db';
 import type { SettingsType } from '$types/settings';
 import type { UserType } from '$types/user';
-import {
-	createIdbqDb,
-	type IdbqModel,
-	type Tpl,
-	type DbFieldTypes,
-	type TplFieldType
-} from '@medyll/idae-idbql';
+import { createIdbqDb, type IdbqModel, type Tpl, type DbFieldTypes, type TplFieldType } from '@medyll/idae-idbql';
 import { space } from 'postcss/lib/list';
 import type { DbDataModel, DbDataModelTs } from './dataModel';
 
@@ -89,21 +83,21 @@ export const schemeModelDb = {
 		}
 	},
 	chat:                   {
-		keyPath: '++id, &chatId, &chatPassKey, created_at, category, categoryId, dateLastMessage',
+		keyPath:  '++id, &chatId, &chatPassKey, created_at, category, categoryId, dateLastMessage',
 		model:    {} as DbChat,
 		ts:       {} as DbChat,
 		template: {
 			index:        'id',
-			presentation: 'name',
+			presentation: 'title',
 			fields:       {
 				id:              'id',
-				chatId:          'fk.chat.id ',
-				chatPassKey:     'text',
-				created_at:      'date',
+				chatId:          'id (private)',
+				chatPassKey:     'id (private)',
+				title:           'text',
+				created_at:      'date (readonly)',
 				category:        'text',
 				categoryId:      'id',
 				dateLastMessage: 'date',
-				name:            'text',
 				description:     'text',
 				ia_lock:         'boolean',
 				spaceId:         'fk-space.id (required)'
@@ -171,10 +165,10 @@ export const schemeModelDb = {
 		ts:       {} as DBMessage,
 		template: {
 			index:        'id',
-			presentation: 'resume',
+			presentation: 'id resume',
 			fields:       {
 				id:         'id',
-				chatId:     'id',
+				chatId:     'fk-chat.id',
 				messageId:  'id',
 				created_at: 'date',
 				content:    'text-long',
@@ -184,7 +178,13 @@ export const schemeModelDb = {
 				model:      'text',
 				ia_lock:    'boolean'
 			},
-			fks:          {}
+			fks:          {
+				chat: {
+					code:     'chat',
+					rules:    'readonly private',
+					multiple: false
+				}
+			}
 		}
 	},
 	prompts:                {
@@ -195,11 +195,11 @@ export const schemeModelDb = {
 			index:        'id',
 			presentation: 'name',
 			fields:       {
-				id:         'id',
-				name:       'text',
-				code:       'text',
-				value:      'text',
-				created_at: 'date',
+				id:         'id ',
+				code:       'text-tiny',
+				name:       'text-medium',
+				value:      'text-area',
+				created_at: 'date (private)',
 				ia_lock:    'boolean'
 			},
 			fks:          {}

@@ -19,7 +19,7 @@
 	 }*/
 
 	let showHide = $state(false);
-	let style    = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
+	let style = $derived(showHide ? 'display: contents;' : 'display: none;content-visibility:hidden');
 </script>
 
 <!--<ChatSystemPrompt/>-->
@@ -29,7 +29,7 @@
 	{chatParametersState.promptSystem?.code ?? $t('prompt.systemPrompt')}
 </button>
 <div class="popover" id="popover" popover style="position-anchor : --anchor;">
-	<CollectionListMenu collection="prompts" onclick={(prompt) => (chatParametersState.promptSystem = prompt)} target="collection-list" />
+	<CollectionListMenu collection="prompts" onclick={(prompt) => (chatParametersState.promptSystem = prompt)} />
 </div>
 <Attachment bind:imageFile={chatParametersState.images} disabled={false} form="prompt-form" />
 <div class="flex-h flex-align-middle gap-2">
@@ -43,27 +43,27 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/references.css";
+	@reference "../../styles/references.css";
 
-    [popover] {
-        border: 0;
-        inset: unset;
-        margin: 0;
-        padding: 0;
-        position: fixed;
-    }
+	[popover] {
+		border: 0;
+		inset: unset;
+		margin: 0;
+		padding: 0;
+		position: fixed;
+	}
 
-    :popover-open {
-        background-color: var(--cfab-bg);
-        bottom: anchor(--anchor top);
-        color: var(--cfab-foreground);
-        left: anchor(--anchor left);
+	:popover-open {
+		background-color: var(--cfab-bg);
+		bottom: anchor(--anchor top);
+		color: var(--cfab-foreground);
+		left: anchor(--anchor left);
 
-        position-anchor: --anchor;
-        right: anchor(--anchor right);
+		position-anchor: --anchor;
+		right: anchor(--anchor right);
 
-        width: 200px;
-        @apply shadow-md;
-        @apply rounded-md;
-    }
+		width: 200px;
+		@apply shadow-md;
+		@apply rounded-md;
+	}
 </style>

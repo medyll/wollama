@@ -10,10 +10,10 @@ export class Guesser {
 	}
 
 	async guessValue(params: {
-		collection: TplCollectionName;
+		collection:    TplCollectionName;
 		collectionId?: any;
-		fieldName: string;
-		data: Record<string, any>;
+		fieldName:     string;
+		data:          Record<string, any>;
 	}) {
 		const guessObj = this.buildGuessObject(params);
 		// Appel à l'API IA avec guessObj
@@ -28,10 +28,10 @@ export class Guesser {
 	}
 
 	private buildGuessObject(params: {
-		collection: TplCollectionName;
+		collection:    TplCollectionName;
 		collectionId?: any;
-		fieldName: string;
-		data: Record<string, any>;
+		fieldName:     string;
+		data:          Record<string, any>;
 	}) {
 		const { collection, collectionId, fieldName, data: formData } = params;
 		return {
@@ -43,12 +43,7 @@ export class Guesser {
 		};
 	}
 
-	private buildGuessFor(
-		collection: TplCollectionName,
-		collectionId: any,
-		fieldName: string,
-		formData: Record<string, any>
-	) {
+	private buildGuessFor(collection: TplCollectionName, collectionId: any, fieldName: string, formData: Record<string, any>) {
 		return [
 			{
 				collectionId,
@@ -67,28 +62,24 @@ export class Guesser {
 	private buildGuessWithRFks(collection: TplCollectionName, formData: Record<string, any>) {
 		const guessWithRFks: Array<{ collection: string; fieldName: string; value: any }> = [];
 
-		Object.entries(this.dbFields.parseAllCollections()).forEach(
-			([otherCollection, otherFields]) => {
-				const otherCollectionTemplate = this.dbFields.getCollection(
-					otherCollection as TplCollectionName
-				)?.template;
-				const otherFks = otherCollectionTemplate?.fks;
-				if (otherFks && otherFks[collection]) {
-					const rfkField = otherFks[collection].code;
-					if (formData[rfkField]) {
-						Object.keys(otherFields).forEach((fieldName) => {
-							if (formData[fieldName] !== undefined) {
-								guessWithRFks.push({
-									collection: otherCollection,
-									fieldName,
-									value:      formData[fieldName]
-								});
-							}
-						});
-					}
+		Object.entries(this.dbFields.parseAllCollections()).forEach(([otherCollection, otherFields]) => {
+			const otherCollectionTemplate = this.dbFields.getCollection(otherCollection as TplCollectionName)?.template;
+			const otherFks = otherCollectionTemplate?.fks;
+			if (otherFks && otherFks[collection]) {
+				const rfkField = otherFks[collection].code;
+				if (formData[rfkField]) {
+					Object.keys(otherFields).forEach((fieldName) => {
+						if (formData[fieldName] !== undefined) {
+							guessWithRFks.push({
+								collection: otherCollection,
+								fieldName,
+								value:      formData[fieldName]
+							});
+						}
+					});
 				}
 			}
-		);
+		});
 
 		return guessWithRFks;
 	}
@@ -105,9 +96,7 @@ export class Guesser {
 			const fkValue = formData?.[fkField];
 
 			if (fkValue) {
-				const fkCollectionTemplate = this.dbFields.getCollection(
-					fkCollection as TplCollectionName
-				)?.template;
+				const fkCollectionTemplate = this.dbFields.getCollection(fkCollection as TplCollectionName)?.template;
 				if (fkCollectionTemplate) {
 					Object.keys(fkCollectionTemplate.fields).forEach((fieldName) => {
 						if (formData[fieldName] !== undefined) {

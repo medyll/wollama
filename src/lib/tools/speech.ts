@@ -28,9 +28,7 @@ const defaultOptions = {
 	stopOnWord: 'Stop.'
 };
 
-const speechRecognition = browser
-	? new (window.SpeechRecognition || window.webkitSpeechRecognition)()
-	: () => {};
+const speechRecognition = browser ? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : () => {};
 
 export const speechRecognitionTracker = {
 	isListening: false
@@ -42,10 +40,7 @@ export const speechRecognitionTracker = {
  * @param options - The options for speech recognition.
  * @returns An object with methods to start and stop speech recognition.
  */
-export const speechRecognitionHandler = (
-	speechHandler: (args: SpeechReturn) => void,
-	options: DefaultOptions = defaultOptions
-) => {
+export const speechRecognitionHandler = (speechHandler: (args: SpeechReturn) => void, options: DefaultOptions = defaultOptions) => {
 	let waiterTimer: any;
 	const speechOptions = { ...defaultOptions, ...options };
 

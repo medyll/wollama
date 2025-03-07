@@ -54,8 +54,7 @@ const uiStore = () => {
 		set,
 		setActiveChatId,
 		setAutoScroll,
-		setParameterValue: <T = UiStoreType>(key: keyof T, value: typeof key) =>
-			update((state) => ({ ...state, [key]: value })),
+		setParameterValue: <T = UiStoreType>(key: keyof T, value: typeof key) => update((state) => ({ ...state, [key]: value })),
 		showHideMenu,
 		showHidePromptMenu,
 		showHideSettings,

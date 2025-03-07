@@ -15,12 +15,13 @@ function ollamaOptionStorage() {
 	function init(values: Partial<Options> = {}) {
 		if (browser) {
 			const storeOptions = JSON.parse(localStorage.getItem('ollamaOptions') ?? '{}');
-			const options: Partial<Options> = Object.keys(
-				OllamaOptionsDefaults as unknown as Options
-			).reduce((acc: Partial<Options>, key) => {
-				acc[key] = OllamaOptionsDefaults[key].default ?? null;
-				return acc;
-			}, {});
+			const options: Partial<Options> = Object.keys(OllamaOptionsDefaults as unknown as Options).reduce(
+				(acc: Partial<Options>, key) => {
+					acc[key] = OllamaOptionsDefaults[key].default ?? null;
+					return acc;
+				},
+				{}
+			);
 
 			store.set({ ...storeOptions, ...options, ...values });
 		}
@@ -38,13 +39,10 @@ function ollamaOptionStorage() {
 
 	function resetAll() {
 		localStorage.ollamaOptions = JSON.stringify({});
-		const options: Options = Object.keys(OllamaOptionsDefaults).reduce(
-			(acc: Partial<Options>, key) => {
-				acc[key] = OllamaOptionsDefaults[key].default ?? null;
-				return acc;
-			},
-			{}
-		);
+		const options: Options = Object.keys(OllamaOptionsDefaults).reduce((acc: Partial<Options>, key) => {
+			acc[key] = OllamaOptionsDefaults[key].default ?? null;
+			return acc;
+		}, {});
 		store.set(options);
 	}
 

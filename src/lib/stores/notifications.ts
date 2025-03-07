@@ -19,8 +19,7 @@ function notifierStateStore() {
 		},
 		notify(status: NotifyStatus = 'info', message: string, nId?: any) {
 			const id = nId ?? crypto.randomUUID();
-			if (get(store)[id]?.status !== status)
-				store.set({ ...get(store), [id]: { id, message, status } });
+			if (get(store)[id]?.status !== status) store.set({ ...get(store), [id]: { id, message, status } });
 		},
 		set:       store.set,
 		subscribe: store.subscribe,

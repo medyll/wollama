@@ -47,13 +47,11 @@ export function connectionStore() {
 
 	return {
 		get:                           (key: keyof ConnectionStoreType) => currentStore[key],
-		incrementConnectionRetryCount: () =>
-			update((state) => ({ ...state, connectionRetryCount: state.connectionRetryCount + 1 })),
+		incrementConnectionRetryCount: () => update((state) => ({ ...state, connectionRetryCount: state.connectionRetryCount + 1 })),
 		set,
 		setConnectionStatus:           (status: ConnectionStoreType['connectionStatus']) =>
 			update((state) => ({ ...state, connectionStatus: status })),
-		setKey:                        (key: keyof ConnectionStoreType, value: any) =>
-			update((state) => ({ ...state, [key]: value })),
+		setKey:                        (key: keyof ConnectionStoreType, value: any) => update((state) => ({ ...state, [key]: value })),
 		subscribe,
 		update
 	};

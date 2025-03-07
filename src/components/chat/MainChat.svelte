@@ -26,7 +26,7 @@
 
 	let { chatPassKey }: MainChatProps = $props();
 
-	let activeChatId: number | undefined       = $state();
+	let activeChatId: number | undefined = $state();
 	let chatSessionManager: ChatSessionManager = ChatSessionManager.loadSession();
 
 	chatSessionManager.loadFromPathKey(chatPassKey).then((chat) => (activeChatId = chat?.id));
@@ -34,47 +34,40 @@
 
 	$effect(() => {
 		console.log(chatSessionManager.session);
-		activeChatId = chatSessionManager.sessionId
+		activeChatId = chatSessionManager.sessionId;
 	});
 
-	let placeholder: string = $derived(
-		chatParametersState.voiceListening ? 'Listening...' : 'Message to ai'
-	);
+	let placeholder: string = $derived(chatParametersState.voiceListening ? 'Listening...' : 'Message to ai');
 
 	let disableSubmit: boolean = $derived(
 		chatParametersState.prompt.trim() == '' || chatParametersState.isPrompting || $aiState == 'running'
 	);
 
 	async function sendPrompt(sessionManager: ChatSessionManager, chatParams: ChatParameters) {
-		const config        = get(settings);
+		const config = get(settings);
 		const ollamaOptions = get(ollamaApiMainOptionsParams);
 
-		const { systemMessage, previousMessages, userChatMessage } = await sessionManager.buildMessages(
-			chatParams,
-			config
-		);
+		const { systemMessage, previousMessages, userChatMessage } = await sessionManager.buildMessages(chatParams, config);
 
-
-
-		let assistantDbMessage: DBMessage ;
-		aiState.set('running')
+		let assistantDbMessage: DBMessage;
+		aiState.set('running');
 		await Promise.all(
 			chatParams.models.map(async (model: string) => {
 				assistantDbMessage =
 					assistantDbMessage ??
 					(await sessionManager.createDbMessage(OllamaChatMessageRole.ASSISTANT, {
-						status    : 'idle',
-						role      : OllamaChatMessageRole.ASSISTANT,
-						content   : '',
-						model     : model,
+						status:     'idle',
+						role:       OllamaChatMessageRole.ASSISTANT,
+						content:    '',
+						model:      model,
 						tool_calls: []
 					}));
 
 				const request: ChatRequest = {
-					model   : model ?? config?.defaultModel,
-					options : { ...ollamaOptions, temperature: chatParams.temperature },
-					format  : chatParams.format,
-					stream  : true,
+					model:    model ?? config?.defaultModel,
+					options:  { ...ollamaOptions, temperature: chatParams.temperature },
+					format:   chatParams.format,
+					stream:   true,
 					messages: [systemMessage, ...previousMessages, userChatMessage]
 				} satisfies ChatRequest;
 
@@ -85,7 +78,6 @@
 					sessionManager.onMessageStream(assistantDbMessage, response);
 					ui.setAutoScroll(target.chatId, false);
 				};
-
 
 				/*{abortController
 					: 	AbortController {signal: AbortSignal},
@@ -105,13 +97,13 @@
 	async function submitHandler(chatParams: ChatParameters) {
 		if (!chatSessionManager.sessionId) {
 			const session = await chatSessionManager.ChatSessionDB.createSession({
-				models      : [...chatParams?.models],
+				models:       [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 			});
 			window.history.replaceState(history.state, '', `/chat/${session.dbChat.chatPassKey}`);
 		} else {
 			await chatSessionManager.ChatSessionDB.updateSession({
-				models      : [...chatParams?.models],
+				models:       [...chatParams?.models],
 				systemPrompt: chatParams.promptSystem
 				/* ollamaBody: ollamaBodyStore, */
 			});
@@ -134,15 +126,15 @@
 
 	// retrieve model, temperature, format
 	$effect(() => {
-		chatParametersState.mode   = $settings.request_mode;
+		chatParametersState.mode = $settings.request_mode;
 		chatParametersState.models = [$settings.defaultModel];
 	});
-</script> 
+</script>
 
 {#snippet input()}
 	<div class="application-chat-main">
 		<div class="application-chat-zone">
-			 <Images />
+			<Images />
 			<div class="application-chat-room">
 				<div class="absolute -top-10 left-0 flex w-full justify-center">
 					<Speech
@@ -161,15 +153,9 @@
 						{placeholder}
 						form="prompt-form"
 					/>
-					<div
-						class="absolute top-[50%] right-3 -mt-5 flex h-10 w-10 flex-col place-content-center rounded-full"
-					>
+					<div class="absolute top-[50%] right-3 -mt-5 flex h-10 w-10 flex-col place-content-center rounded-full">
 						{#if $aiState == 'done'}
-							<button
-								class="input aspect-square items-center rounded-full drop-shadow-lg"
-								type="submit"
-								form="prompt-form"
-							>
+							<button class="input aspect-square items-center rounded-full drop-shadow-lg" type="submit" form="prompt-form">
 								<Icon icon="mdi:send" />
 							</button>
 						{:else}

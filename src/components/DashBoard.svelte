@@ -1,11 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
-	let {
-		showList = $bindable(false),
-		children,
-		home
-	}: { showList: boolean; children: Snippet; home?: Snippet } = $props();
+	let { showList = $bindable(false), children, home }: { showList: boolean; children: Snippet; home?: Snippet } = $props();
 </script>
 
 <div class="application-dashboard">

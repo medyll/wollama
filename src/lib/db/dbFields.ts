@@ -2,13 +2,7 @@
     path: D:\boulot\python\wollama\src\lib\db\dbFields.ts
  */
 
-import type {
-	CollectionModel,
-	IdbqModel,
-	TplCollectionName,
-	Tpl,
-	TplFields
-} from '@medyll/idae-idbql';
+import type { CollectionModel, IdbqModel, TplCollectionName, Tpl, TplFields } from '@medyll/idae-idbql';
 import { schemeModel } from './dbSchema';
 
 export enum enumPrimitive {
@@ -32,9 +26,7 @@ export enum TplProperties {
 	'required' = 'required'
 }
 
-type CombineElements<T extends string, U extends string = T> = T extends any
-	? T | `${T} ${CombineElements<Exclude<U, T>>}`
-	: never;
+type CombineElements<T extends string, U extends string = T> = T extends any ? T | `${T} ${CombineElements<Exclude<U, T>>}` : never;
 type CombinedArgs = CombineElements<TplProperties>;
 
 type IdbObjectify<T extends string = 'number'> = `array-of-${T}` | `object-${T}`;
@@ -90,7 +82,7 @@ class IDbError extends Error {
 	}
 }
 // renammed from IDbFields to IDbCollections
-export class IDbCollections<T = Record<string, any>> {
+export class IDbCollections {
 	model: IdbqModel = schemeModel;
 
 	constructor(model?: IdbqModel) {
@@ -106,9 +98,7 @@ export class IDbCollections<T = Record<string, any>> {
 		return out;
 	}
 
-	parseRawCollection(
-		collection: TplCollectionName
-	): Record<string, IDbForge | undefined> | undefined {
+	parseRawCollection(collection: TplCollectionName): Record<string, IDbForge | undefined> | undefined {
 		const fields = this.getCollectionTemplateFields(collection);
 		if (!fields) return;
 		let out: Record<string, IDbForge | undefined> = {};
@@ -123,23 +113,14 @@ export class IDbCollections<T = Record<string, any>> {
 		return out;
 	}
 
-	parseCollectionFieldName(
-		collection: TplCollectionName,
-		fieldName: keyof TplFields
-	): IDbForge | undefined {
+	parseCollectionFieldName(collection: TplCollectionName, fieldName: keyof TplFields): IDbForge | undefined {
 		const field = this.#getTemplateFieldRule(collection, fieldName);
 		if (!field) {
-			IDbError.throwError(
-				`Field ${fieldName} not found in collection ${collection}`,
-				'FIELD_NOT_FOUND'
-			);
+			IDbError.throwError(`Field ${fieldName} not found in collection ${collection}`, 'FIELD_NOT_FOUND');
 			return undefined;
 		}
 		let fieldType =
-			this.testIs('primitive', field) ??
-			this.testIs('array', field) ??
-			this.testIs('object', field) ??
-			this.testIs('fk', field);
+			this.testIs('primitive', field) ?? this.testIs('array', field) ?? this.testIs('object', field) ?? this.testIs('fk', field);
 
 		return this.forge({ collection, fieldName, ...fieldType });
 	}
@@ -155,14 +136,7 @@ export class IDbCollections<T = Record<string, any>> {
 		return fieldType;
 	}
 
-	private forge({
-		collection,
-		fieldName,
-		fieldType,
-		fieldRule,
-		fieldArgs,
-		is
-	}: IDbForge): IDbForge {
+	private forge({ collection, fieldName, fieldType, fieldRule, fieldArgs, is }: IDbForge): IDbForge {
 		return {
 			collection,
 			fieldName,
@@ -196,9 +170,7 @@ export class IDbCollections<T = Record<string, any>> {
 		return this.getCollectionTemplate(collection)?.presentation as string;
 	}
 	#getTemplateFieldRule(collection: TplCollectionName, fieldName: keyof TplFields) {
-		return this.getCollectionTemplateFields(collection)?.[String(fieldName)] as
-			| IDbFieldRules
-			| undefined;
+		return this.getCollectionTemplateFields(collection)?.[String(fieldName)] as IDbFieldRules | undefined;
 	}
 
 	getFkFieldType(string: `${string}.${string}`) {
@@ -213,10 +185,7 @@ export class IDbCollections<T = Record<string, any>> {
 		return this.getCollection(collection).template?.fields;
 	}
 
-	private testIs(
-		what: 'array' | 'object' | 'fk' | 'primitive',
-		fieldRule: IDbFieldRules
-	): Partial<IDbForge> | undefined {
+	private testIs(what: 'array' | 'object' | 'fk' | 'primitive', fieldRule: IDbFieldRules): Partial<IDbForge> | undefined {
 		const typeMappings = {
 			fk:        'fk-',
 			array:     'array-of-',
@@ -239,10 +208,7 @@ export class IDbCollections<T = Record<string, any>> {
 		return data[presentation];
 	}
 
-	extract(
-		type: 'array' | 'object' | 'fk' | 'primitive',
-		fieldRule: IDbFieldRules
-	): Partial<IDbForge> {
+	extract(type: 'array' | 'object' | 'fk' | 'primitive', fieldRule: IDbFieldRules): Partial<IDbForge> {
 		// fieldType
 		function extractAfter(pattern: string, source: string) {
 			// remove all between () on source
@@ -251,9 +217,7 @@ export class IDbCollections<T = Record<string, any>> {
 			return reg.split(pattern)[1] as IDbFieldRules;
 		}
 
-		function extractArgs(
-			source: string
-		): { piece: any; args: [TplProperties] | IDbForgeArgs } | undefined {
+		function extractArgs(source: string): { piece: any; args: [TplProperties] | IDbForgeArgs } | undefined {
 			const [piece, remaining] = source.split('(');
 			if (!remaining) return { piece: piece.trim(), args: undefined };
 			const [central] = remaining?.split(')');
@@ -321,11 +285,7 @@ export class IDbCollections<T = Record<string, any>> {
 	}
 
 	// iterate base
-	iterateArrayField(
-		collection: TplCollectionName,
-		fieldName: keyof TplFields,
-		data: any[]
-	): IDbForge[] {
+	iterateArrayField(collection: TplCollectionName, fieldName: keyof TplFields, data: any[]): IDbForge[] {
 		const fieldInfo = this.parseCollectionFieldName(collection, fieldName);
 		if (fieldInfo?.is !== 'array' || !Array.isArray(data)) {
 			return [];
@@ -334,19 +294,13 @@ export class IDbCollections<T = Record<string, any>> {
 		return data.map(() => this.parseCollectionFieldName(collection, fieldName));
 	}
 
-	iterateObjectField(
-		collection: TplCollectionName,
-		fieldName: keyof TplFields,
-		data: Record<string, any>
-	): IDbForge[] {
+	iterateObjectField(collection: TplCollectionName, fieldName: keyof TplFields, data: Record<string, any>): IDbForge[] {
 		const fieldInfo = this.parseCollectionFieldName(collection, fieldName);
 		if (fieldInfo?.is !== 'object' || typeof data !== 'object') {
 			return [];
 		}
 
-		return Object.keys(data).map((key) =>
-			this.parseCollectionFieldName(collection, key as keyof TplFields)
-		);
+		return Object.keys(data).map((key) => this.parseCollectionFieldName(collection, key as keyof TplFields));
 	}
 }
 
@@ -386,11 +340,7 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 			this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
 			const indexName = this.dbCollections.getIndexName(this.collection);
 			this.#checkError(!indexName, 'Index not found for collection', 'INDEX_NOT_FOUND');
-			this.#checkError(
-				!(indexName in data),
-				`Index field ${indexName} not found in data`,
-				'FIELD_NOT_FOUND'
-			);
+			this.#checkError(!(indexName in data), `Index field ${indexName} not found in data`, 'FIELD_NOT_FOUND');
 			return data[indexName];
 		} catch (error) {
 			IDbError.handleError(error);
@@ -401,20 +351,9 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 	format(fieldName: keyof T, data: T): string {
 		try {
 			this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
-			this.#checkError(
-				!(fieldName in data),
-				`Field ${String(fieldName)} not found in data`,
-				'FIELD_NOT_FOUND'
-			);
-			const fieldInfo = this.dbCollections.parseCollectionFieldName(
-				this.collection,
-				fieldName as string
-			);
-			this.#checkError(
-				!fieldInfo,
-				`Field ${String(fieldName)} not found in collection`,
-				'FIELD_NOT_FOUND'
-			);
+			this.#checkError(!(fieldName in data), `Field ${String(fieldName)} not found in data`, 'FIELD_NOT_FOUND');
+			const fieldInfo = this.dbCollections.parseCollectionFieldName(this.collection, fieldName as string);
+			this.#checkError(!fieldInfo, `Field ${String(fieldName)} not found in collection`, 'FIELD_NOT_FOUND');
 
 			switch (fieldInfo?.fieldType) {
 				case 'number':
@@ -438,23 +377,15 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 	getInputDataSet(
 		fieldName: string,
 		data: T
-	): Record<
-		`data-${'collection' | 'collectionId' | 'fieldName' | 'fieldType' | 'fieldArgs'}`,
-		string
-	> {
-		const fieldInfo = this.dbCollections.parseCollectionFieldName(
-			this.collection,
-			fieldName as string
-		);
+	): Record<`data-${'collection' | 'collectionId' | 'fieldName' | 'fieldType' | 'fieldArgs'}`, string> {
+		const fieldInfo = this.dbCollections.parseCollectionFieldName(this.collection, fieldName as string);
 		const fieldType = fieldInfo?.fieldType ?? '';
 		const fieldArgs = fieldInfo?.fieldArgs?.join(' ') ?? '';
 		const indexName = this.dbCollections.getIndexName(this.collection);
 
 		return {
 			'data-collection':   this.collection,
-			'data-collectionId': indexName && data?.[indexName] !== undefined
-				? String(data?.[indexName])
-				: '',
+			'data-collectionId': indexName && data?.[indexName] !== undefined ? String(data?.[indexName]) : '',
 			'data-fieldName':    String(fieldName),
 			'data-fieldType':    fieldType,
 			'data-fieldArgs':    fieldArgs
@@ -476,11 +407,11 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 
 	#formatTextField(value: string, type: string): string {
 		const lengths = {
-			'text-tiny': 10,
-			'text-short': 20,
+			'text-tiny':   10,
+			'text-short':  20,
 			'text-medium': 30,
-			'text-long': 40,
-			'text-giant': 50
+			'text-long':   40,
+			'text-giant':  50
 		};
 		const maxLength = lengths[type as keyof typeof lengths] || value.length;
 		return value.substring(0, maxLength);
@@ -510,10 +441,7 @@ export class IDbCollectionFieldValues<T extends Record<string, any>> {
 	}
 
 	format(fieldName: keyof T): string | string[] {
-		const fieldInfo = this.#collectionValues.dbCollections.parseCollectionFieldName(
-			this.#collection,
-			fieldName
-		);
+		const fieldInfo = this.#collectionValues.dbCollections.parseCollectionFieldName(this.#collection, fieldName);
 		if (fieldInfo?.is === 'array') {
 			return this.iterateArray(String(fieldName), this.#data);
 		}
@@ -529,10 +457,7 @@ export class IDbCollectionFieldValues<T extends Record<string, any>> {
 	}
 	// renamed from parseCollectionFieldName
 	getForge(fieldName: keyof T): IDbForge | undefined {
-		return this.#collectionValues.dbCollections.parseCollectionFieldName(
-			this.#collection,
-			String(fieldName)
-		);
+		return this.#collectionValues.dbCollections.parseCollectionFieldName(this.#collection, String(fieldName));
 	}
 
 	iterateArray(fieldName: string, data: any[]): IDbForge[] {
@@ -571,10 +496,7 @@ export class IDbCollectionFieldForge<T extends Record<string, any>> {
 	}
 	// renamed from parseCollectionFieldName
 	get forge(): IDbForge | undefined {
-		return this.#collectionValues.dbCollections.parseCollectionFieldName(
-			this.#collection,
-			String(this.#fieldName)
-		);
+		return this.#collectionValues.dbCollections.parseCollectionFieldName(this.#collection, String(this.#fieldName));
 	}
 
 	get fieldArgs(): IDbForgeArgs | undefined {
@@ -590,11 +512,7 @@ export class IDbCollectionFieldForge<T extends Record<string, any>> {
 		let variant = this?.fieldType?.split('text-')?.[1] ?? this.fieldType;
 		if (variant === 'area') return variant;
 		if (this.forge?.fieldType?.startsWith('text-')) return 'text';
-		if (
-			['url', 'email', 'number', 'date', 'time', 'datetime', 'phone', 'password'].includes(
-				this.forge?.fieldType ?? ''
-			)
-		) {
+		if (['url', 'email', 'number', 'date', 'time', 'datetime', 'phone', 'password'].includes(this.forge?.fieldType ?? '')) {
 			return this.forge?.fieldType?.trim?.() ?? 'text';
 		}
 		return 'text';

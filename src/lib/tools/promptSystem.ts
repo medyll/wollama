@@ -148,7 +148,7 @@ Fourni  un résumé.[/INST]`;
 }
 
 async function doResume(chatId: any, steps: number = 10) {
-	const chatMessages =  dbQuery('messages').getBy(chatId,'chatId')
+	const chatMessages = dbQuery('messages').getBy(chatId, 'chatId');
 	return chatMessages
 		.slice(0, steps)
 		.map((message: DBMessage) => {

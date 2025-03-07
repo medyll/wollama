@@ -25,11 +25,7 @@ export class engine {
 		goto(`${prefix}${url}`);
 	}
 
-	public static resolveDotPath<T = unknown>(
-		object: Record<string, any>,
-		path: string,
-		defaultValue?: any
-	): T {
+	public static resolveDotPath<T = unknown>(object: Record<string, any>, path: string, defaultValue?: any): T {
 		return (path.split('.').reduce((r, s) => (r ? r[s] : defaultValue), object) ?? undefined) as T;
 	}
 

@@ -2,13 +2,9 @@
 	"useTabs": true,
 	"singleQuote": true,
 	"trailingComma": "none",
-	"tabWidth" : 4,
+	"tabWidth": 4,
 	"printWidth": 140,
-	"plugins": [
-		"prettier-plugin-svelte",
-		"prettier-plugin-tailwindcss",
-		"@huggingface/prettier-plugin-vertical-align"
-	],
+	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss", "@huggingface/prettier-plugin-vertical-align"],
 	"filepath": "./src/**/*.{svelte,css}",
 	"overrides": [
 		{
