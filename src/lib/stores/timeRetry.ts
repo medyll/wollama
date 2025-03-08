@@ -42,7 +42,8 @@ export function timeRetryStore() {
 
 	return {
 		get:                           (key: keyof UiStoreType) => currentStore[key],
-		incrementConnectionRetryCount: () => update((state) => ({ ...state, connectionRetryCount: state.connectionRetryCount + 1 })),
+		incrementConnectionRetryCount: () =>
+			update((state) => ({ ...state, connectionRetryCount: state.connectionRetryCount + 1 })),
 		set,
 		setConnectionStatus:           (status: UiStoreType['connectionStatus']) =>
 			update((state) => ({ ...state, connectionStatus: status })),

@@ -37,11 +37,7 @@
 	/** gradients */
 	--cfab-gradient-from: var(--cfab-bg);
 	--cfab-gradient-to: var(--cfab-bg-darken-20);
-	--cfab-gradient: linear-gradient(
-		to bottom,
-		var(--cfab-gradient-from),
-		var(--cfab-gradient-to) 90%
-	);
+	--cfab-gradient: linear-gradient(to bottom, var(--cfab-gradient-from), var(--cfab-gradient-to) 90%);
 
 	/** --cfab-bg */
 	/** darkens --cfab-bg */
@@ -141,37 +137,13 @@
 	--sld-color-secondary-alpha-mid: color-mix(in srgb, var(--sld-color-secondary), transparent 50%);
 	--sld-color-tertiary-alpha-mid: color-mix(in srgb, var(--sld-color-tertiary), transparent 50%);
 
-	--sld-color-background-alpha-low: color-mix(
-		in srgb,
-		var(--sld-color-background),
-		transparent 10%
-	);
-	--sld-color-background-alpha-mid: color-mix(
-		in srgb,
-		var(--sld-color-background),
-		transparent 50%
-	);
-	--sld-color-background-alpha-high: color-mix(
-		in srgb,
-		var(--sld-color-background),
-		transparent 90%
-	);
+	--sld-color-background-alpha-low: color-mix(in srgb, var(--sld-color-background), transparent 10%);
+	--sld-color-background-alpha-mid: color-mix(in srgb, var(--sld-color-background), transparent 50%);
+	--sld-color-background-alpha-high: color-mix(in srgb, var(--sld-color-background), transparent 90%);
 
-	--sld-color-foreground-alpha-low: color-mix(
-		in srgb,
-		var(--sld-color-foreground),
-		transparent 10%
-	);
-	--sld-color-foreground-alpha-mid: color-mix(
-		in srgb,
-		var(--sld-color-foreground),
-		transparent 50%
-	);
-	--sld-color-foreground-alpha-high: color-mix(
-		in srgb,
-		var(--sld-color-foreground),
-		transparent 90%
-	);
+	--sld-color-foreground-alpha-low: color-mix(in srgb, var(--sld-color-foreground), transparent 10%);
+	--sld-color-foreground-alpha-mid: color-mix(in srgb, var(--sld-color-foreground), transparent 50%);
+	--sld-color-foreground-alpha-high: color-mix(in srgb, var(--sld-color-foreground), transparent 90%);
 
 	--sld-color-border: color-mix(in srgb, var(--sld-color-foreground), transparent 70%);
 

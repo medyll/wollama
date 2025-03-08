@@ -36,11 +36,7 @@
 			})
 			.catch((e) => {
 				console.log(e);
-				notifierState.notify(
-					'error',
-					e?.error ?? $t('settings.delete_model_error'),
-					'delete-model'
-				);
+				notifierState.notify('error', e?.error ?? $t('settings.delete_model_error'), 'delete-model');
 			});
 	}
 </script>
@@ -63,13 +59,7 @@
 		<form name="pull-form" on:submit|preventDefault={(e) => pullModel} />
 		<progress class="w-full" hidden={progress === 0} max={progressMax} value={progress}></progress>
 		<div class="flex gap-2">
-			<input
-				bind:value={addModel}
-				class="w-full"
-				form="pull-form"
-				placeholder={$t('settings.enter_model')}
-				type="text"
-			/>
+			<input bind:value={addModel} class="w-full" form="pull-form" placeholder={$t('settings.enter_model')} type="text" />
 			<button disabled={addModel.trim() == ''} form="pull-form" on:click={pullModel}>
 				<Icon icon="mdi:download" />
 			</button>

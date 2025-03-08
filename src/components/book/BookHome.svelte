@@ -30,12 +30,7 @@
 			{#snippet children(item)}
 				<div class="p2 font-bold">{item.collection}</div>
 				<!-- list and button create -->
-				<CollectionListMenu
-					{where}
-					data={{} as DbChapter}
-					collection={item?.collection}
-					target="red"
-				/>
+				<CollectionListMenu {where} data={{} as DbChapter} collection={item?.collection} target="red" />
 				<!--   button create -->
 				<CollectionButton mode="create" collection={item?.collection} withData={{ bookId: id }} />
 				<br />

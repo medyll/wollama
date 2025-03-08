@@ -22,9 +22,7 @@
 		settings.setSetting('menuExpanded', !$settings.menuExpanded);
 	};
 
-	const getChatLink = (
-		link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books' | 'spaces'
-	) => {
+	const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books' | 'spaces') => {
 		let goTo;
 		switch (link) {
 			case 'settings':
@@ -53,33 +51,18 @@
 <div class="application-sideBar" aria-expanded={$settings.menuExpanded}>
 	<div class="not-expanded">
 		<div class="not-expanded line-gap-2 p-4">
-			<img
-				alt="logo"
-				class="iconify"
-				width="32"
-				src="/assets/svg/lama.svg"
-				style="transform: scaleX(-1)"
-			/>
+			<img alt="logo" class="iconify" width="32" src="/assets/svg/lama.svg" style="transform: scaleX(-1)" />
 			<div class="text-md">wOollama !</div>
 			<full />
 		</div>
 		<div class="w-full px-2">
-			<input
-				class="input w-full"
-				type="search"
-				placeholder={$t('ui.searchChats')}
-				bind:value={$ui.searchString}
-			/>
+			<input class="input w-full" type="search" placeholder={$t('ui.searchChats')} bind:value={$ui.searchString} />
 		</div>
 	</div>
 
 	<div class="application-sideBar-menu">
 		<MenuList tall="small" class="flex h-full flex-col  ">
-			<MenuListItem
-				selectable={false}
-				onclick={() => getChatLink('newChat')}
-				title={$t('ui.newChat')}
-			>
+			<MenuListItem selectable={false} onclick={() => getChatLink('newChat')} title={$t('ui.newChat')}>
 				<Icon icon="mdi:plus" alt={$t('ui.newChat')} />
 				<span>{$t('ui.newChat')}</span>
 			</MenuListItem>

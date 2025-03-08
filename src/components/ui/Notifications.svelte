@@ -5,9 +5,7 @@
 
 <div class="gauge tr fixed z-50 flex w-96 flex-col gap-2 p-4">
 	{#each Object.values($notifierState) as notification, idx}
-		<div
-			class="line-gap-2 {notification.status} theme-bg theme-border w-full rounded-md p-1 shadow-xs"
-		>
+		<div class="line-gap-2 {notification.status} theme-bg theme-border w-full rounded-md p-1 shadow-xs">
 			<div class="">
 				<Icon icon="mdi:information-outline" style="font-size:1.6em" />
 			</div>

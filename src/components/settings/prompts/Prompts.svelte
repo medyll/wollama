@@ -134,9 +134,7 @@
 	<hr />
 	<div class="flex-align-middle gap-8 p-2">
 		<Selector values={['list', 'create']} value={mode} let:item>
-			<button class="m-1 px-2" type="button" onclick={() => (mode = item)}
-				><Icon icon="mdi:list" /> {item}</button
-			>
+			<button class="m-1 px-2" type="button" onclick={() => (mode = item)}><Icon icon="mdi:list" /> {item}</button>
 		</Selector>
 		<div class="flex-1"></div>
 		<div class="soft-title">{$t('prompt.promptCenter')}</div>

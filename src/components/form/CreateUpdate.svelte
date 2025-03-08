@@ -11,30 +11,26 @@
 	import CollectionFieldInput from './CollectionFieldValue.svelte';
 
 	let {
-			collection,
-			data        = {},
-			dataId,
-			mode        = 'show',
-			withData,
-			showFields,
-			inPlaceEdit,
-			displayMode = 'wrap',
-			showFks     = false
-		}: CreateUpdateProps = $props();
-	let inputForm            = `form-${String(collection)}-${mode}`;
-	let dbFields             = new DbFields(schemeModel);
-	let indexName            = dbFields.getIndexName(collection);
-	let formFields           = showFields
-							   ? Object.fromEntries(
-			Object.entries(dbFields.parseRawCollection(collection) ?? {}).filter(([key]) =>
-				showFields.includes(key)
+		collection,
+		data = {},
+		dataId,
+		mode = 'show',
+		withData,
+		showFields,
+		inPlaceEdit,
+		displayMode = 'wrap',
+		showFks = false
+	}: CreateUpdateProps = $props();
+	let inputForm = `form-${String(collection)}-${mode}`;
+	let dbFields = new DbFields(schemeModel);
+	let indexName = dbFields.getIndexName(collection);
+	let formFields = showFields
+		? Object.fromEntries(
+				Object.entries(dbFields.parseRawCollection(collection) ?? {}).filter(([key]) => showFields.includes(key))
 			)
-		)
-							   : (dbFields.parseRawCollection(collection) ?? {});
+		: (dbFields.parseRawCollection(collection) ?? {});
 
-	let qy: any = $derived(
-		dataId && indexName ? idbqlState[collection].where({ [indexName]: { eq: dataId } }) : {}
-	);
+	let qy: any = $derived(dataId && indexName ? idbqlState[collection].where({ [indexName]: { eq: dataId } }) : {});
 
 	let formData = $state<Record<string, any>>({ ...data, ...withData, ...$state.snapshot(qy)[0] });
 
@@ -43,14 +39,14 @@
 	});
 	let ds = Object.keys(data).length > 0 ? data : qy[0];
 
-	let formValidator                            = new IDbFormValidate(collection);
+	let formValidator = new IDbFormValidate(collection);
 	let validationErrors: Record<string, string> = {};
 
 	const validateFormData = (formData: Record<string, any> = {}) => {
 		const { isValid, errors } = formValidator.validateForm(formData, {
 			ignoreFields: mode == 'create' ? [indexName] : undefined
 		});
-		validationErrors          = errors;
+		validationErrors = errors;
 
 		return isValid;
 	};
@@ -123,10 +119,7 @@
 				return new Date().toISOString().split('T')[1].split('.')[0];
 		}
 	}
-
-
 </script>
-
 
 <form
 	id={inputForm}
@@ -147,8 +140,7 @@
 				{collection}
 				{fieldName}
 				{mode}
-				editInPlace={inPlaceEdit === true ||
-						(Array.isArray(inPlaceEdit) && inPlaceEdit.includes(fieldName))}
+				editInPlace={inPlaceEdit === true || (Array.isArray(inPlaceEdit) && inPlaceEdit.includes(fieldName))}
 				bind:data={formData}
 				{inputForm}
 			/>
@@ -166,33 +158,33 @@
 </div>
 
 <style lang="postcss">
-    @reference "../../styles/references.css";
+	@reference "../../styles/references.css";
 
-    :global(.crud) {
-        min-width: 32rem;
-        padding: 2rem;
+	:global(.crud) {
+		min-width: 32rem;
+		padding: 2rem;
 
-        &.wrap {
-            display: flex;
-            flex-wrap: wrap;
-			gap:0.5rem;
-        }
+		&.wrap {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
 
-        &.inline {
-            display: flex;
-            flex-direction: row;
-            gap: 1rem;
-        }
-    }
+		&.inline {
+			display: flex;
+			flex-direction: row;
+			gap: 1rem;
+		}
+	}
 
-    [aria-invalid='true'] {
-        background-color: #ffeeee;
-        border-color: red;
-    }
+	[aria-invalid='true'] {
+		background-color: #ffeeee;
+		border-color: red;
+	}
 
-    .error-message {
-        color: red;
-        font-size: 0.8em;
-        margin-top: 0.2em;
-    }
+	.error-message {
+		color: red;
+		font-size: 0.8em;
+		margin-top: 0.2em;
+	}
 </style>

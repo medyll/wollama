@@ -16,12 +16,7 @@
 </script>
 
 <div>
-	<Button
-		onclick={() => openCrud($page.params.collection)}
-		width="auto"
-		icon="ep:files"
-		value="ui.explore"
-	/>
+	<Button onclick={() => openCrud($page.params.collection)} width="auto" icon="ep:files" value="ui.explore" />
 </div>
 <hr />
 <slot />

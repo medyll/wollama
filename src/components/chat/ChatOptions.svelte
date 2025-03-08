@@ -24,7 +24,7 @@
 </script>
 
 <!--<ChatSystemPrompt/>-->
-<CollectionButton collection="prompts"   mode="create" />
+<CollectionButton collection="prompts" mode="create" />
 <button class="flex gap-1" popovertarget="popover" style="anchor-name: --anchor;position:relative">
 	<Icon icon="material-symbols-light:post-add-sharp" />
 	{chatParametersState.promptSystem?.code ?? $t('prompt.systemPrompt')}

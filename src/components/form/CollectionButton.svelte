@@ -23,10 +23,4 @@
 	}
 </script>
 
-<Button
-	class="ellipsis"
-	onclick={() => openCrud(collection)}
-	width="auto"
-	icon="mdi:add"
-	value="ui.{rest.mode}-{collection}"
-/>
+<Button class="ellipsis" onclick={() => openCrud(collection)} width="auto" icon="mdi:add" value="ui.{rest.mode}-{collection}" />

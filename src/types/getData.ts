@@ -47,15 +47,7 @@ interface OperatorType {
 // table_name, action, data
 interface GetDataParams<T> extends Record<string, unknown> {
 	table_name: string;
-	action:
-		| 'get_one'
-		| 'getAll'
-		| 'create'
-		| 'delete'
-		| 'update'
-		| 'where'
-		| 'updateWhere'
-		| 'deleteWhere';
+	action:     'get_one' | 'getAll' | 'create' | 'delete' | 'update' | 'where' | 'updateWhere' | 'deleteWhere';
 	data:       Record<string, any>;
 }
 

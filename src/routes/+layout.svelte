@@ -50,8 +50,7 @@
 	}
 
 	async function loadConfig() {
-		if (!initiated)
-			wollamaApiConfig.setOptions({ host: $settings.ollama_server, model: $settings.defaultModel });
+		if (!initiated) wollamaApiConfig.setOptions({ host: $settings.ollama_server, model: $settings.defaultModel });
 	}
 
 	async function loader() {
@@ -144,10 +143,7 @@
 		mutation?: MutationRecord
 	) => void;
 
-	export function detectAndAct(
-		selector: string,
-		{ attributes, trackChildList, trackCharacterData, trackResize }
-	) {
+	export function detectAndAct(selector: string, { attributes, trackChildList, trackCharacterData, trackResize }) {
 		const api = {
 			resize:        () => {
 				trackResize = true;

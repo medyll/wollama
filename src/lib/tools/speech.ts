@@ -40,7 +40,10 @@ export const speechRecognitionTracker = {
  * @param options - The options for speech recognition.
  * @returns An object with methods to start and stop speech recognition.
  */
-export const speechRecognitionHandler = (speechHandler: (args: SpeechReturn) => void, options: DefaultOptions = defaultOptions) => {
+export const speechRecognitionHandler = (
+	speechHandler: (args: SpeechReturn) => void,
+	options: DefaultOptions = defaultOptions
+) => {
 	let waiterTimer: any;
 	const speechOptions = { ...defaultOptions, ...options };
 

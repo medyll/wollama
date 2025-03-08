@@ -15,15 +15,7 @@
 	}}
 />
 <input form={formName} value={formData?.id ?? ''} type="hidden" name="id" />
-<input
-	required
-	form={formName}
-	name="title"
-	type="text"
-	class="w-96"
-	placeholder="prompt title"
-	value={formData?.title ?? ''}
-/>
+<input required form={formName} name="title" type="text" class="w-96" placeholder="prompt title" value={formData?.title ?? ''} />
 <textarea
 	required
 	form={formName}

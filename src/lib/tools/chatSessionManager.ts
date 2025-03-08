@@ -196,7 +196,9 @@ export class ChatSessionManager {
 
 		return {
 			systemMessage:    systemMessage,
-			previousMessages: previousMessages.map((e) => ChatSessionManager.#dbMessageToMessage(e)).filter((e) => e.role !== 'system'),
+			previousMessages: previousMessages
+				.map((e) => ChatSessionManager.#dbMessageToMessage(e))
+				.filter((e) => e.role !== 'system'),
 			userChatMessage
 		};
 	}

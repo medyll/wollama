@@ -82,19 +82,8 @@ export type DBMessage = {
 	  }
 );
 
-export type DbPrimitive =
-	| 'date'
-	| 'text'
-	| 'number'
-	| 'boolean'
-	| 'array'
-	| 'object'
-	| `${string}.${string}`;
-export type DbFieldTypes =
-	| DbPrimitive
-	| `array-of-${DbPrimitive}`
-	| `object-${DbPrimitive}`
-	| `fk-${DbPrimitive}`;
+export type DbPrimitive = 'date' | 'text' | 'number' | 'boolean' | 'array' | 'object' | `${string}.${string}`;
+export type DbFieldTypes = DbPrimitive | `array-of-${DbPrimitive}` | `object-${DbPrimitive}` | `fk-${DbPrimitive}`;
 
 export type DbTemplateModel<TPL> = {
 	[COL in keyof TPL]: {
@@ -119,12 +108,7 @@ export type DBAgent = {
 	ia_lock:         boolean;
 	created_at:      Date;
 	//
-	specialization?:
-		| 'character development'
-		| 'plot outline'
-		| 'world building'
-		| 'dialogue'
-		| 'general';
+	specialization?: 'character development' | 'plot outline' | 'world building' | 'dialogue' | 'general';
 };
 
 export type DbAgentPrompt = {

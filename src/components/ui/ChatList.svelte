@@ -13,17 +13,18 @@
 		engine.goto(`/chat/${chatPassKey}`);
 	};
 
-
-	let groupedMenuList = $derived(dbQuery('chat').getAll()?.groupBy?.((item) => {
-		/*console.log(item)*/
-		return {
-			code : getPeriodGroup(item.created_at),
-			items: item.items,
-			title: getPeriodGroup(item.created_at)
-		};
-	}, true));
-
-
+	let groupedMenuList = $derived(
+		dbQuery('chat')
+			.getAll()
+			?.groupBy?.((item) => {
+				/*console.log(item)*/
+				return {
+					code:  getPeriodGroup(item.created_at),
+					items: item.items,
+					title: getPeriodGroup(item.created_at)
+				};
+			}, true)
+	);
 </script>
 
 <MenuList data={Object.values(groupedMenuList ?? {}) ?? []} selectorField="code" style="width:100%">
@@ -47,7 +48,7 @@
 		</MenuList>
 	{/snippet}
 </MenuList>
-{#if Object.values((groupedMenuList ?? {}))?.length == 0}
+{#if Object.values(groupedMenuList ?? {})?.length == 0}
 	<div class="flex flex-col gap-2 text-center text-neutral-500 dark:text-neutral-400">
 		<span class="text-2xl">{$t('ui.noChats')}</span>
 	</div>

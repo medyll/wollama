@@ -26,7 +26,9 @@ export enum TplProperties {
 	'required' = 'required'
 }
 
-type CombineElements<T extends string, U extends string = T> = T extends any ? T | `${T} ${CombineElements<Exclude<U, T>>}` : never;
+type CombineElements<T extends string, U extends string = T> = T extends any
+	? T | `${T} ${CombineElements<Exclude<U, T>>}`
+	: never;
 type CombinedArgs = CombineElements<TplProperties>;
 
 type IdbObjectify<T extends string = 'number'> = `array-of-${T}` | `object-${T}`;
@@ -120,7 +122,10 @@ export class IDbCollections {
 			return undefined;
 		}
 		let fieldType =
-			this.testIs('primitive', field) ?? this.testIs('array', field) ?? this.testIs('object', field) ?? this.testIs('fk', field);
+			this.testIs('primitive', field) ??
+			this.testIs('array', field) ??
+			this.testIs('object', field) ??
+			this.testIs('fk', field);
 
 		return this.forge({ collection, fieldName, ...fieldType });
 	}

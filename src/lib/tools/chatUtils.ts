@@ -50,7 +50,7 @@ export async function guessChatMetadata(message: string): Promise<OllamaResponse
 
 	const defaultOptions = {
 		model:   config?.defaultModel,
-		system: 'Tu es un assistant de génération de titres. Ceux-ci doivent appraitre dans une liste. Tu réponds toujours en un maximum de trois seul mot.Tu ne fais jamais de phrases longues. Tes  reponse font entre un et dix mots',
+		system:  'Tu es un assistant de génération de titres. Ceux-ci doivent appraitre dans une liste. Tu réponds toujours en un maximum de trois seul mot.Tu ne fais jamais de phrases longues. Tes  reponse font entre un et dix mots',
 		prompt,
 		stream:  false,
 		format:  'json',

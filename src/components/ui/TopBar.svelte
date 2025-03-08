@@ -1,11 +1,9 @@
 <script lang="ts">
-
 	import StatusBar from '../settings/StatusBar.svelte';
 	import { ui } from '$lib/stores/ui';
 	import { engine } from '$lib/tools/engine';
 	import { dbQuery } from '$lib/db/dbQuery';
 	import { page } from '$app/stores';
-
 
 	new Date().getSeconds();
 

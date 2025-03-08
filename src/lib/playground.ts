@@ -48,7 +48,8 @@ function buildElementHierarchy(element: cheerio.Element, index: number = 0): any
 		});
 	if (Object.keys($(element).attr() ?? {})?.[0]) {
 		return {
-			[`${Object.keys($(element).attr())}_${$(element).prop('tagName').toLowerCase()}`]: children.length > 0 ? children : null
+			[`${Object.keys($(element).attr())}_${$(element).prop('tagName').toLowerCase()}`]:
+				children.length > 0 ? children : null
 		};
 	}
 	return null;

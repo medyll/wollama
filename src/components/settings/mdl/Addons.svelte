@@ -20,11 +20,6 @@
 		>
 	</InfoLine>
 	<InfoLine title={$t('settings.avatar')} vertical>
-		<input
-			type="text"
-			class="w-full"
-			bind:value={$settings.avatar_email}
-			placeholder={$t('settings.avatar_email')}
-		/>
+		<input type="text" class="w-full" bind:value={$settings.avatar_email} placeholder={$t('settings.avatar_email')} />
 	</InfoLine>
 </div>

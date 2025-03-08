@@ -1,12 +1,5 @@
 <script lang="ts" generics="COL = Record<string,any>">
-	import {
-		type MenuListProps,
-		Button,
-		MenuList,
-		MenuListItem,
-		openWindow,
-		type Props
-	} from '@medyll/idae-slotui-svelte';
+	import { type MenuListProps, Button, MenuList, MenuListItem, openWindow, type Props } from '@medyll/idae-slotui-svelte';
 	import CreateUpdate from '$components/form/CreateUpdate.svelte';
 	import { idbqlState } from '$lib/db/dbSchema';
 	import { IDbCollections, IDbCollectionValues } from '$lib/db/dbFields';
@@ -23,8 +16,7 @@
 		onclick?:       (event: CustomEvent, index: number) => void;
 	}
 
-	let { collection, target, data, menuListProps, onclick, style, where }: CollectionListMenuProps =
-		$props();
+	let { collection, target, data, menuListProps, onclick, style, where }: CollectionListMenuProps = $props();
 
 	let test = new IDbCollections();
 	let fieldValues = new IDbCollectionValues(collection);
