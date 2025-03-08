@@ -74,6 +74,10 @@
 				<Icon icon="fluent:library-20-filled" alt={$t('ui.mylib')} />
 				<span>{$t('ui.myLib')}</span>
 			</MenuListItem>
+			<MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
+				<Icon icon="earth" alt={$t('ui.spaces')} />
+				<span>{$t('ui.spaces')}</span>
+			</MenuListItem>
 			<div class="application-sideBar-content flex-1 overflow-auto">
 				<ChatList />
 			</div>
@@ -81,10 +85,6 @@
 				<Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
 			</MenuListItem>
 			<hr />
-			<MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
-				<Icon icon="earth" alt={$t('ui.spaces')} />
-				<span>{$t('ui.spaces')}</span>
-			</MenuListItem>
 			<!-- <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
 					 <Icon icon="settings" alt={$t('ui.books')} />
 					 <span>{$t('ui.books')}</span>
