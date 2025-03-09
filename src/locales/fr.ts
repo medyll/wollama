@@ -56,6 +56,8 @@ export default {
 			startondate:           'date de début',
 			thisWeek:              'cette semaine',
 			use_model:             'utiliser le modèle',
+			spaces:                'espaces',
+			myLib:                 'bibliothèque',
 			configuration:         {
 				home: 'accueil'
 			}
