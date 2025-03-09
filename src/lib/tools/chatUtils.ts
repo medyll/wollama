@@ -3,7 +3,7 @@ import type { DBMessage } from '$types/db';
 import { get } from 'svelte/store';
 import { WollamaApi } from '../db/wollamaApi';
 import { settings } from '$lib/stores/settings.svelte';
-import { dbQuery, idbQuery } from '$lib/db/dbQuery';
+import { qoolie, idbQuery } from '$lib/db/dbQuery';
 import type { OllApiGenerate, OllamaResponse } from '$types/ollama';
 import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 
@@ -128,10 +128,10 @@ Résumé :`;
 	return await WollamaApi.generate(defaultOptions, () => {});
 }
 
-export class chatUtils {
+export class dataUtils {
 	static async checkCategorie(chatId: string) {
-		const chat = await dbQuery('chat').getOne(chatId);
-		const chatMessages = await dbQuery('messages').getBy(chatId, 'chatId');
+		const chat = await qoolie('chat').getOne(chatId);
+		const chatMessages = await qoolie('messages').getBy(chatId, 'chatId');
 		const resume = chatMessages
 			.slice(0, 15)
 			.map((message: DBMessage) => message.content)

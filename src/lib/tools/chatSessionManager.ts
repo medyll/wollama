@@ -1,4 +1,4 @@
-import { dbQuery, idbQuery } from '$lib/db/dbQuery';
+import { qoolie, idbQuery } from '$lib/db/dbQuery';
 import type { GenerateResponseHook } from '$lib/db/wollamaApi';
 import { type ChatParameters } from '$lib/states/chat.svelte';
 import type { DbChat, DBMessage } from '$types/db';
@@ -42,14 +42,14 @@ export class ChatSessionManager {
 	}
 
 	async #loadChatSessionFromDB(id: number) {
-		const dbChat = await dbQuery('chat').getOne(id);
+		const dbChat = await qoolie('chat').getOne(id);
 		this.#SessionDB.dbChat = dbChat ?? ({} as Partial<DbChat>);
 		this.#SessionDB.sessionId = dbChat?.id;
 	}
 
 	async #initChatDb(sessionId?: number, chatData: DbChat = {} as DbChat): Promise<Partial<DbChat>> {
 		let ret: Partial<DbChat>;
-		if (sessionId && Boolean(await dbQuery('chat').getOne(sessionId))) {
+		if (sessionId && Boolean(await qoolie('chat').getOne(sessionId))) {
 			ret = await idbQuery.updateChat(sessionId, chatData);
 		} else {
 			ret = await idbQuery.insertChat(chatData); // dbQuery('chat').create(chatData) ; //
@@ -171,7 +171,7 @@ export class ChatSessionManager {
 			images:     [],
 			tool_calls: []
 		};
-		const existingSystemMessage = await dbQuery('messages').where({
+		const existingSystemMessage = await qoolie('messages').where({
 			chatId: this.sessionId,
 			role:   OllamaChatMessageRole.SYSTEM
 		})[0];
@@ -204,7 +204,7 @@ export class ChatSessionManager {
 	}
 
 	public async getPreviousMessages(): Promise<DBMessage[]> {
-		const chatList = await dbQuery('messages').getBy(this.sessionId, 'chatId');
+		const chatList = await qoolie('messages').getBy(this.sessionId, 'chatId');
 
 		this.previousMessages = chatList.map((e) => e);
 

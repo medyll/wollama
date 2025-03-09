@@ -1,4 +1,4 @@
-import { dbQuery, idbQuery } from '$lib/db/dbQuery';
+import { qoolie, idbQuery } from '$lib/db/dbQuery';
 import type { DbChat, DBMessage } from '$types/db';
 
 export class ChatSessionManager {
@@ -24,7 +24,7 @@ export class ChatSessionManager {
 	}
 
 	#loadChatDBSession = (id: number) => {
-		dbQuery('chat')
+		qoolie('chat')
 			.getOne(id)
 			.then((dbChat: DbChat | undefined) => {
 				this.#SessionDB.dbChat = dbChat ?? ({} as Partial<DbChat>);
@@ -64,12 +64,12 @@ export class ChatSessionManager {
 	}
 
 	async #initChatDb(sessionId?: number, chatData: DbChat = {} as DbChat): Promise<DbChat> {
-		if (sessionId && Boolean(await dbQuery('chat').getOne(sessionId))) {
+		if (sessionId && Boolean(await qoolie('chat').getOne(sessionId))) {
 			await idbQuery.updateChat(sessionId, chatData);
 		}
 
-		return sessionId && Boolean(await dbQuery('chat').getOne(sessionId))
-			? ((await dbQuery('chat').getOne(sessionId)) as DbChat)
+		return sessionId && Boolean(await qoolie('chat').getOne(sessionId))
+			? ((await qoolie('chat').getOne(sessionId)) as DbChat)
 			: ((await idbQuery.insertChat(chatData)) as DbChat);
 	}
 
