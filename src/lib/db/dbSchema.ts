@@ -94,7 +94,7 @@ export const schemeModelDb = {
 				chatId:          'id (private)',
 				chatPassKey:     'id (private)',
 				title:           'text',
-				created_at:      'date (readonly)',
+				created_at:      'timestamp (readonly)',
 				category:        'text',
 				categoryId:      'id',
 				dateLastMessage: 'date',
@@ -104,7 +104,7 @@ export const schemeModelDb = {
 			},
 			fks:          {
 				space: {
-					code:     'text',
+					code:     'space',
 					rules:    'private required',
 					multiple: false
 				}
@@ -135,12 +135,20 @@ export const schemeModelDb = {
 			index:        'id',
 			presentation: 'name',
 			fields:       {
-				id:      'id',
-				code:    'text',
-				name:    'text',
-				ia_lock: 'boolean (private)'
+				id:         'id',
+				modelId:    'id',
+				name:       'text',
+				caption:    'text-long',
+				created_at: 'timestamp',
+				ia_lock:    'boolean'
 			},
-			fks:          {}
+			fks:          {
+				model: {
+					code:     'model',
+					rules:    'required private',
+					multiple: false
+				}
+			}
 		}
 	},
 	tags:                   {

@@ -1,17 +1,15 @@
 <script lang="ts">
-	import { openWindow, Button } from '@medyll/idae-slotui-svelte';
 	import type { PageData } from './$types';
-	import CreateUpdate from '$components/form/CreateUpdate.svelte';
+	import { qoolie } from '$lib/db/dbQuery';
+	import CollectionButton from '$components/form/CollectionButton.svelte';
+	import CollectionList from '$components/form/CollectionList.svelte';
 
 	export let data: PageData;
 
-	function openCrud(collection: string) {
-		openWindow(`create-${collection}`, {
-			component:       CreateUpdate,
-			componentProps:  { collection: collection, mode: 'create' },
-			hideCloseButton: false
-		});
-	}
+	const spaceList = qoolie('space').getAll();
+ 
 </script>
 
-<Button onclick={() => openCrud('space')} width="auto" icon="ep:files" value="ui.create-new" />
+<CollectionList collection="space">
+	<CollectionButton collection="space" mode="create" />
+</CollectionList>

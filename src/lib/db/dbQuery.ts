@@ -1,6 +1,6 @@
 import type { DbChat, DBMessage, PromptType } from '$types/db';
 import { type OllamaResponse } from '$types/ollama';
-import { chatUtils } from '$lib/tools/chatUtils';
+import { dataUtils } from '$lib/tools/chatUtils';
 import { idbql, idbqlState, schemeModelDb } from './dbSchema';
 import type { UserType } from '$types/user';
 import { getClientData } from '$types/getData';
@@ -43,7 +43,7 @@ export function ideo(collection: keyof typeof schemeModelDb) {
 	};
 }
 
-export function dbQuery(collection: keyof typeof schemeModelDb) {
+export function qoolie(collection: keyof typeof schemeModelDb) {
 	if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
 	return {
 		get:         idbqlState[collection].get,
@@ -69,7 +69,7 @@ export class idbQuery {
 	}
 
 	static async insertChat(chatData?: Partial<DbChat>): Promise<DbChat> {
-		let newChat = chatUtils.getChatDataObject();
+		let newChat = dataUtils.getChatDataObject();
 
 		newChat = await idbqlState.chat.put({ ...newChat, ...chatData }); // dbQuery('chat').create({ ...newChat, ...chatData }); //
 		return { ...newChat, ...chatData };
@@ -92,12 +92,12 @@ export class idbQuery {
 	}
 
 	static async initChat(id?: number, chatData: DbChat = {} as DbChat): Promise<DbChat> {
-		if (id && (await dbQuery('chat').getOne(id))) {
+		if (id && (await qoolie('chat').getOne(id))) {
 			await idbQuery.updateChat(id, chatData);
 		}
 
-		return id && Boolean(await dbQuery('chat').getOne(id))
-			? ((await dbQuery('chat').getOne(id)) as DbChat)
+		return id && Boolean(await qoolie('chat').getOne(id))
+			? ((await qoolie('chat').getOne(id)) as DbChat)
 			: ((await idbQuery.insertChat(chatData)) as DbChat);
 	}
 
@@ -105,7 +105,7 @@ export class idbQuery {
 
 	static async insertMessage(chatId: number, messageData: Partial<DBMessage>): Promise<DBMessage> {
 		if (!chatId) throw new Error('chatId is required');
-		const message = chatUtils.getMessageDataObject({ chatId, ...messageData });
+		const message = dataUtils.getMessageDataObject({ chatId, ...messageData });
 		return await idbqlState.messages.add(message);
 	}
 
@@ -116,7 +116,7 @@ export class idbQuery {
 
 	static async updateMessageStream(id: number, data: Partial<OllamaResponse>) {
 		if (!id) throw new Error('id is required');
-		const message = await dbQuery('messages').getOne(id);
+		const message = await qoolie('messages').getOne(id);
 
 		const content = (message?.content ?? '') + (data?.message?.content ?? data?.response ?? '');
 
