@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { dbQuery, idbQuery } from '$lib/db/dbQuery';
+	import { qoolie, idbQuery } from '$lib/db/dbQuery';
 	import Message from './Message.svelte';
 	import { Looper } from '@medyll/idae-slotui-svelte';
 
 	let { id }: { id?: number } = $props();
 
-	let chat = $derived(id ? dbQuery('chat').getOne(id) : []);
-	let messages = $derived(id ? dbQuery('messages').where({ chatId: { eq: id }, role: { ne: 'system' } }) : []);
+	let chat = $derived(id ? qoolie('chat').getOne(id) : []);
+	let messages = $derived(id ? qoolie('messages').where({ chatId: { eq: id }, role: { ne: 'system' } }) : []);
 
 	let element: HTMLElement;
 

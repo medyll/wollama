@@ -6,7 +6,7 @@
 	import { ui } from '$lib/stores/ui';
 	import { engine } from '$lib/tools/engine';
 	import { page } from '$app/stores';
-	import { dbQuery } from '$lib/db/dbQuery';
+	import { qoolie } from '$lib/db/dbQuery';
 
 	const loadChat = async (chatPassKey: string) => {
 		ui.showHideMenu(false);
@@ -14,7 +14,7 @@
 	};
 
 	let groupedMenuList = $derived(
-		dbQuery('chat')
+		qoolie('chat')
 			.getAll()
 			?.groupBy?.((item) => {
 				/*console.log(item)*/

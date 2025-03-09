@@ -22,7 +22,7 @@
 		settings.setSetting('menuExpanded', !$settings.menuExpanded);
 	};
 
-	const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books' | 'spaces') => {
+	const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books' | 'space') => {
 		let goTo;
 		switch (link) {
 			case 'settings':
@@ -39,6 +39,9 @@
 				break;
 			case 'explore':
 				goTo = `${window.location.origin}/explore`;
+				break;
+			case 'space':
+				goTo = `${window.location.origin}/space`;
 				break;
 			default:
 				goTo = `${window.location.origin}/${link}`;

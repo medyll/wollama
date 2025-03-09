@@ -1,19 +1,19 @@
 <script lang="ts">
 	import Confirm from '$components/fragments/Confirm.svelte';
-	import { dbQuery, idbQuery } from '$lib/db/dbQuery';
+	import { qoolie, idbQuery } from '$lib/db/dbQuery';
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import { Icon } from '@medyll/idae-slotui-svelte';
 	import { Button, Menu, Popper, MenuItem } from '@medyll/idae-slotui-svelte';
 
-	import { chatUtils } from '$lib/tools/chatUtils';
+	import { dataUtils } from '$lib/tools/chatUtils';
 
 	import { idbqlState } from '$lib/db/dbSchema';
 	import { chatMetadata } from '$lib/tools/promptSystem';
 
 	const { id = '', selected = false } = $props();
 
-	let chat = $derived(id ? dbQuery('chat').getOne(id) : {});
+	let chat = $derived(id ? qoolie('chat').getOne(id) : {});
 
 	let editChat: boolean = $state(false);
 	let isOpen: boolean = $state(false);

@@ -2,12 +2,12 @@
 	import StatusBar from '../settings/StatusBar.svelte';
 	import { ui } from '$lib/stores/ui';
 	import { engine } from '$lib/tools/engine';
-	import { dbQuery } from '$lib/db/dbQuery';
+	import { qoolie } from '$lib/db/dbQuery';
 	import { page } from '$app/stores';
 
 	new Date().getSeconds();
 
-	$: chat = dbQuery('chat').getOne($ui.activeChatId);
+	$: chat = qoolie('chat').getOne($ui.activeChatId);
 
 	$: showConfigClose = $page.route.id?.includes('/configuration');
 
