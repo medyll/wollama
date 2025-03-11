@@ -364,7 +364,7 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 			switch (fieldInfo?.fieldType) {
 				case 'timestamp':
 				case 'date':
-					return new Date(data[fieldName]);
+					return new Date(data[fieldName]).toLocaleDateString('fr-FR');
 				case 'number':
 					return this.#formatNumberField(data[fieldName]);
 				case 'text':

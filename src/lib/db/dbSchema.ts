@@ -139,6 +139,7 @@ export const schemeModelDb = {
 				modelId:    'id',
 				name:       'text',
 				caption:    'text-long',
+				prompt:     'text-area',
 				created_at: 'timestamp',
 				ia_lock:    'boolean'
 			},
@@ -495,5 +496,5 @@ export const schemeModel: IdbqModel = {
 
 export type DataModelFinal = DbDataModelTs<typeof schemeModelDb>;
 
-const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 13);
+const idbqStore = createIdbqDb<typeof schemeModel>(schemeModel, 1);
 export const { idbql, idbqlState, idbDatabase, idbqModel } = idbqStore.create('woolama');
