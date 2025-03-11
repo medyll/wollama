@@ -44,18 +44,19 @@ export function ideo(collection: keyof typeof schemeModelDb) {
 }
 
 export function qoolie(collection: keyof typeof schemeModelDb) {
-	if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
+	// if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
+	console.log({ idbqlState });
 	return {
-		get:         idbqlState[collection].get,
-		getBy:       idbqlState[collection].getBy,
-		getOne:      idbqlState[collection].getOne,
-		getAll:      idbqlState[collection].getAll,
-		create:      idbqlState[collection].put,
-		delete:      idbqlState[collection].delete,
-		deleteWhere: idbqlState[collection].deleteWhere,
-		update:      idbqlState[collection].update,
-		where:       idbqlState[collection].where,
-		updateWhere: idbqlState[collection].updateWhere
+		get:         idbqlState?.[collection]?.get,
+		getBy:       idbqlState?.[collection]?.getBy,
+		getOne:      idbqlState?.[collection]?.getOne,
+		getAll:      idbqlState?.[collection]?.getAll,
+		create:      idbqlState?.[collection]?.put,
+		delete:      idbqlState?.[collection]?.delete,
+		deleteWhere: idbqlState?.[collection]?.deleteWhere,
+		update:      idbqlState?.[collection]?.update,
+		where:       idbqlState?.[collection]?.where,
+		updateWhere: idbqlState?.[collection]?.updateWhere
 	};
 }
 
