@@ -8,7 +8,7 @@
 	import { idbql, idbqlState, schemeModel } from '$lib/db/dbSchema';
 	import type { CreateUpdateProps } from './types';
 	import CollectionReverseFks from './CollectionReverseFks.svelte';
-	import FieldInput from './timestamp.svelte';
+	import FieldInput from './FieldValue.svelte';
 
 	let {
 		collection,
