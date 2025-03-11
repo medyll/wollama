@@ -5,7 +5,7 @@
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import { engine } from '$lib/tools/engine';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { qoolie } from '$lib/db/dbQuery';
 
 	const loadChat = async (chatPassKey: string) => {
