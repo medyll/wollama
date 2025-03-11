@@ -35,10 +35,10 @@
 		</ListTitle>
 		<MenuList tall="mini" style="width:100%;" data={item?.data ?? []}>
 			{#snippet children({ item })}
-				<MenuListItem selected={item.chatId === $page?.params?.id} data={item}>
+				<MenuListItem selected={item.chatId === page?.params?.id} data={item}>
 					<ChatMenuItem
 						id={item.id}
-						selected={item.chatPassKey === $page?.params?.id}
+						selected={item.chatPassKey === page?.params?.id}
 						on:click={() => {
 							loadChat(item.chatPassKey);
 						}}

@@ -2,7 +2,7 @@
 	import { Button, openWindow } from '@medyll/idae-slotui-svelte';
 	import type { LayoutData } from './$types';
 	import CreateUpdate from '$components/form/CreateUpdate.svelte';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	export let data: LayoutData;
 
@@ -16,7 +16,7 @@
 </script>
 
 <div>
-	<Button onclick={() => openCrud($page.params.collection)} width="auto" icon="ep:files" value="ui.explore" />
+	<Button onclick={() => openCrud(page.params.collection)} width="auto" icon="ep:files" value="ui.explore" />
 </div>
 <hr />
 <slot />

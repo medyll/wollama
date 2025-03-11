@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n.js';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	import { ui } from '$lib/stores/ui.js';
 	import { engine } from '$lib/tools/engine';
@@ -10,7 +10,7 @@
 	import { goto } from '$app/navigation';
 
 	const openCloseConfig = async () => {
-		if ($page.route.id?.includes('/configuration')) {
+		if (page.route.id?.includes('/configuration')) {
 			ui.setActiveChatId();
 			engine.goto('/');
 		} else {
@@ -70,7 +70,7 @@
 				<span>{$t('ui.newChat')}</span>
 			</MenuListItem>
 			<MenuListItem
-				selected={$page?.route?.id === '/[[lang]]/lib'}
+				selected={page?.route?.id === '/[[lang]]/lib'}
 				onclick={() => getChatLink('lib')}
 				title={$t('ui.mylib')}
 			>
@@ -97,7 +97,7 @@
 					<span>{$t('ui.settings')}</span>
 			</MenuListItem> -->
 			<MenuListItem
-				selected={$page?.route?.id === '/[[lang]]/settings'}
+				selected={page?.route?.id === '/[[lang]]/settings'}
 				title={$t('ui.settings')}
 				onclick={() => getChatLink('settings')}
 			>

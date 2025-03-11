@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import PageTitle from '$components/ui/PageTitle.svelte';
 </script>
 
-<PageTitle icon="ep:files" title="ui.explore" addTitle={$page.params.collection ?? '' + $page.params.id ?? ''} />
+<PageTitle icon="ep:files" title="ui.explore" addTitle={page.params.collection ?? '' + page.params.id ?? ''} />
 <div class="settings h-full w-full p-4 px-8">
 	<slot />
 </div>

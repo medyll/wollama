@@ -3,16 +3,16 @@
 	import { ui } from '$lib/stores/ui';
 	import { engine } from '$lib/tools/engine';
 	import { qoolie } from '$lib/db/dbQuery';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	new Date().getSeconds();
 
 	$: chat = qoolie('chat').getOne($ui.activeChatId);
 
-	$: showConfigClose = $page.route.id?.includes('/configuration');
+	$: showConfigClose = page.route.id?.includes('/configuration');
 
 	const openCloseConfig = async () => {
-		if ($page.route.id?.includes('/configuration')) {
+		if (page.route.id?.includes('/configuration')) {
 			ui.setActiveChatId();
 			engine.goto('/');
 		} else {

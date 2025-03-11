@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n.js';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { getDatePeriod } from '$lib/tools/chatMenuList.svelte.js';
 	import { format } from 'date-fns';
 	import { ui } from '$lib/stores/ui.js';
@@ -13,7 +13,7 @@
 	let chatList = $derived(idbqlState.chat.getAll());
 
 	const openCloseConfig = async () => {
-		if ($page.route.id?.includes('/configuration')) {
+		if (page.route.id?.includes('/configuration')) {
 			ui.setActiveChatId();
 			engine.goto('/');
 		} else {
