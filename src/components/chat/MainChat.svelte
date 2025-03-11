@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { settings } from '$lib/stores/settings.svelte';
 	import Speech from '$components/chat/input/Speech.svelte';
-	import Input from './input/Input.svelte';
+	import TextArea from './input/TextArea.svelte';
 	import { ui } from '$lib/stores/ui';
 	import ChatOptions from './ChatOptions.svelte';
 	import { aiState } from '$lib/stores';
@@ -19,6 +19,7 @@
 	import { ChatSessionManager } from '$lib/tools/chatSessionManager';
 	import { OllamaChatMessageRole } from '$types/ollama';
 	import Images from '$components/chat/input/Images.svelte';
+	import ChatArea from './ChatArea.svelte';
 
 	interface MainChatProps {
 		chatPassKey?: string;
@@ -133,52 +134,7 @@
 
 {#snippet input()}
 	<div class="application-chat-main">
-		<div class="application-chat-zone">
-			<Images />
-			<div class="application-chat-room">
-				<div class="absolute -top-10 left-0 flex w-full justify-center">
-					<Speech
-						onEnd={submitHandler}
-						bind:prompt={chatParametersState.prompt}
-						bind:voiceListening={chatParametersState.voiceListening}
-					/>
-				</div>
-				<!-- <hr /> -->
-				<div class="relative flex-1">
-					<Input
-						disabled={!connectionTimer.connected}
-						onkeypress={keyPressHandler}
-						bind:value={chatParametersState.prompt}
-						bind:requestStop={$aiState}
-						{placeholder}
-						form="prompt-form"
-					/>
-					<div class="absolute top-[50%] right-3 -mt-5 flex h-10 w-10 flex-col place-content-center rounded-full">
-						{#if $aiState == 'done'}
-							<button
-								class="input aspect-square items-center rounded-full drop-shadow-lg"
-								type="submit"
-								form="prompt-form"
-							>
-								<Icon icon="mdi:send" />
-							</button>
-						{:else}
-							<button
-								class="flex aspect-square place-content-center rounded-full border border drop-shadow-lg"
-								form="prompt-form"
-							>
-								<Icon icon="mdi:stop" />
-							</button>
-						{/if}
-					</div>
-					<!-- <hr /> -->
-				</div>
-				<div class="flex">
-					<ChatOptions />
-					<div class="flex-1"></div>
-				</div>
-			</div>
-		</div>
+		<ChatArea submitHandler={submitHandler} keyPressHandler={keyPressHandler} placeholder={placeholder} />
 		<!--<div class="text-xs text-center theme-bg p-2">{$t('ui.aiCautionMessage')}</div>-->
 	</div>
 {/snippet}
