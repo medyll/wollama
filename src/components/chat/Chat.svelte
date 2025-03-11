@@ -5,7 +5,7 @@
 	import ChatArea from './ChatArea.svelte';
 
 	interface MainChatProps {
-		chatPassKey?: string;
+		chatPassKey?: string; 
 	}
 
 	let { chatPassKey }: MainChatProps = $props();
