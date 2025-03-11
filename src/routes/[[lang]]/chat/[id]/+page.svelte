@@ -1,9 +1,9 @@
 <script lang="ts">
 	import MainChat from '$components/chat/MainChat.svelte';
 
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 </script>
 
-{#key $page.params.id}
-	<MainChat activeChatId={$page.params.id} chatPassKey={$page.params.id} />
+{#key page.params.id}
+	<MainChat activeChatId={page.params.id} chatPassKey={page.params.id} />
 {/key}

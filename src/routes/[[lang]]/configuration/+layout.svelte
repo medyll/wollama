@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import Selector from '$components/fragments/Selector.svelte';
 	import { t } from '$lib/stores/i18n';
 	import { engine } from '$lib/tools/engine';
@@ -7,7 +7,7 @@
 
 	const tabs = ['ollama', 'model', 'create'];
 
-	$: activeTab = $page.params?.config ?? 'ollama';
+	$: activeTab = page.params?.config ?? 'ollama';
 </script>
 
 <div class="h-full w-full overflow-hidden pl-8">

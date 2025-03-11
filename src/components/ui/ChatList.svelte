@@ -5,8 +5,8 @@
 	import { t } from '$lib/stores/i18n';
 	import { ui } from '$lib/stores/ui';
 	import { engine } from '$lib/tools/engine';
-	import { page } from '$app/stores';
-	import { dbQuery } from '$lib/db/dbQuery';
+	import { page } from '$app/state';
+	import { qoolie } from '$lib/db/dbQuery';
 
 	const loadChat = async (chatPassKey: string) => {
 		ui.showHideMenu(false);
@@ -14,7 +14,7 @@
 	};
 
 	let groupedMenuList = $derived(
-		dbQuery('chat')
+		qoolie('chat')
 			.getAll()
 			?.groupBy?.((item) => {
 				/*console.log(item)*/
@@ -35,10 +35,10 @@
 		</ListTitle>
 		<MenuList tall="mini" style="width:100%;" data={item?.data ?? []}>
 			{#snippet children({ item })}
-				<MenuListItem selected={item.chatId === $page?.params?.id} data={item}>
+				<MenuListItem selected={item.chatId === page?.params?.id} data={item}>
 					<ChatMenuItem
 						id={item.id}
-						selected={item.chatPassKey === $page?.params?.id}
+						selected={item.chatPassKey === page?.params?.id}
 						on:click={() => {
 							loadChat(item.chatPassKey);
 						}}

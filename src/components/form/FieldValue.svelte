@@ -1,40 +1,43 @@
 <!-- Component: CollectionFieldValue.svelte (ancien nom CollectionFieldInput.svelte) -->
-<script lang="ts">
+<script lang="ts" generics="COL = Record<string,any>">
 	// Importation des types et composants nécessaires
 	import { IDbCollectionFieldForge, IDbCollectionValues } from '$lib/db/dbFields';
 	import type { TplCollectionName } from '@medyll/idae-idbql';
 	import { IconButton } from '@medyll/idae-slotui-svelte';
+	import { getAllContexts, getContext } from 'svelte';
 
-	// Définition du type pour la position de l'étiquette
-	type LabelPosition = 'before' | 'above' | 'after' | 'below' | boolean;
+	interface FieldValueProps {
+		collection?:   TplCollectionName;
+		collectionId?: any;
+		fieldName:     keyof COL;
+		data?:         COL;
+		mode?:         'show' | 'create' | 'update';
+		editInPlace?:  boolean;
+		inputForm?:    string;
+		showLabel?:    LabelPosition;
+		showAiGuess?:  boolean;
+	}
 
 	// Déclaration des propriétés du composant avec leurs valeurs par défaut
 	let {
-		collection,
+		collection = getContext('collection'),
 		collectionId,
 		fieldName,
 		data = $bindable(),
-		mode,
+		mode = 'show',
 		editInPlace = false,
 		inputForm,
 		showLabel = true,
 		showAiGuess = false
-	} = $props<{
-		collection:    TplCollectionName;
-		collectionId?: any;
-		fieldName:     string;
-		data:          Record<string, any>;
-		mode:          'show' | 'create' | 'update';
-		editInPlace?:  boolean;
-		inputForm:     string;
-		showLabel?:    LabelPosition;
-		showAiGuess?:  boolean;
-	}>();
+	}: FieldValueProps = $props();
+
+	let _data = getContext('data');
+
+	data = data ?? ({} as COL);
 
 	// Initialisation des valeurs de champ de collection
 	let collectionFieldValues = new IDbCollectionValues(collection);
 	let inputDataset = collectionFieldValues.getInputDataSet(fieldName, data);
-	data = data ? data : {};
 
 	// Création d'une instance de forge de champ de collection
 	const fieldForge = $derived(new IDbCollectionFieldForge(collection, fieldName, data));
@@ -109,10 +112,7 @@
 </script>
 
 {#if !isPrivate}
-	<div
-		class="cell relative flex flex-col gap-2 wrapper-{fieldForge.fieldType}"
-		class:hidden={fieldForge?.fieldArgs?.includes('private')}
-	>
+	<div class="cell relative flex flex-col gap-2 wrapper-{fieldForge.fieldType}">
 		{#if fieldForge.fieldType !== 'id' && (labelPosition === 'before' || labelPosition === 'above')}
 			<label form={inputForm} for={fieldName} class="field-label {labelPosition}">{fieldName} </label>
 		{/if}
@@ -120,8 +120,8 @@
 		<div class="field-input flex">
 			{#if mode === 'show'}
 				<div class="flex w-48 gap-2">
-					<div class="flex-1">{fieldForge.format}</div>
-					<IconButton width="tiny" onclick={() => console.log('Edit in place for', fieldName)} icon="mdi:pencil" />
+					<div class="flex-1" {...inputDataset}>{fieldForge.format}</div>
+					<!-- <IconButton width="tiny" onclick={() => console.log('Edit in place for', fieldName)} icon="mdi:pencil" /> -->
 				</div>
 			{:else if fieldForge.fieldType === 'id'}
 				{#if mode !== 'create'}
@@ -129,7 +129,7 @@
 				{/if}
 			{:else if fieldForge.fieldType === 'boolean'}
 				<input type="checkbox" bind:checked={data[fieldName]} {...inputDataset} {...finalArgs} />
-			{:else if fieldForge.fieldType?.startsWith('text-long') || fieldForge.fieldType?.includes('area')}
+			{:else if fieldForge.fieldType?.includes('area')}
 				<textarea
 					style="width:100%;max-width:100%;"
 					bind:value={data[fieldName]}

@@ -10,6 +10,7 @@ export enum enumPrimitive {
 	any = 'any',
 	date = 'date',
 	datetime = 'datetime',
+	timestamp = 'timestamp',
 	time = 'time',
 	text = 'text',
 	number = 'number',
@@ -309,7 +310,7 @@ export class IDbCollections {
 	}
 }
 
-// display field values, based on schema and provided data
+// display   field values, based on schema and provided data
 // renamed from iDBFieldValues to iDbCollectionValues
 // path D:\boulot\python\wollama\src\lib\db\dbFields.ts
 export class IDbCollectionValues<T extends Record<string, any>> {
@@ -353,7 +354,7 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 		}
 	}
 
-	format(fieldName: keyof T, data: T): string {
+	display(fieldName: keyof T, data: T): string {
 		try {
 			this.#checkError(!this.#checkAccess(), 'Access denied', 'ACCESS_DENIED');
 			this.#checkError(!(fieldName in data), `Field ${String(fieldName)} not found in data`, 'FIELD_NOT_FOUND');
@@ -361,6 +362,9 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 			this.#checkError(!fieldInfo, `Field ${String(fieldName)} not found in collection`, 'FIELD_NOT_FOUND');
 
 			switch (fieldInfo?.fieldType) {
+				case 'timestamp':
+				case 'date':
+					return new Date(data[fieldName]).toLocaleDateString('fr-FR');
 				case 'number':
 					return this.#formatNumberField(data[fieldName]);
 				case 'text':
@@ -369,7 +373,7 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 				case 'text-medium':
 				case 'text-long':
 				case 'text-giant':
-					return this.#formatTextField(data[fieldName], fieldInfo.fieldType);
+					return this.#formatTextFieldLength(data[fieldName], fieldInfo.fieldType);
 				default:
 					return String(data[fieldName]);
 			}
@@ -410,7 +414,7 @@ export class IDbCollectionValues<T extends Record<string, any>> {
 		return value.toString();
 	}
 
-	#formatTextField(value: string, type: string): string {
+	#formatTextFieldLength(value: string, type: string): string {
 		const lengths = {
 			'text-tiny':   10,
 			'text-short':  20,
@@ -454,7 +458,7 @@ export class IDbCollectionFieldValues<T extends Record<string, any>> {
 		if (fieldInfo?.is === 'object') {
 			return this.iterateObject(String(fieldName), this.#data);
 		}
-		return this.#collectionValues.format(fieldName, this.#data);
+		return this.#collectionValues.display(fieldName, this.#data);
 	}
 
 	getInputDataSet(fieldName: keyof T) {
@@ -493,7 +497,7 @@ export class IDbCollectionFieldForge<T extends Record<string, any>> {
 	}
 
 	get format(): string {
-		return this.#collectionValues.format(String(this.#fieldName), this.#data);
+		return this.#collectionValues.display(String(this.#fieldName), this.#data);
 	}
 
 	get inputDataSet() {

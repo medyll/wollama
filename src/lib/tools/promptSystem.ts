@@ -3,7 +3,7 @@ import type { DBMessage } from '$types/db';
 import { get } from 'svelte/store';
 import { WollamaApi } from '../db/wollamaApi';
 import { settings } from '$lib/stores/settings.svelte';
-import { dbQuery, idbQuery } from '$lib/db/dbQuery';
+import { qoolie, idbQuery } from '$lib/db/dbQuery';
 import type { OllApiGenerate, OllamaResponse } from '$types/ollama';
 import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
 import { idbql } from '$lib/db/dbSchema';
@@ -148,7 +148,7 @@ Fourni  un résumé.[/INST]`;
 }
 
 async function doResume(chatId: any, steps: number = 10) {
-	const chatMessages = dbQuery('messages').getBy(chatId, 'chatId');
+	const chatMessages = qoolie('messages').getBy(chatId, 'chatId');
 	return chatMessages
 		.slice(0, steps)
 		.map((message: DBMessage) => {

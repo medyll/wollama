@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { idbqlState, schemeModel } from '$lib/db/dbSchema';
 	import { Icon, Looper, openWindow, Window } from '@medyll/idae-slotui-svelte';
 	import { IDbCollections } from '$lib/db/dbFields';
 	import CrudZone from '$components/form/CrudZone.svelte';
 
-	let collection = $page.params.collection;
+	let collection = page.params.collection;
 
 	let list = idbqlState[collection].getAll();
 

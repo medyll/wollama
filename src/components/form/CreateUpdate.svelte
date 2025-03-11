@@ -3,12 +3,12 @@
     Button validate and cancel is in the Window component.
  -->
 
-<script lang="ts">
+<script lang="ts" generics="COL = Record<string,any>">
 	import { IDbCollections as DbFields, IDbFormValidate } from '$lib/db/dbFields';
 	import { idbql, idbqlState, schemeModel } from '$lib/db/dbSchema';
 	import type { CreateUpdateProps } from './types';
 	import CollectionReverseFks from './CollectionReverseFks.svelte';
-	import CollectionFieldInput from './CollectionFieldValue.svelte';
+	import FieldInput from './FieldValue.svelte';
 
 	let {
 		collection,
@@ -19,6 +19,7 @@
 		showFields,
 		inPlaceEdit,
 		displayMode = 'wrap',
+		afterCreate,
 		showFks = false
 	}: CreateUpdateProps = $props();
 	let inputForm = `form-${String(collection)}-${mode}`;
@@ -52,8 +53,7 @@
 	};
 
 	export const submit = async (event: FormDataEvent) => {
-		if (!validateFormData($state.snapshot(formData))) {
-			console.log(validationErrors);
+		if (!validateFormData($state.snapshot(formData))) { 
 
 			Object.entries(validationErrors).forEach(([fieldName, errorMessage]) => {
 				// Trouver l'élément input correspondant dans le formulaire
@@ -100,7 +100,7 @@
 	};
 
 	function setFormDataDefaultFieldValues() {
-		Object.entries(formFields).forEach(([fieldName, field]) => {
+		Object.entries(formFields).forEach(([fieldName, field]) => { 
 			if (formData[fieldName] === undefined && getDefaultValue(field?.fieldType)) {
 				formData[fieldName] = getDefaultValue(field?.fieldType);
 			}
@@ -111,6 +111,8 @@
 	function getDefaultValue(fieldType?: string) {
 		if (mode !== 'create') return undefined;
 		switch (fieldType) {
+			case 'timestamp':
+				return Date.now();
 			case 'date':
 				return new Date().toISOString().split('T')[0];
 			case 'datetime':
@@ -136,7 +138,7 @@
 <div style="width:750px;display:flex;">
 	<div class="crud {displayMode}">
 		{#each Object.entries(formFields) as [fieldName, fieldInfo]}
-			<CollectionFieldInput
+			<FieldInput
 				{collection}
 				{fieldName}
 				{mode}

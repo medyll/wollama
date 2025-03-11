@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '$lib/stores/i18n.js';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	import { ui } from '$lib/stores/ui.js';
 	import { engine } from '$lib/tools/engine';
@@ -10,7 +10,7 @@
 	import { goto } from '$app/navigation';
 
 	const openCloseConfig = async () => {
-		if ($page.route.id?.includes('/configuration')) {
+		if (page.route.id?.includes('/configuration')) {
 			ui.setActiveChatId();
 			engine.goto('/');
 		} else {
@@ -22,7 +22,7 @@
 		settings.setSetting('menuExpanded', !$settings.menuExpanded);
 	};
 
-	const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books' | 'spaces') => {
+	const getChatLink = (link: 'settings' | 'chat' | 'newChat' | 'lib' | 'explore' | 'books' | 'space') => {
 		let goTo;
 		switch (link) {
 			case 'settings':
@@ -39,6 +39,9 @@
 				break;
 			case 'explore':
 				goTo = `${window.location.origin}/explore`;
+				break;
+			case 'space':
+				goTo = `${window.location.origin}/space`;
 				break;
 			default:
 				goTo = `${window.location.origin}/${link}`;
@@ -67,12 +70,16 @@
 				<span>{$t('ui.newChat')}</span>
 			</MenuListItem>
 			<MenuListItem
-				selected={$page?.route?.id === '/[[lang]]/lib'}
+				selected={page?.route?.id === '/[[lang]]/lib'}
 				onclick={() => getChatLink('lib')}
 				title={$t('ui.mylib')}
 			>
 				<Icon icon="fluent:library-20-filled" alt={$t('ui.mylib')} />
 				<span>{$t('ui.myLib')}</span>
+			</MenuListItem>
+			<MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
+				<Icon icon="earth" alt={$t('ui.spaces')} />
+				<span>{$t('ui.spaces')}</span>
 			</MenuListItem>
 			<div class="application-sideBar-content flex-1 overflow-auto">
 				<ChatList />
@@ -81,10 +88,6 @@
 				<Icon icon="ri:expand-right-line" alt={$t('ui.settings')} class="red" />
 			</MenuListItem>
 			<hr />
-			<MenuListItem title={$t('ui.spaces')} onclick={getChatLink('spaces')}>
-				<Icon icon="earth" alt={$t('ui.spaces')} />
-				<span>{$t('ui.spaces')}</span>
-			</MenuListItem>
 			<!-- <MenuListItem title={$t('ui.books')} onclick={getChatLink('books')}>
 					 <Icon icon="settings" alt={$t('ui.books')} />
 					 <span>{$t('ui.books')}</span>
@@ -94,7 +97,7 @@
 					<span>{$t('ui.settings')}</span>
 			</MenuListItem> -->
 			<MenuListItem
-				selected={$page?.route?.id === '/[[lang]]/settings'}
+				selected={page?.route?.id === '/[[lang]]/settings'}
 				title={$t('ui.settings')}
 				onclick={() => getChatLink('settings')}
 			>

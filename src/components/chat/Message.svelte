@@ -7,14 +7,14 @@
 	import Prism from 'prismjs';
 	import { tick } from 'svelte';
 	import 'prismjs/themes/prism-tomorrow.css';
-	import { dbQuery, idbQuery } from '$lib/db/dbQuery';
+	import { qoolie, idbQuery } from '$lib/db/dbQuery';
 
 	interface MessageProps {
 		messageId: string;
 	}
 
 	let { messageId }: MessageProps = $props();
-	let message = $derived<DBMessage>(messageId ? dbQuery('messages').getOne(messageId) : ({} as DBMessage));
+	let message = $derived<DBMessage>(messageId ? qoolie('messages').getOne(messageId) : ({} as DBMessage));
 
 	let icon = $derived(message?.role === 'user' ? 'lets-icons:user-scan-light' : 'icon-park:robot-one');
 	let place = $derived(message?.role === 'user' ? 'mr-24' : 'ml-24');
