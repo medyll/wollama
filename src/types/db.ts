@@ -58,7 +58,7 @@ export type DBMessage = {
 	messageId?: string;
 	chatId:     number;
 	content:    string;
-	created_at: Date;
+	created_at: number;
 	images?:    MessageImageType;
 	status:     'idle' | 'done' | 'sent' | 'streaming' | 'error';
 	context:    number[];
