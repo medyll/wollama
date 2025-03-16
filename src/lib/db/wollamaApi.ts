@@ -1,10 +1,9 @@
-import type { AbortableAsyncIterator, WollamaResponse } from '$types/ollama';
+import type { AbortableAsyncIterator   } from '$types/ollama';
 import ollama, {
 	type Config,
 	type GenerateRequest,
 	type GenerateResponse,
 	type ChatRequest,
-	type ChatResponse,
 	type PushRequest,
 	type CreateRequest,
 	type Message
