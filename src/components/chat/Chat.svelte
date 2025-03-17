@@ -1,11 +1,10 @@
 <script lang="ts">
-
-	import DashBoard from '$components/DashBoard.svelte'; 
-	import MessagesList from './MessagesList.svelte'; 
+	import DashBoard from '$components/DashBoard.svelte';
+	import MessagesList from './MessagesList.svelte';
 	import ChatArea from './ChatArea.svelte';
 
 	interface MainChatProps {
-		chatPassKey?: string; 
+		chatPassKey?: string;
 	}
 
 	let { chatPassKey }: MainChatProps = $props();
@@ -16,7 +15,6 @@
 		activeChatId = id;
 		window.history.replaceState(history.state, '', `/chat/${chatPassKey}`);
 	}
- 
 </script>
 
 {#snippet input()}

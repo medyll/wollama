@@ -157,7 +157,7 @@
 				{placeholder}
 				form="prompt-form"
 			/>
-			<div class="absolute right-3 top-[50%] -mt-5 flex h-10 w-10 flex-col place-content-center rounded-full">
+			<div class="absolute top-[50%] right-3 -mt-5 flex h-10 w-10 flex-col place-content-center rounded-full">
 				{#if $aiState == 'done'}
 					<button class="input aspect-square items-center rounded-full drop-shadow-lg" type="submit" form="prompt-form">
 						<Icon icon="mdi:send" />

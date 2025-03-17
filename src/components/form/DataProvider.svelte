@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { setContext } from 'svelte'; 
+	import { setContext } from 'svelte';
 
 	interface PROPS {
 		collection: string;
@@ -12,7 +12,7 @@
 	let _data = $derived(data);
 
 	setContext('collection', collection);
- 
+
 	setContext('data', data);
 	$inspect('data.provider', _data); // Corrected to reference others.data directly
 </script>

@@ -53,8 +53,7 @@
 	};
 
 	export const submit = async (event: FormDataEvent) => {
-		if (!validateFormData($state.snapshot(formData))) { 
-
+		if (!validateFormData($state.snapshot(formData))) {
 			Object.entries(validationErrors).forEach(([fieldName, errorMessage]) => {
 				// Trouver l'élément input correspondant dans le formulaire
 				const inputElement = document.querySelector(
@@ -100,7 +99,7 @@
 	};
 
 	function setFormDataDefaultFieldValues() {
-		Object.entries(formFields).forEach(([fieldName, field]) => { 
+		Object.entries(formFields).forEach(([fieldName, field]) => {
 			if (formData[fieldName] === undefined && getDefaultValue(field?.fieldType)) {
 				formData[fieldName] = getDefaultValue(field?.fieldType);
 			}

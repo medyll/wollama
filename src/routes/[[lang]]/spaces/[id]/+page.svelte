@@ -10,7 +10,7 @@
 	let _data = $derived(qoolie('space').getOne(page.params.id));
 
 	function onChatLoaded(id: number, chatPassKey?: string) {
-		engine.goto(`/chat/${chatPassKey}`); 
+		engine.goto(`/chat/${chatPassKey}`);
 	}
 </script>
 

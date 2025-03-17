@@ -1,4 +1,4 @@
-import type { AbortableAsyncIterator   } from '$types/ollama';
+import type { AbortableAsyncIterator } from '$types/ollama';
 import ollama, {
 	type Config,
 	type GenerateRequest,

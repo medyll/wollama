@@ -6,4 +6,4 @@
 	export let data: PageData;
 </script>
 
-<MainChat activeChatId={page.params.id} /> 
+<MainChat activeChatId={page.params.id} />
