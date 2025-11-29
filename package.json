@@ -50,6 +50,8 @@
 		"marked-highlight": "^2.2.3",
 		"ollama": "^0.6.3",
 		"ollama-node": "^0.1.28",
+		"pouchdb": "^9.0.0",
+		"pouchdb-find": "^9.0.0",
 		"prismjs": "^1.30.0",
 		"ts-deepmerge": "^7.0.3"
 	},
@@ -70,6 +72,8 @@
 		"@testing-library/svelte": "^5.2.9",
 		"@types/eslint": "^9.6.1",
 		"@types/marked": "^6.0.0",
+		"@types/pouchdb": "^6.4.2",
+		"@types/pouchdb-find": "^7.3.3",
 		"concurrently": "^9.2.1",
 		"cross-env": "^10.1.0",
 		"daisyui": "^5.5.5",
