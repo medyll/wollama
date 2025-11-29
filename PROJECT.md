@@ -4,8 +4,9 @@
 Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and voice (STT/TTS) capabilities.
 * **Hosting:** Self-hosted Node.js server on Windows (compiled as .exe).
 * **Clients:** Android, iOS (via Capacitor) and Windows, Linux, macOS (via Electron).
-* **Target AI:** Ollama (Local).
-* **Target UX:** Responsive (Mobile First) & Themable (Light/Dark/Custom).
+*   **Target AI:** Ollama (Local).
+*   **Target UX:** Responsive (Mobile First) & Themable (Light/Dark/Custom).
+*   **Internationalization:** The application is multi-language (i18n) with support for English, French, German, Spanish, Italian.
 
 ## 2. TECHNICAL STACK (MANDATORY)
 

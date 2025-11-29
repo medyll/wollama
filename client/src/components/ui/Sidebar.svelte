@@ -17,7 +17,7 @@
         </a>
     </div>
 
-    <div class="p-4 border-t border-base-content/10">
+    <div class="p-4 border-t border-base-content/10 flex flex-col gap-2">
         <a href="/chat/new" class="btn btn-outline btn-block btn-sm">
             + Nouvelle Chat
         </a>

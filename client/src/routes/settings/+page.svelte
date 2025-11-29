@@ -1,6 +1,7 @@
 <script lang="ts">
     import { userState } from '$lib/state/user.svelte';
     import { goto } from '$app/navigation';
+    import LanguageSelector from '$components/ui/LanguageSelector.svelte';
 
     let advancedMode = $state(false);
 
@@ -18,6 +19,9 @@
         </div>
         <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
             <div class="card-body">
+                <div class="flex justify-end mb-2">
+                    <LanguageSelector />
+                </div>
                 <div class="form-control">
                     <label class="label" for="nickname">
                         <span class="label-text">Votre Surnom (Optionnel)</span>
