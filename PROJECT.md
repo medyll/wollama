@@ -92,8 +92,10 @@ Represents the human user.
 - `user_id`: Link → User
 - `theme`: String
 - `locale`: String
-- `auto_play_audio`: Boolean
 - `server_url`: String
+- `default_model`: String
+- `default_temperature`: Number
+- `auto_play_audio`: Boolean
 
 ### Companion
 Represents the AI configuration (Personality).

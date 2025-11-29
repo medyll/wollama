@@ -21,7 +21,9 @@ export const appSchema: DatabaseSchema = {
             theme: { type: 'string' },
             locale: { type: 'string' },
             auto_play_audio: { type: 'boolean' },
-            server_url: { type: 'string' }
+            server_url: { type: 'string' },
+            default_model: { type: 'string' },
+            default_temperature: { type: 'number' }
         }
     },
     companions: {

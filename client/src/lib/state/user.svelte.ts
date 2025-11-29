@@ -1,8 +1,14 @@
 export class UserState {
     nickname = $state('');
-    serverUrl = $state('http://localhost:3000');
-    locale = $state('en');
     isConfigured = $state(false);
+    
+    preferences = $state({
+        serverUrl: 'http://localhost:3000',
+        locale: 'en',
+        theme: 'light',
+        defaultModel: 'mistral',
+        defaultTemperature: 0.7
+    });
 
     constructor() {
         // Load from localStorage if available
@@ -10,10 +16,13 @@ export class UserState {
             const stored = localStorage.getItem('wollama_user');
             if (stored) {
                 const data = JSON.parse(stored);
-                this.nickname = data.nickname;
-                this.serverUrl = data.serverUrl;
-                this.locale = data.locale || 'en';
+                this.nickname = data.nickname || '';
                 this.isConfigured = true;
+                
+                // Merge stored preferences with defaults
+                if (data.preferences) {
+                    this.preferences = { ...this.preferences, ...data.preferences };
+                }
             }
         }
     }
@@ -23,8 +32,7 @@ export class UserState {
         if (typeof localStorage !== 'undefined') {
             localStorage.setItem('wollama_user', JSON.stringify({
                 nickname: this.nickname,
-                serverUrl: this.serverUrl,
-                locale: this.locale
+                preferences: this.preferences
             }));
         }
     }
