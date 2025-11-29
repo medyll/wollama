@@ -38,7 +38,7 @@ export interface Message {
 export interface Chat {
 	chat_id: string; // UUID
 	user_id: string; // UUID
-	user_ai_id?: string; // UUID (Compagnon)
+	companion_id?: string; // UUID (Companion)
 
 	title: string;
 	created_at: number; // Timestamp
@@ -59,8 +59,8 @@ export interface ChatList {
 	[key: string]: Chat;
 }
 
-export interface Compagnon {
-	user_ai_id: string; // UUID
+export interface Companion {
+	companion_id: string; // UUID
 	name: string;
 	description?: string;
 	system_prompt: string;

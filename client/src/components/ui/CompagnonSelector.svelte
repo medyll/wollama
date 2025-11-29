@@ -1,13 +1,36 @@
 <script lang="ts">
+    import type { Companion } from '$types/data';
+
     let { isOpen = $bindable(false), onSelect } = $props();
 
-    const compagnons = [
-        { id: '1', name: 'Assistant Général', description: 'Un assistant polyvalent pour toutes vos tâches.', model: 'mistral' },
-        { id: '2', name: 'Codeur Expert', description: 'Spécialisé en développement logiciel.', model: 'codellama' },
-        { id: '3', name: 'Traducteur', description: 'Traduit vos textes en plusieurs langues.', model: 'llama2' },
+    const compagnons: Companion[] = [
+        { 
+            companion_id: '1', 
+            name: 'Assistant Général', 
+            description: 'Un assistant polyvalent pour toutes vos tâches.', 
+            model: 'mistral',
+            system_prompt: 'You are a helpful assistant.',
+            created_at: Date.now()
+        },
+        { 
+            companion_id: '2', 
+            name: 'Codeur Expert', 
+            description: 'Spécialisé en développement logiciel.', 
+            model: 'codellama',
+            system_prompt: 'You are an expert programmer.',
+            created_at: Date.now()
+        },
+        { 
+            companion_id: '3', 
+            name: 'Traducteur', 
+            description: 'Traduit vos textes en plusieurs langues.', 
+            model: 'llama2',
+            system_prompt: 'You are a translator.',
+            created_at: Date.now()
+        },
     ];
 
-    function selectCompagnon(compagnon: any) {
+    function selectCompagnon(compagnon: Companion) {
         onSelect(compagnon);
         isOpen = false;
     }

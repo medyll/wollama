@@ -69,21 +69,21 @@ Represents the human user.
 - `username`: String
 - `preferences`: JSON `{ "theme": "dark", "auto_play_audio": boolean }`
 
-### User_AI (Compagnon)
+### Companion
 Represents the AI configuration (Personality).
 
-- `user_ai_id`: UUID
+- `companion_id`: UUID
 - `name`: String (e.g., "Jarvis")
 - `system_prompt`: String (Base instructions for the LLM)
 - `voice_id`: String (Identifier of the TTS voice used)
 - `model`: String (Ollama model name, e.g., "mistral")
 
 ### Chat (Session)
-A conversation between a User and a User_AI.
+A conversation between a User and a Companion.
 
 - `chat_id`: UUID
 - `user_id`: Link → User
-- `user_ai_id`: Link → User_AI
+- `companion_id`: Link → Companion
 - `title`: String
 - `created_at`: Timestamp
 - `updated_at`: Timestamp

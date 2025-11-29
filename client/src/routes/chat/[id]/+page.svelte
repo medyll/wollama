@@ -1,11 +1,18 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import CompagnonSelector from '$components/ui/CompagnonSelector.svelte';
+    import type { Companion } from '$types/data';
     
     // Placeholder for chat logic
     let messageInput = $state('');
     let isCompagnonModalOpen = $state(false);
-    let currentCompagnon = $state({ name: 'Assistant Général', model: 'mistral' });
+    let currentCompagnon: Companion = $state({ 
+        companion_id: '1',
+        name: 'Assistant Général', 
+        model: 'mistral',
+        system_prompt: 'You are a helpful assistant.',
+        created_at: Date.now()
+    });
     
     // Mock messages for the static view
     let messages = $state([
@@ -34,7 +41,7 @@
         }, 1000);
     }
 
-    function onCompagnonSelected(compagnon: any) {
+    function onCompagnonSelected(compagnon: Companion) {
         currentCompagnon = compagnon;
         // Logic to update chat context with new compagnon
         messages.push({
