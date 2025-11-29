@@ -23,7 +23,8 @@ Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and 
 * **Runtime:** Node.js v20+.
 * **Server Framework:** Express.js.
 * **Packaging:** `pkg` (Binary compilation).
-* **Database:** JSON Flat file (MVP) or SQLite.
+* **Database:** PouchDB (LevelDB adapter) + express-pouchdb.
+* **API:** REST + PouchDB Sync Protocol.
 
 ### AI & Audio
 * **LLM:** Ollama API (Streaming enabled).
@@ -37,6 +38,7 @@ Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and 
 ├── client/                     # [Svelte 5 + Vite]
 │   ├── src/
 │   │   ├── lib/
+│   │   │   ├── db.ts           # RxDB Client Database & Sync Logic
 │   │   │   ├── state/          # Svelte 5 Stores (.svelte.js) - Theme Management here
 │   │   │   ├── services/       # Client API & Audio Recorder
 │   │   │   └── utils/          # Markdown Config & Audio Player
@@ -48,65 +50,102 @@ Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and 
 │   └── capacitor.config.ts     # [Mobile Config]
 │
 ├── server/                     # [Node.js Express]
-│   ├── server.js               # Entry Point
+│   ├── server.ts               # Entry Point (Express + PouchDB Server)
+│   ├── config.ts               # Centralized Configuration
+│   ├── db/                     # Database Initialization
+│   │   └── database.ts         # PouchDB Setup
 │   └── services/               # Isolated Business Logic
-│       ├── ollama.service.js   # LLM Management & Streaming
-│       ├── stt.service.js      # Audio Input Processing (Whisper)
-│       ├── tts.service.js      # Audio Output Processing
-│       └── storage.service.js  # JSON/SQLite Persistence
+│       ├── ollama.service.ts   # LLM Management & Streaming
+│       ├── generic.service.ts  # Server-side Data Access
+│       ├── stt.service.ts      # Audio Input Processing (Whisper)
+│       ├── tts.service.ts      # Audio Output Processing
+│       └── storage.service.ts  # (Deprecated/Legacy)
+│
+├── shared/                     # [Shared Code]
+│   ├── db/
+│   │   ├── database-scheme.ts  # Single Source of Truth for Schema
+│   │   └── schema-definition.ts
+│   └── services/
+│       └── abstract-generic.service.ts # Shared Interface
 │
 └── package.json                # Global Scripts
 ```
 
 ## 4. DATA MODEL (SIMPLIFIED SCHEMA)
 
+**Architecture:** Offline-First with Sync.
+- **Client:** RxDB (IndexedDB/Dexie)
+- **Server:** PouchDB (LevelDB)
+- **Sync:** CouchDB Replication Protocol
+
 **Convention:** Primary and foreign IDs must be prefixed by the entity name.
 
 ### User
 Represents the human user.
 
-- `user_id`: UUID
+- `user_id`: UUID (PK)
 - `username`: String
-- `preferences`: JSON `{ "theme": "dark", "auto_play_audio": boolean }`
+- `created_at`: Timestamp
+
+### UserPreferences
+- `user_preferences_id`: UUID (PK)
+- `user_id`: Link → User
+- `theme`: String
+- `locale`: String
+- `auto_play_audio`: Boolean
+- `server_url`: String
 
 ### Companion
 Represents the AI configuration (Personality).
 
-- `companion_id`: UUID
+- `companion_id`: UUID (PK)
 - `name`: String (e.g., "Jarvis")
-- `system_prompt`: String (Base instructions for the LLM)
-- `voice_id`: String (Identifier of the TTS voice used)
+- `description`: String
+- `system_prompt`: Text (Base instructions for the LLM)
 - `model`: String (Ollama model name, e.g., "mistral")
+- `voice_id`: String (Identifier of the TTS voice used)
+- `avatar`: String
+- `specialization`: String
+- `is_locked`: Boolean
 
 ### Chat (Session)
 A conversation between a User and a Companion.
 
-- `chat_id`: UUID
+- `chat_id`: UUID (PK)
 - `user_id`: Link → User
 - `companion_id`: Link → Companion
 - `title`: String
+- `tags`: Array<String>
+- `category`: String
+- `context`: Array<Number> (Embedding context)
 - `created_at`: Timestamp
 - `updated_at`: Timestamp
 
 ### Message
 A single exchange in a Chat.
 
-- `message_id`: UUID
+- `message_id`: UUID (PK)
 - `chat_id`: Link → Chat
-- `role`: Enum `['user', 'assistant', 'system']`
+- `role`: Enum `['system', 'user', 'assistant', 'tool']`
 - `content`: Text (Raw Markdown)
+- `status`: Enum `['idle', 'done', 'sent', 'streaming', 'error']`
 - `audio_file_path`: String (Optional, local path)
-- `timestamp`: Timestamp
+- `images`: Array<Object>
+- `urls`: Array<Object>
+- `created_at`: Timestamp
 
 ## 5. DATA FLOW
 
 ### A. Text Flow (Streaming)
 
 1. **UI:** User input → Svelte Store (`chat.svelte.js`).
-2. **Transport:** POST `/chat` to Node.js.
-3. **Backend:** Call Ollama API (`stream: true`).
-4. **Response:** Pipe Ollama stream to HTTP response (Chunked).
-5. **Rendering:** Svelte updates `` on each chunk. Render via `marked` + `{@html}`.
+2. **Persistence:** Client inserts message into RxDB (`status: 'sent'`).
+3. **Sync:** RxDB replicates to Server PouchDB.
+4. **Processing:** Server detects new message (Change Stream) OR Client calls API.
+   * *Current Implementation:* Client calls Server API for generation, Server streams response back.
+5. **Response:** Server streams chunks to Client.
+6. **Update:** Client updates RxDB message content progressively (`status: 'streaming'`).
+7. **Finalization:** Message marked as `done`.
 
 ### B. Voice Flow (Audio)
 
