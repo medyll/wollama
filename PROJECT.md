@@ -125,6 +125,8 @@ Un échange unitaire dans un Chat.
 - **Gestion d'Erreur :** Streaming résilient (reconnexion, gestion timeout).
 - **Sécurité :** Parsing Markdown obligatoire avant injection HTML.
 - **Compatibilité :** Détection runtime (Electron vs Capacitor vs Web) pour adapter l'API Audio.
+- **TypeScript :** l'application devra etre fortement typée.
+- **Accessibilité :** l'application devra etre RGAA 2.0 compatible.
 
 ## 7. SPÉCIFICITÉS MOBILE (CAPACITOR & SVELTEKIT)
 
