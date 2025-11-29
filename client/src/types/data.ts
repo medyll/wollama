@@ -38,7 +38,7 @@ export interface Message {
 export interface Chat {
 	chat_id: string; // UUID
 	user_id: string; // UUID
-	user_ai_id?: string; // UUID (Persona)
+	user_ai_id?: string; // UUID (Compagnon)
 
 	title: string;
 	created_at: number; // Timestamp
@@ -59,7 +59,7 @@ export interface ChatList {
 	[key: string]: Chat;
 }
 
-export interface Persona {
+export interface Compagnon {
 	user_ai_id: string; // UUID
 	name: string;
 	description?: string;

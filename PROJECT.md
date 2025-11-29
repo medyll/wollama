@@ -69,7 +69,7 @@ Represents the human user.
 - `username`: String
 - `preferences`: JSON `{ "theme": "dark", "auto_play_audio": boolean }`
 
-### User_AI (Persona)
+### User_AI (Compagnon)
 Represents the AI configuration (Personality).
 
 - `user_ai_id`: UUID
@@ -165,7 +165,7 @@ onMount(() => {
 - **Active Chat (`/chat/[id]`)**: Main discussion interface.
 
 ### Modals & Overlays
-- **Persona Selector**: AI choice grid (Name, Description, Model). Accessible from the chat header.
+- **Compagnon Selector**: AI choice grid (Name, Description, Model). Accessible from the chat header.
 - **Settings (Coming Soon)**: Advanced configuration.
 
 ## 9. DEVELOPMENT PHASING

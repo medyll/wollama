@@ -1,14 +1,14 @@
 <script lang="ts">
     let { isOpen = $bindable(false), onSelect } = $props();
 
-    const personas = [
+    const compagnons = [
         { id: '1', name: 'Assistant Général', description: 'Un assistant polyvalent pour toutes vos tâches.', model: 'mistral' },
         { id: '2', name: 'Codeur Expert', description: 'Spécialisé en développement logiciel.', model: 'codellama' },
         { id: '3', name: 'Traducteur', description: 'Traduit vos textes en plusieurs langues.', model: 'llama2' },
     ];
 
-    function selectPersona(persona: any) {
-        onSelect(persona);
+    function selectCompagnon(compagnon: any) {
+        onSelect(compagnon);
         isOpen = false;
     }
 </script>
@@ -18,15 +18,15 @@
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={() => isOpen = false}>✕</button>
         </form>
-        <h3 class="font-bold text-lg mb-4">Choisir un Interlocuteur</h3>
+        <h3 class="font-bold text-lg mb-4">Choisir un Compagnon</h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {#each personas as persona}
-                <button class="card bg-base-200 hover:bg-base-300 transition-colors text-left" onclick={() => selectPersona(persona)}>
+            {#each compagnons as compagnon}
+                <button class="card bg-base-200 hover:bg-base-300 transition-colors text-left" onclick={() => selectCompagnon(compagnon)}>
                     <div class="card-body p-4">
-                        <h4 class="font-bold">{persona.name}</h4>
-                        <p class="text-sm opacity-70">{persona.description}</p>
-                        <div class="badge badge-outline mt-2">{persona.model}</div>
+                        <h4 class="font-bold">{compagnon.name}</h4>
+                        <p class="text-sm opacity-70">{compagnon.description}</p>
+                        <div class="badge badge-outline mt-2">{compagnon.model}</div>
                     </div>
                 </button>
             {/each}

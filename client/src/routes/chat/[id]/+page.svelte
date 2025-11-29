@@ -1,11 +1,11 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import PersonaSelector from '$components/ui/PersonaSelector.svelte';
+    import CompagnonSelector from '$components/ui/CompagnonSelector.svelte';
     
     // Placeholder for chat logic
     let messageInput = $state('');
-    let isPersonaModalOpen = $state(false);
-    let currentPersona = $state({ name: 'Assistant Général', model: 'mistral' });
+    let isCompagnonModalOpen = $state(false);
+    let currentCompagnon = $state({ name: 'Assistant Général', model: 'mistral' });
     
     // Mock messages for the static view
     let messages = $state([
@@ -34,26 +34,26 @@
         }, 1000);
     }
 
-    function onPersonaSelected(persona: any) {
-        currentPersona = persona;
-        // Logic to update chat context with new persona
+    function onCompagnonSelected(compagnon: any) {
+        currentCompagnon = compagnon;
+        // Logic to update chat context with new compagnon
         messages.push({
             id: messages.length + 1,
             role: 'system',
-            content: `Interlocuteur changé pour : ${persona.name}`
+            content: `Interlocuteur changé pour : ${compagnon.name}`
         });
     }
 </script>
 
-<PersonaSelector bind:isOpen={isPersonaModalOpen} onSelect={onPersonaSelected} />
+<CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
 <div class="flex flex-col h-full">
     <!-- Chat Header -->
     <div class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur">
-        <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isPersonaModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isPersonaModalOpen = true)}>
+        <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isCompagnonModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isCompagnonModalOpen = true)}>
             <h2 class="font-bold text-lg">Discussion #{$page.params.id}</h2>
             <div class="flex items-center gap-2">
-                <span class="text-xs opacity-50">Avec: {currentPersona.name} ({currentPersona.model})</span>
+                <span class="text-xs opacity-50">Avec: {currentCompagnon.name} ({currentCompagnon.model})</span>
                 <span class="badge badge-xs badge-info">Changer</span>
             </div>
         </div>
