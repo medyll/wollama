@@ -3,7 +3,7 @@
         <div class="max-w-md">
             <h1 class="text-3xl font-bold">Prêt à discuter ?</h1>
             <p class="py-6">Sélectionnez une conversation dans le menu ou démarrez-en une nouvelle.</p>
-            <a href="/personas" class="btn btn-primary">Nouvelle Conversation</a>
+            <a href="/chat/new" class="btn btn-primary">Nouvelle Conversation</a>
         </div>
     </div>
 </div>

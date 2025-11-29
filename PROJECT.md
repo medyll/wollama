@@ -154,7 +154,19 @@ onMount(() => {
     });
 });
 
-## 8. PHASAGE DU DÉVELOPPEMENT
+## 8. LISTE DES ÉCRANS (UI MAP)
+
+### Écrans Principaux
+- **Welcome (`/`)** : Chargement, logo, redirection automatique.
+- **Setup (`/setup`)** : Configuration initiale (Surnom, Serveur).
+- **Chat Home (`/chat`)** : État vide, invitation à démarrer une conversation.
+- **Chat Active (`/chat/[id]`)** : Interface de discussion principale.
+
+### Modales & Overlays
+- **Persona Selector** : Grille de choix de l'IA (Nom, Description, Modèle). Accessible depuis le header du chat.
+- **Settings (À venir)** : Configuration avancée.
+
+## 9. PHASAGE DU DÉVELOPPEMENT
 
 - **Phase 1 (Core) :** Serveur Node + Client Svelte Texte (Streaming) + Structure Données JSON + Theming.
 - **Phase 2 (Audio) :** Pipeline STT/TTS complet.

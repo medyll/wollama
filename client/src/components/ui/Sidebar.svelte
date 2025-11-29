@@ -18,7 +18,7 @@
     </div>
 
     <div class="p-4 border-t border-base-content/10">
-        <a href="/personas" class="btn btn-outline btn-block btn-sm">
+        <a href="/chat/new" class="btn btn-outline btn-block btn-sm">
             + Nouvelle Chat
         </a>
     </div>

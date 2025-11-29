@@ -1,8 +1,11 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import PersonaSelector from '$components/ui/PersonaSelector.svelte';
     
     // Placeholder for chat logic
     let messageInput = $state('');
+    let isPersonaModalOpen = $state(false);
+    let currentPersona = $state({ name: 'Assistant Général', model: 'mistral' });
     
     // Mock messages for the static view
     let messages = $state([
@@ -30,14 +33,29 @@
             });
         }, 1000);
     }
+
+    function onPersonaSelected(persona: any) {
+        currentPersona = persona;
+        // Logic to update chat context with new persona
+        messages.push({
+            id: messages.length + 1,
+            role: 'system',
+            content: `Interlocuteur changé pour : ${persona.name}`
+        });
+    }
 </script>
+
+<PersonaSelector bind:isOpen={isPersonaModalOpen} onSelect={onPersonaSelected} />
 
 <div class="flex flex-col h-full">
     <!-- Chat Header -->
     <div class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur">
-        <div>
+        <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isPersonaModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isPersonaModalOpen = true)}>
             <h2 class="font-bold text-lg">Discussion #{$page.params.id}</h2>
-            <span class="text-xs opacity-50">Modèle: Mistral (Local)</span>
+            <div class="flex items-center gap-2">
+                <span class="text-xs opacity-50">Avec: {currentPersona.name} ({currentPersona.model})</span>
+                <span class="badge badge-xs badge-info">Changer</span>
+            </div>
         </div>
         <div class="flex gap-2">
             <button class="btn btn-ghost btn-sm btn-circle">
