@@ -16,7 +16,7 @@
 			"prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
 		}
 	},
-	"main": "electron/main.js",
+	"main": "client/electron/main.js",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",

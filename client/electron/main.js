@@ -21,7 +21,7 @@ function createWindow() {
             contextIsolation: false,
             // preload: path.join(__dirname, 'preload.js')
         },
-        icon: path.join(__dirname, '../static/favicon.png'),
+        icon: path.join(__dirname, '../../static/favicon.png'),
         show: false
     });
 

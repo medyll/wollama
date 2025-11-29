@@ -12,10 +12,20 @@ const config = {
 	preprocess: [vitePreprocess(), mdsvex()],
 	kit:        {
 		adapter: adapter(),
+		files: {
+			assets: 'client/static',
+			hooks: 'client/src/hooks',
+			lib: 'client/src/lib',
+			params: 'client/src/params',
+			routes: 'client/src/routes',
+			serviceWorker: 'client/src/service-worker',
+			appTemplate: 'client/src/app.html',
+			errorTemplate: 'client/src/error.html'
+		},
 		alias:   {
-			$components:    path.resolve('./src/components'),
-			$types:         path.resolve('./src/types'),
-			$configuration: path.resolve('./src/configuration')
+			$components:    path.resolve('./client/src/components'),
+			$types:         path.resolve('./client/src/types'),
+			$configuration: path.resolve('./client/src/configuration')
 		}
 	},
 	extensions: ['.svelte']
