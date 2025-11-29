@@ -9,17 +9,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"moduleResolution": "bundler",
-		"paths": {
-			"$lib": ["./client/src/lib"],
-			"$lib/*": ["./client/src/lib/*"],
-			"$components": ["./client/src/components"],
-			"$components/*": ["./client/src/components/*"],
-			"$types": ["./client/src/types"],
-			"$types/*": ["./client/src/types/*"],
-			"$configuration": ["./client/src/configuration"],
-			"$configuration/*": ["./client/src/configuration/*"]
-		}
+		"moduleResolution": "bundler"
 	},
 	"include": ["client/src/**/*.d.ts", "client/src/**/*.ts", "client/src/**/*.js", "client/src/**/*.svelte"],
 	"exclude": ["./node_modules/**", "./client/src-tauri/**", "./client/src/components/_old/**", "./client/src/lib/_old/**"]

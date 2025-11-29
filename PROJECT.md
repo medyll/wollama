@@ -13,7 +13,7 @@ Application de chat IA multiplateforme (Mobile & Desktop) avec capacités textue
 * **Framework :** Svelte 5 (Syntaxe Runes `$state`, `$effect` obligatoire).
 * **Build System :** Vite.
 * **CSS Framework :** Tailwind CSS + **DaisyUI**.
-    * *Note :* Utiliser les thèmes DaisyUI pour la gestion "Themable" via attribut `data-theme`.
+    * *Note :* Utiliser les thèmes DaisyUI pour la gestion "Themable" via attribut `data-theme`. avec theme clair sombre ou bien tout autre couleur
 * **Mobile Engine :** Capacitor.
 * **Desktop Engine :** Electron.
 * **Markdown Renderer :** Librairie `marked`.

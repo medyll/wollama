@@ -14,13 +14,9 @@ const config = {
 		adapter: adapter(),
 		files: {
 			assets: 'client/static',
-			hooks: 'client/src/hooks',
 			lib: 'client/src/lib',
-			params: 'client/src/params',
 			routes: 'client/src/routes',
-			serviceWorker: 'client/src/service-worker',
-			appTemplate: 'client/src/app.html',
-			errorTemplate: 'client/src/error.html'
+			appTemplate: 'client/src/app.html'
 		},
 		alias:   {
 			$components:    path.resolve('./client/src/components'),
