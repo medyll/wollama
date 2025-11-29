@@ -4,15 +4,21 @@ import path from 'path';
 import fs from 'fs';
 import { appSchema } from '../../shared/db/database-scheme.js';
 import type { DatabaseSchema } from '../../shared/db/schema-definition.js';
+import { config } from '../config.js';
 
 // Register the find plugin for MongoDB-style queries
 PouchDB.plugin(PouchFind);
 
 // Ensure data directory exists
-const DATA_DIR = path.resolve('data');
+const DATA_DIR = config.database.dir;
 if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR);
+    fs.mkdirSync(DATA_DIR, { recursive: true });
 }
+
+// Configure PouchDB defaults
+const MyPouchDB = PouchDB.defaults({
+    prefix: DATA_DIR + path.sep
+});
 
 // Generic Database Manager
 class DatabaseManager {
@@ -26,7 +32,8 @@ class DatabaseManager {
 
     private initDatabases() {
         for (const tableName of Object.keys(this.schema)) {
-            this.dbs[tableName] = new PouchDB(path.join(DATA_DIR, tableName));
+            // Use the configured MyPouchDB
+            this.dbs[tableName] = new MyPouchDB(tableName);
             this.initIndexes(tableName);
         }
     }
@@ -54,6 +61,11 @@ class DatabaseManager {
 
     public getSchema(tableName: string) {
         return this.schema[tableName];
+    }
+
+    // Expose the constructor for express-pouchdb
+    public getPouchDBConstructor() {
+        return MyPouchDB;
     }
 }
 
