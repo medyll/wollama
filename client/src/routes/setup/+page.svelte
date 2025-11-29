@@ -5,7 +5,6 @@
     let advancedMode = $state(false);
 
     function onSave() {
-        if (!userState.nickname) return;
         userState.save();
         goto('/chat');
     }
@@ -21,7 +20,7 @@
             <div class="card-body">
                 <div class="form-control">
                     <label class="label" for="nickname">
-                        <span class="label-text">Votre Surnom</span>
+                        <span class="label-text">Votre Surnom (Optionnel)</span>
                     </label>
                     <input 
                         type="text" 
@@ -29,7 +28,6 @@
                         placeholder="Ex: Neo" 
                         class="input input-bordered" 
                         bind:value={userState.nickname} 
-                        required 
                     />
                 </div>
                 
@@ -56,7 +54,7 @@
                 {/if}
 
                 <div class="form-control mt-6">
-                    <button class="btn btn-primary" onclick={onSave} disabled={!userState.nickname}>
+                    <button class="btn btn-primary" onclick={onSave}>
                         Commencer
                     </button>
                 </div>
