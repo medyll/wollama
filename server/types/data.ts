@@ -80,6 +80,8 @@ export interface Companion {
 }
 
 export interface UserPreferences {
+	user_preferences_id: string; // UUID (PK)
+	user_id: string; // UUID
 	theme: string;
 	locale: string;
 	auto_play_audio: boolean;
@@ -89,6 +91,5 @@ export interface UserPreferences {
 export interface User {
 	user_id: string; // UUID
 	username: string;
-	preferences: UserPreferences;
 	created_at: number;
 }
