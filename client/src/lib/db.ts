@@ -30,7 +30,8 @@ const convertSchema = (tableName: string, tableDef: any) => {
         primaryKey: tableDef.primaryKey,
         type: 'object',
         properties,
-        required
+        required,
+        indexes: tableDef.indexes ? [tableDef.indexes] : []
     };
 };
 
