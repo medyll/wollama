@@ -1,84 +1,84 @@
-# PROJET TOTAL : CONTEXTE TECHNIQUE, ARCHITECTURE & DATA
+# TOTAL PROJECT: TECHNICAL CONTEXT, ARCHITECTURE & DATA
 
-## 1. DÉFINITION DU PROJET
-Application de chat IA multiplateforme (Mobile & Desktop) avec capacités textuelles (Streaming) et vocales (STT/TTS).
-* **Hébergement :** Serveur Node.js auto-hébergé sur Windows (compilé en .exe).
-* **Clients :** Android, iOS (via Capacitor) et Windows, Linux, macOS (via Electron).
-* **IA Cible :** Ollama (Local).
-* **UX Target :** Responsive (Mobile First) & Themable (Light/Dark/Custom).
+## 1. PROJECT DEFINITION
+Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and voice (STT/TTS) capabilities.
+* **Hosting:** Self-hosted Node.js server on Windows (compiled as .exe).
+* **Clients:** Android, iOS (via Capacitor) and Windows, Linux, macOS (via Electron).
+* **Target AI:** Ollama (Local).
+* **Target UX:** Responsive (Mobile First) & Themable (Light/Dark/Custom).
 
-## 2. STACK TECHNIQUE (IMPOSÉE)
+## 2. TECHNICAL STACK (MANDATORY)
 
 ### Frontend (Client)
-* **Framework :** Svelte 5 (Syntaxe Runes `$state`, `$effect` obligatoire).
-* **Build System :** Vite.
-* **CSS Framework :** Tailwind CSS + **DaisyUI**.
-    * *Note :* Utiliser les thèmes DaisyUI pour la gestion "Themable" via attribut `data-theme`. avec theme clair sombre ou bien tout autre couleur
-* **Mobile Engine :** Capacitor.
-* **Desktop Engine :** Electron.
-* **Markdown Renderer :** Librairie `marked`.
+* **Framework:** Svelte 5 (Runes syntax `$state`, `$effect` mandatory).
+* **Build System:** Vite.
+* **CSS Framework:** Tailwind CSS + **DaisyUI**.
+    * *Note:* Use DaisyUI themes for "Themable" management via `data-theme` attribute. with light dark theme or any other color
+* **Mobile Engine:** Capacitor.
+* **Desktop Engine:** Electron.
+* **Markdown Renderer:** `marked` library.
 
-### Backend (Serveur)
-* **Runtime :** Node.js v20+.
-* **Server Framework :** Express.js.
-* **Packaging :** `pkg` (Compilation binaire).
-* **Database :** JSON Flat file (MVP) ou SQLite.
+### Backend (Server)
+* **Runtime:** Node.js v20+.
+* **Server Framework:** Express.js.
+* **Packaging:** `pkg` (Binary compilation).
+* **Database:** JSON Flat file (MVP) or SQLite.
 
-### IA & Audio
-* **LLM :** Ollama API (Streaming enabled).
-* **STT (Input) :** Whisper (via Ollama ou OpenAI API compatible).
-* **TTS (Output) :** API Web Speech (Front) ou Moteur TTS Node.js (Back).
+### AI & Audio
+* **LLM:** Ollama API (Streaming enabled).
+* **STT (Input):** Whisper (via Ollama or OpenAI API compatible).
+* **TTS (Output):** Web Speech API (Front) or Node.js TTS Engine (Back).
 
-## 3. STRUCTURE MONOREPO
+## 3. MONOREPO STRUCTURE
 
 ```text
 /root
 ├── client/                     # [Svelte 5 + Vite]
 │   ├── src/
 │   │   ├── lib/
-│   │   │   ├── state/          # Stores Svelte 5 (.svelte.js) - Gestion Thème ici
-│   │   │   ├── services/       # API Client & Audio Recorder
+│   │   │   ├── state/          # Svelte 5 Stores (.svelte.js) - Theme Management here
+│   │   │   ├── services/       # Client API & Audio Recorder
 │   │   │   └── utils/          # Markdown Config & Audio Player
 │   │   ├── assets/
 │   │   ├── routes/
-│   │   │   └── +layout.svelte  # Gestion globale (Deep Linking, Thème)
+│   │   │   └── +layout.svelte  # Global Management (Deep Linking, Theme)
 │   │   └── App.svelte
 │   ├── electron/               # [Electron Main Process]
 │   └── capacitor.config.ts     # [Mobile Config]
 │
 ├── server/                     # [Node.js Express]
 │   ├── server.js               # Entry Point
-│   └── services/               # Logique Métier isolée
-│       ├── ollama.service.js   # Gestion LLM & Streaming
-│       ├── stt.service.js      # Traitement Audio Input (Whisper)
-│       ├── tts.service.js      # Traitement Audio Output
-│       └── storage.service.js  # Persistance JSON/SQLite
+│   └── services/               # Isolated Business Logic
+│       ├── ollama.service.js   # LLM Management & Streaming
+│       ├── stt.service.js      # Audio Input Processing (Whisper)
+│       ├── tts.service.js      # Audio Output Processing
+│       └── storage.service.js  # JSON/SQLite Persistence
 │
-└── package.json                # Scripts globaux
+└── package.json                # Global Scripts
 ```
 
-## 4. MODÈLE DE DONNÉES (SCHEMA SIMPLIFIÉ)
+## 4. DATA MODEL (SIMPLIFIED SCHEMA)
 
-**Convention :** Les IDs primaires et étrangers doivent être préfixés par le nom de l'entité.
+**Convention:** Primary and foreign IDs must be prefixed by the entity name.
 
 ### User
-Représente l'utilisateur humain.
+Represents the human user.
 
 - `user_id`: UUID
 - `username`: String
 - `preferences`: JSON `{ "theme": "dark", "auto_play_audio": boolean }`
 
 ### User_AI (Persona)
-Représente la configuration de l'IA (Personnalité).
+Represents the AI configuration (Personality).
 
 - `user_ai_id`: UUID
-- `name`: String (ex: "Jarvis")
-- `system_prompt`: String (Instructions de base pour le LLM)
-- `voice_id`: String (Identifiant de la voix TTS utilisée)
-- `model`: String (Nom du modèle Ollama, ex: "mistral")
+- `name`: String (e.g., "Jarvis")
+- `system_prompt`: String (Base instructions for the LLM)
+- `voice_id`: String (Identifier of the TTS voice used)
+- `model`: String (Ollama model name, e.g., "mistral")
 
 ### Chat (Session)
-Une conversation entre un User et un User_AI.
+A conversation between a User and a User_AI.
 
 - `chat_id`: UUID
 - `user_id`: Link → User
@@ -88,58 +88,58 @@ Une conversation entre un User et un User_AI.
 - `updated_at`: Timestamp
 
 ### Message
-Un échange unitaire dans un Chat.
+A single exchange in a Chat.
 
 - `message_id`: UUID
 - `chat_id`: Link → Chat
 - `role`: Enum `['user', 'assistant', 'system']`
-- `content`: Text (Markdown brut)
-- `audio_file_path`: String (Optionnel, chemin local)
+- `content`: Text (Raw Markdown)
+- `audio_file_path`: String (Optional, local path)
 - `timestamp`: Timestamp
 
-## 5. FLUX DE DONNÉES (DATA FLOW)
+## 5. DATA FLOW
 
-### A. Flux Textuel (Streaming)
+### A. Text Flow (Streaming)
 
-1. **UI :** Saisie utilisateur → Store Svelte (`chat.svelte.js`).
-2. **Transport :** POST `/chat` vers Node.js.
-3. **Backend :** Appel Ollama API (`stream: true`).
-4. **Réponse :** Pipe du stream Ollama vers réponse HTTP (Chunked).
-5. **Rendu :** Svelte met à jour `` à chaque chunk. Rendu via `marked` + `{@html}`.
+1. **UI:** User input → Svelte Store (`chat.svelte.js`).
+2. **Transport:** POST `/chat` to Node.js.
+3. **Backend:** Call Ollama API (`stream: true`).
+4. **Response:** Pipe Ollama stream to HTTP response (Chunked).
+5. **Rendering:** Svelte updates `` on each chunk. Render via `marked` + `{@html}`.
 
-### B. Flux Vocal (Audio)
+### B. Voice Flow (Audio)
 
-1. **UI :** MediaRecorder capture l'audio → Blob.
-2. **Transport :** Upload FormData vers Node.js.
-3. **Backend STT :** Conversion Blob → Texte (Service STT).
-4. **Backend LLM :** Texte → Ollama → Réponse Texte.
-5. **Backend TTS :** Réponse Texte → Audio Buffer.
-6. **UI :** Réception Audio → Lecture automatique.
+1. **UI:** MediaRecorder captures audio → Blob.
+2. **Transport:** Upload FormData to Node.js.
+3. **Backend STT:** Convert Blob → Text (STT Service).
+4. **Backend LLM:** Text → Ollama → Text Response.
+5. **Backend TTS:** Text Response → Audio Buffer.
+6. **UI:** Receive Audio → Auto-play.
 
-## 6. DIRECTIVES IA (POUR CODING)
+## 6. AI DIRECTIVES (FOR CODING)
 
-- **Svelte 5 Strict :** Utiliser exclusivement les Runes (``, ``, ``). Pas d'ancienne syntaxe.
-- **Responsive UI :** Design Mobile First. Breakpoints Tailwind (`md:`, `lg:`) pour sidebar/chat.
-- **Theming :** Attribut `data-theme` sur `<html>` géré par Svelte pour basculer les thèmes DaisyUI.
-- **DaisyUI :** Utiliser les classes sémantiques (`chat`, `chat-start`, `chat-bubble`).
-- **Gestion d'Erreur :** Streaming résilient (reconnexion, gestion timeout).
-- **Sécurité :** Parsing Markdown obligatoire avant injection HTML.
-- **Compatibilité :** Détection runtime (Electron vs Capacitor vs Web) pour adapter l'API Audio.
-- **TypeScript :** l'application devra etre fortement typée.
-- **Accessibilité :** l'application devra etre RGAA 2.0 compatible.
+- **Svelte 5 Strict:** Use Runes exclusively (``, ``, ``). No old syntax.
+- **Responsive UI:** Mobile First Design. Tailwind breakpoints (`md:`, `lg:`) for sidebar/chat.
+- **Theming:** `data-theme` attribute on `<html>` managed by Svelte to toggle DaisyUI themes.
+- **DaisyUI:** Use semantic classes (`chat`, `chat-start`, `chat-bubble`).
+- **Error Handling:** Resilient streaming (reconnection, timeout handling).
+- **Security:** Mandatory Markdown parsing before HTML injection.
+- **Compatibility:** Runtime detection (Electron vs Capacitor vs Web) to adapt Audio API.
+- **TypeScript:** The application must be strongly typed.
+- **Accessibility:** The application must be RGAA 2.0 compatible.
 
-## 7. SPÉCIFICITÉS MOBILE (CAPACITOR & SVELTEKIT)
+## 7. MOBILE SPECIFICS (CAPACITOR & SVELTEKIT)
 
-### Architecture Routing
+### Routing Architecture
 
-- **Mode SPA Obligatoire :** Utilisation de `@sveltejs/adapter-static` avec `fallback: 'index.html'`.
-- **SSR Désactivé :** `export const ssr = false;` et `export const prerender = true;` dans `src/routes/+layout.js`.
+- **SPA Mode Mandatory:** Use `@sveltejs/adapter-static` with `fallback: 'index.html'`.
+- **SSR Disabled:** `export const ssr = false;` and `export const prerender = true;` in `src/routes/+layout.js`.
 
-### Deep Linking (URLs Entrantes)
+### Deep Linking (Incoming URLs)
 
-Capacitor n'utilise pas le router web standard pour les ouvertures d'app via custom scheme. Il faut intercepter l'événement `appUrlOpen` et router manuellement.
+Capacitor does not use the standard web router for app opens via custom scheme. You must intercept the `appUrlOpen` event and route manually.
 
-**Snippet requis (`src/routes/+layout.svelte`) :**
+**Required Snippet (`src/routes/+layout.svelte`):**
 
 ```javascript
 import { onMount } from 'svelte';
@@ -148,27 +148,28 @@ import { App } from '@capacitor/app';
 
 onMount(() => {
     App.addListener('appUrlOpen', data => {
-        // Nettoyage: "myapp://chat/123" -> "/chat/123"
+        // Cleanup: "myapp://chat/123" -> "/chat/123"
         const slug = data.url.split('.com').pop(); 
         if (slug) goto(slug);
     });
 });
+```
 
-## 8. LISTE DES ÉCRANS (UI MAP)
+## 8. SCREEN LIST (UI MAP)
 
-### Écrans Principaux
-- **Welcome (`/`)** : Chargement, logo, redirection automatique.
-- **Setup (`/setup`)** : Configuration initiale (Surnom, Serveur).
-- **Chat Home (`/chat`)** : État vide, invitation à démarrer une conversation.
-- **Chat Active (`/chat/[id]`)** : Interface de discussion principale.
+### Main Screens
+- **Welcome (`/`)**: Loading, logo, automatic redirection.
+- **Settings (`/settings`)**: Initial configuration (Nickname, Server).
+- **Chat Home (`/chat`)**: Empty state, invitation to start a conversation.
+- **Active Chat (`/chat/[id]`)**: Main discussion interface.
 
-### Modales & Overlays
-- **Persona Selector** : Grille de choix de l'IA (Nom, Description, Modèle). Accessible depuis le header du chat.
-- **Settings (À venir)** : Configuration avancée.
+### Modals & Overlays
+- **Persona Selector**: AI choice grid (Name, Description, Model). Accessible from the chat header.
+- **Settings (Coming Soon)**: Advanced configuration.
 
-## 9. PHASAGE DU DÉVELOPPEMENT
+## 9. DEVELOPMENT PHASING
 
-- **Phase 1 (Core) :** Serveur Node + Client Svelte Texte (Streaming) + Structure Données JSON + Theming.
-- **Phase 2 (Audio) :** Pipeline STT/TTS complet.
-- **Phase 3 (Platform) :** Configuration Capacitor (Android) et Electron (Desktop).
-- **Phase 4 (Build) :** Packaging `.exe` et `.apk`.
+- **Phase 1 (Core):** Node Server + Svelte Client Text (Streaming) + JSON Data Structure + Theming.
+- **Phase 2 (Audio):** Complete STT/TTS Pipeline.
+- **Phase 3 (Platform):** Capacitor (Android) and Electron (Desktop) Configuration.
+- **Phase 4 (Build):** `.exe` and `.apk` Packaging.

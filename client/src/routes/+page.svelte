@@ -8,7 +8,7 @@
             if (userState.isConfigured) {
                 goto('/chat');
             } else {
-                goto('/setup');
+                goto('/settings');
             }
         }, 2000); // Fake loading time for effect
     });
