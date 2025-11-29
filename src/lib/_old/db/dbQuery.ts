@@ -1,47 +1,9 @@
-import type { DbChat, DBMessage, PromptType } from '$types/db';
-import { type OllamaResponse } from '$types/ollama';
+import type { DbChat, DBMessage, PromptType } from '$types/_old/db';
+import { type OllamaResponse } from '$types/_old/ollama';
 import { dataUtils } from '$lib/_old/tools/chatUtils';
 import { idbql, idbqlState, schemeModelDb } from './dbSchema';
-import type { UserType } from '$types/user';
-import { getClientData } from '$types/getData';
+import type { UserType } from '$types/_old/user'; 
 
-export function ideo(collection: keyof typeof schemeModelDb) {
-	if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);
-	return {
-		get:         getClientData({ table_name: collection, action: 'get_one', data: {} }),
-		getAll:      getClientData({
-			table_name: collection,
-			action:     'getAll',
-			data:       {}
-		}),
-		create:      getClientData({
-			table_name: collection,
-			action:     'create',
-			data:       {}
-		}),
-		delete:      getClientData({
-			table_name: collection,
-			action:     'delete',
-			data:       {}
-		}),
-		deleteWhere: getClientData({
-			table_name: collection,
-			action:     'deleteWhere',
-			data:       {}
-		}),
-		update:      getClientData({
-			table_name: collection,
-			action:     'update',
-			data:       {}
-		}),
-		where:       getClientData({ table_name: collection, action: 'where', data: {} }),
-		updateWhere: getClientData({
-			table_name: collection,
-			action:     'updateWhere',
-			data:       {}
-		})
-	};
-}
 
 export function qoolie(collection: keyof typeof schemeModelDb) {
 	// if (!idbqlState[collection]) throw new Error(`Collection ${collection} not found`);

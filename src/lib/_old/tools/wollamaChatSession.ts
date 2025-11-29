@@ -1,5 +1,5 @@
 import { qoolie, idbQuery } from '$lib/_old/db/dbQuery';
-import type { DbChat, DBMessage } from '$types/db';
+import type { DbChat, DBMessage } from '$types/_old/db';
 
 export class ChatSessionManager {
 	#sessionId?:             number;

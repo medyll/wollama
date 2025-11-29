@@ -14,10 +14,10 @@ import type {
 	DbWritingGoal,
 	PromptType,
 	DbSpaces
-} from '$types/db';
-import type { DBMessage } from '$types/db';
-import type { SettingsType } from '$types/settings';
-import type { UserType } from '$types/user';
+} from '$types/_old/db';
+import type { DBMessage } from '$types/_old/db';
+import type { SettingsType } from '$types/_old/settings';
+import type { UserType } from '$types/_old/user';
 import { createIdbqDb, type IdbqModel, type Tpl, type DbFieldTypes, type TplFieldType } from '@medyll/idae-idbql';
 import { space } from 'postcss/lib/list';
 import type { DbDataModel, DbDataModelTs } from './dataModel';

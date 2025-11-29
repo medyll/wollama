@@ -1,5 +1,5 @@
 import type { TplFieldType } from '@medyll/idae-idbql';
-import type { OllamaChat } from './ollama';
+import type { OllamaChat } from '../ollama';
 /* 
 
 curl http://localhost:11434/api/generate -d '{

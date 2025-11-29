@@ -1,5 +1,5 @@
 import { PUBLIC_OLLAMA_SERVER_API, PUBLIC_WOLLAMA_API_URL } from '$env/static/public';
-import type { SettingsType } from '$types/settings';
+import type { SettingsType } from '$types/_old/settings';
 
 export const defaultOllamaSettings = {
 	num_ctx:        undefined,

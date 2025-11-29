@@ -1,4 +1,4 @@
-import type { DbChat } from '$types/db';
+import type { DbChat } from '$types/_old/db';
 import { startOfDay, endOfDay, isThisWeek, format } from 'date-fns';
 
 type Group<T = any> = {

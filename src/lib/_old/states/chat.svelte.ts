@@ -1,4 +1,4 @@
-import type { MessageImageType, PromptType } from '$types/db';
+import type { MessageImageType, PromptType } from '$types/_old/db';
 
 export type ChatParameters = {
 	disabledPrompt: boolean;

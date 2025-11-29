@@ -1,9 +1,9 @@
 import { qoolie, idbQuery } from '$lib/_old/db/dbQuery';
 import type { GenerateResponseHook } from '$lib/_old/db/wollamaApi';
 import { type ChatParameters } from '$lib/states/chat.svelte';
-import type { DbChat, DBMessage } from '$types/db';
-import { type OllamaChatMessage, OllamaChatMessageRole } from '$types/ollama';
-import type { SettingsType } from '$types/settings';
+import type { DbChat, DBMessage } from '$types/_old/db';
+import { type OllamaChatMessage, OllamaChatMessageRole } from '$types/_old/ollama';
+import type { SettingsType } from '$types/_old/settings';
 import type { Message } from 'ollama/browser';
 
 export class ChatSessionManager {
