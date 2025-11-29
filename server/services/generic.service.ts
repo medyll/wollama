@@ -1,16 +1,14 @@
 import { dbManager } from '../db/database.js';
+import { AbstractGenericService } from '../../shared/services/abstract-generic.service.js';
 
-export class GenericService<T> {
-    private tableName: string;
-    private primaryKey: string;
+export class GenericService<T> extends AbstractGenericService<T> {
 
     constructor(tableName: string) {
-        this.tableName = tableName;
         const schema = dbManager.getSchema(tableName);
         if (!schema) {
             throw new Error(`Schema not found for table ${tableName}`);
         }
-        this.primaryKey = schema.primaryKey;
+        super(tableName, schema.primaryKey);
     }
 
     private get db() {
