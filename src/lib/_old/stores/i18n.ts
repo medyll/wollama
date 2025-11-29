@@ -1,7 +1,7 @@
 import { derived, get, writable } from 'svelte/store';
-import { translations } from '../../locales/translations.js';
-import { settings } from '$lib/stores/settings.svelte';
-import { engine } from '$lib/tools/engine.js';
+import { translations } from '../../../locales/translations.js';
+import { settings } from '$lib/_old/stores/settings.svelte.js';
+import { engine } from '$lib/_old/tools/engine.js';
 
 export const missingLocale = writable<string[]>([]);
 export const locale = writable<string>('en');

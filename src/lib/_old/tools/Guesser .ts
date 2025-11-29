@@ -1,6 +1,6 @@
 // guesser.ts
 import type { TplCollectionName } from '@medyll/idae-idbql';
-import { IDbCollections } from '$lib/db/dbFields';
+import { IDbCollections } from '$lib/_old/db/dbFields';
 
 export class Guesser {
 	private dbFields: IDbCollections;

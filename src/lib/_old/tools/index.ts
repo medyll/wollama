@@ -1,4 +1,4 @@
-import { ingest as ingest } from '$lib/external/ingest';
+import { ingest as ingest } from '$lib/_old/external/ingest';
 
 const directory = process.argv[2];
 const extensions = process.argv[3];

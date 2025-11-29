@@ -3,10 +3,10 @@ import type { DBMessage } from '$types/db';
 import { get } from 'svelte/store';
 import { WollamaApi } from '../db/wollamaApi';
 import { settings } from '$lib/stores/settings.svelte';
-import { qoolie, idbQuery } from '$lib/db/dbQuery';
+import { qoolie, idbQuery } from '$lib/_old/db/dbQuery';
 import type { OllApiGenerate, OllamaResponse } from '$types/ollama';
 import { ollamaApiMainOptionsParams } from '$lib/stores/ollamaParams';
-import { idbql } from '$lib/db/dbSchema';
+import { idbql } from '$lib/_old/db/dbSchema';
 
 let categoryPresets = [
 	'Coding',

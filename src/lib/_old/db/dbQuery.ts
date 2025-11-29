@@ -1,6 +1,6 @@
 import type { DbChat, DBMessage, PromptType } from '$types/db';
 import { type OllamaResponse } from '$types/ollama';
-import { dataUtils } from '$lib/tools/chatUtils';
+import { dataUtils } from '$lib/_old/tools/chatUtils';
 import { idbql, idbqlState, schemeModelDb } from './dbSchema';
 import type { UserType } from '$types/user';
 import { getClientData } from '$types/getData';

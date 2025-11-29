@@ -1,5 +1,5 @@
-import { qoolie, idbQuery } from '$lib/db/dbQuery';
-import type { GenerateResponseHook } from '$lib/db/wollamaApi';
+import { qoolie, idbQuery } from '$lib/_old/db/dbQuery';
+import type { GenerateResponseHook } from '$lib/_old/db/wollamaApi';
 import { type ChatParameters } from '$lib/states/chat.svelte';
 import type { DbChat, DBMessage } from '$types/db';
 import { type OllamaChatMessage, OllamaChatMessageRole } from '$types/ollama';

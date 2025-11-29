@@ -1,5 +1,5 @@
-import { idbql } from '$lib/db/dbSchema';
-import { promptLib } from '$lib/prompts/promptLib';
+import { idbql } from '$lib/_old/db/dbSchema';
+import { promptLib } from '$lib/_old/prompts/promptLib';
 
 export async function init() {
 	let query;
