@@ -6,11 +6,19 @@ import expressPouchDB from 'express-pouchdb';
 import { dbManager } from './db/database.js';
 import { config } from './config.js';
 
+import cors from 'cors';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = config.server.port;
+
+// CORS Configuration
+app.use(cors({
+    origin: config.cors.origin,
+    credentials: true
+}));
 
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
