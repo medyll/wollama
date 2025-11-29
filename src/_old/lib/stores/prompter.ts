@@ -1,5 +1,5 @@
-import type { MessageImageType, PromptType } from '$types/_old/db';
-import type { OllamaChat } from '$types/_old/ollama';
+import type { MessageImageType, PromptType } from '../../types/db';
+import type { OllamaChat } from '../../types/ollama';
 import { type Options } from 'ollama/browser';
 import { derived, get, writable } from 'svelte/store';
 import { settings } from '$lib/stores/settings.svelte';

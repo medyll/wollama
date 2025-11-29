@@ -1,8 +1,8 @@
-import type { DbChat, DBMessage, PromptType } from '$types/_old/db';
-import { type OllamaResponse } from '$types/_old/ollama';
+import type { DbChat, DBMessage, PromptType } from '../../types/db';
+import { type OllamaResponse } from '../../types/ollama';
 import { dataUtils } from '$lib/_old/tools/chatUtils';
 import { idbql, idbqlState, schemeModelDb } from './dbSchema';
-import type { UserType } from '$types/_old/user'; 
+import type { UserType } from '../../types/user'; 
 
 
 export function qoolie(collection: keyof typeof schemeModelDb) {

@@ -1,4 +1,4 @@
-import type { DbChat } from '$types/_old/db';
+import type { DbChat } from '../../types/db';
 import { addWeeks, differenceInMonths, differenceInWeeks, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 
 type GroupItem = {

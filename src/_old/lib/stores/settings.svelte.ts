@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-import { defaultSettings } from '$configuration/_old/configuration';
-import type { SettingsType } from '$types/_old/settings';
+import { defaultSettings } from '../../../_old/configuration/configuration';
+import type { SettingsType } from '../../types/settings';
 
 /* class Settings {
     settings = $state<SettingsType>(defaultSettings);

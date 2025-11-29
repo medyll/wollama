@@ -1,4 +1,4 @@
-import type { AbortableAsyncIterator } from '$types/_old/ollama';
+import type { AbortableAsyncIterator } from '../../types/ollama';
 import ollama, {
 	type Config,
 	type GenerateRequest,
@@ -8,7 +8,7 @@ import ollama, {
 	type CreateRequest,
 	type Message
 } from 'ollama/browser';
-import type { DBMessage } from '$types/_old/db';
+import type { DBMessage } from '../../types/db';
 
 interface Hook {
 	messageId: string;

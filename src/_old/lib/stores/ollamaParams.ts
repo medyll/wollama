@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { OllamaOptionsDefaults } from '$configuration/_old/configuration';
+import { OllamaOptionsDefaults } from '../../../_old/configuration/configuration';
 import { type Options } from 'ollama/browser';
 import { writable } from 'svelte/store';
 
