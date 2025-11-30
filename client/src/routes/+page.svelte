@@ -15,11 +15,12 @@
     });
 </script>
 
-<div class="hero min-h-screen bg-base-200">
-    <div class="hero-content text-center">
+<div class="hero min-h-screen bg-base-300" style="background-image: url('/assets/lama.png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="hero-overlay bg-opacity-60"></div>
+    <div class="hero-content text-center text-neutral-content">
         <div class="max-w-md">
             <h1 class="text-5xl font-bold text-primary">Wollama</h1>
-            <p class="py-6">{t('ui.loading_assistant')}</p>
+            <p class="py-6 font-bold text-xl">{t('ui.loading_assistant')}</p>
             <span class="loading loading-dots loading-lg text-primary"></span>
         </div>
     </div>
