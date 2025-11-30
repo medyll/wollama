@@ -21,7 +21,8 @@ export class UserState {
                 
                 // Merge stored preferences with defaults
                 if (data.preferences) {
-                    this.preferences = { ...this.preferences, ...data.preferences };
+                    // Use Object.assign to update the reactive proxy instead of replacing it
+                    Object.assign(this.preferences, data.preferences);
                 }
             }
         }

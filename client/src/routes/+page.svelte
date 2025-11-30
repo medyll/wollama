@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { userState } from '$lib/state/user.svelte';
+    import { t } from '$lib/state/i18n.svelte';
 
     onMount(() => {
         setTimeout(() => {
@@ -18,7 +19,7 @@
     <div class="hero-content text-center">
         <div class="max-w-md">
             <h1 class="text-5xl font-bold text-primary">Wollama</h1>
-            <p class="py-6">Chargement de votre assistant personnel...</p>
+            <p class="py-6">{t('ui.loading_assistant')}</p>
             <span class="loading loading-dots loading-lg text-primary"></span>
         </div>
     </div>

@@ -8,10 +8,12 @@ class I18nState {
     }
 
     // The main translation function
-    // Since it accesses userState.locale (which is a $state), 
+    // Since it accesses userState.preferences.locale (which is a $state), 
     // Svelte 5 will automatically track this dependency when used in templates/effects.
     t(key: string, vars: Record<string, string | number> = {}) {
-        const currentLocale = userState.locale as keyof typeof translations;
+        // Access the state directly to ensure reactivity
+        const locale = userState.preferences.locale;
+        const currentLocale = (locale in translations ? locale : 'en') as keyof typeof translations;
         
         // Get translation data for current locale, fallback to English
         const localeData = translations[currentLocale] || translations['en'];

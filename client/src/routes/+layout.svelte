@@ -3,6 +3,8 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { App } from '@capacitor/app';
+    import ToastContainer from '$components/ui/ToastContainer.svelte';
+    import ServerConnectionCheck from '$components/setup/ServerConnectionCheck.svelte';
 
 	let { children } = $props();
 
@@ -16,4 +18,6 @@
 	});
 </script>
 
+<ToastContainer />
+<ServerConnectionCheck />
 {@render children()}

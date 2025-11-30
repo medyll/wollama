@@ -1,10 +1,11 @@
 <script lang="ts">
+    import { t } from '$lib/state/i18n.svelte';
     let { isOpen = $bindable(true) } = $props();
 </script>
 
 <aside class="bg-base-300 h-full transition-all duration-300 flex flex-col border-r border-base-content/10 {isOpen ? 'w-64' : 'w-0 overflow-hidden'}">
     <div class="p-4 border-b border-base-content/10 flex items-center justify-between">
-        <span class="font-bold text-xl truncate">Conversations</span>
+        <span class="font-bold text-xl truncate">{t('ui.myChats')}</span>
     </div>
     
     <div class="flex-1 overflow-y-auto p-2 space-y-2">
@@ -19,7 +20,7 @@
 
     <div class="p-4 border-t border-base-content/10 flex flex-col gap-2">
         <a href="/chat/new" class="btn btn-outline btn-block btn-sm">
-            + Nouvelle Chat
+            + {t('ui.newChat')}
         </a>
     </div>
 </aside>

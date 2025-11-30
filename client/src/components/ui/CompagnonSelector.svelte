@@ -1,29 +1,30 @@
 <script lang="ts">
     import type { Companion } from '$types/data';
+    import { t } from '$lib/state/i18n.svelte';
 
     let { isOpen = $bindable(false), onSelect } = $props();
 
     const compagnons: Companion[] = [
         { 
             companion_id: '1', 
-            name: 'Assistant Général', 
-            description: 'Un assistant polyvalent pour toutes vos tâches.', 
+            name: t('ui.general_assistant'), 
+            description: t('ui.general_assistant_desc'), 
             model: 'mistral',
             system_prompt: 'You are a helpful assistant.',
             created_at: Date.now()
         },
         { 
             companion_id: '2', 
-            name: 'Codeur Expert', 
-            description: 'Spécialisé en développement logiciel.', 
+            name: t('ui.expert_coder'), 
+            description: t('ui.expert_coder_desc'), 
             model: 'codellama',
             system_prompt: 'You are an expert programmer.',
             created_at: Date.now()
         },
         { 
             companion_id: '3', 
-            name: 'Traducteur', 
-            description: 'Traduit vos textes en plusieurs langues.', 
+            name: t('ui.translator'), 
+            description: t('ui.translator_desc'), 
             model: 'llama2',
             system_prompt: 'You are a translator.',
             created_at: Date.now()
@@ -41,7 +42,7 @@
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={() => isOpen = false}>✕</button>
         </form>
-        <h3 class="font-bold text-lg mb-4">Choisir un Compagnon</h3>
+        <h3 class="font-bold text-lg mb-4">{t('ui.choose_companion')}</h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {#each compagnons as compagnon}

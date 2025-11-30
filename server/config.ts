@@ -8,7 +8,7 @@ export const config = {
     database: {
         // Directory where PouchDB stores data (LevelDB files)
         // Defaults to 'data' folder in the project root
-        dir: process.env.DB_PATH ? path.resolve(process.env.DB_PATH) : path.resolve(process.cwd(), 'data')
+        dir: process.env.DB_PATH ? path.resolve(process.env.DB_PATH) : path.resolve(process.cwd(), 'db_data')
     },
     pouchdb: {
         // Configuration for express-pouchdb

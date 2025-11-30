@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import { t } from '$lib/state/i18n.svelte';
     import CompagnonSelector from '$components/ui/CompagnonSelector.svelte';
     import type { Companion } from '$types/data';
     
@@ -8,7 +9,7 @@
     let isCompagnonModalOpen = $state(false);
     let currentCompagnon: Companion = $state({ 
         companion_id: '1',
-        name: 'Assistant Général', 
+        name: t('ui.general_assistant'), 
         model: 'mistral',
         system_prompt: 'You are a helpful assistant.',
         created_at: Date.now()
@@ -16,7 +17,7 @@
     
     // Mock messages for the static view
     let messages = $state([
-        { id: 1, role: 'assistant', content: 'Bonjour ! Comment puis-je vous aider aujourd\'hui ?' },
+        { id: 1, role: 'assistant', content: t('ui.welcome_message') },
         { id: 2, role: 'user', content: 'Je teste l\'interface de chat.' },
         { id: 3, role: 'assistant', content: 'C\'est noté. L\'interface semble fonctionner correctement.' }
     ]);
@@ -47,7 +48,7 @@
         messages.push({
             id: messages.length + 1,
             role: 'system',
-            content: `Interlocuteur changé pour : ${compagnon.name}`
+            content: `${t('ui.interlocutor_changed')} ${compagnon.name}`
         });
     }
 </script>
@@ -58,10 +59,10 @@
     <!-- Chat Header -->
     <div class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur">
         <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isCompagnonModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isCompagnonModalOpen = true)}>
-            <h2 class="font-bold text-lg">Discussion #{$page.params.id}</h2>
+            <h2 class="font-bold text-lg">{t('ui.chat_title')} #{$page.params.id}</h2>
             <div class="flex items-center gap-2">
-                <span class="text-xs opacity-50">Avec: {currentCompagnon.name} ({currentCompagnon.model})</span>
-                <span class="badge badge-xs badge-info">Changer</span>
+                <span class="text-xs opacity-50">{t('ui.with')} {currentCompagnon.name} ({currentCompagnon.model})</span>
+                <span class="badge badge-xs badge-info">{t('ui.change')}</span>
             </div>
         </div>
         <div class="flex gap-2">
@@ -81,7 +82,7 @@
                     </div>
                 </div>
                 <div class="chat-header opacity-50 text-xs mb-1">
-                    {message.role === 'user' ? 'Vous' : 'Assistant'}
+                    {message.role === 'user' ? t('ui.you') : t('ui.assistant')}
                 </div>
                 <div class="chat-bubble {message.role === 'user' ? 'chat-bubble-primary' : 'chat-bubble-secondary'}">
                     {message.content}
@@ -98,7 +99,7 @@
             </button>
             <input 
                 type="text" 
-                placeholder="Écrivez votre message..." 
+                placeholder={t('ui.type_message')} 
                 class="input input-bordered flex-1" 
                 bind:value={messageInput}
                 onkeydown={(e) => e.key === 'Enter' && sendMessage()}
