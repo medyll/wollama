@@ -55,22 +55,53 @@ const _createDatabase = async () => {
 
     await db.addCollections(collections);
 
-    // Setup replication for each collection
-    // We assume the server is running on localhost:3000 (or configured URL)
-    const serverUrl = 'http://localhost:3000/_db/';
+    return db;
+};
+
+// Store replication states to be able to cancel them
+const replicationStates: any[] = [];
+
+export const enableReplication = async (userId: string, token: string) => {
+    const db = await getDatabase();
+    const serverUrl = 'http://localhost:3000/_db/'; // Should come from userState.preferences.serverUrl
+
+    // Cancel existing replications if any
+    await disableReplication();
+
+    console.log(`Starting replication for user ${userId}...`);
 
     for (const tableName of Object.keys(appSchema)) {
-        replicateCouchDB({
-            replicationIdentifier: 'sync-' + tableName,
+        // Strategy: Per-User Database on Server
+        // The server DB name will be: user_{userId}_{tableName}
+        // e.g. user_abc123_chats
+        const remoteName = `user_${userId}_${tableName}`;
+        
+        const replicationState = replicateCouchDB({
+            replicationIdentifier: `sync-${userId}-${tableName}`,
             collection: db.collections[tableName],
-            url: serverUrl + tableName,
+            url: serverUrl + remoteName,
             live: true,
-            pull: {},
-            push: {}
+            pull: {
+                // Add Auth headers here if needed
+                // headers: { Authorization: `Bearer ${token}` }
+            },
+            push: {
+                // headers: { Authorization: `Bearer ${token}` }
+            }
         });
-    }
 
-    return db;
+        replicationState.error$.subscribe(err => {
+            console.error(`Replication error on ${tableName}:`, err);
+        });
+
+        replicationStates.push(replicationState);
+    }
+};
+
+export const disableReplication = async () => {
+    console.log('Stopping replication...');
+    await Promise.all(replicationStates.map(state => state.cancel()));
+    replicationStates.length = 0;
 };
 
 export const getDatabase = () => {

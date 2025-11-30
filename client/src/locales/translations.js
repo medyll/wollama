@@ -89,6 +89,7 @@ export const translations = {
 			translator:            'Translator',
 			translator_desc:       'Translates your texts into multiple languages.',
 			choose_companion:      'Choose a Companion',
+			signIn:                'Sign In / Sync',
 			aiCautionMessage:      'the llama can have some hallucinations',
 			myChats:               'my chats',
 			messageRole_assistant: 'assistant',

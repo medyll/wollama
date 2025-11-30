@@ -80,6 +80,7 @@ export default {
 			translator:            'Traducteur',
 			translator_desc:       'Traduit vos textes en plusieurs langues.',
 			choose_companion:      'Choisir un Compagnon',
+			signIn:                'Connexion / Sync',
 			aiCautionMessage:      'le lama peut avoir des hallucinations',
 			messageRole_assistant: 'assistant',
 			lastWeek:              'la semaine dernière',
