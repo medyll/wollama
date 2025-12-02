@@ -153,3 +153,13 @@ export const getDatabase = () => {
     }
     return dbPromise;
 };
+
+export const destroyDatabase = async () => {
+    await disableReplication();
+    if (dbPromise) {
+        const db = await dbPromise;
+        await db.remove();
+        dbPromise = null;
+        console.log('Database destroyed');
+    }
+};

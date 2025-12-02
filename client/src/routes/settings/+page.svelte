@@ -7,6 +7,7 @@
     import { goto } from '$app/navigation';
     import Icon from '@iconify/svelte';
     import { GenericService } from '$lib/services/generic.service';
+    import { destroyDatabase } from '$lib/db';
     import type { Companion } from '$types/data';
 
     let localServerUrl = $state(userState.preferences.serverUrl);
@@ -27,6 +28,22 @@
             companions = await service.getAll();
         } catch (e) {
             console.error('Failed to load companions', e);
+        }
+    }
+
+    async function deleteAccount() {
+        if (!confirm(t('settings.delete_confirm') || 'Are you sure you want to delete your account and all data? This action cannot be undone.')) {
+            return;
+        }
+        
+        try {
+            await destroyDatabase();
+            userState.reset();
+            toast.success(t('settings.delete_success') || 'Account deleted successfully');
+            goto('/');
+        } catch (e) {
+            console.error('Failed to delete account', e);
+            toast.error(t('settings.delete_error') || 'Failed to delete account');
         }
     }
 
@@ -312,6 +329,25 @@
                         <div class="label">
                             <span class="label-text-alt">{t('settings.server_help')}</span>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="collapse collapse-arrow join-item border-base-300 border border-error/20">
+                <input type="checkbox" checked={activeSection === 'danger'} onchange={() => activeSection = activeSection === 'danger' ? null : 'danger'} />
+                <div class="collapse-title text-lg font-medium text-error">
+                    {t('settings.danger_zone') || 'Danger Zone'}
+                </div>
+                <div class="collapse-content">
+                    <div class="pt-4">
+                        <p class="text-sm mb-4 opacity-70">
+                            {t('settings.delete_warning') || 'Deleting your account will remove all your data, including chats, companions, and settings. This action cannot be undone.'}
+                        </p>
+                        <button class="btn btn-error btn-outline w-full md:w-auto" onclick={deleteAccount}>
+                            <Icon icon="lucide:trash-2" class="w-4 h-4 mr-2" />
+                            {t('settings.delete_account') || 'Delete Account & Data'}
+                        </button>
                     </div>
                 </div>
             </div>

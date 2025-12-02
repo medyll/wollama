@@ -89,6 +89,33 @@ export class UserState {
             }));
         }
     }
+
+    reset() {
+        this.nickname = '';
+        this.isConfigured = false;
+        this.isAuthenticated = false;
+        this.uid = null;
+        this.email = null;
+        this.photoURL = null;
+        this.token = null;
+        this.password = null;
+        this.isSecured = false;
+        
+        // Reset preferences to defaults
+        this.preferences = {
+            serverUrl: 'http://localhost:3000',
+            locale: 'en',
+            theme: 'light',
+            defaultModel: 'mistral:latest',
+            defaultCompanion: '1',
+            defaultTemperature: 0.7,
+            auto_play_audio: false
+        };
+
+        if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem('wollama_user');
+        }
+    }
 }
 
 export const userState = new UserState();
