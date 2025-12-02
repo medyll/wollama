@@ -182,6 +182,19 @@
             console.error('Error regenerating response:', e);
         }
     }
+
+    function handleMessageClick(event: MouseEvent) {
+        const target = event.target as HTMLElement;
+        const btn = target.closest('.copy-btn');
+        if (btn) {
+            const code = decodeURIComponent(btn.getAttribute('data-code') || '');
+            if (code) {
+                navigator.clipboard.writeText(code).then(() => {
+                    toast.success(t('ui.copied_to_clipboard') || 'Copied to clipboard');
+                });
+            }
+        }
+    }
 </script>
 
 <CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
@@ -226,7 +239,9 @@
     </div>
 
     <!-- Messages Area -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-4" onclick={handleMessageClick}>
         {#if messages.length === 0}
             <div class="hero h-full">
                 <div class="hero-content text-center">

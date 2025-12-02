@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+    import 'highlight.js/styles/atom-one-dark.css';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { App } from '@capacitor/app';
