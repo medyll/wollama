@@ -33,7 +33,9 @@
 
         // Navigation logic
         if (!userState.isConfigured) {
-            goto('/settings');
+            goto('/setup');
+        } else if (userState.isSecured && !userState.isAuthenticated) {
+            goto('/login');
         } else if ($page.url.pathname === '/') {
             goto('/chat');
         }
