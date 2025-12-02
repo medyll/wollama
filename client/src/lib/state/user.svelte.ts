@@ -18,7 +18,9 @@ export class UserState {
         defaultModel: 'mistral:latest',
         defaultCompanion: '1', // Default to General Assistant
         defaultTemperature: 0.7,
-        auto_play_audio: false
+        auto_play_audio: false,
+        audioInputId: '',
+        audioOutputId: ''
     });
 
     constructor() {

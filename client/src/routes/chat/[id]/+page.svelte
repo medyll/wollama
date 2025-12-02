@@ -112,22 +112,33 @@
         }
     }
 
+    let isTranscribing = $state(false);
+
     async function toggleRecording() {
         if (isRecording) {
             try {
                 const audioBlob = await audioService.stopRecording();
                 isRecording = false;
+                isTranscribing = true;
                 
                 // Transcribe audio
-                const text = await audioService.transcribe(audioBlob);
-                
-                if (text) {
-                    messageInput = text;
-                    sendMessage();
+                try {
+                    const text = await audioService.transcribe(audioBlob);
+                    if (text) {
+                        messageInput = (messageInput + ' ' + text).trim();
+                        // We do NOT send automatically anymore, allowing user to review/edit
+                        // sendMessage(); 
+                    }
+                } catch (err) {
+                    console.error('Transcription failed', err);
+                    toast.error(t('status.error') || 'Transcription failed');
+                } finally {
+                    isTranscribing = false;
                 }
             } catch (error) {
-                console.error('Error stopping recording or transcribing:', error);
+                console.error('Error stopping recording:', error);
                 isRecording = false;
+                isTranscribing = false;
             }
         } else {
             try {
@@ -135,6 +146,7 @@
                 isRecording = true;
             } catch (error) {
                 console.error('Error starting recording:', error);
+                toast.error('Could not access microphone');
             }
         }
     }
@@ -265,6 +277,7 @@
                         {message.role === 'user' ? t('ui.you') : t('ui.assistant')}
                     </div>
                     <div class="chat-bubble {message.role === 'user' ? 'chat-bubble-primary' : 'chat-bubble-secondary'}">
+                        {message.status}
                         {#if message.images && message.images.length > 0}
                             <div class="flex flex-wrap gap-2 mb-2">
                                 {#each message.images as img}
@@ -354,8 +367,11 @@
                     class="btn btn-circle {isRecording ? 'btn-error animate-pulse' : 'btn-ghost'}" 
                     onclick={toggleRecording}
                     aria-label={isRecording ? "Stop recording" : "Start recording"}
+                    disabled={isTranscribing}
                 >
-                    {#if isRecording}
+                    {#if isTranscribing}
+                        <span class="loading loading-spinner loading-xs"></span>
+                    {:else if isRecording}
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C12.5523 2 13 2.44772 13 3V21C13 21.5523 12.5523 22 12 22C11.4477 22 11 21.5523 11 21V3C11 2.44772 11.4477 2 12 2Z" /><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
                     {:else}
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>

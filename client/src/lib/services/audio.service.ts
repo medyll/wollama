@@ -8,12 +8,28 @@ export class AudioService {
 
     async startRecording(): Promise<void> {
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            this.mediaRecorder = new MediaRecorder(this.stream);
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Media Devices API not supported');
+            }
+
+            const constraints: MediaStreamConstraints = {
+                audio: userState.preferences.audioInputId 
+                    ? { deviceId: { exact: userState.preferences.audioInputId } } 
+                    : true
+            };
+
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 
+                             MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+            
+            this.mediaRecorder = mimeType ? new MediaRecorder(this.stream, { mimeType }) : new MediaRecorder(this.stream);
             this.audioChunks = [];
 
             this.mediaRecorder.ondataavailable = (event) => {
-                this.audioChunks.push(event.data);
+                if (event.data.size > 0) {
+                    this.audioChunks.push(event.data);
+                }
             };
 
             this.mediaRecorder.start();
@@ -32,7 +48,8 @@ export class AudioService {
             }
 
             this.mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                const mimeType = this.mediaRecorder?.mimeType || 'audio/webm';
+                const audioBlob = new Blob(this.audioChunks, { type: mimeType });
                 this.audioChunks = [];
                 this.isRecording = false;
                 this.stopStream();
@@ -52,25 +69,47 @@ export class AudioService {
 
     playAudio(audioUrl: string) {
         const audio = new Audio(audioUrl);
+        const outputId = userState.preferences.audioOutputId;
+        if (outputId && (audio as any).setSinkId) {
+            (audio as any).setSinkId(outputId).catch((e: any) => console.warn('Failed to set audio output', e));
+        }
         audio.play();
+    }
+
+    async getDevices() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+            return { inputs: [], outputs: [] };
+        }
+        
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        return {
+            inputs: devices.filter(d => d.kind === 'audioinput'),
+            outputs: devices.filter(d => d.kind === 'audiooutput')
+        };
     }
 
     async transcribe(audioBlob: Blob): Promise<string> {
         const formData = new FormData();
-        formData.append('file', audioBlob, 'recording.webm');
+        const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm';
+        formData.append('file', audioBlob, `recording.${ext}`);
 
         const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
-        const response = await fetch(`${serverUrl}/api/audio/transcribe`, {
-            method: 'POST',
-            body: formData
-        });
+        try {
+            const response = await fetch(`${serverUrl}/api/audio/transcribe`, {
+                method: 'POST',
+                body: formData
+            });
 
-        if (!response.ok) {
-            throw new Error('Transcription failed');
+            if (!response.ok) {
+                throw new Error(`Transcription failed: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            return data.text;
+        } catch (error) {
+            console.error('Transcription error:', error);
+            throw error;
         }
-
-        const data = await response.json();
-        return data.text;
     }
 
     async speak(text: string, voiceId?: string, voiceTone: 'neutral' | 'fast' | 'slow' | 'deep' | 'high' = 'neutral'): Promise<void> {
@@ -129,6 +168,47 @@ export class AudioService {
         } else {
             console.error('Browser does not support speech synthesis');
         }
+    }
+
+    listen(onResult: (text: string) => void, onError: (err: any) => void): () => void {
+        if (typeof window === 'undefined') return () => {};
+        
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            onError(new Error('Speech Recognition not supported'));
+            return () => {};
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = userState.preferences.locale || 'en-US';
+
+        recognition.onresult = (event: any) => {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                }
+            }
+            if (finalTranscript) {
+                onResult(finalTranscript);
+            }
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error('Speech recognition error', event.error);
+            onError(event.error);
+        };
+
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error('Failed to start speech recognition', e);
+            onError(e);
+        }
+        
+        return () => recognition.stop();
     }
 }
 

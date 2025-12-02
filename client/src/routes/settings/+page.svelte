@@ -3,6 +3,7 @@
     import { downloadState } from '$lib/state/downloads.svelte';
     import { t } from '$lib/state/i18n.svelte';
     import { toast } from '$lib/state/notifications.svelte';
+    import { audioService } from '$lib/services/audio.service';
     import LanguageSelector from '$components/ui/LanguageSelector.svelte';
     import { goto } from '$app/navigation';
     import Icon from '@iconify/svelte';
@@ -17,6 +18,8 @@
     let isLoadingModels = $state(false);
     let newModelName = $state('');
     let activeSection = $state<string | null>('profile');
+    let audioInputs = $state<MediaDeviceInfo[]>([]);
+    let audioOutputs = $state<MediaDeviceInfo[]>([]);
 
     const themes = [
         "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula"
@@ -28,6 +31,16 @@
             companions = await service.getAll();
         } catch (e) {
             console.error('Failed to load companions', e);
+        }
+    }
+
+    async function loadAudioDevices() {
+        try {
+            const devices = await audioService.getDevices();
+            audioInputs = devices.inputs;
+            audioOutputs = devices.outputs;
+        } catch (e) {
+            console.error('Failed to load audio devices', e);
         }
     }
 
@@ -100,6 +113,8 @@
         userState.preferences.defaultCompanion;
         userState.preferences.defaultTemperature;
         userState.preferences.auto_play_audio;
+        userState.preferences.audioInputId;
+        userState.preferences.audioOutputId;
         
         userState.save();
     });
@@ -107,6 +122,7 @@
     $effect(() => {
         loadModels();
         loadCompanions();
+        loadAudioDevices();
     });
 </script>
 
@@ -181,6 +197,41 @@
                                     <span class="text-[10px] font-bold capitalize">{theme}</span>
                                 </button>
                             {/each}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio -->
+            <div class="collapse collapse-arrow join-item border-base-300 border">
+                <input type="checkbox" checked={activeSection === 'audio'} onchange={() => activeSection = activeSection === 'audio' ? null : 'audio'} />
+                <div class="collapse-title text-lg font-medium">
+                    {t('settings.audio') || 'Audio'}
+                </div>
+                <div class="collapse-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                        <div class="form-control w-full">
+                            <label class="label" for="audio-input">
+                                <span class="label-text">{t('settings.microphone') || 'Microphone'}</span>
+                            </label>
+                            <select id="audio-input" class="select select-bordered w-full" bind:value={userState.preferences.audioInputId}>
+                                <option value="">Default</option>
+                                {#each audioInputs as device}
+                                    <option value={device.deviceId}>{device.label || `Microphone ${device.deviceId.slice(0, 5)}...`}</option>
+                                {/each}
+                            </select>
+                        </div>
+
+                        <div class="form-control w-full">
+                            <label class="label" for="audio-output">
+                                <span class="label-text">{t('settings.speaker') || 'Speaker'}</span>
+                            </label>
+                            <select id="audio-output" class="select select-bordered w-full" bind:value={userState.preferences.audioOutputId}>
+                                <option value="">Default</option>
+                                {#each audioOutputs as device}
+                                    <option value={device.deviceId}>{device.label || `Speaker ${device.deviceId.slice(0, 5)}...`}</option>
+                                {/each}
+                            </select>
                         </div>
                     </div>
                 </div>
