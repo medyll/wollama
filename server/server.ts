@@ -204,32 +204,66 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+const isLocalHost = (host: string) => {
+    return host.includes('localhost') || host.includes('127.0.0.1') || host.includes('0.0.0.0');
+};
+
+const isOllamaRunning = async () => {
+    try {
+        if (process.platform === 'win32') {
+            const { stdout } = await execAsync('tasklist');
+            const lowerOutput = stdout.toLowerCase();
+            return lowerOutput.includes('ollama app.exe') || lowerOutput.includes('ollama.exe');
+        } else {
+            const { stdout } = await execAsync('pgrep -f ollama');
+            return !!stdout.trim();
+        }
+    } catch {
+        return false;
+    }
+};
+
 const startLocalOllama = async () => {
-    if (process.platform !== 'win32') return false;
+    if (await isOllamaRunning()) {
+        logger.info('OLLAMA', 'Local Ollama process detected running.');
+        return true;
+    }
     
     try {
         logger.info('OLLAMA', 'Attempting to find and start local Ollama instance...');
         
-        // Try to find ollama executable path
-        const { stdout: whereOutput } = await execAsync('where ollama');
-        const ollamaPath = whereOutput.split('\n')[0].trim();
-        
-        if (ollamaPath) {
-            // Usually "ollama app.exe" is in the same folder or similar
-            // The user path was: C:\Users\...\AppData\Local\Programs\Ollama\ollama.exe
-            // The app is: C:\Users\...\AppData\Local\Programs\Ollama\ollama app.exe
-            const appPath = path.join(path.dirname(ollamaPath), 'ollama app.exe');
+        if (process.platform === 'win32') {
+            // Try to find ollama executable path
+            const { stdout: whereOutput } = await execAsync('where ollama');
+            const ollamaPath = whereOutput.split('\n')[0].trim();
             
-            logger.info('OLLAMA', `Found Ollama at: ${appPath}`);
-            
-            // Start the process detached
-            const child = spawn(appPath, [], {
+            if (ollamaPath) {
+                // Usually "ollama app.exe" is in the same folder or similar
+                const appPath = path.join(path.dirname(ollamaPath), 'ollama app.exe');
+                
+                logger.info('OLLAMA', `Found Ollama at: ${appPath}`);
+                
+                // Start the process detached
+                const child = spawn(appPath, [], {
+                    detached: true,
+                    stdio: 'ignore'
+                });
+                child.unref();
+                
+                logger.success('OLLAMA', 'Started local Ollama instance (Windows)');
+                return true;
+            }
+        } else if (process.platform === 'darwin') {
+            await execAsync('open -a Ollama');
+            logger.success('OLLAMA', 'Started local Ollama instance (macOS)');
+            return true;
+        } else if (process.platform === 'linux') {
+            const child = spawn('ollama', ['serve'], {
                 detached: true,
                 stdio: 'ignore'
             });
             child.unref();
-            
-            logger.success('OLLAMA', 'Started local Ollama instance');
+            logger.success('OLLAMA', 'Started local Ollama instance (Linux)');
             return true;
         }
     } catch (e) {
@@ -283,11 +317,12 @@ const initializeOllama = async () => {
             
             return; // Success, exit function
 
-        } catch (error) {
+        } catch (error: any) {
             const isLastAttempt = i === maxRetries - 1;
+            const isConnectionRefused = error.code === 'ECONNREFUSED' || error.cause?.code === 'ECONNREFUSED';
             
-            // If first attempt fails, try to start local ollama
-            if (i === 0) {
+            // If first attempt fails and it looks like the service is down (and local), try to start it
+            if (i === 0 && isLocalHost(config.ollama.host)) {
                 logger.warn('OLLAMA', 'Connection failed. Trying to start local instance...');
                 const started = await startLocalOllama();
                 if (started) {
