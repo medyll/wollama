@@ -113,6 +113,9 @@ export const translations = {
 			delete_chat:      'delete',
 			guess_chat_title: 'guess title',
 			describe:         'describe'
+		},
+		setup: {
+			subtitle: 'Choose how you want to start your journey.'
 		}
 	},
 	es: es.es,

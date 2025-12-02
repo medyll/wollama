@@ -106,6 +106,9 @@ export default {
 			configuration:         {
 				home: 'accueil'
 			}
+		},
+		setup: {
+			subtitle: 'Choisissez comment vous souhaitez commencer votre voyage.'
 		}
 	}
 };

@@ -29,7 +29,9 @@ Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and 
 ### AI & Audio
 * **LLM:** Ollama API (Streaming enabled).
 * **STT (Input):** Whisper (via Ollama or OpenAI API compatible).
-* **TTS (Output):** Web Speech API (Front) or Node.js TTS Engine (Back).
+* **TTS (Output):** Web Speech API (Front) or **Piper** (Local Neural TTS) on Backend.
+* **Analysis:** Real-time Tone/Sentiment detection of user input.
+* **Expressivity:** Adaptive Voice Mood/Style generation in server responses.
 
 ## 3. MONOREPO STRUCTURE
 
@@ -131,6 +133,8 @@ A single exchange in a Chat.
 - `role`: Enum `['system', 'user', 'assistant', 'tool']`
 - `content`: Text (Raw Markdown)
 - `status`: Enum `['idle', 'done', 'sent', 'streaming', 'error']`
+- `sentiment`: String (Detected emotion/tone of the input)
+- `voice_style`: String (TTS parameter for mood/expressivity)
 - `audio_file_path`: String (Optional, local path)
 - `images`: Array<Object>
 - `urls`: Array<Object>
@@ -207,6 +211,16 @@ onMount(() => {
     - Back button to return to home/chat.
 - **Chat Home (`/chat`)**: Empty state, invitation to start a conversation.
 - **Active Chat (`/chat/[id]`)**: Main discussion interface.
+    - **Message Bubbles:**
+        - Must support Markdown rendering including Code Blocks with syntax highlighting.
+        - Must support Image display.
+    - **Agent Actions (Last Message Only):**
+        - A component bar must appear at the bottom of the last message from the `assistant` role.
+        - **Actions required:**
+            - **Rating:** Thumbs Up / Thumbs Down (Good/Bad).
+            - **Reload:** Button to regenerate the response.
+            - **Share:** Button (Functionality to be defined later).
+            - **Copy:** Button to copy content to clipboard (Must trigger a toast notification).
 
 ### Modals & Overlays
 - **Compagnon Selector**: AI choice grid (Name, Description, Model). Accessible from the chat header.

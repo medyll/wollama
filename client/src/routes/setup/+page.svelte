@@ -57,7 +57,7 @@
                 <LanguageSelector />
             </div>
             
-            <p class="text-base-content/70 mb-6">Choose how you want to start your journey.</p>
+            <p class="text-base-content/70 mb-6">{t('setup.subtitle')}</p>
 
             <div role="tablist" class="tabs tabs-boxed mb-6">
                 <button 
