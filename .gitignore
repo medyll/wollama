@@ -12,3 +12,4 @@ src-tauri/database/*
 /db_data/*
 /data/*
 /bin/*
+/android/gradle/*

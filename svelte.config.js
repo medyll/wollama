@@ -11,7 +11,9 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
 	preprocess: [vitePreprocess(), mdsvex()],
 	kit:        {
-		adapter: adapter(),
+		adapter: adapter({
+			fallback: 'index.html'
+		}),
 		files: {
 			assets: 'client/static',
 			lib: 'client/src/lib',

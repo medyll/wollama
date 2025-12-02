@@ -8,6 +8,8 @@ export class UserState {
     email = $state<string | null>(null);
     photoURL = $state<string | null>(null);
     token = $state<string | null>(null);
+    password = $state<string | null>(null); // Simple local protection
+    isSecured = $state(false);
 
     preferences = $state({
         serverUrl: 'http://localhost:3000',
@@ -36,6 +38,9 @@ export class UserState {
                     this.isAuthenticated = true;
                 }
 
+                this.password = data.password || null;
+                this.isSecured = !!this.password;
+
                 // Merge stored preferences with defaults
                 if (data.preferences) {
                     // Use Object.assign to update the reactive proxy instead of replacing it
@@ -54,12 +59,20 @@ export class UserState {
         this.save();
     }
 
+    setLocalProtection(password: string) {
+        this.password = password;
+        this.isSecured = true;
+        this.save();
+    }
+
     logout() {
         this.uid = null;
         this.email = null;
         this.photoURL = null;
         this.token = null;
         this.isAuthenticated = false;
+        // Keep preferences and nickname? Or full reset?
+        // For now, just clear auth
         this.save();
     }
 
@@ -71,7 +84,8 @@ export class UserState {
                 preferences: this.preferences,
                 uid: this.uid,
                 email: this.email,
-                photoURL: this.photoURL
+                photoURL: this.photoURL,
+                password: this.password
             }));
         }
     }
