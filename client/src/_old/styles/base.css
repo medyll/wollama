@@ -1,0 +1,97 @@
+/* base.css */
+@layer base {
+	/* skin.css */
+
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+
+	.aspect-ratio-square {
+		aspect-ratio: 1 / 1;
+	}
+	.inputZone {
+		border-radius: 0.375rem;
+		border: 1px solid var(--cfab-input-border-color) !important;
+		background: var(--cfab-input-bg-color);
+		color: var(--cfab-input-foreground-color);
+	}
+
+	.theme-gradient-from {
+		background-color: var(--cfab-gradient-from);
+	}
+
+	.theme-gradient-to {
+		background-color: var(--cfab-gradient-to);
+	}
+
+	.theme-border {
+		border-color: var(--cfab-border-color);
+		border-width: 1px;
+	}
+
+	.soft-title {
+		color: var(--cfab-soft-title-text-color);
+	}
+
+	.paper {
+		border-color: var(--cfab-paper-border-color);
+		background-color: var(--cfab-paper-bg-color);
+	}
+
+	.iconify {
+		display: inline-block;
+		opacity: 0.7;
+		font-size: 1.1em;
+		&.sm {
+			font-size: 1.1em;
+		}
+		&.md {
+			font-size: 1.6em;
+		}
+		&.lg {
+			font-size: 2.7em;
+		}
+		&.xl {
+			font-size: 3.8em;
+		}
+		&.spin {
+			animation: spin 1s linear infinite;
+		}
+	}
+
+	hr {
+		margin: 1em 0;
+		border: 1px solid top;
+	}
+
+	svg {
+		color: var(--cfab-icon-color);
+	}
+
+	/* theme.css */
+
+	:root {
+		--color-bg: var(--bg-gray-50);
+		--color-text: var(--text-gray-700);
+	}
+
+	:root {
+		--theme-color-foreground-alpha-high: var(--cfab-paper-border-color);
+		--theme-color-background: var(--cfab-bg);
+		--theme-color-primary: var(--cfab-primary);
+		--theme-color-background-alpha: #cccccc;
+		--radius-tiny: 4px;
+	}
+
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+}
