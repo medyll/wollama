@@ -170,13 +170,14 @@ A single exchange in a Chat.
 **Objective:** Integrate Whisper (STT) and Piper (TTS) into a modern JavaScript application targeting three environments: Web, Desktop (Electron), and Mobile (Capacitor). The application must be offline-first.
 
 ### 1. Web Environment (Browser)
-Execution must be entirely client-side via **WebAssembly (WASM)**.
-*   **For Whisper:** Use **Transformers.js** library relying on ONNX Runtime Web. Prioritize **WebGPU** backend for hardware acceleration, with automatic fallback to WASM (CPU) if GPU is incompatible. A viable alternative is direct `whisper.wasm` port (Emscripten).
-*   **For Piper:** Use **Piper WASM** builds. The voice model (`.onnx` and `.json` files) must be loaded dynamically via `fetch`, and generated audio played via Web Audio API.
+**Execution must be delegated to the Server.**
+*   **Strategy:** The browser does not run the models locally (No WASM).
+*   **STT:** The client records audio (MediaRecorder) and uploads the Blob to the Node.js Server. The Server processes it via Whisper and returns the text.
+*   **TTS:** The client requests audio from the Server. The Server generates it via Piper and streams the audio file back.
 
 ### 2. Desktop Environment (Electron)
 Execution must prioritize native performance via **Node.js Child Processes**, bypassing the browser layer.
-*   **Strategy:** Do not use WASM engine. Embed optimized precompiled binaries (C++) (AVX/CUDA/CoreML) of `whisper.cpp` and `piper`.
+*   **Strategy:** Embed optimized precompiled binaries (C++) (AVX/CUDA/CoreML) of `whisper.cpp` and `piper`.
 *   **Implementation:** Control these binaries via `child_process.spawn`.
     *   *Piper:* Send text via `stdin` and retrieve PCM audio stream via `stdout`.
     *   *Whisper:* Pass audio file as argument or via stream to get transcription.
@@ -184,15 +185,13 @@ Execution must prioritize native performance via **Node.js Child Processes**, by
 ### 3. Mobile Environment (Capacitor iOS/Android)
 Hybrid approach depending on performance needs.
 *   **High Performance Option (Recommended):** Develop or use a **Custom Capacitor Plugin**. This plugin acts as a bridge to native C++ libraries (via JNI on Android and Swift/Objective-C on iOS) to exploit phone NPU/GPU.
-*   **MVP Option (WebView):** Use the same stack as Web environment (WASM) directly in Capacitor WebView. *Note:* This method risks high latency and excessive battery consumption.
+*   **Fallback:** Delegate to Server (like Web Environment) if offline mode is not strictly required for Audio, or if the device is too old.
 
 ### 4. Critical Points & Technical Constraints
 The code generating AI must strictly follow these rules:
 
-*   **Thread Management (Web/WASM):** Model inference (heavy calculations) must run in dedicated **Web Workers** to never block the main thread (UI).
-*   **HTTP Security Headers:** To enable multithreading via `SharedArrayBuffer` in WASM, the server must serve the following headers: `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`.
-*   **Cache Strategy:** Models (`.onnx`, `.wasm` files) being large, they must not depend on standard HTTP cache but be stored explicitly via **Cache Storage API** to guarantee offline operation.
-*   **Unified Architecture:** Code must be modular (e.g., Adapter Pattern) to dynamically switch between `spawn` implementation (Electron) and `WASM` implementation (Web) based on detected runtime environment.
+*   **Unified Architecture:** Code must be modular (e.g., Adapter Pattern) to dynamically switch between `spawn` implementation (Electron), `Server API` implementation (Web), and `Native Plugin` implementation (Mobile) based on detected runtime environment.
+*   **Offline-First (Data):** While Audio processing might require a server connection for the Web client, the textual chat and data synchronization must remain offline-first.
 
 ## 7. AFFECTIVE COMPUTING MODULE (EMOTION MANAGEMENT)
 
@@ -233,7 +232,7 @@ The code generating AI must strictly follow these rules:
     3.  Concatenate audio buffers using `ffmpeg` or a buffer concatenation utility.
 
 #### System Prompt (Ollama)
-Add to `system_prompt` in DB:
+Add to `system_prompt` in DB: ( and in config)
 > "You are an expressive AI. Adapt your tone to the user's emotion.
 > To express physical emotions, use these exact tokens:
 > - [LAUGH] to laugh.

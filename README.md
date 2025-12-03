@@ -27,10 +27,8 @@
 The application employs a specific strategy for integrating Speech-to-Text (Whisper) and Text-to-Speech (Piper) across different platforms to ensure optimal performance and offline capabilities:
 
 *   **Web (Browser)**:
-    *   **Execution**: Client-side via **WebAssembly (WASM)**.
-    *   **Whisper**: Uses **Transformers.js** (ONNX Runtime Web) with WebGPU acceleration (fallback to WASM).
-    *   **Piper**: Uses **Piper WASM** builds with dynamic model loading.
-    *   **Constraints**: Heavy inference runs in **Web Workers** to prevent UI blocking. Requires specific HTTP headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`) for `SharedArrayBuffer` support.
+    *   **Execution**: Delegated to **Server**.
+    *   **Strategy**: Audio is recorded/played by the browser but processed by the Node.js backend (Whisper/Piper) to avoid heavy client-side load.
 
 *   **Desktop (Electron)**:
     *   **Execution**: Native **Node.js Child Processes**.
