@@ -21,6 +21,25 @@
 *   **Mobile Wrapper**: Capacitor.
 *   **Database**: RxDB (Client) <-> PouchDB (Server) sync.
 
+## 🧠 Architecture Highlights
+
+### Context Injection: Whisper & Piper Integration
+The application employs a specific strategy for integrating Speech-to-Text (Whisper) and Text-to-Speech (Piper) across different platforms to ensure optimal performance and offline capabilities:
+
+*   **Web (Browser)**:
+    *   **Execution**: Client-side via **WebAssembly (WASM)**.
+    *   **Whisper**: Uses **Transformers.js** (ONNX Runtime Web) with WebGPU acceleration (fallback to WASM).
+    *   **Piper**: Uses **Piper WASM** builds with dynamic model loading.
+    *   **Constraints**: Heavy inference runs in **Web Workers** to prevent UI blocking. Requires specific HTTP headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`) for `SharedArrayBuffer` support.
+
+*   **Desktop (Electron)**:
+    *   **Execution**: Native **Node.js Child Processes**.
+    *   **Strategy**: Bypasses the browser layer to use optimized precompiled C++ binaries (`whisper.cpp`, `piper`) for maximum performance (AVX/CUDA).
+
+*   **Mobile (Capacitor)**:
+    *   **Strategy**: **Custom Capacitor Plugin** (Native Bridge).
+    *   **Implementation**: Bridges to native libraries (JNI/Swift) to leverage device NPU/GPU, avoiding the performance overhead of running WASM inside a WebView.
+
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:

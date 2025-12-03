@@ -3,7 +3,10 @@
 ## 1. PROJECT DEFINITION
 Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and voice (STT/TTS) capabilities.
 * **Hosting:** Self-hosted Node.js server on Windows (compiled as .exe).
-* **Clients:** Android, iOS (via Capacitor) and Windows, Linux, macOS (via Electron).
+* **Clients:** 
+    *   **Web:** Browser-based interface.
+    *   **Desktop:** Windows, Linux, macOS (via Electron).
+    *   **Mobile:** Android, iOS (via Capacitor).
 *   **Target AI:** Ollama (Local).
 *   **Target UX:** Responsive (Mobile First) & Themable (Light/Dark/Custom).
 *   **Internationalization:** The application is multi-language (i18n) with support for English, French, German, Spanish, Italian.
@@ -160,9 +163,90 @@ A single exchange in a Chat.
 3. **Backend STT:** Convert Blob → Text (STT Service).
 4. **Backend LLM:** Text → Ollama → Text Response.
 5. **Backend TTS:** Text Response → Audio Buffer.
-6. **UI:** Receive Audio → Auto-play.
+6. UI: Receive Audio → Auto-play.
 
-## 6. AI DIRECTIVES (FOR CODING)
+## 6. CONTEXT INJECTION: WHISPER & PIPER INTEGRATION (CROSS-PLATFORM)
+
+**Objective:** Integrate Whisper (STT) and Piper (TTS) into a modern JavaScript application targeting three environments: Web, Desktop (Electron), and Mobile (Capacitor). The application must be offline-first.
+
+### 1. Web Environment (Browser)
+Execution must be entirely client-side via **WebAssembly (WASM)**.
+*   **For Whisper:** Use **Transformers.js** library relying on ONNX Runtime Web. Prioritize **WebGPU** backend for hardware acceleration, with automatic fallback to WASM (CPU) if GPU is incompatible. A viable alternative is direct `whisper.wasm` port (Emscripten).
+*   **For Piper:** Use **Piper WASM** builds. The voice model (`.onnx` and `.json` files) must be loaded dynamically via `fetch`, and generated audio played via Web Audio API.
+
+### 2. Desktop Environment (Electron)
+Execution must prioritize native performance via **Node.js Child Processes**, bypassing the browser layer.
+*   **Strategy:** Do not use WASM engine. Embed optimized precompiled binaries (C++) (AVX/CUDA/CoreML) of `whisper.cpp` and `piper`.
+*   **Implementation:** Control these binaries via `child_process.spawn`.
+    *   *Piper:* Send text via `stdin` and retrieve PCM audio stream via `stdout`.
+    *   *Whisper:* Pass audio file as argument or via stream to get transcription.
+
+### 3. Mobile Environment (Capacitor iOS/Android)
+Hybrid approach depending on performance needs.
+*   **High Performance Option (Recommended):** Develop or use a **Custom Capacitor Plugin**. This plugin acts as a bridge to native C++ libraries (via JNI on Android and Swift/Objective-C on iOS) to exploit phone NPU/GPU.
+*   **MVP Option (WebView):** Use the same stack as Web environment (WASM) directly in Capacitor WebView. *Note:* This method risks high latency and excessive battery consumption.
+
+### 4. Critical Points & Technical Constraints
+The code generating AI must strictly follow these rules:
+
+*   **Thread Management (Web/WASM):** Model inference (heavy calculations) must run in dedicated **Web Workers** to never block the main thread (UI).
+*   **HTTP Security Headers:** To enable multithreading via `SharedArrayBuffer` in WASM, the server must serve the following headers: `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`.
+*   **Cache Strategy:** Models (`.onnx`, `.wasm` files) being large, they must not depend on standard HTTP cache but be stored explicitly via **Cache Storage API** to guarantee offline operation.
+*   **Unified Architecture:** Code must be modular (e.g., Adapter Pattern) to dynamically switch between `spawn` implementation (Electron) and `WASM` implementation (Web) based on detected runtime environment.
+
+## 7. AFFECTIVE COMPUTING MODULE (EMOTION MANAGEMENT)
+
+### 1. OBJECTIVE
+1.  **Input:** Detect user emotional state (Joy, Anger, Sadness, Neutral).
+2.  **Output:** Modulate AI response (Tone, Laughter, Sighs) via TTS.
+
+### 2. EMOTIONAL FLOW
+
+#### A. Detection (User Input)
+*Selected Option (MVP Node.js): Semantic Analysis of Transcribed Text.*
+
+1.  **Audio -> Text:** `stt.service.ts` transcribes audio via Whisper.
+2.  **Text -> Emotion Label:**
+    *   *Method:* Pass text through a micro-analysis module (e.g., `sentiment` library or a lightweight specific LLM prompt).
+    *   *Result:* JSON `{ "sentiment": "happy", "score": 0.8 }`.
+3.  **Context Injection:** Inject state before sending the main prompt to Ollama.
+    *   *Final Prompt:* `[SYSTEM: User is HAPPY.] User: Hi Jarvis!`
+
+#### B. Expression (AI Output)
+*Key Technology: SSML (Speech Synthesis Markup Language).*
+
+1.  **System Prompt:** Configure AI to use tags.
+    *   *Instruction:* "If you find something funny, use the tag `<break time="500ms" />` for a pause or `*laughs*`."
+2.  **LLM Generation:**
+    *   *Raw Response:* `That's hilarious! <laugh>Hahaha</laugh>, I wouldn't have thought of that.`
+3.  **TTS Parser:** `tts.service.ts` detects tags.
+    *   If TTS engine supports SSML (e.g., Google Cloud, Azure, some Coqui models) -> Direct send.
+    *   If TTS engine is basic -> Service injects a pre-recorded sound file (`laugh.mp3`) replacing the `<laugh>` tag.
+
+### 3. TECHNICAL IMPLEMENTATION
+
+#### Backend (`server/services/emotion.service.ts`)
+*   **Analyzer:** Use `natural` or `sentiment` (Node.js libs) for fast polarity detection (+/-) of transcribed text.
+*   **Audio Injector (Fallback):** If TTS cannot laugh:
+    1.  Split text: `["That's hilarious!", "<laugh>", "I wouldn't have thought of that."]`
+    2.  Generate Audio 1 + Load `laugh.wav` + Generate Audio 2.
+    3.  Concatenate audio buffers using `ffmpeg` or a buffer concatenation utility.
+
+#### System Prompt (Ollama)
+Add to `system_prompt` in DB:
+> "You are an expressive AI. Adapt your tone to the user's emotion.
+> To express physical emotions, use these exact tokens:
+> - [LAUGH] to laugh.
+> - [SIGH] to sigh.
+> - [CLEARS_THROAT] to clear throat.
+> Only use these tokens if the context truly warrants it."
+
+### 4. DATA MODEL IMPACT
+
+Add to **Message** table:
+- `detected_emotion`: String (e.g., "anger", "joy") - stored for analytics or future memory.
+
+## 8. AI DIRECTIVES (FOR CODING)
 
 - **Svelte 5 Strict:** Use Runes exclusively (``, ``, ``). No old syntax.
 - **Responsive UI:** Mobile First Design. Tailwind breakpoints (`md:`, `lg:`) for sidebar/chat.
@@ -174,7 +258,7 @@ A single exchange in a Chat.
 - **TypeScript:** The application must be strongly typed.
 - **Accessibility:** The application must be RGAA 2.0 compatible.
 
-## 7. MOBILE SPECIFICS (CAPACITOR & SVELTEKIT)
+## 8. MOBILE SPECIFICS (CAPACITOR & SVELTEKIT)
 
 ### Routing Architecture
 
@@ -201,7 +285,7 @@ onMount(() => {
 });
 ```
 
-## 8. SCREEN LIST (UI MAP)
+## 9. SCREEN LIST (UI MAP)
 
 ### Main Screens
 - **Welcome (`/`)**: Loading, logo, automatic redirection.
@@ -226,7 +310,7 @@ onMount(() => {
 - **Compagnon Selector**: AI choice grid (Name, Description, Model). Accessible from the chat header.
 - **Settings (Coming Soon)**: Advanced configuration.
 
-## 9. DEVELOPMENT PHASING
+## 10. DEVELOPMENT PHASING
 
 - **Phase 1 (Core):** Node Server + Svelte Client Text (Streaming) + JSON Data Structure + Theming.
 - **Phase 2 (Audio):** Complete STT/TTS Pipeline.
