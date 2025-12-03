@@ -88,6 +88,72 @@ export class AudioService {
         };
     }
 
+    async monitorMicrophone(deviceId: string, onLevelChange: (level: number) => void): Promise<() => void> {
+        try {
+            const constraints = {
+                audio: deviceId ? { deviceId: { exact: deviceId } } : true
+            };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            const audioContext = new AudioContext();
+            const source = audioContext.createMediaStreamSource(stream);
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            source.connect(analyser);
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            let isActive = true;
+
+            const update = () => {
+                if (!isActive) return;
+                analyser.getByteFrequencyData(dataArray);
+                // Calculate average volume
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
+                const average = sum / dataArray.length;
+                // Normalize to 0-100 roughly
+                const level = Math.min(100, Math.round((average / 255) * 100 * 2)); 
+                onLevelChange(level);
+                requestAnimationFrame(update);
+            };
+            update();
+
+            return () => {
+                isActive = false;
+                stream.getTracks().forEach(track => track.stop());
+                audioContext.close();
+            };
+        } catch (error) {
+            console.error('Error monitoring microphone:', error);
+            return () => {};
+        }
+    }
+
+    playTestSound() {
+        // Simple beep using oscillator
+        const audioContext = new AudioContext();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4
+        
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        const outputId = userState.preferences.audioOutputId;
+        if (outputId && (audioContext as any).setSinkId) {
+             (audioContext as any).setSinkId(outputId).catch((e: any) => console.warn('setSinkId failed', e));
+        }
+
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5);
+    }
+
     async transcribe(audioBlob: Blob): Promise<string> {
         const formData = new FormData();
         const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm';

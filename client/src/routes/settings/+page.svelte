@@ -20,6 +20,9 @@
     let activeSection = $state<string | null>('profile');
     let audioInputs = $state<MediaDeviceInfo[]>([]);
     let audioOutputs = $state<MediaDeviceInfo[]>([]);
+    let micLevel = $state(0);
+    let isMonitoringMic = $state(false);
+    let stopMonitoring: (() => void) | null = null;
 
     const themes = [
         "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula"
@@ -42,6 +45,23 @@
         } catch (e) {
             console.error('Failed to load audio devices', e);
         }
+    }
+
+    async function toggleMicTest() {
+        if (isMonitoringMic) {
+            if (stopMonitoring) stopMonitoring();
+            isMonitoringMic = false;
+            micLevel = 0;
+        } else {
+            stopMonitoring = await audioService.monitorMicrophone(userState.preferences.audioInputId, (level) => {
+                micLevel = level;
+            });
+            isMonitoringMic = true;
+        }
+    }
+
+    function playTestSound() {
+        audioService.playTestSound();
     }
 
     async function deleteAccount() {
@@ -205,33 +225,61 @@
             <!-- Audio -->
             <div class="collapse collapse-arrow join-item border-base-300 border">
                 <input type="checkbox" checked={activeSection === 'audio'} onchange={() => activeSection = activeSection === 'audio' ? null : 'audio'} />
-                <div class="collapse-title text-lg font-medium">
+                <div class="collapse-title text-lg font-medium flex items-center gap-2">
+                    <Icon icon="lucide:mic" class="w-5 h-5" />
                     {t('settings.audio') || 'Audio'}
                 </div>
                 <div class="collapse-content">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                        <!-- Microphone Section -->
                         <div class="form-control w-full">
                             <label class="label" for="audio-input">
-                                <span class="label-text">{t('settings.microphone') || 'Microphone'}</span>
+                                <span class="label-text flex items-center gap-2">
+                                    <Icon icon="lucide:mic" class="w-4 h-4" />
+                                    {t('settings.microphone') || 'Microphone'}
+                                </span>
                             </label>
-                            <select id="audio-input" class="select select-bordered w-full" bind:value={userState.preferences.audioInputId}>
+                            <select id="audio-input" class="select select-bordered w-full mb-2" bind:value={userState.preferences.audioInputId} onchange={() => { if(isMonitoringMic) toggleMicTest(); }}>
                                 <option value="">Default</option>
                                 {#each audioInputs as device}
                                     <option value={device.deviceId}>{device.label || `Microphone ${device.deviceId.slice(0, 5)}...`}</option>
                                 {/each}
                             </select>
+                            
+                            <div class="flex items-center gap-2 mt-2">
+                                <button class="btn btn-sm {isMonitoringMic ? 'btn-error' : 'btn-secondary'}" onclick={toggleMicTest}>
+                                    {#if isMonitoringMic}
+                                        <Icon icon="lucide:square" class="w-4 h-4" /> Stop Test
+                                    {:else}
+                                        <Icon icon="lucide:play" class="w-4 h-4" /> Test Mic
+                                    {/if}
+                                </button>
+                                <div class="flex-1 h-4 bg-base-300 rounded-full overflow-hidden relative">
+                                    <div class="h-full bg-success transition-all duration-100 ease-out" style="width: {micLevel}%"></div>
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- Speaker Section -->
                         <div class="form-control w-full">
                             <label class="label" for="audio-output">
-                                <span class="label-text">{t('settings.speaker') || 'Speaker'}</span>
+                                <span class="label-text flex items-center gap-2">
+                                    <Icon icon="lucide:speaker" class="w-4 h-4" />
+                                    {t('settings.speaker') || 'Speaker'}
+                                </span>
                             </label>
-                            <select id="audio-output" class="select select-bordered w-full" bind:value={userState.preferences.audioOutputId}>
+                            <select id="audio-output" class="select select-bordered w-full mb-2" bind:value={userState.preferences.audioOutputId}>
                                 <option value="">Default</option>
                                 {#each audioOutputs as device}
                                     <option value={device.deviceId}>{device.label || `Speaker ${device.deviceId.slice(0, 5)}...`}</option>
                                 {/each}
                             </select>
+
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-secondary" onclick={playTestSound}>
+                                    <Icon icon="lucide:volume-2" class="w-4 h-4" /> Test Sound
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
