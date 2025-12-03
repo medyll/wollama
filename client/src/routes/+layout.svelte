@@ -88,9 +88,6 @@
                     <Icon icon="lucide:server" class={`h-5 w-5 ${connectionState.isConnected ? 'text-success' : 'text-error'}`} />
                 </button>
                 <LanguageSelector />
-                <a href="/settings" class="btn btn-ghost btn-circle" aria-label="Settings">
-                    <Icon icon="lucide:settings" class="h-5 w-5" />
-                </a>
             </div>
         </header>
 
