@@ -6,6 +6,7 @@ import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 import { wrappedValidateAjvStorage } from 'rxdb/plugins/validate-ajv';
 import { appSchema } from '../../../shared/db/database-scheme';
 import type { DatabaseSchema } from '../../../shared/db/schema-definition';
+import { userState } from '$lib/state/user.svelte';
 
 // Add plugins
 addRxPlugin(RxDBLeaderElectionPlugin);
@@ -106,7 +107,8 @@ const replicationStates: any[] = [];
 
 export const enableReplication = async (userId: string, token: string) => {
     const db = await getDatabase();
-    const serverUrl = 'http://localhost:3000/_db/'; // Should come from userState.preferences.serverUrl
+    const baseUrl = userState.preferences.serverUrl || 'http://localhost:3000';
+    const serverUrl = baseUrl.endsWith('/') ? `${baseUrl}_db/` : `${baseUrl}/_db/`;
 
     // Cancel existing replications if any
     await disableReplication();
