@@ -9,6 +9,7 @@
     import CompagnonSelector from '$components/ui/CompagnonSelector.svelte';
     import DataButton from '$components/ui/DataButton.svelte';
     import MessageActions from '$components/chat/MessageActions.svelte';
+    import AudioToggle from '$components/chat/AudioToggle.svelte';
     import Icon from '@iconify/svelte';
     import type { Companion } from '$types/data';
     import { goto } from '$app/navigation';
@@ -282,6 +283,38 @@
     {#snippet inputArea()}
         <!-- Section: Input Area -->
         <div class="w-full md:max-w-[760px] mx-auto">
+            <!-- Top Bar: Companion, Audio, Delete -->
+            <div class="flex justify-between items-center mb-2 px-2">
+                <!-- Left: Companion -->
+                <div 
+                    class="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity" 
+                    onclick={() => isCompagnonModalOpen = true} 
+                    role="button" 
+                    tabindex="0" 
+                    onkeydown={(e) => e.key === 'Enter' && (isCompagnonModalOpen = true)}
+                >
+                    <span class="text-xs font-medium opacity-70">{currentCompagnon.name}</span>
+                    <span class="badge badge-xs badge-ghost opacity-50">{currentCompagnon.model}</span>
+                </div>
+
+                <!-- Center: Audio Toggle -->
+                <div class="flex justify-center">
+                    <AudioToggle />
+                </div>
+
+                <!-- Right: Delete Chat -->
+                <div>
+                    {#if chatId}
+                        <DataButton 
+                            table="chats" 
+                            table_id={chatId} 
+                            mode="delete" 
+                            confirm={true} 
+                        />
+                    {/if}
+                </div>
+            </div>
+
             <!-- File Previews -->
             {#if selectedFiles.length > 0}
                 <div class="flex gap-2 p-2 overflow-x-auto mb-2">
@@ -368,48 +401,7 @@
 <CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
 <div class="absolute inset-0 flex flex-col overflow-hidden">
-    <!-- Section: Header -->
-    <div class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur z-10">
-        <div class="flex items-center gap-4">
-            <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isCompagnonModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isCompagnonModalOpen = true)}>
-                <!-- <h2 class="font-bold text-lg">
-                    {#if chatId}
-                        {t('ui.chat_title')} #{chatId}
-                    {:else}
-                        {t('ui.newChat')}
-                    {/if}
-                </h2> -->
-                <div class="flex items-center gap-2">
-                    <span class="text-xs opacity-50">{t('ui.with')} {currentCompagnon.name} ({currentCompagnon.model})</span>
-                    <span class="badge badge-xs badge-info">{t('ui.change')}</span>
-                </div>
-            </div>
-            {#if chatId}
-                <DataButton 
-                    table="chats" 
-                    table_id={chatId} 
-                    mode="delete" 
-                    confirm={true} 
-                />
-            {/if}
-        </div>
-        <div class="flex gap-2 items-center">
-            <label class="swap swap-rotate btn btn-ghost btn-sm btn-circle" aria-label="Toggle Audio Response">
-                <!-- this hidden checkbox controls the state -->
-                <input 
-                    type="checkbox" 
-                    bind:checked={userState.preferences.auto_play_audio} 
-                    onchange={() => userState.save()}
-                />
-                
-                <!-- volume on icon -->
-                <Icon icon="lucide:volume-2" class="swap-on w-5 h-5 text-primary" />
-                
-                <!-- volume off icon -->
-                <Icon icon="lucide:volume-x" class="swap-off w-5 h-5 opacity-50" />
-            </label> 
-        </div>
-    </div>
+    <!-- Section: Header Removed (Moved to Input Area) -->
 
     {#if messages.length === 0}
         <!-- Section: Empty State -->
