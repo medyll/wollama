@@ -4,6 +4,7 @@ export const appSchema: DatabaseSchema = {
     users: {
         primaryKey: 'user_id',
         indexes: ['username'],
+        template: { presentation: 'username' },
         fields: {
             user_id: { type: 'uuid', required: true },
             username: { type: 'string', required: true },
@@ -18,27 +19,28 @@ export const appSchema: DatabaseSchema = {
         fields: {
             user_preferences_id: { type: 'uuid', required: true },
             user_id: { type: 'uuid', required: true },
-            theme: { type: 'string' },
-            locale: { type: 'string' },
-            auto_play_audio: { type: 'boolean' },
-            server_url: { type: 'string' },
+            theme: { type: 'string', ui: { type: 'select', options: ['light', 'dark', 'system'] } },
+            locale: { type: 'string', ui: { type: 'select', options: ['en', 'fr', 'es', 'de'] } },
+            auto_play_audio: { type: 'boolean', ui: { type: 'toggle' } },
+            server_url: { type: 'string', ui: { type: 'url' } },
             default_model: { type: 'string' },
-            default_temperature: { type: 'number' }
+            default_temperature: { type: 'number', ui: { type: 'slider', min: 0, max: 1, step: 0.1 } }
         }
     },
     companions: {
         primaryKey: 'companion_id',
         indexes: ['name'],
+        template: { presentation: 'name' },
         fields: {
             companion_id: { type: 'uuid', required: true },
             name: { type: 'string', required: true },
-            description: { type: 'string' },
-            system_prompt: { type: 'text-long', required: true },
+            description: { type: 'string', ui: { type: 'textarea' } },
+            system_prompt: { type: 'text-long', required: true, ui: { type: 'textarea', rows: 10 } },
             model: { type: 'string', required: true },
             voice_id: { type: 'string' },
             voice_tone: { type: 'string', enum: ['neutral', 'fast', 'slow', 'deep', 'high'] },
             mood: { type: 'string', enum: ['neutral', 'happy', 'sad', 'angry', 'sarcastic', 'professional', 'friendly'] },
-            avatar: { type: 'string' },
+            avatar: { type: 'string', ui: { type: 'image' } },
             created_at: { type: 'timestamp', required: true, auto: true },
             updated_at: { type: 'timestamp', auto: true },
             specialization: { type: 'string' },
