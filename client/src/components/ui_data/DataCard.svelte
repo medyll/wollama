@@ -1,6 +1,6 @@
 <script lang="ts">
     import { appSchema } from '../../../../shared/db/database-scheme';
-    import { GenericService } from '$lib/services/generic.service';
+    import { DataGenericService } from '$lib/services/data-generic.service';
     import Icon from '@iconify/svelte';
     import DataUpdate from './DataUpdate.svelte';
 
@@ -22,7 +22,7 @@
     let cardLines = $derived(tableDef?.template?.card_lines || []);
     let presentationField = $derived(tableDef?.template?.presentation || 'id');
     
-    let dataService = $derived(new GenericService(tableName));
+    let dataService = $derived(new DataGenericService(tableName));
 
     $effect(() => {
         if (data) {

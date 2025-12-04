@@ -4,7 +4,7 @@ import { appSchema } from '../../../../shared/db/database-scheme';
 import type { RxCollection } from 'rxdb';
 import { AbstractGenericService } from '../../../../shared/services/abstract-generic.service';
 
-export class GenericService<T> extends AbstractGenericService<T> {
+export class DataGenericService<T> extends AbstractGenericService<T> {
     private tableDef: any;
     private cardLines: string[];
 

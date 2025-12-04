@@ -1,6 +1,6 @@
 <script lang="ts">
     import { appSchema } from '../../../../shared/db/database-scheme';
-    import { GenericService } from '$lib/services/generic.service';
+    import { DataGenericService } from '$lib/services/data-generic.service';
 
     let { 
         tableName, 
@@ -14,7 +14,7 @@
     let error = $state<string | null>(null);
 
     let tableDef = $derived(appSchema[tableName]);
-    let dataService = $derived(new GenericService(tableName));
+    let dataService = $derived(new DataGenericService(tableName));
 
     $effect(() => {
         if (isOpen && id) {

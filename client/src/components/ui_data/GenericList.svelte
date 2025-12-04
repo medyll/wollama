@@ -2,7 +2,7 @@
     import { appSchema } from '../../../../shared/db/database-scheme';
     import Icon from '@iconify/svelte';
     import DataCard from './DataCard.svelte';
-    import { GenericService } from '$lib/services/generic.service';
+    import { DataGenericService } from '$lib/services/data-generic.service';
 
     let { 
         tableName, 
@@ -23,7 +23,7 @@
     let cardLines = $derived(tableDef?.template?.card_lines || []);
     let presentationField = $derived(tableDef?.template?.presentation || 'id');
     
-    let dataService = $derived(new GenericService(tableName));
+    let dataService = $derived(new DataGenericService(tableName));
 
     $effect(() => {
         loadData(tableName, orderBy, orderDirection as 'asc' | 'desc');

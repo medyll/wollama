@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { GenericService } from '$lib/services/generic.service';
+    import { DataGenericService } from '$lib/services/data-generic.service';
     import { createEventDispatcher } from 'svelte';
     import Icon from '@iconify/svelte';
     import { goto } from '$app/navigation';
@@ -17,7 +17,7 @@
     let isLoading = $state(false);
 
     const dispatch = createEventDispatcher();
-    const service = new GenericService(table);
+    const service = new DataGenericService(table);
 
     async function handleClick() {
         if (confirm && !isConfirming) {

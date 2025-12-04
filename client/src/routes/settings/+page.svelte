@@ -7,7 +7,7 @@
     import LanguageSelector from '$components/ui/LanguageSelector.svelte';
     import { goto } from '$app/navigation';
     import Icon from '@iconify/svelte';
-    import { GenericService } from '$lib/services/generic.service';
+    import { DataGenericService } from '$lib/services/data-generic.service';
     import { destroyDatabase } from '$lib/db';
     import type { Companion } from '$types/data';
 
@@ -30,7 +30,7 @@
 
     async function loadCompanions() {
         try {
-            const service = new GenericService<Companion>('companions');
+            const service = new DataGenericService<Companion>('companions');
             companions = await service.getAll();
         } catch (e) {
             console.error('Failed to load companions', e);
