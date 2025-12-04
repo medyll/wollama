@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { t } from '$lib/state/i18n.svelte';
-    import { uiState } from '$lib/state/ui.svelte';
+	import { uiState } from '$lib/state/ui.svelte';
 	import { chatService } from '$lib/services/chat.service';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
+	import SidebarCollapse from '$components/ui/SidebarCollapse.svelte';
+	import SidebarTrigger from '$components/ui/SidebarTrigger.svelte';
 
-	let { isOpen = $bindable(true) } = $props();
 	let chats = $state<any[]>([]);
 
 	$effect(() => {
@@ -14,10 +15,8 @@
 
 		const init = async () => {
 			try {
-				console.log('Sidebar: Loading chats...');
 				const obs = await chatService.getChats();
 				subscription = obs.subscribe((data: any[]) => {
-					console.log('Sidebar: Chats received:', data);
 					chats = data;
 				});
 			} catch (e) {
@@ -33,26 +32,40 @@
 	});
 
 	async function createNewChat() {
-		console.log('Button clicked: createNewChat');
 		goto('/chat/new');
 	}
 </script>
 
 <aside
-	class="bg-base-300 border-base-content/10 flex h-full flex-col border-r transition-all duration-300 {isOpen
+	class="bg-base-300 border-base-content/10 flex h-full flex-col border-r transition-all duration-300 {uiState.sidebarOpen
 		? uiState.sidebarCollapsed
 			? 'w-20'
 			: 'w-64'
 		: 'w-0 overflow-hidden'}"
-    aria-label="Sidebar"
+	aria-label="Sidebar"
 >
 	<div class="flex flex-col gap-2 p-2">
-        <!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
-        <div class="hidden md:flex items-center space-y-2 p-2 {uiState.sidebarCollapsed ? 'justify-center' : 'justify-end'}">
-            <button class="btn btn-ghost btn-square" aria-label="Search" onclick={() => goto('/search')}>
-                <Icon icon="lucide:search" class="h-5 w-5" />
-            </button>
-        </div>
+		<!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
+		<div
+			class="hidden md:flex {uiState.sidebarCollapsed
+				? 'flex-col items-center gap-2'
+				: 'flex-row items-center justify-between'} p-2"
+		>
+			<div class="flex items-center gap-1">
+				<SidebarTrigger class="btn-sm" title={t('ui.close')} visible={!uiState.sidebarCollapsed} />
+			</div>
+
+			{#if !uiState.sidebarCollapsed}
+				<button class="btn btn-ghost btn-square btn-sm" aria-label="Search" onclick={() => goto('/search')}>
+					<Icon icon="lucide:search" class="h-5 w-5" />
+				</button>
+			{/if}
+		</div>
+		{#if uiState.sidebarCollapsed}
+			<button class="btn btn-ghost btn-square btn-sm mx-auto" aria-label="Search" onclick={() => goto('/search')}>
+				<Icon icon="lucide:search" class="h-5 w-5" />
+			</button>
+		{/if}
 
 		<button
 			class="btn btn-ghost btn-block {uiState.sidebarCollapsed ? 'px-0' : 'justify-start'}"
@@ -66,11 +79,7 @@
 		</button>
 	</div>
 
-	<nav 
-        id="sidebar-nav"
-        class="flex-1 space-y-2 overflow-y-auto p-2" 
-        aria-label={t('ui.myChats')}
-    >
+	<nav id="sidebar-nav" class="flex-1 space-y-2 overflow-y-auto p-2" aria-label={t('ui.myChats')}>
 		{#if !uiState.sidebarCollapsed}
 			{#each chats as chat}
 				<a
@@ -90,6 +99,10 @@
 	</nav>
 
 	<div class="  flex flex-col gap-2 p-4">
+		
+		<div class="px-2 flex justify-end">
+			<SidebarCollapse />
+		</div>
 		<button
 			class="btn btn-ghost btn-block {uiState.sidebarCollapsed ? 'px-0' : 'justify-start'}"
 			onclick={() => goto('/settings')}

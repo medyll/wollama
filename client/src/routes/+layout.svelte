@@ -8,6 +8,7 @@
     import ServerConnectionCheck from '$components/setup/ServerConnectionCheck.svelte';
     import SplashScreen from '$components/ui/SplashScreen.svelte';
     import Sidebar from '$components/ui/Sidebar.svelte';
+    import SidebarTrigger from '$components/ui/SidebarTrigger.svelte';
     import UserMenu from '$components/ui/UserMenu.svelte';
     import { connectionState } from '$lib/state/connection.svelte';
     import { uiState } from '$lib/state/ui.svelte';
@@ -19,7 +20,6 @@
     import Icon from '@iconify/svelte';
 
 	let { children } = $props();
-    let isSidebarOpen = $state(false);
 
     $effect(() => {
         if (typeof document !== 'undefined') {
@@ -30,7 +30,13 @@
     $effect(() => {
         // Close sidebar on navigation (mobile)
         const path = $page.url.pathname;
-        isSidebarOpen = false;
+        // Only close on mobile if needed, but uiState.sidebarOpen is shared.
+        // Maybe we want to keep it open on desktop?
+        // For now, let's just close it if it's mobile (we can check window width or just rely on user intent)
+        // But since we share state, let's leave it for now or check media query.
+        if (window.innerWidth < 768) {
+             uiState.sidebarOpen = false;
+        }
     });
 
 	onMount(async () => {
@@ -54,26 +60,18 @@
 <ServerConnectionCheck />
 <SplashScreen />
 
-<div class="drawer md:drawer-open h-screen overflow-hidden bg-base-100">
+<div class="drawer md:drawer-open h-screen overflow-hidden ">
     <!-- Section: Drawer Toggle -->
-    <input id="main-drawer" type="checkbox" class="drawer-toggle" bind:checked={isSidebarOpen} />
+    <input id="main-drawer" type="checkbox" class="drawer-toggle" bind:checked={uiState.sidebarOpen} />
     
     <div class="drawer-content flex flex-col h-full relative">
         <!-- Section: Navbar -->
         <header class="navbar bg-base-100 min-h-16 z-10">
             <div class="flex-none md:hidden">
-                <label for="main-drawer" class="btn btn-square btn-ghost" aria-label="Open sidebar">
-                    <Icon icon="lucide:menu" class="inline-block w-5 h-5" />
-                </label>
+                <SidebarTrigger />
             </div>
             <div class="flex-none hidden md:block mr-2">
-                <button 
-                    class="btn btn-square btn-ghost" 
-                    onclick={() => uiState.toggleSidebar()}
-                    aria-label={uiState.sidebarCollapsed ? t('ui.expand') : t('ui.collapse')}
-                >
-                    <Icon icon="lucide:menu" class="inline-block w-5 h-5" />
-                </button>
+                <SidebarTrigger visible={!uiState.sidebarOpen} />
             </div>
             <div class="flex-1 flex items-center gap-2">
                 <a href="/chat" class="btn btn-ghost text-xl">Wollama</a>
@@ -115,6 +113,6 @@
     <!-- Section: Sidebar -->
     <div class="drawer-side z-20">
         <label for="main-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-        <Sidebar isOpen={true} />
+        <Sidebar />
     </div>
 </div>

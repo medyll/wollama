@@ -1,6 +1,7 @@
 export class UIState {
     pageTitle = $state('');
     sidebarCollapsed = $state(false);
+    sidebarOpen = $state(true);
 
     setTitle(title: string) {
         this.pageTitle = title;
@@ -12,6 +13,10 @@ export class UIState {
 
     toggleSidebar() {
         this.sidebarCollapsed = !this.sidebarCollapsed;
+    }
+
+    toggleSidebarVisibility() {
+        this.sidebarOpen = !this.sidebarOpen;
     }
 }
 
