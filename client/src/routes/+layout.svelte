@@ -10,6 +10,7 @@
     import Sidebar from '$components/ui/Sidebar.svelte';
     import UserMenu from '$components/ui/UserMenu.svelte';
     import { connectionState } from '$lib/state/connection.svelte';
+    import { uiState } from '$lib/state/ui.svelte';
     import { userState } from '$lib/state/user.svelte';
     import { downloadState } from '$lib/state/downloads.svelte';
     import { companionService } from '$lib/services/companion.service';
@@ -65,8 +66,13 @@
                     <Icon icon="lucide:menu" class="inline-block w-5 h-5" />
                 </label>
             </div>
-            <div class="flex-1">
+            <div class="flex-1 flex items-center gap-2">
                 <a href="/chat" class="btn btn-ghost text-xl">Wollama</a>
+                {#if uiState.pageTitle}
+                    <span class="text-lg font-normal opacity-70 truncate max-w-[200px] md:max-w-md hidden sm:inline-block">
+                        {uiState.pageTitle}
+                    </span>
+                {/if}
             </div>
             <div class="flex-none flex items-center gap-2">
                 {#if downloadState.isPulling}

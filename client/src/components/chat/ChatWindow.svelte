@@ -1,6 +1,7 @@
 <script lang="ts">
     import { t } from '$lib/state/i18n.svelte';
     import { userState } from '$lib/state/user.svelte';
+    import { uiState } from '$lib/state/ui.svelte';
     import { toast } from '$lib/state/notifications.svelte';
     import { audioService } from '$lib/services/audio.service';
     import { chatService } from '$lib/services/chat.service';
@@ -51,12 +52,19 @@
     $effect(() => {
         if (!chatId) {
             messages = [];
+            uiState.clearTitle();
             return;
         }
 
         let sub: any;
         
         (async () => {
+            // Load chat details to get title
+            const chat = await chatService.getChat(chatId);
+            if (chat) {
+                uiState.setTitle(chat.title);
+            }
+
             const obs = await chatService.getMessages(chatId);
             sub = obs.subscribe((data: any[]) => {
                 messages = data;
@@ -70,6 +78,7 @@
 
         return () => {
             if (sub) sub.unsubscribe();
+            uiState.clearTitle();
         };
     });
 
@@ -355,7 +364,7 @@
             </div>
         </div>
     {/snippet}
-
+ 
 <CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
 <div class="absolute inset-0 flex flex-col overflow-hidden">
@@ -363,13 +372,13 @@
     <div class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur z-10">
         <div class="flex items-center gap-4">
             <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isCompagnonModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isCompagnonModalOpen = true)}>
-                <h2 class="font-bold text-lg">
+                <!-- <h2 class="font-bold text-lg">
                     {#if chatId}
                         {t('ui.chat_title')} #{chatId}
                     {:else}
                         {t('ui.newChat')}
                     {/if}
-                </h2>
+                </h2> -->
                 <div class="flex items-center gap-2">
                     <span class="text-xs opacity-50">{t('ui.with')} {currentCompagnon.name} ({currentCompagnon.model})</span>
                     <span class="badge badge-xs badge-info">{t('ui.change')}</span>
@@ -394,14 +403,11 @@
                 />
                 
                 <!-- volume on icon -->
-                <svg class="swap-on fill-current w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z" /></svg>
+                <Icon icon="lucide:volume-2" class="swap-on w-5 h-5 text-primary" />
                 
                 <!-- volume off icon -->
-                <svg class="swap-off fill-current w-5 h-5 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z" /></svg>
-            </label>
-            <button class="btn btn-ghost btn-sm btn-circle" aria-label="Chat options">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
-            </button>
+                <Icon icon="lucide:volume-x" class="swap-off w-5 h-5 opacity-50" />
+            </label> 
         </div>
     </div>
 
@@ -422,11 +428,8 @@
         <!-- Section: Messages Area -->
         <div 
             class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0" 
-            onclick={handleMessageClick}
-            onkeydown={(e) => e.key === 'Enter' && handleMessageClick(e as unknown as MouseEvent)}
             role="log"
             aria-label="Chat messages"
-            tabindex="0"
             bind:this={chatContainer}
             onscroll={handleScroll}
         >
@@ -443,7 +446,13 @@
                     <div class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}">
                         {message.status}
                         {#if message.images && message.images.length > 0}
-                            <div class="flex flex-wrap gap-2 mb-2">
+                    <div 
+                        class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}"
+                        onclick={handleMessageClick}
+                        onkeydown={(e) => e.key === 'Enter' && handleMessageClick(e)}
+                        role="button"
+                        tabindex="0"
+                    >
                                 {#each message.images as img}
                                     {#if img.startsWith('data:image')}
                                         <img src={img} alt="attachment" class="max-w-full h-auto rounded-lg max-h-64" />
