@@ -7,3 +7,5 @@
     <title>Wollama</title>
 </svelte:head>
 
+<!-- Section: Root Placeholder -->
+

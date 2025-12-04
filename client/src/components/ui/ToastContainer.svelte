@@ -36,6 +36,7 @@
 
 <div class="toast {positionClasses} z-50 p-4">
     {#each toast.toasts as item (item.id)}
+        <!-- Section: Toast Item -->
         <div 
             animate:flip={{ duration: 300 }}
             in:fly={{ y: 20, duration: 300 }} 

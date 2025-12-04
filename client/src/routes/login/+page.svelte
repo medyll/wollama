@@ -18,6 +18,7 @@
 </script>
 
 <div class="min-h-screen bg-base-200 flex items-center justify-center p-4">
+    <!-- Section: Login Card -->
     <div class="card w-full max-w-sm bg-base-100 shadow-xl">
         <div class="card-body items-center text-center">
             <div class="avatar placeholder mb-4">
@@ -33,6 +34,7 @@
                 <input 
                     type="password" 
                     placeholder="Password" 
+                    aria-label="Password"
                     class="input input-bordered w-full text-center" 
                     bind:value={password}
                     onkeydown={(e) => e.key === 'Enter' && handleLogin()}
@@ -43,7 +45,7 @@
                 <div class="text-error text-sm mt-2">{error}</div>
             {/if}
 
-            <button class="btn btn-primary w-full mt-6" onclick={handleLogin}>
+            <button class="btn btn-primary w-full mt-6" onclick={handleLogin} aria-label="Unlock">
                 Unlock
                 <Icon icon="lucide:unlock" class="w-4 h-4 ml-2" />
             </button>
@@ -56,7 +58,7 @@
                     localStorage.clear();
                     location.reload();
                 }
-            }}>
+            }} aria-label="Reset App">
                 Forgot password? (Reset App)
             </button>
         </div>

@@ -8,6 +8,7 @@
 </script>
 
 <div class="hero h-full bg-base-200">
+    <!-- Section: Hero Content -->
     <div class="hero-content text-center">
         <div class="max-w-md flex flex-col items-center">
             <img src="/assets/lama.png" alt="Wollama" class="w-32 h-32 object-contain mb-6 opacity-90" />

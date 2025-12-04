@@ -50,6 +50,7 @@
 </script>
 
 <div class="min-h-screen bg-base-200 flex items-center justify-center p-4">
+    <!-- Section: Setup Card -->
     <div class="card w-full max-w-md bg-base-100 shadow-xl">
         <div class="card-body">
             <div class="flex justify-between items-center mb-4">
@@ -59,11 +60,13 @@
             
             <p class="text-base-content/70 mb-6">{t('setup.subtitle')}</p>
 
+            <!-- Section: Tabs -->
             <div role="tablist" class="tabs tabs-boxed mb-6">
                 <button 
                     role="tab" 
                     class="tab {activeTab === 'manual' ? 'tab-active' : ''}"
                     onclick={() => activeTab = 'manual'}
+                    aria-selected={activeTab === 'manual'}
                 >
                     Manual Setup
                 </button>
@@ -71,12 +74,14 @@
                     role="tab" 
                     class="tab {activeTab === 'oauth' ? 'tab-active' : ''}"
                     onclick={() => activeTab = 'oauth'}
+                    aria-selected={activeTab === 'oauth'}
                 >
                     Connect Account
                 </button>
             </div>
 
             {#if activeTab === 'manual'}
+                <!-- Section: Manual Form -->
                 <div class="space-y-4">
                     <div class="form-control">
                         <label class="label" for="nickname">

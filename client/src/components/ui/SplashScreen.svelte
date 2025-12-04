@@ -51,16 +51,17 @@
         class="modal backdrop:bg-base-300/50 backdrop:backdrop-blur-sm" 
         bind:this={dialog} 
         oncancel={(e) => e.preventDefault()}
+        aria-labelledby="splash-title"
     >
         <div class="modal-box relative overflow-hidden p-0 w-full max-w-md shadow-2xl bg-base-100">
-            <!-- Background Image Container -->
+            <!-- Section: Background Image Container -->
             <div class="absolute inset-0 z-0" style="background-image: url('/assets/lama.png'); background-size: cover; background-position: center;">
                 <div class="absolute inset-0 bg-base-100/90"></div>
             </div>
             
-            <!-- Content -->
+            <!-- Section: Content -->
             <div class="relative z-10 p-10 text-center flex flex-col items-center">
-                <h1 class="text-4xl font-bold text-primary mb-2">Wollama</h1>
+                <h1 id="splash-title" class="text-4xl font-bold text-primary mb-2">Wollama</h1>
                 <p class="py-6 font-medium text-lg opacity-70">{t('ui.loading_assistant')}</p>
                 <span class="loading loading-dots loading-lg text-primary"></span>
             </div>

@@ -148,6 +148,7 @@
 
 <div class="h-full overflow-y-auto bg-base-200 p-4 md:p-8">
     <div class="max-w-3xl mx-auto">
+        <!-- Section: Header -->
         <div class="flex items-center justify-between mb-8">
             <button class="btn btn-ghost btn-circle" onclick={() => goto('/')} aria-label="Back">
                 <Icon icon="lucide:arrow-left" class="w-6 h-6" />
@@ -160,9 +161,9 @@
         </div>
 
         <div class="join join-vertical w-full bg-base-100 shadow-xl">
-            <!-- User Profile -->
+            <!-- Section: User Profile -->
             <div class="collapse collapse-arrow join-item border-base-300 border">
-                <input type="checkbox" checked={activeSection === 'profile'} onchange={() => activeSection = activeSection === 'profile' ? null : 'profile'} />
+                <input type="checkbox" checked={activeSection === 'profile'} onchange={() => activeSection = activeSection === 'profile' ? null : 'profile'} aria-label="Toggle User Profile" />
                 <div class="collapse-title text-lg font-medium">
                     {t('ui.userProfile')}
                 </div>
@@ -193,9 +194,9 @@
                 </div>
             </div>
 
-            <!-- Interface -->
+            <!-- Section: Interface -->
             <div class="collapse collapse-arrow join-item border-base-300 border">
-                <input type="checkbox" checked={activeSection === 'interface'} onchange={() => activeSection = activeSection === 'interface' ? null : 'interface'} />
+                <input type="checkbox" checked={activeSection === 'interface'} onchange={() => activeSection = activeSection === 'interface' ? null : 'interface'} aria-label="Toggle Interface" />
                 <div class="collapse-title text-lg font-medium">
                     {t('settings.interface')}
                 </div>
@@ -210,6 +211,7 @@
                                     class="btn h-auto flex flex-col gap-1 p-2 border-2 rounded-xl {userState.preferences.theme === theme ? 'border-primary' : 'border-base-content/10'}"
                                     onclick={() => userState.preferences.theme = theme}
                                     data-theme={theme}
+                                    aria-label="Select theme {theme}"
                                 >
                                     <div class="w-full h-4 rounded bg-base-100 border border-base-content/10"></div>
                                     <div class="w-full h-4 rounded bg-primary"></div>
@@ -222,9 +224,9 @@
                 </div>
             </div>
 
-            <!-- Audio -->
+            <!-- Section: Audio -->
             <div class="collapse collapse-arrow join-item border-base-300 border">
-                <input type="checkbox" checked={activeSection === 'audio'} onchange={() => activeSection = activeSection === 'audio' ? null : 'audio'} />
+                <input type="checkbox" checked={activeSection === 'audio'} onchange={() => activeSection = activeSection === 'audio' ? null : 'audio'} aria-label="Toggle Audio" />
                 <div class="collapse-title text-lg font-medium flex items-center gap-2">
                     <Icon icon="lucide:mic" class="w-5 h-5" />
                     {t('settings.audio') || 'Audio'}
@@ -247,7 +249,7 @@
                             </select>
                             
                             <div class="flex items-center gap-2 mt-2">
-                                <button class="btn btn-sm {isMonitoringMic ? 'btn-error' : 'btn-secondary'}" onclick={toggleMicTest}>
+                                <button class="btn btn-sm {isMonitoringMic ? 'btn-error' : 'btn-secondary'}" onclick={toggleMicTest} aria-label={isMonitoringMic ? "Stop Test" : "Test Mic"}>
                                     {#if isMonitoringMic}
                                         <Icon icon="lucide:square" class="w-4 h-4" /> Stop Test
                                     {:else}
@@ -276,7 +278,7 @@
                             </select>
 
                             <div class="mt-2">
-                                <button class="btn btn-sm btn-secondary" onclick={playTestSound}>
+                                <button class="btn btn-sm btn-secondary" onclick={playTestSound} aria-label="Test Sound">
                                     <Icon icon="lucide:volume-2" class="w-4 h-4" /> Test Sound
                                 </button>
                             </div>
@@ -285,9 +287,9 @@
                 </div>
             </div>
 
-            <!-- AI Configuration -->
+            <!-- Section: AI Configuration -->
             <div class="collapse collapse-arrow join-item border-base-300 border">
-                <input type="checkbox" checked={activeSection === 'ai'} onchange={() => activeSection = activeSection === 'ai' ? null : 'ai'} />
+                <input type="checkbox" checked={activeSection === 'ai'} onchange={() => activeSection = activeSection === 'ai' ? null : 'ai'} aria-label="Toggle AI Configuration" />
                 <div class="collapse-title text-lg font-medium">
                     {t('settings.ai')}
                 </div>
@@ -372,6 +374,7 @@
                                 class="btn btn-primary join-item" 
                                 onclick={pullModel}
                                 disabled={downloadState.isPulling || !newModelName}
+                                aria-label="Download Model"
                             >
                                 {#if downloadState.isPulling}
                                     <span class="loading loading-spinner loading-sm"></span>
@@ -387,16 +390,16 @@
                                     <span>{downloadState.status}</span>
                                     <span>{downloadState.progress}%</span>
                                 </div>
-                                <progress class="progress progress-primary w-full" value={downloadState.progress} max="100"></progress>
+                                <progress class="progress progress-primary w-full" value={downloadState.progress} max="100" aria-label="Download progress"></progress>
                             </div>
                         {/if}
                     </div>
                 </div>
             </div>
 
-            <!-- Server Configuration -->
+            <!-- Section: Server Configuration -->
             <div class="collapse collapse-arrow join-item border-base-300 border">
-                <input type="checkbox" checked={activeSection === 'server'} onchange={() => activeSection = activeSection === 'server' ? null : 'server'} />
+                <input type="checkbox" checked={activeSection === 'server'} onchange={() => activeSection = activeSection === 'server' ? null : 'server'} aria-label="Toggle Server Configuration" />
                 <div class="collapse-title text-lg font-medium">
                     {t('settings.server_connection')}
                 </div>
@@ -417,6 +420,7 @@
                                 class="btn btn-primary join-item" 
                                 onclick={verifyHost}
                                 disabled={isVerifying}
+                                aria-label="Verify Server"
                             >
                                 {#if isVerifying}
                                     <span class="loading loading-spinner loading-sm"></span>
@@ -432,9 +436,9 @@
                 </div>
             </div>
 
-            <!-- Danger Zone -->
+            <!-- Section: Danger Zone -->
             <div class="collapse collapse-arrow join-item border-base-300 border border-error/20">
-                <input type="checkbox" checked={activeSection === 'danger'} onchange={() => activeSection = activeSection === 'danger' ? null : 'danger'} />
+                <input type="checkbox" checked={activeSection === 'danger'} onchange={() => activeSection = activeSection === 'danger' ? null : 'danger'} aria-label="Toggle Danger Zone" />
                 <div class="collapse-title text-lg font-medium text-error">
                     {t('settings.danger_zone') || 'Danger Zone'}
                 </div>
@@ -443,7 +447,7 @@
                         <p class="text-sm mb-4 opacity-70">
                             {t('settings.delete_warning') || 'Deleting your account will remove all your data, including chats, companions, and settings. This action cannot be undone.'}
                         </p>
-                        <button class="btn btn-error btn-outline w-full md:w-auto" onclick={deleteAccount}>
+                        <button class="btn btn-error btn-outline w-full md:w-auto" onclick={deleteAccount} aria-label="Delete Account">
                             <Icon icon="lucide:trash-2" class="w-4 h-4 mr-2" />
                             {t('settings.delete_account') || 'Delete Account & Data'}
                         </button>

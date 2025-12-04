@@ -30,12 +30,13 @@
 </script>
 
 <div class="flex items-center gap-2 mt-2">
-    <!-- Rating -->
+    <!-- Section: Rating -->
     <div class="join gap-2 ">
         <button 
             class="btn btn-ghost btn-xs btn-square join-item {rating === 'good' ? 'text-success' : ''}" 
             onclick={() => handleRate('good')}
             title="Good response"
+            aria-label="Rate good"
         >
             <Icon icon={rating === 'good' ? "lucide:thumbs-up" : "lucide:thumbs-up"} class="w-4 h-4" />
         </button>
@@ -43,6 +44,7 @@
             class="btn btn-ghost btn-xs btn-square join-item {rating === 'bad' ? 'text-error' : ''}" 
             onclick={() => handleRate('bad')}
             title="Bad response"
+            aria-label="Rate bad"
         >
             <Icon icon={rating === 'bad' ? "lucide:thumbs-down" : "lucide:thumbs-down"} class="w-4 h-4" />
         </button>
@@ -50,11 +52,12 @@
 
     <div class="divider divider-horizontal mx-0"></div>
 
-    <!-- Copy -->
+    <!-- Section: Copy -->
     <button 
         class="btn btn-ghost btn-xs btn-square" 
         onclick={copyToClipboard}
         title="Copy"
+        aria-label="Copy to clipboard"
     >
         {#if isCopied}
             <Icon icon="lucide:check" class="w-4 h-4 text-success" />
@@ -63,21 +66,23 @@
         {/if}
     </button>
 
-    <!-- Reload (only if onRegenerate is provided) -->
+    <!-- Section: Reload (only if onRegenerate is provided) -->
     {#if onRegenerate}
         <button 
             class="btn btn-ghost btn-xs btn-square" 
             onclick={onRegenerate}
             title="Regenerate"
+            aria-label="Regenerate response"
         >
             <Icon icon="lucide:refresh-cw" class="w-4 h-4" />
         </button>
     {/if}
 
-    <!-- Share -->
+    <!-- Section: Share -->
     <button 
         class="btn btn-ghost btn-xs btn-square" 
         title="Share"
+        aria-label="Share"
     >
         <Icon icon="lucide:share-2" class="w-4 h-4" />
     </button>

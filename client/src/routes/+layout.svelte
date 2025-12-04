@@ -42,7 +42,7 @@
         }
 
 		App.addListener('appUrlOpen', (data) => {
-			// Nettoyage: "myapp://chat/123" -> "/chat/123"
+			// Cleanup: "myapp://chat/123" -> "/chat/123"
 			// Adjust logic based on actual scheme
 			const slug = data.url.split('.com').pop();
 			if (slug) goto(slug);
@@ -55,10 +55,11 @@
 <SplashScreen />
 
 <div class="drawer md:drawer-open h-screen overflow-hidden bg-base-100">
+    <!-- Section: Drawer Toggle -->
     <input id="main-drawer" type="checkbox" class="drawer-toggle" bind:checked={isSidebarOpen} />
     
     <div class="drawer-content flex flex-col h-full relative">
-        <!-- Top Navigation Bar -->
+        <!-- Section: Navbar -->
         <header class="navbar bg-base-100 min-h-16 z-10">
             <div class="flex-none md:hidden">
                 <label for="main-drawer" class="btn btn-square btn-ghost" aria-label="Open sidebar">
@@ -75,7 +76,7 @@
                             <span class="font-bold truncate max-w-20">{downloadState.currentModel}</span>
                             <span>{downloadState.progress}%</span>
                         </div>
-                        <progress class="progress progress-primary w-full h-1.5" value={downloadState.progress} max="100"></progress>
+                        <progress class="progress progress-primary w-full h-1.5" value={downloadState.progress} max="100" aria-label="Download progress"></progress>
                     </div>
                 {/if}
                 <button 
@@ -92,12 +93,13 @@
         </header>
 
 
-        <!-- Page Content -->
+        <!-- Section: Main Content -->
         <main class="flex-1 overflow-hidden relative">
             {@render children()}
         </main>
     </div>
     
+    <!-- Section: Sidebar -->
     <div class="drawer-side z-20">
         <label for="main-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <Sidebar isOpen={true} />

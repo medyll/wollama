@@ -270,90 +270,96 @@
     }
 </script>
 
-{#snippet inputArea()}
-    <div class="w-full md:max-w-[760px] mx-auto">
-        <!-- File Previews -->
-        {#if selectedFiles.length > 0}
-            <div class="flex gap-2 p-2 overflow-x-auto mb-2">
-                {#each selectedFiles as file, i}
-                    <div class="relative group shrink-0">
-                        {#if file.startsWith('data:image')}
-                            <img src={file} alt="preview" class="h-20 w-20 object-cover rounded-lg border border-base-content/10" />
-                        {:else}
-                            <div class="h-20 w-20 flex flex-col items-center justify-center bg-base-200 rounded-lg border border-base-content/10">
-                                <Icon icon="lucide:file" class="w-8 h-8 opacity-50" />
-                                <span class="text-[10px] opacity-50">File</span>
-                            </div>
-                        {/if}
-                        <button class="btn btn-circle btn-xs btn-error absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-md" onclick={() => removeFile(i)}>✕</button>
-                    </div>
-                {/each}
-            </div>
-        {/if}
-
-        <div class="bg-base-200 rounded-2xl p-2 border border-base-content/10 focus-within:border-primary transition-colors shadow-sm">
-            <textarea 
-                bind:this={textareaRef}
-                placeholder={t('ui.type_message')} 
-                class="textarea textarea-ghost w-full resize-none focus:outline-none bg-transparent px-2 py-2 min-h-12 text-base max-h-[50vh] overflow-y-auto" 
-                rows="1"
-                bind:value={messageInput}
-                oninput={autoResize}
-                onkeydown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                }}
-            ></textarea>
-            
-            <div class="flex justify-between items-center mt-1 px-1">
-                <!-- Left: Attachments -->
-                <div>
-                    <input 
-                        type="file" 
-                        class="hidden" 
-                        multiple 
-                        bind:this={fileInput} 
-                        onchange={handleFileSelect} 
-                    />
-                    <button class="btn btn-ghost btn-sm btn-circle" aria-label="Add attachment" onclick={triggerFileInput}>
-                        <Icon icon="lucide:paperclip" class="w-5 h-5 opacity-70" />
-                    </button>
-                </div>
-
-                <!-- Right: Send / Mic -->
-                <div>
-                    {#if !messageInput.trim()}
-                        <button 
-                            class="btn btn-circle btn-sm {isRecording ? 'btn-error animate-pulse' : 'btn-ghost'}" 
-                            onclick={toggleRecording}
-                            aria-label={isRecording ? "Stop recording" : "Start recording"}
-                            disabled={isTranscribing}
-                        >
-                            {#if isTranscribing}
-                                <span class="loading loading-spinner loading-xs"></span>
-                            {:else if isRecording}
-                                <Icon icon="lucide:square" class="w-5 h-5" />
+    {#snippet inputArea()}
+        <!-- Section: Input Area -->
+        <div class="w-full md:max-w-[760px] mx-auto">
+            <!-- File Previews -->
+            {#if selectedFiles.length > 0}
+                <div class="flex gap-2 p-2 overflow-x-auto mb-2">
+                    {#each selectedFiles as file, i}
+                        <div class="relative group shrink-0">
+                            {#if file.startsWith('data:image')}
+                                <img src={file} alt="preview" class="h-20 w-20 object-cover rounded-lg border border-base-content/10" />
                             {:else}
-                                <Icon icon="lucide:mic" class="w-5 h-5 opacity-70" />
+                                <div class="h-20 w-20 flex flex-col items-center justify-center bg-base-200 rounded-lg border border-base-content/10">
+                                    <Icon icon="lucide:file" class="w-8 h-8 opacity-50" />
+                                    <span class="text-[10px] opacity-50">File</span>
+                                </div>
                             {/if}
+                            <button 
+                                class="btn btn-circle btn-xs btn-error absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-md" 
+                                onclick={() => removeFile(i)}
+                                aria-label={t('ui.remove_file') || 'Remove file'}
+                            >✕</button>
+                        </div>
+                    {/each}
+                </div>
+            {/if}
+    
+            <div class="bg-base-200 rounded-2xl p-2 border border-base-content/10 focus-within:border-primary transition-colors shadow-sm">
+                <textarea 
+                    bind:this={textareaRef}
+                    placeholder={t('ui.type_message')} 
+                    aria-label={t('ui.type_message')}
+                    class="textarea textarea-ghost w-full resize-none focus:outline-none bg-transparent px-2 py-2 min-h-12 text-base max-h-[50vh] overflow-y-auto" 
+                    rows="1"
+                    bind:value={messageInput}
+                    oninput={autoResize}
+                    onkeydown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage();
+                        }
+                    }}
+                ></textarea>
+                
+                <div class="flex justify-between items-center mt-1 px-1">
+                    <!-- Left: Attachments -->
+                    <div>
+                        <input 
+                            type="file" 
+                            class="hidden" 
+                            multiple 
+                            bind:this={fileInput} 
+                            onchange={handleFileSelect} 
+                        />
+                        <button class="btn btn-ghost btn-sm btn-circle" aria-label="Add attachment" onclick={triggerFileInput}>
+                            <Icon icon="lucide:paperclip" class="w-5 h-5 opacity-70" />
                         </button>
-                    {:else}
-                        <button class="btn btn-primary btn-sm btn-circle" onclick={sendMessage} aria-label="Send message">
-                            <Icon icon="lucide:send-horizontal" class="w-5 h-5" />
-                        </button>
-                    {/if}
+                    </div>
+    
+                    <!-- Right: Send / Mic -->
+                    <div>
+                        {#if !messageInput.trim()}
+                            <button 
+                                class="btn btn-circle btn-sm {isRecording ? 'btn-error animate-pulse' : 'btn-ghost'}" 
+                                onclick={toggleRecording}
+                                aria-label={isRecording ? "Stop recording" : "Start recording"}
+                                disabled={isTranscribing}
+                            >
+                                {#if isTranscribing}
+                                    <span class="loading loading-spinner loading-xs"></span>
+                                {:else if isRecording}
+                                    <Icon icon="lucide:square" class="w-5 h-5" />
+                                {:else}
+                                    <Icon icon="lucide:mic" class="w-5 h-5 opacity-70" />
+                                {/if}
+                            </button>
+                        {:else}
+                            <button class="btn btn-primary btn-sm btn-circle" onclick={sendMessage} aria-label="Send message">
+                                <Icon icon="lucide:send-horizontal" class="w-5 h-5" />
+                            </button>
+                        {/if}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-{/snippet}
+    {/snippet}
 
 <CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
 <div class="absolute inset-0 flex flex-col overflow-hidden">
-    <!-- Chat Header -->
+    <!-- Section: Header -->
     <div class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur z-10">
         <div class="flex items-center gap-4">
             <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isCompagnonModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isCompagnonModalOpen = true)}>
@@ -400,7 +406,7 @@
     </div>
 
     {#if messages.length === 0}
-        <!-- Empty State: Centered Input -->
+        <!-- Section: Empty State -->
         <div class="flex-1 flex flex-col items-center justify-center p-4 overflow-y-auto">
             <div class="max-w-md flex flex-col items-center w-full">
                 <img src="/assets/lama.png" alt="Wollama" class="w-32 h-32 object-contain mb-6 opacity-90" />
@@ -413,12 +419,14 @@
             </div>
         </div>
     {:else}
-        <!-- Messages Area -->
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions --> 
+        <!-- Section: Messages Area -->
         <div 
             class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0" 
             onclick={handleMessageClick}
+            onkeydown={(e) => e.key === 'Enter' && handleMessageClick(e as unknown as MouseEvent)}
+            role="log"
+            aria-label="Chat messages"
+            tabindex="0"
             bind:this={chatContainer}
             onscroll={handleScroll}
         >
@@ -470,7 +478,7 @@
             {/each}
         </div>
 
-        <!-- Input Area (Bottom) -->
+        <!-- Section: Input Area (Bottom) -->
         <div class="p-0 md:p-4 bg-base-100 w-full">
             {@render inputArea()}
         </div>

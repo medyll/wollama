@@ -60,13 +60,14 @@
 </script>
 
 <div class="relative inline-block">
+    <!-- Section: Confirmation Overlay -->
     {#if isConfirming}
         <div class="flex items-center gap-2 bg-error/10 text-error rounded-lg p-1 pr-2 absolute right-0 top-0 h-full z-10 whitespace-nowrap overflow-hidden animate-in slide-in-from-right-4 fade-in duration-200">
-            <button class="btn btn-xs btn-ghost btn-circle" onclick={cancel}>
+            <button class="btn btn-xs btn-ghost btn-circle" onclick={cancel} aria-label="Cancel">
                 <Icon icon="lucide:x" class="w-4 h-4" />
             </button>
             <span class="text-xs font-bold">Confirm?</span>
-            <button class="btn btn-xs btn-error" onclick={handleClick} disabled={isLoading}>
+            <button class="btn btn-xs btn-error" onclick={handleClick} disabled={isLoading} aria-label="Confirm">
                 {#if isLoading}
                     <span class="loading loading-spinner loading-xs"></span>
                 {:else}
@@ -76,6 +77,7 @@
         </div>
     {/if}
 
+    <!-- Section: Main Button -->
     <button 
         class="btn btn-ghost btn-sm btn-circle {isConfirming ? 'opacity-0 pointer-events-none' : ''} transition-opacity"
         onclick={handleClick}

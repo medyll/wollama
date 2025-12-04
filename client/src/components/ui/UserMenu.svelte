@@ -24,6 +24,7 @@
 		onclick={handleSignIn}
 		disabled={isSigningIn}
 		title={t('ui.signIn')}
+        aria-label={t('ui.signIn')}
 	>
 		{#if isSigningIn}
 			<span class="loading loading-spinner loading-xs"></span>
@@ -33,6 +34,7 @@
 		{/if}
 	</button>
 {:else}
+    <!-- Section: User Profile -->
 	<div class="flex items-center gap-2 bg-base-200 rounded-lg px-2 py-1">
 		{#if userState.photoURL}
 			<img src={userState.photoURL} alt="Avatar" class="h-8 w-8 rounded-full" />

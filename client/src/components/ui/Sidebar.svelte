@@ -44,9 +44,10 @@
 			? 'w-20'
 			: 'w-64'
 		: 'w-0 overflow-hidden'}"
+    aria-label="Sidebar"
 >
 	<div class="flex flex-col gap-2 p-2">
-        <!-- Desktop Navicon (Collapse Toggle) & Search -->
+        <!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
         <div class="hidden md:flex items-center space-y-2 p-2 {isCollapsed ? 'justify-center' : 'justify-between'}">
             <button 
                 class="btn btn-ghost btn-square" 

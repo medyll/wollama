@@ -26,13 +26,14 @@
     }
 </script>
 
-<dialog class="modal" class:modal-open={isOpen}>
+<dialog class="modal" class:modal-open={isOpen} aria-labelledby="companion-modal-title">
     <div class="modal-box w-11/12 max-w-5xl">
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={() => isOpen = false}>✕</button>
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick={() => isOpen = false} aria-label="Close">✕</button>
         </form>
-        <h3 class="font-bold text-lg mb-4">{t('ui.choose_companion')}</h3>
+        <h3 id="companion-modal-title" class="font-bold text-lg mb-4">{t('ui.choose_companion')}</h3>
         
+        <!-- Section: Companion List -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {#each compagnons as compagnon}
                 <button class="card bg-base-200 hover:bg-base-300 transition-colors text-left" onclick={() => selectCompagnon(compagnon)}>
