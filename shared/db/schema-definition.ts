@@ -34,6 +34,7 @@ export interface TableDefinition {
     fk?: Record<string, { table: string; required?: boolean }>;
     template?: {
         presentation: string;
+        card_lines?: string[];
     };
 }
 

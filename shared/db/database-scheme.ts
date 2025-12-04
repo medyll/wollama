@@ -30,7 +30,10 @@ export const appSchema: DatabaseSchema = {
     companions: {
         primaryKey: 'companion_id',
         indexes: ['name'],
-        template: { presentation: 'name' },
+        template: { 
+            presentation: 'name',
+            card_lines: ['description', 'model', 'specialization']
+        },
         fields: {
             companion_id: { type: 'uuid', required: true },
             name: { type: 'string', required: true },
@@ -50,6 +53,10 @@ export const appSchema: DatabaseSchema = {
     chats: {
         primaryKey: 'chat_id',
         indexes: ['user_id', 'companion_id', 'updated_at'],
+        template: {
+            presentation: 'title',
+            card_lines: ['title', 'model', 'companion_id.name']
+        },
         fk: {
             user_id: { table: 'users', required: true },
             companion_id: { table: 'companions', required: false }
