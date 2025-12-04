@@ -150,7 +150,7 @@
     <div class="max-w-3xl mx-auto">
         <!-- Section: Header -->
         <div class="flex items-center justify-between mb-8">
-            <button class="btn btn-ghost btn-circle" onclick={() => goto('/')} aria-label="Back">
+            <button class="btn btn-ghost btn-circle" onclick={() => window.history.back()} aria-label="Back">
                 <Icon icon="lucide:arrow-left" class="w-6 h-6" />
             </button>
             <div class="text-center flex-1">
