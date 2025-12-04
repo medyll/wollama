@@ -49,11 +49,9 @@
 	<div class="flex flex-col gap-2 p-2">
         <!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
         <div class="hidden md:flex items-center space-y-2 p-2 {uiState.sidebarCollapsed ? 'justify-center' : 'justify-end'}">
-            {#if !uiState.sidebarCollapsed}
-                <button class="btn btn-ghost btn-square" aria-label="Search">
-                    <Icon icon="lucide:search" class="h-5 w-5" />
-                </button>
-            {/if}
+            <button class="btn btn-ghost btn-square" aria-label="Search" onclick={() => goto('/search')}>
+                <Icon icon="lucide:search" class="h-5 w-5" />
+            </button>
         </div>
 
 		<button

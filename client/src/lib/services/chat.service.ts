@@ -242,6 +242,99 @@ export class ChatService {
             throw error;
         }
     }
+
+    async search(query: string, filters: { chatName: boolean, messageContent: boolean, assistantName: boolean }, sortOrder: 'asc' | 'desc' = 'desc') {
+        const db = await getDatabase();
+        const userId = userState.uid || 'anonymous';
+        let allResults: any[] = [];
+        const regex = new RegExp(query, 'i');
+
+        // 1. Search Chats by Title
+        if (filters.chatName) {
+            const chats = await db.chats.find({
+                selector: {
+                    user_id: userId,
+                    title: { $regex: regex }
+                }
+            }).exec();
+            allResults.push(...chats.map(c => ({ type: 'chat', data: c.toJSON(), date: c.updated_at })));
+        }
+
+        // 2. Search Messages
+        if (filters.messageContent) {
+            const messages = await db.messages.find({
+                selector: {
+                    content: { $regex: regex }
+                }
+            }).exec();
+            
+            for (const m of messages) {
+                const msgData = m.toJSON();
+                const chat = await db.chats.findOne(msgData.chat_id).exec();
+                if (chat && chat.user_id === userId) {
+                     allResults.push({ type: 'message', data: msgData, chat: chat.toJSON(), date: msgData.created_at });
+                }
+            }
+        }
+
+        // 3. Search by Assistant Name
+        if (filters.assistantName) {
+            const companions = await db.companions.find({
+                selector: {
+                    name: { $regex: regex }
+                }
+            }).exec();
+            
+            const companionIds = companions.map(c => c.companion_id);
+            if (companionIds.length > 0) {
+                const chats = await db.chats.find({
+                    selector: {
+                        user_id: userId,
+                        companion_id: { $in: companionIds }
+                    }
+                }).exec();
+                
+                for (const chat of chats) {
+                    const chatData = chat.toJSON();
+                    const companion = companions.find(c => c.companion_id === chatData.companion_id);
+                    allResults.push({ 
+                        type: 'chat_assistant', 
+                        data: chatData, 
+                        date: chatData.updated_at, 
+                        assistant: companion ? companion.toJSON() : null 
+                    });
+                }
+            }
+        }
+
+        // Deduplicate results
+        const uniqueResults = new Map();
+        for (const item of allResults) {
+            let id;
+            if (item.type === 'message') {
+                id = item.data.message_id;
+            } else {
+                id = item.data.chat_id;
+            }
+            
+            const key = item.type === 'message' ? `msg-${id}` : `chat-${id}`;
+            
+            if (!uniqueResults.has(key)) {
+                uniqueResults.set(key, item);
+            }
+        }
+        
+        allResults = Array.from(uniqueResults.values());
+
+        // Sort
+        allResults.sort((a, b) => {
+            const dateA = new Date(a.date).getTime();
+            const dateB = new Date(b.date).getTime();
+            return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+        });
+
+        return allResults;
+    }
 }
 
 export const chatService = new ChatService();
