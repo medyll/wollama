@@ -1,15 +1,9 @@
 <script lang="ts">
     import { t } from '$lib/state/i18n.svelte';
-    import { chatService } from '$lib/services/chat.service';
     import { goto } from '$app/navigation';
 
-    async function createNewChat() {
-        try {
-            const chatId = await chatService.createChat();
-            goto(`/chat/${chatId}`);
-        } catch (e) {
-            console.error('Failed to create chat:', e);
-        }
+    function createNewChat() {
+        goto('/chat/new');
     }
 </script>
 

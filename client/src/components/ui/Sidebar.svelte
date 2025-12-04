@@ -48,13 +48,7 @@
 
 	async function createNewChat() {
 		console.log('Button clicked: createNewChat');
-		try {
-			const chatId = await chatService.createChat();
-			console.log('Chat created, navigating to:', chatId);
-			goto(`/chat/${chatId}`);
-		} catch (e) {
-			console.error('Failed to create chat:', e);
-		}
+		goto('/chat/new');
 	}
 </script>
 
@@ -65,7 +59,7 @@
 			: 'w-64'
 		: 'w-0 overflow-hidden'}"
 >
-	<div class="border-base-content/10 border-b p-2">
+	<div class="p-2">
 		<button
 			class="btn btn-ghost btn-block {isCollapsed ? 'px-0' : 'justify-start'}"
 			onclick={createNewChat}
@@ -97,7 +91,7 @@
 		{/if}
 	</div>
 
-	<div class="border-base-content/10 flex flex-col gap-2 border-t p-4">
+	<div class="  flex flex-col gap-2 p-4">
 		{#if !userState.isAuthenticated}
 			<button
 				class="btn btn-primary btn-block btn-sm {isCollapsed ? 'px-0' : ''}"
@@ -134,12 +128,22 @@
 			</div>
 		{/if}
 
-		<button class="btn btn-ghost btn-xs mt-2 w-full" onclick={() => (isCollapsed = !isCollapsed)} aria-label="Toggle Sidebar">
-			<Icon icon={isCollapsed ? 'lucide:chevrons-right' : 'lucide:chevrons-left'} class="h-4 w-4" />
+		<button class="btn btn-ghost btn-block {isCollapsed ? 'px-0' : 'justify-start'}" onclick={() => (isCollapsed = !isCollapsed)} aria-label="Toggle Sidebar">
+			<Icon icon={isCollapsed ? 'lucide:chevrons-right' : 'lucide:chevrons-left'}  class="h-5 w-5 {isCollapsed ? '' : 'mr-2'}"  />
+            {#if !isCollapsed}
+				{t('ui.expand')}
+			{/if}
 		</button>
 
-		<a href="/settings" class="btn btn-ghost btn-circle" aria-label="Settings">
-			<Icon icon="lucide:settings" class="h-5 w-5" />
-		</a>
+		<button
+			class="btn btn-ghost btn-block {isCollapsed ? 'px-0' : 'justify-start'}"
+			onclick={() => goto('/settings')}
+			title={t('ui.settings')}
+		>
+			<Icon icon="lucide:settings" class="h-5 w-5 {isCollapsed ? '' : 'mr-2'}" />
+			{#if !isCollapsed}
+				{t('ui.settings')}
+			{/if}
+		</button>
 	</div>
 </aside>
