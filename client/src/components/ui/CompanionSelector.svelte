@@ -4,7 +4,7 @@
     import { companionService } from '$lib/services/companion.service';
 
     let { isOpen = $bindable(false), onSelect } = $props();
-    let compagnons = $state<Companion[]>([]);
+    let companions = $state<Companion[]>([]);
 
     $effect(() => {
         if (isOpen) {
@@ -14,7 +14,7 @@
 
     async function loadCompanions() {
         try {
-            compagnons = await companionService.getAll();
+            companions = await companionService.getAll();
         } catch (e) {
             console.error('Failed to load companions:', e);
         }
@@ -35,7 +35,7 @@
         
         <!-- Section: Companion List -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {#each compagnons as compagnon}
+            {#each companions as compagnon}
                 <button class="card bg-base-200 hover:bg-base-300 transition-colors text-left" onclick={() => selectCompagnon(compagnon)}>
                     <div class="card-body p-4">
                         <h4 class="font-bold">{compagnon.name}</h4>

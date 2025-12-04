@@ -6,7 +6,7 @@
     import { audioService } from '$lib/services/audio.service';
     import { chatService } from '$lib/services/chat.service';
     import { parseMarkdown } from '$lib/utils/markdown';
-    import CompagnonSelector from '$components/ui/CompagnonSelector.svelte';
+    import CompanionSelector from '$components/ui/CompanionSelector.svelte';
     import MessageActions from '$components/chat/MessageActions.svelte';
     import ChatInput from '$components/chat/ChatInput.svelte';
     import Icon from '@iconify/svelte';
@@ -234,7 +234,7 @@
 
 </script>
  
-<CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
+<CompanionSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
 <div class="absolute inset-0 flex flex-col overflow-hidden">
     <!-- Section: Header Removed (Moved to Input Area) -->

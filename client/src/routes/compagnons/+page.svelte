@@ -3,7 +3,7 @@
     import { userState } from '$lib/state/user.svelte';
 
     // Mock Data
-    const compagnons: Companion[] = [
+    const companions: Companion[] = [
         { 
             companion_id: '1', 
             name: 'Assistant Général', 
@@ -28,7 +28,7 @@
             system_prompt: 'You are a translator.',
             created_at: Date.now()
         },
-    ];
+    ];  
 </script>
 
 <div class="container mx-auto p-4">
@@ -37,7 +37,7 @@
     
     <!-- Section: Companion Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {#each compagnons as compagnon}
+        {#each companions as compagnon}
             <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow border border-base-content/5">
                 <div class="card-body">
                     <h2 class="card-title">{compagnon.name}</h2>

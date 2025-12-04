@@ -3,7 +3,7 @@
     import { toast } from '$lib/state/notifications.svelte';
     import Icon from '@iconify/svelte';
     import AudioToggle from '$components/chat/AudioToggle.svelte';
-    import DataButton from '$components/ui/DataButton.svelte';
+    import DataButton from '$components/ui_data/DataButton.svelte';
     import type { Companion } from '$types/data';
 
     let { 
