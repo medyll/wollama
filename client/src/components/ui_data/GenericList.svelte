@@ -2,6 +2,7 @@
     import { getDatabase } from '$lib/db';
     import { appSchema } from '../../../../shared/db/database-scheme';
     import Icon from '@iconify/svelte';
+    import DataCard from './DataCard.svelte';
 
     let { 
         tableName, 
@@ -122,38 +123,11 @@
         {#if displayType === 'card'}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
                 {#each items as item}
-                    <!-- svelte-ignore a11y_click_events_have_key_events -->
-                    <!-- svelte-ignore a11y_no_static_element_interactions -->
-                    <div 
-                        class="card bg-base-100 shadow-xl border border-base-200 hover:shadow-2xl transition-all {onRowClick ? 'cursor-pointer hover:bg-base-200' : ''}"
-                        onclick={() => onRowClick && onRowClick(item)}
-                    >
-                        <div class="card-body p-5">
-                            <!-- Header / Title -->
-                            <h2 class="card-title text-lg mb-2">
-                                {item[presentationField] || 'Untitled'}
-                            </h2>
-
-                            <!-- Card Lines -->
-                            <div class="space-y-1">
-                                {#each cardLines as line}
-                                    {#if line !== presentationField}
-                                        <div class="text-sm flex items-start gap-2">
-                                            <span class="opacity-60 capitalize min-w-20">{line.split('.').pop()}:</span>
-                                            <span class="font-medium truncate">
-                                                {getDisplayValue(item, line)}
-                                            </span>
-                                        </div>
-                                    {/if}
-                                {/each}
-                            </div>
-                            
-                            <!-- Actions (Slot) -->
-                            <div class="card-actions justify-end mt-4">
-                                <!-- We can add a slot here later -->
-                            </div>
-                        </div>
-                    </div>
+                    <DataCard 
+                        {tableName}
+                        data={item}
+                        {onRowClick} 
+                    />
                 {/each}
             </div>
         {:else}
