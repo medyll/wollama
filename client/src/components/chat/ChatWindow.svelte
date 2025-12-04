@@ -31,6 +31,22 @@
     });
     
     let messages = $state<any[]>([]);
+    let chatContainer = $state<HTMLDivElement>();
+    let userHasScrolledUp = $state(false);
+
+    function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
+        if (chatContainer) {
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior });
+        }
+    }
+
+    function handleScroll() {
+        if (!chatContainer) return;
+        const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+        // If we are close to bottom (within 50px), reset the flag
+        const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+        userHasScrolledUp = !isAtBottom;
+    }
 
     $effect(() => {
         if (!chatId) {
@@ -44,6 +60,11 @@
             const obs = await chatService.getMessages(chatId);
             sub = obs.subscribe((data: any[]) => {
                 messages = data;
+                // Auto-scroll on new messages if user hasn't scrolled up
+                if (!userHasScrolledUp) {
+                    // Use setTimeout to ensure DOM is updated
+                    setTimeout(() => scrollToBottom(), 0);
+                }
             });
         })();
 
@@ -98,6 +119,10 @@
         if (textareaRef) {
              textareaRef.style.height = 'auto';
         }
+
+        // Force scroll to bottom when sending
+        userHasScrolledUp = false;
+        setTimeout(() => scrollToBottom(), 0);
 
         try {
             let targetChatId = chatId;
@@ -245,122 +270,8 @@
     }
 </script>
 
-<CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
-
-<div class="flex flex-col h-full">
-    <!-- Chat Header -->
-    <div class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur">
-        <div class="flex items-center gap-4">
-            <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isCompagnonModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isCompagnonModalOpen = true)}>
-                <h2 class="font-bold text-lg">
-                    {#if chatId}
-                        {t('ui.chat_title')} #{chatId}
-                    {:else}
-                        {t('ui.newChat')}
-                    {/if}
-                </h2>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs opacity-50">{t('ui.with')} {currentCompagnon.name} ({currentCompagnon.model})</span>
-                    <span class="badge badge-xs badge-info">{t('ui.change')}</span>
-                </div>
-            </div>
-            {#if chatId}
-                <DataButton 
-                    table="chats" 
-                    table_id={chatId} 
-                    mode="delete" 
-                    confirm={true} 
-                />
-            {/if}
-        </div>
-        <div class="flex gap-2 items-center">
-            <label class="swap swap-rotate btn btn-ghost btn-sm btn-circle" aria-label="Toggle Audio Response">
-                <!-- this hidden checkbox controls the state -->
-                <input 
-                    type="checkbox" 
-                    bind:checked={userState.preferences.auto_play_audio} 
-                    onchange={() => userState.save()}
-                />
-                
-                <!-- volume on icon -->
-                <svg class="swap-on fill-current w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z" /></svg>
-                
-                <!-- volume off icon -->
-                <svg class="swap-off fill-current w-5 h-5 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z" /></svg>
-            </label>
-            <button class="btn btn-ghost btn-sm btn-circle" aria-label="Chat options">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
-            </button>
-        </div>
-    </div>
-
-    <!-- Messages Area -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-4" onclick={handleMessageClick}>
-        {#if messages.length === 0}
-            <div class="hero h-full">
-                <div class="hero-content text-center">
-                    <div class="max-w-md flex flex-col items-center">
-                        <img src="/assets/lama.png" alt="Wollama" class="w-32 h-32 object-contain mb-6 opacity-90" />
-                        <h1 class="text-3xl font-bold">{t('ui.ready_to_chat')}</h1>
-                        <p class="py-6">{t('ui.select_chat_help')}</p>
-                        <button class="btn btn-primary" onclick={() => document.querySelector('textarea')?.focus()}>{t('ui.type_message')}</button>
-                    </div>
-                </div>
-            </div>
-        {:else}
-            {#each messages as message, i}
-                <div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
-                    <div class="chat-image avatar placeholder">
-                        <div class="bg-neutral text-neutral-content rounded-full w-10">
-                            <span>{message.role === 'user' ? 'U' : 'AI'}</span>
-                        </div>
-                    </div>
-                    <div class="chat-header opacity-50 text-xs mb-1">
-                        {message.role === 'user' ? t('ui.you') : t('ui.assistant')}
-                    </div>
-                    <div class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}">
-                        {message.status}
-                        {#if message.images && message.images.length > 0}
-                            <div class="flex flex-wrap gap-2 mb-2">
-                                {#each message.images as img}
-                                    {#if img.startsWith('data:image')}
-                                        <img src={img} alt="attachment" class="max-w-full h-auto rounded-lg max-h-64" />
-                                    {:else}
-                                        <div class="flex items-center gap-2 p-2 bg-base-100/20 rounded-lg">
-                                            <Icon icon="lucide:file" class="w-6 h-6" />
-                                            <span class="text-xs opacity-70">File attached</span>
-                                        </div>
-                                    {/if}
-                                {/each}
-                            </div>
-                        {/if}
-                        {#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
-                            <div class="flex w-52 flex-col gap-4 p-2">
-                                <div class="skeleton h-4 w-28 opacity-50"></div>
-                                <div class="skeleton h-4 w-full opacity-50"></div>
-                                <div class="skeleton h-4 w-full opacity-50"></div>
-                            </div>
-                        {:else}
-                            <div class="prose prose-sm max-w-none dark:prose-invert wrap-break-word">
-                                {@html parseMarkdown(message.content)}
-                            </div>
-                            {#if message.role === 'assistant' && message.status !== 'streaming'}
-                                <MessageActions 
-                                    message={message} 
-                                    onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined} 
-                                />
-                            {/if}
-                        {/if}
-                    </div>
-                </div>
-            {/each}
-        {/if}
-    </div>
-
-    <!-- Input Area -->
-    <div class="p-4  bg-base-100">
+{#snippet inputArea()}
+    <div class="w-full md:max-w-[760px] mx-auto">
         <!-- File Previews -->
         {#if selectedFiles.length > 0}
             <div class="flex gap-2 p-2 overflow-x-auto mb-2">
@@ -380,7 +291,7 @@
             </div>
         {/if}
 
-        <div class="bg-base-200 rounded-2xl p-2 border border-base-content/10 focus-within:border-primary transition-colors">
+        <div class="bg-base-200 rounded-2xl p-2 border border-base-content/10 focus-within:border-primary transition-colors shadow-sm">
             <textarea 
                 bind:this={textareaRef}
                 placeholder={t('ui.type_message')} 
@@ -437,4 +348,131 @@
             </div>
         </div>
     </div>
+{/snippet}
+
+<CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
+
+<div class="absolute inset-0 flex flex-col overflow-hidden">
+    <!-- Chat Header -->
+    <div class="p-4 border-b border-base-content/10 flex justify-between items-center bg-base-100/50 backdrop-blur z-10">
+        <div class="flex items-center gap-4">
+            <div class="cursor-pointer hover:opacity-70 transition-opacity" onclick={() => isCompagnonModalOpen = true} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && (isCompagnonModalOpen = true)}>
+                <h2 class="font-bold text-lg">
+                    {#if chatId}
+                        {t('ui.chat_title')} #{chatId}
+                    {:else}
+                        {t('ui.newChat')}
+                    {/if}
+                </h2>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs opacity-50">{t('ui.with')} {currentCompagnon.name} ({currentCompagnon.model})</span>
+                    <span class="badge badge-xs badge-info">{t('ui.change')}</span>
+                </div>
+            </div>
+            {#if chatId}
+                <DataButton 
+                    table="chats" 
+                    table_id={chatId} 
+                    mode="delete" 
+                    confirm={true} 
+                />
+            {/if}
+        </div>
+        <div class="flex gap-2 items-center">
+            <label class="swap swap-rotate btn btn-ghost btn-sm btn-circle" aria-label="Toggle Audio Response">
+                <!-- this hidden checkbox controls the state -->
+                <input 
+                    type="checkbox" 
+                    bind:checked={userState.preferences.auto_play_audio} 
+                    onchange={() => userState.save()}
+                />
+                
+                <!-- volume on icon -->
+                <svg class="swap-on fill-current w-5 h-5 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z" /></svg>
+                
+                <!-- volume off icon -->
+                <svg class="swap-off fill-current w-5 h-5 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z" /></svg>
+            </label>
+            <button class="btn btn-ghost btn-sm btn-circle" aria-label="Chat options">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
+            </button>
+        </div>
+    </div>
+
+    {#if messages.length === 0}
+        <!-- Empty State: Centered Input -->
+        <div class="flex-1 flex flex-col items-center justify-center p-4 overflow-y-auto">
+            <div class="max-w-md flex flex-col items-center w-full">
+                <img src="/assets/lama.png" alt="Wollama" class="w-32 h-32 object-contain mb-6 opacity-90" />
+                <h1 class="text-3xl font-bold mb-2">{t('ui.ready_to_chat')}</h1>
+                <p class="mb-8 opacity-70">{t('ui.select_chat_help')}</p>
+                
+                <div class="w-full">
+                    {@render inputArea()}
+                </div>
+            </div>
+        </div>
+    {:else}
+        <!-- Messages Area -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions --> 
+        <div 
+            class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0" 
+            onclick={handleMessageClick}
+            bind:this={chatContainer}
+            onscroll={handleScroll}
+        >
+            {#each messages as message, i}
+                <div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
+                    <div class="chat-image avatar placeholder">
+                        <div class="bg-neutral text-neutral-content rounded-full w-10">
+                            <span>{message.role === 'user' ? 'U' : 'AI'}</span>
+                        </div>
+                    </div>
+                    <div class="chat-header opacity-50 text-xs mb-1">
+                        {message.role === 'user' ? t('ui.you') : t('ui.assistant')}
+                    </div>
+                    <div class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}">
+                        {message.status}
+                        {#if message.images && message.images.length > 0}
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                {#each message.images as img}
+                                    {#if img.startsWith('data:image')}
+                                        <img src={img} alt="attachment" class="max-w-full h-auto rounded-lg max-h-64" />
+                                    {:else}
+                                        <div class="flex items-center gap-2 p-2 bg-base-100/20 rounded-lg">
+                                            <Icon icon="lucide:file" class="w-6 h-6" />
+                                            <span class="text-xs opacity-70">File attached</span>
+                                        </div>
+                                    {/if}
+                                {/each}
+                            </div>
+                        {/if}
+                        {#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
+                            <div class="flex w-52 flex-col gap-4 p-2">
+                                <div class="skeleton h-4 w-28 opacity-50"></div>
+                                <div class="skeleton h-4 w-full opacity-50"></div>
+                                <div class="skeleton h-4 w-full opacity-50"></div>
+                            </div>
+                        {:else}
+                            <div class="prose prose-sm max-w-none dark:prose-invert wrap-break-word">
+                                {@html parseMarkdown(message.content)}
+                            </div>
+                            {#if message.role === 'assistant' && message.status !== 'streaming'}
+                                <MessageActions 
+                                    message={message} 
+                                    onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined} 
+                                />
+                            {/if}
+                        {/if}
+                    </div>
+                </div>
+            {/each}
+        </div>
+
+        <!-- Input Area (Bottom) -->
+        <div class="p-0 md:p-4 bg-base-100 w-full">
+            {@render inputArea()}
+        </div>
+    {/if}
 </div>

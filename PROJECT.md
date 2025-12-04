@@ -332,3 +332,19 @@ onMount(() => {
 - **Phase 2 (Audio):** Complete STT/TTS Pipeline.
 - **Phase 3 (Platform):** Capacitor (Android) and Electron (Desktop) Configuration.
 - **Phase 4 (Build):** `.exe` and `.apk` Packaging.
+
+## 11. CURRENT STATE & RECENT CHANGES (Dec 2025)
+
+### UI/UX Improvements
+- **Chat Interface:**
+    - **Input Area:** Redesigned with auto-resizing textarea (max 50vh), transparent background, and bottom toolbar for attachments/send/mic.
+    - **Message Bubbles:** Rounded corners (2xl) with removed "tail" and top corners flattened for a cleaner look.
+    - **Message Actions:** Always visible below assistant messages (Copy, Rate, Regenerate, Share).
+    - **Auto-scroll:** Smart auto-scroll to bottom on new messages, disabled if user is manually scrolling up.
+- **Navigation:**
+    - **Mobile:** Drawer layout for navigation.
+    - **Desktop:** Collapsible Sidebar.
+    - **User Menu:** Extracted to TopBar for better accessibility.
+- **Android:**
+    - Updated build configuration to use **Java 21 (LTS)**.
+
