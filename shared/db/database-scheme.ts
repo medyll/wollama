@@ -4,10 +4,15 @@ export const appSchema: DatabaseSchema = {
     users: {
         primaryKey: 'user_id',
         indexes: ['username'],
+        template: { 
+            presentation: 'username',
+            card_lines: ['username', 'created_at']
+        },
         fields: {
             user_id: { type: 'uuid', required: true },
             username: { type: 'string', required: true },
-            created_at: { type: 'timestamp', required: true, auto: true }
+            created_at: { type: 'timestamp', required: true, auto: true },
+            updated_at: { type: 'timestamp', auto: true }
         }
     },
     user_preferences: {
@@ -18,27 +23,32 @@ export const appSchema: DatabaseSchema = {
         fields: {
             user_preferences_id: { type: 'uuid', required: true },
             user_id: { type: 'uuid', required: true },
-            theme: { type: 'string' },
-            locale: { type: 'string' },
-            auto_play_audio: { type: 'boolean' },
-            server_url: { type: 'string' },
+            theme: { type: 'string', ui: { type: 'select', options: ['light', 'dark', 'system'] } },
+            locale: { type: 'string', ui: { type: 'select', options: ['en', 'fr', 'es', 'de'] } },
+            auto_play_audio: { type: 'boolean', ui: { type: 'toggle' } },
+            server_url: { type: 'string', ui: { type: 'url' } },
             default_model: { type: 'string' },
-            default_temperature: { type: 'number' }
+            default_temperature: { type: 'number', ui: { type: 'slider', min: 0, max: 1, step: 0.1 } },
+            updated_at: { type: 'timestamp', auto: true }
         }
     },
     companions: {
         primaryKey: 'companion_id',
         indexes: ['name'],
+        template: { 
+            presentation: 'name',
+            card_lines: ['description', 'model', 'specialization']
+        },
         fields: {
             companion_id: { type: 'uuid', required: true },
             name: { type: 'string', required: true },
-            description: { type: 'string' },
-            system_prompt: { type: 'text-long', required: true },
+            description: { type: 'string', ui: { type: 'textarea' } },
+            system_prompt: { type: 'text-long', required: true, ui: { type: 'textarea', rows: 10 } },
             model: { type: 'string', required: true },
             voice_id: { type: 'string' },
             voice_tone: { type: 'string', enum: ['neutral', 'fast', 'slow', 'deep', 'high'] },
             mood: { type: 'string', enum: ['neutral', 'happy', 'sad', 'angry', 'sarcastic', 'professional', 'friendly'] },
-            avatar: { type: 'string' },
+            avatar: { type: 'string', ui: { type: 'image' } },
             created_at: { type: 'timestamp', required: true, auto: true },
             updated_at: { type: 'timestamp', auto: true },
             specialization: { type: 'string' },
@@ -48,6 +58,10 @@ export const appSchema: DatabaseSchema = {
     chats: {
         primaryKey: 'chat_id',
         indexes: ['user_id', 'companion_id', 'updated_at'],
+        template: {
+            presentation: 'title',
+            card_lines: ['title', 'model', 'companion_id.name']
+        },
         fk: {
             user_id: { table: 'users', required: true },
             companion_id: { table: 'companions', required: false }
@@ -69,6 +83,10 @@ export const appSchema: DatabaseSchema = {
     messages: {
         primaryKey: 'message_id',
         indexes: ['chat_id', 'created_at'],
+        template: {
+            presentation: 'content',
+            card_lines: ['role', 'content', 'model']
+        },
         fk: {
             chat_id: { table: 'chats', required: true }
         },
@@ -78,6 +96,7 @@ export const appSchema: DatabaseSchema = {
             role: { type: 'string', required: true, enum: ['system', 'user', 'assistant', 'tool'] },
             content: { type: 'text-long', required: true },
             created_at: { type: 'timestamp', required: true, auto: true },
+            updated_at: { type: 'timestamp', auto: true },
             status: { type: 'string', enum: ['idle', 'done', 'sent', 'streaming', 'error'] },
             context: { type: 'array', items: { type: 'number' } },
             model: { type: 'string' },

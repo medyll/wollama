@@ -3,7 +3,6 @@
     import { t } from '$lib/state/i18n.svelte';
     import { goto } from '$app/navigation';
     import Icon from '@iconify/svelte';
-    import LanguageSelector from '$components/ui/LanguageSelector.svelte';
 
     let activeTab = $state<'manual' | 'oauth'>('manual');
     let nickname = $state('');
@@ -55,10 +54,11 @@
         <div class="card-body">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="card-title text-2xl font-bold">Welcome to Wollama</h2>
-                <LanguageSelector />
             </div>
             
-            <p class="text-base-content/70 mb-6">{t('setup.subtitle')}</p>
+            <p class="text-base-content/70 mb-6">
+                {t('setup.welcome_message') || 'Please set up your profile to get started.'}
+            </p>
 
             <!-- Section: Tabs -->
             <div role="tablist" class="tabs tabs-boxed mb-6">

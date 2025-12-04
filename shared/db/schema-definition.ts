@@ -21,6 +21,10 @@ export interface FieldDefinition {
     enum?: string[];
     items?: FieldDefinition; // For arrays
     properties?: Record<string, FieldDefinition>; // For objects
+    ui?: {
+        type: string;
+        [key: string]: any;
+    };
 }
 
 export interface TableDefinition {
@@ -28,6 +32,10 @@ export interface TableDefinition {
     indexes?: string[];
     fields: Record<string, FieldDefinition>;
     fk?: Record<string, { table: string; required?: boolean }>;
+    template?: {
+        presentation: string;
+        card_lines?: string[];
+    };
 }
 
 export interface DatabaseSchema {
