@@ -66,6 +66,15 @@
                     <Icon icon="lucide:menu" class="inline-block w-5 h-5" />
                 </label>
             </div>
+            <div class="flex-none hidden md:block mr-2">
+                <button 
+                    class="btn btn-square btn-ghost" 
+                    onclick={() => uiState.toggleSidebar()}
+                    aria-label={uiState.sidebarCollapsed ? t('ui.expand') : t('ui.collapse')}
+                >
+                    <Icon icon="lucide:menu" class="inline-block w-5 h-5" />
+                </button>
+            </div>
             <div class="flex-1 flex items-center gap-2">
                 <a href="/chat" class="btn btn-ghost text-xl">Wollama</a>
                 {#if uiState.pageTitle}

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { t } from '$lib/state/i18n.svelte';
+    import { uiState } from '$lib/state/ui.svelte';
 	import { chatService } from '$lib/services/chat.service';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
 
 	let { isOpen = $bindable(true) } = $props();
-	let isCollapsed = $state(false);
 	let chats = $state<any[]>([]);
 
 	$effect(() => {
@@ -40,7 +40,7 @@
 
 <aside
 	class="bg-base-300 border-base-content/10 flex h-full flex-col border-r transition-all duration-300 {isOpen
-		? isCollapsed
+		? uiState.sidebarCollapsed
 			? 'w-20'
 			: 'w-64'
 		: 'w-0 overflow-hidden'}"
@@ -48,18 +48,8 @@
 >
 	<div class="flex flex-col gap-2 p-2">
         <!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
-        <div class="hidden md:flex items-center space-y-2 p-2 {isCollapsed ? 'justify-center' : 'justify-between'}">
-            <button 
-                class="btn btn-ghost btn-square" 
-                onclick={() => isCollapsed = !isCollapsed}
-                aria-label={isCollapsed ? t('ui.expand') : t('ui.collapse')}
-                aria-expanded={!isCollapsed}
-                aria-controls="sidebar-nav"
-            >
-                <Icon icon="lucide:menu" class="h-5 w-5" />
-            </button>
-
-            {#if !isCollapsed}
+        <div class="hidden md:flex items-center space-y-2 p-2 {uiState.sidebarCollapsed ? 'justify-center' : 'justify-end'}">
+            {#if !uiState.sidebarCollapsed}
                 <button class="btn btn-ghost btn-square" aria-label="Search">
                     <Icon icon="lucide:search" class="h-5 w-5" />
                 </button>
@@ -67,12 +57,12 @@
         </div>
 
 		<button
-			class="btn btn-ghost btn-block {isCollapsed ? 'px-0' : 'justify-start'}"
+			class="btn btn-ghost btn-block {uiState.sidebarCollapsed ? 'px-0' : 'justify-start'}"
 			onclick={createNewChat}
 			title={t('ui.newChat')}
 		>
-			<Icon icon="lucide:square-pen" class="h-5 w-5 {isCollapsed ? '' : 'mr-2'}" />
-			{#if !isCollapsed}
+			<Icon icon="lucide:square-pen" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
+			{#if !uiState.sidebarCollapsed}
 				{t('ui.newChat')}
 			{/if}
 		</button>
@@ -83,7 +73,7 @@
         class="flex-1 space-y-2 overflow-y-auto p-2" 
         aria-label={t('ui.myChats')}
     >
-		{#if !isCollapsed}
+		{#if !uiState.sidebarCollapsed}
 			{#each chats as chat}
 				<a
 					href="/chat/{chat.chat_id}"
@@ -103,12 +93,12 @@
 
 	<div class="  flex flex-col gap-2 p-4">
 		<button
-			class="btn btn-ghost btn-block {isCollapsed ? 'px-0' : 'justify-start'}"
+			class="btn btn-ghost btn-block {uiState.sidebarCollapsed ? 'px-0' : 'justify-start'}"
 			onclick={() => goto('/settings')}
 			title={t('ui.settings')}
 		>
-			<Icon icon="lucide:settings" class="h-5 w-5 {isCollapsed ? '' : 'mr-2'}" />
-			{#if !isCollapsed}
+			<Icon icon="lucide:settings" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
+			{#if !uiState.sidebarCollapsed}
 				{t('ui.settings')}
 			{/if}
 		</button>
