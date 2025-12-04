@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { getDatabase } from '$lib/db';
     import { appSchema } from '../../../../shared/db/database-scheme';
     import Icon from '@iconify/svelte';
     import DataCard from './DataCard.svelte';
+    import { DataService } from '$lib/services/data-loader.svelte';
 
     let { 
         tableName, 
@@ -20,73 +20,22 @@
     let tableDef = $derived(appSchema[tableName]);
     let cardLines = $derived(tableDef?.template?.card_lines || []);
     let presentationField = $derived(tableDef?.template?.presentation || 'id');
+    
+    let dataService = $derived(new DataService(tableName));
 
     $effect(() => {
-        loadData(tableName, orderBy, orderDirection);
+        loadData(tableName, orderBy, orderDirection as 'asc' | 'desc');
     });
 
-    async function loadData(table: string, order: string, direction: string) {
+    async function loadData(table: string, order: string, direction: 'asc' | 'desc') {
         if (!table) return;
         loading = true;
         try {
-            const db = await getDatabase();
-            if (!db[table]) {
-                error = `Table ${table} not found in database`;
-                loading = false;
-                return;
-            }
-
-            // Build query
-            let query = db[table].find();
-            
-            // Apply sort if field exists in schema
-            // Note: RxDB requires the sort field to be indexed
-            if (order && tableDef.fields[order]) {
-                // RxDB sort direction: 'asc' | 'desc'
-                const sortDir = direction === 'asc' ? 'asc' : 'desc';
-                query = query.sort({ [order]: sortDir });
-            }
+            const query = await dataService.loadList(order, direction);
 
             // Subscribe to data
             query.$.subscribe(async (docs: any[]) => {
-                // Process documents to resolve relations if needed
-                const processedItems = await Promise.all(docs.map(async (doc) => {
-                    const data = doc.toJSON();
-                    
-                    // Resolve relations for card_lines
-                    // Example: 'companion_id.name'
-                    const resolvedLines: Record<string, any> = {};
-                    
-                    for (const line of cardLines) {
-                        if (line.includes('.')) {
-                            const [foreignKey, field] = line.split('.');
-                            // Check if it's a relation
-                            if (tableDef.fk && tableDef.fk[foreignKey]) {
-                                const relatedTable = tableDef.fk[foreignKey].table;
-                                const relatedId = data[foreignKey];
-                                if (relatedId) {
-                                    try {
-                                        const relatedDoc = await db[relatedTable].findOne(relatedId).exec();
-                                        if (relatedDoc) {
-                                            resolvedLines[line] = relatedDoc[field];
-                                        }
-                                    } catch (e) {
-                                        console.warn(`Failed to resolve relation ${line}`, e);
-                                    }
-                                }
-                            }
-                        } else {
-                            resolvedLines[line] = data[line];
-                        }
-                    }
-                    
-                    return {
-                        ...data,
-                        _resolved: resolvedLines
-                    };
-                }));
-                
-                items = processedItems;
+                items = await dataService.processDocs(docs);
                 loading = false;
             });
 

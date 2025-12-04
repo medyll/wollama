@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { getDatabase } from '$lib/db';
     import { appSchema } from '../../../../shared/db/database-scheme';
+    import { DataService } from '$lib/services/data-loader.svelte';
 
     let { 
         tableName,
@@ -16,52 +16,21 @@
     let tableDef = $derived(appSchema[tableName]);
     let cardLines = $derived(tableDef?.template?.card_lines || []);
     let presentationField = $derived(tableDef?.template?.presentation || 'id');
+    
+    let dataService = $derived(new DataService(tableName));
 
     $effect(() => {
         if (data) {
             item = data;
         } else if (id && tableName) {
-            loadData();
+            loadDataById();
         }
     });
 
-    async function loadData() {
+    async function loadDataById() {
         loading = true;
         try {
-            const db = await getDatabase();
-            const doc = await db[tableName].findOne(id).exec();
-            if (doc) {
-                const docData = doc.toJSON();
-                
-                // Resolve relations
-                const resolvedLines: Record<string, any> = {};
-                for (const line of cardLines) {
-                    if (line.includes('.')) {
-                        const [foreignKey, field] = line.split('.');
-                        if (tableDef.fk && tableDef.fk[foreignKey]) {
-                            const relatedTable = tableDef.fk[foreignKey].table;
-                            const relatedId = docData[foreignKey];
-                            if (relatedId) {
-                                try {
-                                    const relatedDoc = await db[relatedTable].findOne(relatedId).exec();
-                                    if (relatedDoc) {
-                                        resolvedLines[line] = relatedDoc[field];
-                                    }
-                                } catch (e) {
-                                    console.warn(`Failed to resolve relation ${line}`, e);
-                                }
-                            }
-                        }
-                    } else {
-                        resolvedLines[line] = docData[line];
-                    }
-                }
-
-                item = {
-                    ...docData,
-                    _resolved: resolvedLines
-                };
-            }
+            item = await dataService.loadById(id);
         } catch (e) {
             console.error('Error loading card data:', e);
         } finally {
