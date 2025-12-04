@@ -435,21 +435,35 @@
         >
             {#each messages as message, i}
                 <div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
-                    <div class="chat-image avatar placeholder">
-                        <div class="bg-neutral text-neutral-content rounded-full w-10">
-                            <span>{message.role === 'user' ? 'U' : 'AI'}</span>
+                    <div class="chat-image avatar placeholder self-start">
+                        {#if message.role === 'user'}
+                            <div class="bg-neutral text-neutral-content rounded-full w-10">
+                                <span>U</span>
+                            </div>
+                        {:else}
+                            {#if currentCompagnon.avatar}
+                                <div class="w-10 rounded-full">
+                                    <img src={currentCompagnon.avatar} alt={currentCompagnon.name} />
+                                </div>
+                            {:else}
+                                <div class="bg-primary text-primary-content rounded-full w-10">
+                                    <span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span>
+                                </div>
+                            {/if}
+                        {/if}
+                    </div>
+                    {#if message.role !== 'user'}
+                        <div class="chat-header opacity-50 text-xs mb-1">
+                            {currentCompagnon.name}
                         </div>
-                    </div>
-                    <div class="chat-header opacity-50 text-xs mb-1">
-                        {message.role === 'user' ? t('ui.you') : t('ui.assistant')}
-                    </div>
+                    {/if}
                     <div class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}">
                         {message.status}
                         {#if message.images && message.images.length > 0}
                     <div 
                         class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}"
                         onclick={handleMessageClick}
-                        onkeydown={(e) => e.key === 'Enter' && handleMessageClick(e)}
+                        onkeydown={(e) => e.key === 'Enter' && handleMessageClick(e as unknown as MouseEvent)}
                         role="button"
                         tabindex="0"
                     >
