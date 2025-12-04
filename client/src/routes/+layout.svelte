@@ -9,7 +9,6 @@
     import SplashScreen from '$components/ui/SplashScreen.svelte';
     import Sidebar from '$components/ui/Sidebar.svelte';
     import UserMenu from '$components/ui/UserMenu.svelte';
-    import LanguageSelector from '$components/ui/LanguageSelector.svelte';
     import { connectionState } from '$lib/state/connection.svelte';
     import { userState } from '$lib/state/user.svelte';
     import { downloadState } from '$lib/state/downloads.svelte';
@@ -87,7 +86,6 @@
                 >
                     <Icon icon="lucide:server" class={`h-5 w-5 ${connectionState.isConnected ? 'text-success' : 'text-error'}`} />
                 </button>
-                <LanguageSelector />
                 <UserMenu />
             </div>
         </header>
