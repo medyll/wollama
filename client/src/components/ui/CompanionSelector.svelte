@@ -25,6 +25,8 @@
                 orderBy="name" 
                 orderDirection="asc"
                 onRowClick={selectCompagnon}
+                editable={true}
+
             />
         </div>
     </div>

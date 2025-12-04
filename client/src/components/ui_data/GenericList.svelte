@@ -2,14 +2,16 @@
     import { appSchema } from '../../../../shared/db/database-scheme';
     import Icon from '@iconify/svelte';
     import DataCard from './DataCard.svelte';
-    import { DataService } from '$lib/services/data-loader.svelte';
+    import { GenericService } from '$lib/services/generic.service';
 
     let { 
         tableName, 
         orderBy = 'updated_at', 
         orderDirection = 'desc', 
         displayType = 'card',
-        onRowClick = undefined
+        editable = false,
+        onRowClick = undefined,
+        onEdit = undefined
     } = $props();
 
     let items = $state<any[]>([]);
@@ -21,7 +23,7 @@
     let cardLines = $derived(tableDef?.template?.card_lines || []);
     let presentationField = $derived(tableDef?.template?.presentation || 'id');
     
-    let dataService = $derived(new DataService(tableName));
+    let dataService = $derived(new GenericService(tableName));
 
     $effect(() => {
         loadData(tableName, orderBy, orderDirection as 'asc' | 'desc');
@@ -31,7 +33,7 @@
         if (!table) return;
         loading = true;
         try {
-            const query = await dataService.loadList(order, direction);
+            const query = await dataService.getListQuery(order, direction);
 
             // Subscribe to data
             query.$.subscribe(async (docs: any[]) => {
@@ -75,6 +77,8 @@
                     <DataCard 
                         {tableName}
                         data={item}
+                        {editable}
+                        {onEdit}
                         {onRowClick} 
                     />
                 {/each}
@@ -91,6 +95,9 @@
                                     <th>{line}</th>
                                 {/if}
                             {/each}
+                            {#if editable}
+                                <th>Actions</th>
+                            {/if}
                         </tr>
                     </thead>
                     <tbody>
@@ -105,6 +112,20 @@
                                         <td>{getDisplayValue(item, line)}</td>
                                     {/if}
                                 {/each}
+                                {#if editable}
+                                    <td>
+                                        <button 
+                                            class="btn btn-sm btn-ghost btn-circle"
+                                            onclick={(e) => {
+                                                e.stopPropagation();
+                                                onEdit && onEdit(item);
+                                            }}
+                                            aria-label="Edit"
+                                        >
+                                            <Icon icon="lucide:edit-2" class="w-4 h-4" />
+                                        </button>
+                                    </td>
+                                {/if}
                             </tr>
                         {/each}
                     </tbody>

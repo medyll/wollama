@@ -1,23 +1,28 @@
 <script lang="ts">
     import { appSchema } from '../../../../shared/db/database-scheme';
-    import { DataService } from '$lib/services/data-loader.svelte';
+    import { GenericService } from '$lib/services/generic.service';
+    import Icon from '@iconify/svelte';
+    import DataUpdate from './DataUpdate.svelte';
 
     let { 
         tableName,
         id = undefined,
         data = undefined,
-        onRowClick = undefined 
+        editable = false,
+        onRowClick = undefined,
+        onEdit = undefined
     } = $props();
 
     let item = $state<any>(undefined);
     let loading = $state(false);
+    let isEditing = $state(false);
 
     // Get schema definition
     let tableDef = $derived(appSchema[tableName]);
     let cardLines = $derived(tableDef?.template?.card_lines || []);
     let presentationField = $derived(tableDef?.template?.presentation || 'id');
     
-    let dataService = $derived(new DataService(tableName));
+    let dataService = $derived(new GenericService(tableName));
 
     $effect(() => {
         if (data) {
@@ -30,7 +35,7 @@
     async function loadDataById() {
         loading = true;
         try {
-            item = await dataService.loadById(id);
+            item = await dataService.get(id);
         } catch (e) {
             console.error('Error loading card data:', e);
         } finally {
@@ -80,8 +85,32 @@
             
             <!-- Actions (Slot) -->
             <div class="card-actions justify-end mt-4">
+                {#if editable}
+                    <button 
+                        class="btn btn-sm btn-ghost btn-circle"
+                        onclick={(e) => {
+                            e.stopPropagation();
+                            isEditing = true;
+                            onEdit && onEdit(item);
+                        }}
+                        aria-label="Edit"
+                    >
+                        <Icon icon="lucide:edit-2" class="w-4 h-4" />
+                    </button>
+                {/if}
                 <!-- We can add a slot here later -->
             </div>
         </div>
     </div>
+
+    {#if isEditing}
+        <DataUpdate 
+            {tableName} 
+            id={item[tableDef.primaryKey]} 
+            bind:isOpen={isEditing} 
+            onSave={(newData: any) => {
+                item = { ...item, ...newData };
+            }}
+        />
+    {/if}
 {/if}
