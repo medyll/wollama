@@ -20,6 +20,7 @@
     let isRecording = $state(false);
     let selectedFiles = $state<string[]>([]);
     let fileInput: HTMLInputElement;
+    let textareaRef: HTMLTextAreaElement;
 
     let currentCompagnon: Companion = $state({ 
         companion_id: '1',
@@ -93,6 +94,11 @@
         messageInput = '';
         selectedFiles = [];
         
+        // Reset height
+        if (textareaRef) {
+             textareaRef.style.height = 'auto';
+        }
+
         try {
             let targetChatId = chatId;
 
@@ -231,6 +237,12 @@
             }
         }
     }
+
+    function autoResize(e: Event) {
+        const target = e.target as HTMLTextAreaElement;
+        target.style.height = 'auto';
+        target.style.height = target.scrollHeight + 'px';
+    }
 </script>
 
 <CompagnonSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
@@ -308,7 +320,7 @@
                     <div class="chat-header opacity-50 text-xs mb-1">
                         {message.role === 'user' ? t('ui.you') : t('ui.assistant')}
                     </div>
-                    <div class="chat-bubble {message.role === 'user' ? 'chat-bubble-primary' : 'chat-bubble-secondary'}">
+                    <div class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}">
                         {message.status}
                         {#if message.images && message.images.length > 0}
                             <div class="flex flex-wrap gap-2 mb-2">
@@ -348,7 +360,7 @@
     </div>
 
     <!-- Input Area -->
-    <div class="p-4 border-t border-base-content/10 bg-base-100">
+    <div class="p-4  bg-base-100">
         <!-- File Previews -->
         {#if selectedFiles.length > 0}
             <div class="flex gap-2 p-2 overflow-x-auto mb-2">
@@ -368,52 +380,61 @@
             </div>
         {/if}
 
-        <div class="flex gap-2 items-end">
-            <input 
-                type="file" 
-                class="hidden" 
-                multiple 
-                bind:this={fileInput} 
-                onchange={handleFileSelect} 
-            />
-            <button class="btn btn-circle btn-ghost" aria-label="Add attachment" onclick={triggerFileInput}>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-            </button>
-            <div class="flex-1 relative">
-                <textarea 
-                    placeholder={t('ui.type_message')} 
-                    class="textarea textarea-bordered w-full resize-none leading-normal py-3" 
-                    rows="1"
-                    bind:value={messageInput}
-                    onkeydown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            sendMessage();
-                        }
-                    }}
-                ></textarea>
-            </div>
+        <div class="bg-base-200 rounded-2xl p-2 border border-base-content/10 focus-within:border-primary transition-colors">
+            <textarea 
+                bind:this={textareaRef}
+                placeholder={t('ui.type_message')} 
+                class="textarea textarea-ghost w-full resize-none focus:outline-none bg-transparent px-2 py-2 min-h-12 text-base max-h-[50vh] overflow-y-auto" 
+                rows="1"
+                bind:value={messageInput}
+                oninput={autoResize}
+                onkeydown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                }}
+            ></textarea>
             
-            {#if !messageInput.trim()}
-                <button 
-                    class="btn btn-circle {isRecording ? 'btn-error animate-pulse' : 'btn-ghost'}" 
-                    onclick={toggleRecording}
-                    aria-label={isRecording ? "Stop recording" : "Start recording"}
-                    disabled={isTranscribing}
-                >
-                    {#if isTranscribing}
-                        <span class="loading loading-spinner loading-xs"></span>
-                    {:else if isRecording}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C12.5523 2 13 2.44772 13 3V21C13 21.5523 12.5523 22 12 22C11.4477 22 11 21.5523 11 21V3C11 2.44772 11.4477 2 12 2Z" /><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+            <div class="flex justify-between items-center mt-1 px-1">
+                <!-- Left: Attachments -->
+                <div>
+                    <input 
+                        type="file" 
+                        class="hidden" 
+                        multiple 
+                        bind:this={fileInput} 
+                        onchange={handleFileSelect} 
+                    />
+                    <button class="btn btn-ghost btn-sm btn-circle" aria-label="Add attachment" onclick={triggerFileInput}>
+                        <Icon icon="lucide:paperclip" class="w-5 h-5 opacity-70" />
+                    </button>
+                </div>
+
+                <!-- Right: Send / Mic -->
+                <div>
+                    {#if !messageInput.trim()}
+                        <button 
+                            class="btn btn-circle btn-sm {isRecording ? 'btn-error animate-pulse' : 'btn-ghost'}" 
+                            onclick={toggleRecording}
+                            aria-label={isRecording ? "Stop recording" : "Start recording"}
+                            disabled={isTranscribing}
+                        >
+                            {#if isTranscribing}
+                                <span class="loading loading-spinner loading-xs"></span>
+                            {:else if isRecording}
+                                <Icon icon="lucide:square" class="w-5 h-5" />
+                            {:else}
+                                <Icon icon="lucide:mic" class="w-5 h-5 opacity-70" />
+                            {/if}
+                        </button>
                     {:else}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                        <button class="btn btn-primary btn-sm btn-circle" onclick={sendMessage} aria-label="Send message">
+                            <Icon icon="lucide:send-horizontal" class="w-5 h-5" />
+                        </button>
                     {/if}
-                </button>
-            {:else}
-                <button class="btn btn-primary btn-circle" onclick={sendMessage} aria-label="Send message">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
-                </button>
-            {/if}
+                </div>
+            </div>
         </div>
     </div>
 </div>
