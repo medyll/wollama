@@ -28,7 +28,7 @@ const convertSchema = (tableName: string, tableDef: any) => {
             properties[fieldName] = {
                 type: 'array',
                 items: def.items ? {
-                    type: def.items.type === 'uuid' || def.items.type === 'timestamp' || def.items.type === 'text-long' ? 'string' : def.items.type,
+                    type: def.items.type === 'uuid' || def.items.type === 'text-long' ? 'string' : (def.items.type === 'timestamp' ? 'number' : def.items.type),
                     properties: def.items.properties
                 } : { type: 'string' }
             };
@@ -38,12 +38,22 @@ const convertSchema = (tableName: string, tableDef: any) => {
                 properties: def.properties
             };
         } else {
+            const isTimestamp = def.type === 'timestamp';
             properties[fieldName] = {
-                type: def.type === 'uuid' || def.type === 'timestamp' || def.type === 'text-long' ? 'string' : def.type
+                type: def.type === 'uuid' || def.type === 'text-long' ? 'string' : (isTimestamp ? 'number' : def.type)
             };
+            
+            if (isTimestamp) {
+                properties[fieldName].minimum = 0;
+                properties[fieldName].maximum = 1000000000000000; // Reasonable max for timestamp
+                properties[fieldName].multipleOf = 1;
+            }
+
             // Add maxLength for primary keys and indexed fields (required by RxDB)
             if (fieldName === tableDef.primaryKey || (tableDef.indexes && tableDef.indexes.includes(fieldName))) {
-                properties[fieldName].maxLength = 100; // Reasonable default for UUIDs and short strings
+                if (properties[fieldName].type === 'string') {
+                    properties[fieldName].maxLength = 100; // Reasonable default for UUIDs and short strings
+                }
             }
         }
 
@@ -82,7 +92,7 @@ let dbPromise: Promise<any> | null = null;
 
 const _createDatabase = async () => {
     const db = await createRxDatabase({
-        name: 'wollama_client_db_v8', // Bumped version to force fresh DB
+        name: 'wollama_client_db_v10', // Bumped version to force fresh DB (v10 fixes schema conflict)
         storage: wrappedValidateAjvStorage({
             storage: getRxStorageDexie()
         }),

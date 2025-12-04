@@ -35,8 +35,8 @@ export class ChatService {
                 user_id: userId,
                 title,
                 model,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
+                created_at: Date.now(),
+                updated_at: Date.now(),
                 tags: [],
                 context: [],
                 companion_id: companionId || '', // Ensure companion_id is never undefined/null for indexing

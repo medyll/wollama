@@ -18,6 +18,10 @@ export class DataGenericService<T> extends AbstractGenericService<T> {
         this.cardLines = this.tableDef?.template?.card_lines || [];
     }
 
+    get PrimaryKey(): string {
+        return this.primaryKey;
+    }
+
     private async getCollection(): Promise<RxCollection> {
         const db = await getDatabase();
         return db[this.tableName];
@@ -91,9 +95,20 @@ export class DataGenericService<T> extends AbstractGenericService<T> {
         return null;
     }
 
+    private cleanData(data: any): any {
+        const cleaned = { ...data };
+        delete cleaned._resolved;
+        delete cleaned._rev;
+        delete cleaned._attachments;
+        delete cleaned._meta;
+        delete cleaned._deleted;
+        return cleaned;
+    }
+
     async create(item: T): Promise<T> {
         const collection = await this.getCollection();
-        const doc = await collection.insert(item as any);
+        const data = this.cleanData(item);
+        const doc = await collection.insert(data);
         return doc.toJSON() as T;
     }
 
@@ -107,7 +122,8 @@ export class DataGenericService<T> extends AbstractGenericService<T> {
 
         const doc = await collection.findOne(id).exec();
         if (doc) {
-            await doc.patch(item as any);
+            const data = this.cleanData(item);
+            await doc.patch(data);
             return doc.toJSON() as T;
         }
         throw new Error(`Document ${id} not found in ${this.tableName}`);
