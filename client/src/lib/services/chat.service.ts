@@ -126,11 +126,18 @@ export class ChatService {
         }
     }
 
-    async generateResponse(chatId: string, messageHistory: { role: string; content: string; images?: string[] }[]) {
+    async generateResponse(chatId: string, messageHistory: { role: string; content: string; images?: string[] }[], existingMessageId?: string) {
         const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
         
-        // Create a placeholder message for the assistant
-        const assistantMsgId = await this.addMessage(chatId, 'assistant', '', 'streaming');
+        let assistantMsgId: string;
+
+        if (existingMessageId) {
+            assistantMsgId = existingMessageId;
+            await this.updateMessage(assistantMsgId, '', 'streaming');
+        } else {
+            // Create a placeholder message for the assistant
+            assistantMsgId = await this.addMessage(chatId, 'assistant', '', 'streaming');
+        }
 
         // Fetch chat to get system prompt
         const chat = await this.getChat(chatId);

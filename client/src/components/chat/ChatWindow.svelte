@@ -193,6 +193,8 @@
         const lastMsg = messages[messages.length - 1];
         
         let history;
+        let messageIdToUpdate: string | undefined;
+
         if (lastMsg.role === 'assistant') {
             // Exclude the last assistant message to regenerate it
             history = messages.slice(0, -1).map((m: any) => ({ 
@@ -200,6 +202,7 @@
                 content: m.content,
                 images: m.images 
             }));
+            messageIdToUpdate = lastMsg.message_id;
         } else {
             // Last message is user, just generate
             history = messages.map((m: any) => ({ 
@@ -210,7 +213,7 @@
         }
 
         try {
-            const responseText = await chatService.generateResponse(chatId, history);
+            const responseText = await chatService.generateResponse(chatId, history, messageIdToUpdate);
             if (userState.preferences.auto_play_audio && responseText) {
                 await audioService.speak(responseText, currentCompagnon.voice_id);
             }
