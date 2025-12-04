@@ -8,6 +8,7 @@
     import ServerConnectionCheck from '$components/setup/ServerConnectionCheck.svelte';
     import SplashScreen from '$components/ui/SplashScreen.svelte';
     import Sidebar from '$components/ui/Sidebar.svelte';
+    import UserMenu from '$components/ui/UserMenu.svelte';
     import LanguageSelector from '$components/ui/LanguageSelector.svelte';
     import { connectionState } from '$lib/state/connection.svelte';
     import { userState } from '$lib/state/user.svelte';
@@ -18,16 +19,18 @@
     import Icon from '@iconify/svelte';
 
 	let { children } = $props();
-    let isSidebarOpen = $state(true);
-
-    function toggleSidebar() {
-        isSidebarOpen = !isSidebarOpen;
-    }
+    let isSidebarOpen = $state(false);
 
     $effect(() => {
         if (typeof document !== 'undefined') {
             document.documentElement.setAttribute('data-theme', userState.preferences.theme);
         }
+    });
+
+    $effect(() => {
+        // Close sidebar on navigation (mobile)
+        const path = $page.url.pathname;
+        isSidebarOpen = false;
     });
 
 	onMount(async () => {
@@ -51,20 +54,16 @@
 <ServerConnectionCheck />
 <SplashScreen />
 
-<div class="flex h-screen overflow-hidden bg-base-100">
-    <!-- Sidebar (Desktop & Mobile handled via CSS/Drawer if needed, simple flex for now) -->
-    <div class="hidden md:block h-full">
-        <Sidebar bind:isOpen={isSidebarOpen} />
-    </div>
-
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col h-full relative">
+<div class="drawer md:drawer-open h-screen overflow-hidden bg-base-100">
+    <input id="main-drawer" type="checkbox" class="drawer-toggle" bind:checked={isSidebarOpen} />
+    
+    <div class="drawer-content flex flex-col h-full relative">
         <!-- Top Navigation Bar -->
-        <header class="navbar bg-base-100   min-h-16 z-10">
-            <div class="flex-none">
-                <button class="btn btn-square btn-ghost" onclick={toggleSidebar} aria-label="Toggle sidebar">
+        <header class="navbar bg-base-100 min-h-16 z-10">
+            <div class="flex-none md:hidden">
+                <label for="main-drawer" class="btn btn-square btn-ghost" aria-label="Open sidebar">
                     <Icon icon="lucide:menu" class="inline-block w-5 h-5" />
-                </button>
+                </label>
             </div>
             <div class="flex-1">
                 <a href="/chat" class="btn btn-ghost text-xl">Wollama</a>
@@ -73,7 +72,7 @@
                 {#if downloadState.isPulling}
                     <div class="hidden md:flex flex-col w-40 mr-2 text-xs">
                         <div class="flex justify-between mb-0.5">
-                            <span class="font-bold truncate max-w-[80px]">{downloadState.currentModel}</span>
+                            <span class="font-bold truncate max-w-20">{downloadState.currentModel}</span>
                             <span>{downloadState.progress}%</span>
                         </div>
                         <progress class="progress progress-primary w-full h-1.5" value={downloadState.progress} max="100"></progress>
@@ -88,6 +87,7 @@
                     <Icon icon="lucide:server" class={`h-5 w-5 ${connectionState.isConnected ? 'text-success' : 'text-error'}`} />
                 </button>
                 <LanguageSelector />
+                <UserMenu />
             </div>
         </header>
 
@@ -98,5 +98,8 @@
         </main>
     </div>
     
-    <!-- Mobile Drawer Overlay (Optional implementation for mobile) -->
+    <div class="drawer-side z-20">
+        <label for="main-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+        <Sidebar isOpen={true} />
+    </div>
 </div>

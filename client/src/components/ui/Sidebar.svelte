@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { t } from '$lib/state/i18n.svelte';
-	import { userState } from '$lib/state/user.svelte';
-	import { authService } from '$lib/auth';
 	import { chatService } from '$lib/services/chat.service';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
 
 	let { isOpen = $bindable(true) } = $props();
-	let isSigningIn = $state(false);
 	let isCollapsed = $state(false);
 	let chats = $state<any[]>([]);
 
@@ -35,17 +32,6 @@
 		};
 	});
 
-	async function handleSignIn() {
-		isSigningIn = true;
-		try {
-			await authService.signInWithGoogle();
-		} catch (e) {
-			console.error(e);
-		} finally {
-			isSigningIn = false;
-		}
-	}
-
 	async function createNewChat() {
 		console.log('Button clicked: createNewChat');
 		goto('/chat/new');
@@ -59,7 +45,26 @@
 			: 'w-64'
 		: 'w-0 overflow-hidden'}"
 >
-	<div class="p-2">
+	<div class="flex flex-col gap-2 p-2">
+        <!-- Desktop Navicon (Collapse Toggle) & Search -->
+        <div class="hidden md:flex items-center space-y-2 p-2 {isCollapsed ? 'justify-center' : 'justify-between'}">
+            <button 
+                class="btn btn-ghost btn-square" 
+                onclick={() => isCollapsed = !isCollapsed}
+                aria-label={isCollapsed ? t('ui.expand') : t('ui.collapse')}
+                aria-expanded={!isCollapsed}
+                aria-controls="sidebar-nav"
+            >
+                <Icon icon="lucide:menu" class="h-5 w-5" />
+            </button>
+
+            {#if !isCollapsed}
+                <button class="btn btn-ghost btn-square" aria-label="Search">
+                    <Icon icon="lucide:search" class="h-5 w-5" />
+                </button>
+            {/if}
+        </div>
+
 		<button
 			class="btn btn-ghost btn-block {isCollapsed ? 'px-0' : 'justify-start'}"
 			onclick={createNewChat}
@@ -72,7 +77,11 @@
 		</button>
 	</div>
 
-	<div class="flex-1 space-y-2 overflow-y-auto p-2">
+	<nav 
+        id="sidebar-nav"
+        class="flex-1 space-y-2 overflow-y-auto p-2" 
+        aria-label={t('ui.myChats')}
+    >
 		{#if !isCollapsed}
 			{#each chats as chat}
 				<a
@@ -89,52 +98,9 @@
 				</a>
 			{/each}
 		{/if}
-	</div>
+	</nav>
 
 	<div class="  flex flex-col gap-2 p-4">
-		{#if !userState.isAuthenticated}
-			<button
-				class="btn btn-primary btn-block btn-sm {isCollapsed ? 'px-0' : ''}"
-				onclick={handleSignIn}
-				disabled={isSigningIn}
-				title={t('ui.signIn')}
-			>
-				{#if isSigningIn}
-					<span class="loading loading-spinner loading-xs"></span>
-				{:else}
-					<Icon icon="lucide:log-in" class="h-4 w-4 {isCollapsed ? '' : 'mr-2'}" />
-					{#if !isCollapsed}
-						{t('ui.signIn')}
-					{/if}
-				{/if}
-			</button>
-		{:else}
-			<div class="flex items-center gap-2 {isCollapsed ? 'justify-center' : 'bg-base-200 rounded-lg px-2 py-1'}">
-				{#if userState.photoURL}
-					<img src={userState.photoURL} alt="Avatar" class="h-8 w-8 rounded-full" />
-				{:else}
-					<div
-						class="bg-primary text-primary-content flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bold"
-					>
-						{userState.nickname ? userState.nickname[0].toUpperCase() : 'U'}
-					</div>
-				{/if}
-				{#if !isCollapsed}
-					<div class="min-w-0 flex-1">
-						<p class="truncate text-xs font-bold">{userState.nickname || 'User'}</p>
-						<p class="truncate text-[10px] opacity-70">Sync ON</p>
-					</div>
-				{/if}
-			</div>
-		{/if}
-
-		<button class="btn btn-ghost btn-block {isCollapsed ? 'px-0' : 'justify-start'}" onclick={() => (isCollapsed = !isCollapsed)} aria-label="Toggle Sidebar">
-			<Icon icon={isCollapsed ? 'lucide:chevrons-right' : 'lucide:chevrons-left'}  class="h-5 w-5 {isCollapsed ? '' : 'mr-2'}"  />
-            {#if !isCollapsed}
-				{t('ui.expand')}
-			{/if}
-		</button>
-
 		<button
 			class="btn btn-ghost btn-block {isCollapsed ? 'px-0' : 'justify-start'}"
 			onclick={() => goto('/settings')}

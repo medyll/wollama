@@ -286,6 +286,23 @@ onMount(() => {
 
 ## 9. SCREEN LIST (UI MAP)
 
+### Layout & Navigation (Responsive)
+- **Top Bar (Header):**
+    - **Left:** Mobile Menu Toggle (Navicon) - *Visible only on Mobile*.
+    - **Center:** App Title ("Wollama").
+    - **Right:** 
+        - Connection Status Indicator.
+        - Language Selector.
+        - **User Menu:** Avatar/Initial (or Sign In button). Displays nickname and sync status on Desktop.
+- **Sidebar (Desktop):**
+    - **Top:** Navicon (Collapse/Expand) & Search Icon (aligned).
+    - **Content:** "New Chat" button + Scrollable list of recent chats.
+    - **Bottom:** Settings button.
+    - **Behavior:** Collapsible (Mini-sidebar mode).
+- **Drawer (Mobile):**
+    - **Content:** Same as Sidebar but fully expanded.
+    - **Behavior:** Overlay (Drawer), auto-closes on navigation. No collapse mode.
+
 ### Main Screens
 - **Welcome (`/`)**: Loading, logo, automatic redirection.
 - **Settings (`/settings`)**: 
