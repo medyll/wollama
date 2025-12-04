@@ -3,12 +3,14 @@ import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
 import { replicateCouchDB } from 'rxdb/plugins/replication-couchdb';
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
 import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
+import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { wrappedValidateAjvStorage } from 'rxdb/plugins/validate-ajv';
 import { appSchema } from '../../../shared/db/database-scheme';
 import type { DatabaseSchema } from '../../../shared/db/schema-definition';
 import { userState } from '$lib/state/user.svelte';
 
 // Add plugins
+addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBLeaderElectionPlugin);
 if (import.meta.env.DEV) {
     addRxPlugin(RxDBDevModePlugin);
@@ -80,7 +82,7 @@ let dbPromise: Promise<any> | null = null;
 
 const _createDatabase = async () => {
     const db = await createRxDatabase({
-        name: 'wollama_client_db_v7', // Bumped version to force fresh DB
+        name: 'wollama_client_db_v8', // Bumped version to force fresh DB
         storage: wrappedValidateAjvStorage({
             storage: getRxStorageDexie()
         }),
