@@ -38,7 +38,7 @@ function createWindow() {
         transparent: true,
         frame: false,
         alwaysOnTop: true,
-        icon: path.join(__dirname, '../../static/favicon.png'),
+        icon: path.join(__dirname, '../static/favicon.png'),
         center: true
     });
     splash.loadFile(path.join(__dirname, 'splash.html'));
