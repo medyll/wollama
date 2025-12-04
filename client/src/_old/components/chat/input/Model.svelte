@@ -1,0 +1,81 @@
+<script lang="ts">
+	import { settings } from '$lib/stores/settings.svelte';
+	import { Icon } from '@medyll/idae-slotui-svelte';
+	import { chatParametersState } from '$lib/states/chat.svelte';
+
+	let {
+		activeModels = $bindable([])
+	}: {
+		activeModels: string[];
+	} = $props();
+
+	let appModels: string[] = $settings.defaultModel ? [$settings.defaultModel] : [];
+
+	const changeHandler = (index: number) => (event: Event) => {
+		activeModels[index] = event?.target?.value;
+	};
+
+	function addModelKey() {
+		const newModel = ($settings?.ollamaModels ?? []).filter((model) => !activeModels.includes(model.name))?.[0];
+		activeModels = [...activeModels, newModel?.name ?? '...'];
+	}
+
+	function removeModelKey(index: number) {
+		activeModels = activeModels.filter((_, i) => i !== index);
+	}
+</script>
+
+<div class=" flex-wrap">
+	{#each appModels as modelKey, index (index)}
+		{@const showAdd = index === activeModels.length - 1}
+		{@const showRemove = index === 0}
+		{@const filteredOptions = ($settings?.ollamaModels ?? []).filter(
+			(model) => model.name === modelKey || !appModels.includes(model.name)
+		)}
+
+		<div class="line-gap-2 border-b">
+			<div class="flex-1">
+				<button class="anchor" popovertarget="popover-{index}" style="anchor-name: --anchor-{index};"
+					>{chatParametersState?.models}</button
+				>
+				<div popover class="popover" id="popover-{index}" style="position-anchor : --anchor-{index};">
+					<div class="flex flex-col gap-1">
+						{#each filteredOptions as model}
+							<button onclick={changeHandler(index)} value={model.name}>{model.name}</button>
+						{/each}
+					</div>
+				</div>
+			</div>
+			<!-- <div class="line-gap-2">
+				<button
+					hidden={showRemove}
+					onclick={() => {
+						removeModelKey(index);
+					}}
+				>
+					<Icon icon="mdi:minus" style="font-size:1.6em" />
+				</button>
+				<button hidden={!showAdd} onclick={addModelKey}>
+					<Icon icon="mdi:plus" style="font-size:1.6em" />
+				</button>
+			</div> -->
+		</div>
+	{/each}
+</div>
+
+<style>
+	@reference "../../../styles/references.css";
+	:popover-open {
+		position-anchor: --anchor;
+		bottom: anchor(--anchor top);
+		left: anchor(--anchor left);
+		right: anchor(--anchor right);
+
+		background-color: var(--cfab-bg);
+		color: var(--cfab-foreground);
+
+		width: 200px;
+		@apply shadow-md;
+		@apply rounded-md;
+	}
+</style>

@@ -1,0 +1,243 @@
+.application-body {
+	color: var(--cfab-foreground);
+	background-color: var(--cfab-bg);
+	display: flex;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.application-content {
+	user-select: none;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	overflow: hidden;
+	z-index: 0;
+	position: relative;
+}
+
+.application-topBar {
+	display: flex;
+	align-items: center;
+	z-index: 50;
+	top: 0;
+	gap: 1rem;
+	margin-top: 0px;
+	height: 34px;
+}
+
+.application-main {
+	position: relative;
+	overflow: auto;
+	height: 100%;
+	width: 100%;
+}
+
+.breakpoint-spy {
+	& {
+		position: fixed;
+		color: red;
+		top: 0;
+		left: 0;
+		z-index: 3000;
+		padding: 2rem;
+		font-size: 1.5rem;
+
+		&:after {
+			content: 'sm';
+		}
+	}
+
+	@variant sm {
+	}
+	@variant md {
+		&:after {
+			content: 'md';
+		}
+	}
+	@variant lg {
+		&::after {
+			content: 'lg';
+		}
+	}
+	@variant xl {
+		&:after {
+			content: 'xl';
+		}
+	}
+	@variant 2xl {
+		&:after {
+			content: '2xl';
+		}
+	}
+	@variant 3xl {
+		&:after {
+			content: '3xl';
+		}
+	}
+	@variant hd {
+		&:after {
+			content: 'hd';
+		}
+	}
+	@variant 2k {
+		&:after {
+			content: '2k';
+		}
+	}
+	@variant 4k {
+		&:after {
+			content: '4k';
+		}
+	}
+}
+
+.application-sideBar {
+	@apply hidden w-[80px] lg:flex;
+	@apply flex h-full shrink flex-col overflow-hidden p-3 shadow-lg;
+
+	&[aria-expanded='false'] {
+		@apply lg:w-[80px];
+	}
+
+	&[aria-expanded='true'] {
+		@apply sm:relative sm:w-[270px] md:w-[270px] 2xl:w-[360px];
+	}
+
+	gap: 0.5rem;
+	height: 100%;
+	transition: width 0.1s ease-in-out;
+	z-index: 30;
+	border-right: 1px solid var(--cfab-input-border-color);
+	background-color: var(--cfab-paper-bg-color);
+	background-image: var(--cfab-gradient);
+
+	.application-sideBar-title {
+		@apply flex items-center justify-end;
+		color: var(--cfab-soft-title-text-color);
+		text-align: right;
+	}
+
+	.application-sideBar-content {
+		@apply w-full flex-1 px-2;
+		overflow-y: auto;
+	}
+}
+
+.application-dashboard {
+	@apply relative mx-auto;
+	@apply flex flex-col;
+	@apply h-full flex-1;
+
+	@variant lg {
+		@apply max-w-[55rem];
+	}
+	@variant xl {
+		@apply max-w-[65rem];
+	}
+	@variant 2xl {
+		@apply max-w-[160rem];
+	}
+	@variant 3xl {
+		@apply max-w-[100rem];
+	}
+
+	/*border: 2px solid blue !important;*/
+}
+
+.application-message-list {
+	@apply flex flex-col flex-wrap;
+	/*border: 2px solid red !important;*/
+
+	@variant 2xl {
+		@apply flex-row place-content-center;
+	}
+}
+
+.application-message {
+	@apply gap-3 p-2;
+	@apply rounded-md;
+	@apply relative mb-1 gap-1 overflow-hidden;
+
+	/* border: 2px solid blueviolet;*/
+
+	.message-assistant {
+		@apply flex-row-reverse;
+		@variant 2xl {
+			@apply ml-0 basis-2/3;
+			@apply mt-16;
+		}
+	}
+
+	.message-user {
+		@apply flex-row;
+		@variant 2xl {
+			@apply mr-0 basis-1/3;
+		}
+	}
+}
+
+.application-chat-main {
+	@apply relative sticky bottom-0 mb-0 w-full items-center;
+	background-size: 100vh 100vw;
+	background-position: bottom;
+
+	/*border: 2px solid green !important;*/
+}
+
+.application-chat-zone {
+	border-radius: 0.375rem;
+	border: 1px solid var(--cfab-input-border-color);
+	background: var(--cfab-input-bg-color);
+	color: var(--cfab-input-foreground-color);
+	position: relative;
+
+	/*border: 2px solid orange;*/
+
+	@apply mb-8 flex flex-1 flex-col gap-3 p-3;
+
+	@variant sm {
+		@apply mx-0;
+	}
+
+	@variant xl {
+		@apply mx-[15%];
+	}
+	@variant 2xl {
+		@apply mx-[15%];
+	}
+	@variant 3xl {
+		@apply mx-[15%];
+	}
+	@variant hd {
+		@apply mx-[15%];
+	}
+	@variant 2k {
+	}
+	@variant 4k {
+	}
+
+	/* @apply sm:w-[240px] sm:relative md:w-[340px] lg:w-[340px] xl:w-[340px] 2xl:w-[440px];*/
+
+	&:hover {
+		border-color: var(--cfab-input-border-color-focus);
+		box-shadow: var(--cfab-shadow);
+	}
+
+	&:has(:focus) {
+		border-color: var(--cfab-input-border-color-focus, red);
+		border-radius: 0.5em;
+	}
+}
+
+.application-chet-textarea {
+	border: 2px solid red !important;
+	outline: none !important;
+	resize: none;
+	font: inherit;
+}
+
+.application-chat-room {
+	/*border: 1px solid blue !important;*/
+}
