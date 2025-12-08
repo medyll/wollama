@@ -33,7 +33,8 @@
 		"unlink": "node link-modules.js unlink",
 		"setup:audio": "node setup-audio.js",
 		"server:dev": "tsx server/server.ts",
-		"test:server": "concurrently \"npm run server:dev\" \"npx tsx server/test-server.ts\" --kill-others --success first"
+		"test:server": "concurrently \"npm run server:dev\" \"npx tsx server/test-server.ts\" --kill-others --success first",
+		"test:unit:server": "vitest run server"
 	},
 	"license": "MIT",
 	"dependencies": {
@@ -122,6 +123,7 @@
 		"typescript-eslint": "^8.49.0",
 		"unplugin-icons": "^22.5.0",
 		"vite": "^7.2.7",
+		"vitest": "^4.0.15",
 		"wait-on": "^9.0.3"
 	}
 }
