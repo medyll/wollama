@@ -66,7 +66,7 @@
     }
 
     function removeFile(index: number) {
-        files = files.filter((_, i) => i !== index);
+        files = files.filter((_: any, i: number) => i !== index);
     }
 
     // Reset height when value is cleared (handled via effect or just rely on autoResize on input)

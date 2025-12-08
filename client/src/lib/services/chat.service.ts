@@ -264,7 +264,7 @@ export class ChatService {
                     title: { $regex: regex }
                 }
             }).exec();
-            allResults.push(...chats.map(c => ({ type: 'chat', data: c.toJSON(), date: c.updated_at })));
+            allResults.push(...chats.map((c: any) => ({ type: 'chat', data: c.toJSON(), date: c.updated_at })));
         }
 
         // 2. Search Messages
@@ -292,7 +292,7 @@ export class ChatService {
                 }
             }).exec();
             
-            const companionIds = companions.map(c => c.companion_id);
+            const companionIds = companions.map((c: any) => c.companion_id);
             if (companionIds.length > 0) {
                 const chats = await db.chats.find({
                     selector: {
@@ -303,9 +303,9 @@ export class ChatService {
                 
                 for (const chat of chats) {
                     const chatData = chat.toJSON();
-                    const companion = companions.find(c => c.companion_id === chatData.companion_id);
+                    const companion = companions.find((c: any) => c.companion_id === chatData.companion_id);
                     allResults.push({ 
-                        type: 'chat_assistant', 
+                        type: 'chat_assistant',  
                         data: chatData, 
                         date: chatData.updated_at, 
                         assistant: companion ? companion.toJSON() : null 
