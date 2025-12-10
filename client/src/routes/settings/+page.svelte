@@ -10,6 +10,8 @@
     import { DataGenericService } from '$lib/services/data-generic.service';
     import { destroyDatabase } from '$lib/db';
     import type { Companion } from '$types/data';
+    import GenericList from '$components/ui_data/GenericList.svelte';
+    import DataUpdate from '$components/ui_data/DataUpdate.svelte';
 
     let localServerUrl = $state(userState.preferences.serverUrl);
     let isVerifying = $state(false);
@@ -23,6 +25,7 @@
     let micLevel = $state(0);
     let isMonitoringMic = $state(false);
     let stopMonitoring: (() => void) | null = null;
+    let isCreatingPrompt = $state(false);
 
     const themes = [
         "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula"
@@ -190,6 +193,30 @@
                                 <LanguageSelector />
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: User Prompts -->
+            <div class="collapse collapse-arrow join-item border-base-300 border">
+                <input type="checkbox" checked={activeSection === 'prompts'} onchange={() => activeSection = activeSection === 'prompts' ? null : 'prompts'} aria-label="Toggle User Prompts" />
+                <div class="collapse-title text-lg font-medium flex items-center gap-2">
+                    <Icon icon="lucide:message-square-plus" class="w-5 h-5" />
+                    User Prompts
+                </div>
+                <div class="collapse-content">
+                    <div class="pt-4 flex flex-col gap-4">
+                        <div class="flex justify-end">
+                            <button class="btn btn-sm btn-primary" onclick={() => isCreatingPrompt = true}>
+                                <Icon icon="lucide:plus" class="w-4 h-4 mr-1" />
+                                Add Prompt
+                            </button>
+                        </div>
+                        <GenericList 
+                            tableName="user_prompts" 
+                            displayType="card" 
+                            editable={true} 
+                        />
                     </div>
                 </div>
             </div>
@@ -456,4 +483,9 @@
             </div>
         </div>
     </div>
+
+    <DataUpdate 
+        tableName="user_prompts" 
+        bind:isOpen={isCreatingPrompt} 
+    />
 </div>

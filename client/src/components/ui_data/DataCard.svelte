@@ -76,7 +76,7 @@
                         <div class="text-sm flex items-start gap-2">
                             <span class="opacity-60 capitalize min-w-20">{line.split('.').pop()}:</span>
                             <span class="font-medium truncate">
-                                {getDisplayValue(item, line)}
+                                {String(getDisplayValue(item, line))}
                             </span>
                         </div>
                     {/if}

@@ -1,6 +1,6 @@
 
 export class PromptService {
-    static buildSystemPrompt(baseSystemPrompt: string, profile: any): string {
+    static buildSystemPrompt(baseSystemPrompt: string, profile: any, userPrompts: any[] = []): string {
         let prompt = baseSystemPrompt || "You are a helpful AI assistant.";
         
         // Level 1: Profile & Preferences
@@ -9,6 +9,14 @@ export class PromptService {
             if (profile.nickname) prompt += `- Name: ${profile.nickname}\n`;
             if (profile.locale) prompt += `- Language: ${profile.locale}\n`;
             if (profile.theme) prompt += `- Theme Preference: ${profile.theme}\n`;
+        }
+
+        // Level 1.5: User Custom Prompts
+        if (userPrompts && userPrompts.length > 0) {
+            prompt += `\n\nUser Instructions:\n`;
+            userPrompts.forEach(p => {
+                prompt += `- ${p.content}\n`;
+            });
         }
         
         return prompt;

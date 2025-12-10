@@ -102,7 +102,14 @@ app.post('/api/chat/generate', async (req, res) => {
                 baseSystemPrompt = messages[systemMsgIndex].content;
             }
             
-            const newSystemPrompt = PromptService.buildSystemPrompt(baseSystemPrompt, context.profile);
+            // Fetch active user prompts
+            const promptsDb = dbManager.getDb('user_prompts');
+            const activePromptsResult = await promptsDb.find({
+                selector: { is_active: true }
+            });
+            const activePrompts = activePromptsResult.docs || [];
+
+            const newSystemPrompt = PromptService.buildSystemPrompt(baseSystemPrompt, context.profile, activePrompts);
             
             if (systemMsgIndex !== -1) {
                 messages[systemMsgIndex].content = newSystemPrompt;

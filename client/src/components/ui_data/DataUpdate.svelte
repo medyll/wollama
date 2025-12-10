@@ -4,7 +4,7 @@
 
     let { 
         tableName, 
-        id, 
+        id = undefined, 
         isOpen = $bindable(false),
         onSave = undefined
     } = $props();
@@ -42,8 +42,18 @@
     async function handleSave() {
         loading = true;
         try {
-            const dataToSave = { ...formData, [tableDef.primaryKey]: id };
-            await dataService.update(dataToSave);
+            if (id) {
+                const dataToSave = { ...formData, [tableDef.primaryKey]: id };
+                await dataService.update(dataToSave);
+            } else {
+                // Create
+                const dataToSave = { ...formData };
+                if (tableDef.fields[tableDef.primaryKey].type === 'uuid') {
+                    dataToSave[tableDef.primaryKey] = crypto.randomUUID();
+                }
+                await dataService.create(dataToSave);
+            }
+            
             if (onSave) onSave(formData);
             isOpen = false;
         } catch (e) {

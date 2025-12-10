@@ -126,5 +126,20 @@ export const appSchema: DatabaseSchema = {
                 } 
             }
         }
+    },
+    user_prompts: {
+        primaryKey: 'prompt_id',
+        indexes: ['is_active'],
+        template: {
+            presentation: 'content',
+            card_lines: ['content', 'is_active']
+        },
+        fields: {
+            prompt_id: { type: 'uuid', required: true },
+            content: { type: 'text-long', required: true, ui: { type: 'textarea', rows: 3, label: 'Prompt / Phrase' } },
+            is_active: { type: 'boolean', ui: { type: 'toggle', label: 'Active' }, default: true },
+            created_at: { type: 'timestamp', required: true, auto: true },
+            updated_at: { type: 'timestamp', auto: true }
+        }
     }
 };
