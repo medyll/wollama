@@ -1,3 +1,5 @@
+import { translations } from '../../locales/translations.js';
+
 export class UserState {
     nickname = $state('');
     isConfigured = $state(false);
@@ -47,6 +49,14 @@ export class UserState {
                 if (data.preferences) {
                     // Use Object.assign to update the reactive proxy instead of replacing it
                     Object.assign(this.preferences, data.preferences);
+                }
+            } else {
+                // First start: Detect browser language
+                if (typeof navigator !== 'undefined') {
+                    const browserLang = navigator.language.split('-')[0];
+                    if (browserLang in translations) {
+                        this.preferences.locale = browserLang;
+                    }
                 }
             }
         }
