@@ -77,7 +77,7 @@ export interface Companion {
 	updated_at?: number;
 	
 	// Legacy/Enhanced
-	specialization?: 'character development' | 'plot outline' | 'world building' | 'dialogue' | 'general';
+	specialization?: 'character development' | 'plot outline' | 'world building' | 'dialogue' | 'general' | 'coding' | 'storytelling';
 	is_locked?: boolean; // ia_lock
 }
 

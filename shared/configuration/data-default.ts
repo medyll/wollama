@@ -23,7 +23,8 @@ Response Guidelines:
 - Context: Use the conversation history to provide relevant follow-up answers without needing repetition.`,
         voice_id: 'alloy',
         voice_tone: 'neutral',
-        mood: 'friendly'
+        mood: 'friendly',
+        specialization: 'general'
     },
     { 
         companion_id: '2', 
@@ -54,7 +55,8 @@ Response Guidelines:
                             Uncertainty: If a request lacks context, ask specific technical questions before coding; do not guess.`,
         voice_id: 'onyx',
         voice_tone: 'fast',
-        mood: 'professional'
+        mood: 'professional',
+        specialization: 'coding'
     },
     { 
         companion_id: '3', 
@@ -78,6 +80,7 @@ Response Guidelines:
 - Constraint: If the user provides a specific setting or limitation, adhere to it strictly.`,
         voice_id: 'nova',
         voice_tone: 'slow',
-        mood: 'happy'
+        mood: 'happy',
+        specialization: 'storytelling'
     },
 ];
