@@ -2,9 +2,18 @@ import { DataGenericService } from './data-generic.service';
 import type { Companion } from '$types/data';
 import { DEFAULT_COMPANIONS } from '../../../../shared/configuration/data-default';
 
+const DEFAULT_LANGUAGES = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'it', name: 'Italiano', flag: '🇮🇹' }
+];
+
 export class DataInitializer {
     static async initializeDefaults() {
-        await this.initializeData<Companion>('companions', DEFAULT_COMPANIONS,true);
+        await this.initializeData<Companion>('companions', DEFAULT_COMPANIONS, true);
+        await this.initializeData<any>('languages', DEFAULT_LANGUAGES, true);
     }
 
     private static async initializeData<T>(tableName: string, defaultData: Partial<T>[],force:boolean=false) {

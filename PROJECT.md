@@ -349,6 +349,9 @@ onMount(() => {
     - **Auto-scroll:** Smart auto-scroll to bottom on new messages, disabled if user is manually scrolling up.
 - **Navigation:**
     - **Mobile:** Drawer layout for navigation.
+    - **Generic UI Components:**
+        - Enhanced `GenericList` and `DataCard` with full CRUD capabilities (Create, Read, Update, Delete).
+        - Implemented confirmation dialogs for destructive actions.
 
 ### Context Management & Prompts
 - **Dynamic Context:** Architecture to inject user profile and active files into the LLM context.

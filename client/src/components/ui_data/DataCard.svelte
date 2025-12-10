@@ -9,8 +9,10 @@
         id = undefined,
         data = undefined,
         editable = false,
+        deletable = false,
         onRowClick = undefined,
-        onEdit = undefined
+        onEdit = undefined,
+        onDelete = undefined
     } = $props();
 
     let item = $state<any>(undefined);
@@ -96,6 +98,18 @@
                         aria-label="Edit"
                     >
                         <Icon icon="lucide:edit-2" class="w-4 h-4" />
+                    </button>
+                {/if}
+                {#if deletable}
+                    <button 
+                        class="btn btn-sm btn-ghost btn-circle text-error"
+                        onclick={(e) => {
+                            e.stopPropagation();
+                            onDelete && onDelete(item);
+                        }}
+                        aria-label="Delete"
+                    >
+                        <Icon icon="lucide:trash-2" class="w-4 h-4" />
                     </button>
                 {/if}
                 <!-- We can add a slot here later -->

@@ -10,8 +10,10 @@
         orderDirection = 'desc', 
         displayType = 'card',
         editable = false,
+        deletable = false,
         onRowClick = undefined,
-        onEdit = undefined
+        onEdit = undefined,
+        onDelete = undefined
     } = $props();
 
     let items = $state<any[]>([]);
@@ -48,6 +50,19 @@
         }
     }
 
+    async function handleDelete(item: any) {
+        if (!confirm('Are you sure you want to delete this item?')) return;
+        
+        try {
+            const id = item[tableDef.primaryKey];
+            await dataService.delete(id);
+            if (onDelete) onDelete(item);
+        } catch (e) {
+            console.error('Error deleting item:', e);
+            error = e instanceof Error ? e.message : 'Unknown error';
+        }
+    }
+
     function getDisplayValue(item: any, line: string) {
         if (item._resolved && item._resolved[line] !== undefined) {
             return item._resolved[line];
@@ -78,7 +93,9 @@
                         {tableName}
                         data={item}
                         {editable}
+                        {deletable}
                         {onEdit}
+                        onDelete={() => handleDelete(item)}
                         {onRowClick} 
                     />
                 {/each}
@@ -95,7 +112,7 @@
                                     <th>{line}</th>
                                 {/if}
                             {/each}
-                            {#if editable}
+                            {#if editable || deletable}
                                 <th>Actions</th>
                             {/if}
                         </tr>
@@ -112,18 +129,32 @@
                                         <td>{getDisplayValue(item, line)}</td>
                                     {/if}
                                 {/each}
-                                {#if editable}
-                                    <td>
-                                        <button 
-                                            class="btn btn-sm btn-ghost btn-circle"
-                                            onclick={(e) => {
-                                                e.stopPropagation();
-                                                onEdit && onEdit(item);
-                                            }}
-                                            aria-label="Edit"
-                                        >
-                                            <Icon icon="lucide:edit-2" class="w-4 h-4" />
-                                        </button>
+                                {#if editable || deletable}
+                                    <td class="flex gap-2">
+                                        {#if editable}
+                                            <button 
+                                                class="btn btn-sm btn-ghost btn-circle"
+                                                onclick={(e) => {
+                                                    e.stopPropagation();
+                                                    onEdit && onEdit(item);
+                                                }}
+                                                aria-label="Edit"
+                                            >
+                                                <Icon icon="lucide:edit-2" class="w-4 h-4" />
+                                            </button>
+                                        {/if}
+                                        {#if deletable}
+                                            <button 
+                                                class="btn btn-sm btn-ghost btn-circle text-error"
+                                                onclick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(item);
+                                                }}
+                                                aria-label="Delete"
+                                            >
+                                                <Icon icon="lucide:trash-2" class="w-4 h-4" />
+                                            </button>
+                                        {/if}
                                     </td>
                                 {/if}
                             </tr>

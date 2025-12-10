@@ -141,5 +141,20 @@ export const appSchema: DatabaseSchema = {
             created_at: { type: 'timestamp', required: true, auto: true },
             updated_at: { type: 'timestamp', auto: true }
         }
+    },
+    languages: {
+        primaryKey: 'code',
+        indexes: ['name'],
+        template: {
+            presentation: 'name',
+            card_lines: ['name', 'flag']
+        },
+        fields: {
+            code: { type: 'string', required: true }, // 'en', 'fr', etc.
+            name: { type: 'string', required: true },
+            flag: { type: 'string', required: true }, // Emoji or image path
+            created_at: { type: 'timestamp', auto: true },
+            updated_at: { type: 'timestamp', auto: true }
+        }
     }
 };
