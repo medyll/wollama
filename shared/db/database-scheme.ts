@@ -100,6 +100,7 @@ export const appSchema: DatabaseSchema = {
             user_id: { type: 'uuid', required: true },
             companion_id: { type: 'uuid' },
             title: { type: 'string', required: true },
+            description: { type: 'string' },
             created_at: { type: 'timestamp', required: true, auto: true },
             updated_at: { type: 'timestamp', required: true, auto: true },
             tags: { type: 'array', items: { type: 'string' } },
@@ -183,6 +184,20 @@ export const appSchema: DatabaseSchema = {
             name: { type: 'string', required: true },
             flag: { type: 'string', required: true }, // Emoji or image path
             created_at: { type: 'timestamp', auto: true },
+            updated_at: { type: 'timestamp', auto: true }
+        }
+    },
+    tags: {
+        primaryKey: 'tag_id',
+        indexes: ['name'],
+        template: {
+            presentation: 'name',
+            card_lines: ['name']
+        },
+        fields: {
+            tag_id: { type: 'uuid', required: true },
+            name: { type: 'string', required: true },
+            created_at: { type: 'timestamp', required: true, auto: true },
             updated_at: { type: 'timestamp', auto: true }
         }
     }

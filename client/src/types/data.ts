@@ -41,6 +41,7 @@ export interface Chat {
 	companion_id?: string; // UUID (Companion)
 
 	title: string;
+	description?: string;
 	created_at: number; // Timestamp
 	updated_at: number; // Timestamp
 
@@ -98,4 +99,11 @@ export interface User {
 	username: string;
 	preferences: UserPreferences;
 	created_at: number;
+}
+
+export interface Tag {
+	tag_id: string; // UUID
+	name: string;
+	created_at: number;
+	updated_at?: number;
 }

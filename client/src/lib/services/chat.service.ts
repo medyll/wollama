@@ -3,6 +3,7 @@ import { userState } from '$lib/state/user.svelte';
 import { contextState } from '$lib/state/context.svelte';
 import { toast } from '$lib/state/notifications.svelte';
 import { t } from '$lib/state/i18n.svelte';
+import { MetadataService } from './metadata.service';
 
 export class ChatService {
     
@@ -237,6 +238,8 @@ export class ChatService {
                             if (!toast.isFocused) {
                                 toast.info(t('chat.response_received') || 'Response received');
                             }
+                            // Trigger metadata update in background
+                            MetadataService.updateChatMetadata(chatId).catch(err => console.error('Metadata update failed', err));
                         }
                     } catch (e) {
                         if (e instanceof Error && e.message !== 'JSON.parse') {
