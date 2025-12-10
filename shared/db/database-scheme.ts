@@ -55,6 +55,35 @@ export const appSchema: DatabaseSchema = {
             is_locked: { type: 'boolean' }
         }
     },
+    user_companions: {
+        primaryKey: 'companion_id',
+        indexes: ['name', 'user_id'],
+        template: { 
+            presentation: 'name',
+            card_lines: ['description', 'model', 'specialization']
+        },
+        fk: {
+            user_id: { table: 'users', required: true },
+            original_companion_id: { table: 'companions', required: false }
+        },
+        fields: {
+            companion_id: { type: 'uuid', required: true },
+            user_id: { type: 'uuid', required: true },
+            original_companion_id: { type: 'uuid' },
+            name: { type: 'string', required: true },
+            description: { type: 'string', ui: { type: 'textarea' } },
+            system_prompt: { type: 'text-long', required: true, ui: { type: 'textarea', rows: 10 } },
+            model: { type: 'string', required: true },
+            voice_id: { type: 'string' },
+            voice_tone: { type: 'string', enum: ['neutral', 'fast', 'slow', 'deep', 'high'] },
+            mood: { type: 'string', enum: ['neutral', 'happy', 'sad', 'angry', 'sarcastic', 'professional', 'friendly'] },
+            avatar: { type: 'string', ui: { type: 'image' } },
+            created_at: { type: 'timestamp', required: true, auto: true },
+            updated_at: { type: 'timestamp', auto: true },
+            specialization: { type: 'string' },
+            is_locked: { type: 'boolean' }
+        }
+    },
     chats: {
         primaryKey: 'chat_id',
         indexes: ['user_id', 'companion_id', 'updated_at'],

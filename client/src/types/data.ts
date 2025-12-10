@@ -81,6 +81,11 @@ export interface Companion {
 	is_locked?: boolean; // ia_lock
 }
 
+export interface UserCompanion extends Companion {
+	user_id: string; // UUID
+	original_companion_id?: string; // UUID (if forked from system companion)
+}
+
 export interface UserPreferences {
 	theme: string;
 	locale: string;

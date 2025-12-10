@@ -459,6 +459,8 @@ app.listen(port, async () => {
     logger.info('SERVER', `Environment: ${process.env.NODE_ENV || 'development'}`);
     logger.info('DB', `PouchDB mounted at /_db`);
     
+    await dbManager.seedCompanions();
+
     await ensureAudioSetup();
     await initializeOllama();
     await initializeTTS();

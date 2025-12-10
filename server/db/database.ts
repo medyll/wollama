@@ -3,6 +3,7 @@ import PouchFind from 'pouchdb-find';
 import path from 'path';
 import fs from 'fs';
 import { appSchema } from '../../shared/db/database-scheme.js';
+import { DEFAULT_COMPANIONS } from '../../shared/configuration/data-default.js';
 import type { DatabaseSchema } from '../../shared/db/schema-definition.js';
 import { config } from '../config.js';
 import { logger } from '../utils/logger.js';
@@ -67,6 +68,46 @@ class DatabaseManager {
     // Expose the constructor for express-pouchdb
     public getPouchDBConstructor() {
         return MyPouchDB;
+    }
+
+    public async seedCompanions() {
+        const db = this.getDb('companions');
+        logger.info('DB', 'Seeding companions...');
+        
+        for (const companion of DEFAULT_COMPANIONS) {
+            try {
+                const id = companion.companion_id!;
+                try {
+                    // Try to get existing doc to get _rev
+                    const existing: any = await db.get(id);
+                    // Update with new data, preserving _rev and _id
+                    await db.put({
+                        ...existing,
+                        ...companion,
+                        _id: id,
+                        _rev: existing._rev,
+                        updated_at: Date.now()
+                    });
+                    // logger.info('DB', `Updated companion: ${companion.name}`);
+                } catch (err: any) {
+                    if (err.status === 404) {
+                        // Create new
+                        await db.put({
+                            ...companion,
+                            _id: id,
+                            created_at: Date.now(),
+                            updated_at: Date.now()
+                        });
+                        logger.info('DB', `Created companion: ${companion.name}`);
+                    } else {
+                        throw err;
+                    }
+                }
+            } catch (error) {
+                logger.error('DB', `Failed to seed companion ${companion.name}: ${error}`);
+            }
+        }
+        logger.success('DB', 'Companions seeding completed');
     }
 }
 

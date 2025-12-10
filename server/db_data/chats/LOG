@@ -1,13 +1,5 @@
-2025/12/10-15:47:56.668 49a4 Recovering log #12
-2025/12/10-15:47:56.668 49a4 Level-0 table #14: started
-2025/12/10-15:47:56.677 49a4 Level-0 table #14: 237 bytes OK
-2025/12/10-15:47:56.682 49a4 Delete type=0 #12
-2025/12/10-15:47:56.682 49a4 Delete type=3 #10
-2025/12/10-15:47:56.697 b32c Compacting 4@0 + 0@1 files
-2025/12/10-15:47:56.704 b32c Generated table #16@0: 7 keys, 845 bytes
-2025/12/10-15:47:56.704 b32c Compacted 4@0 + 0@1 files => 845 bytes
-2025/12/10-15:47:56.705 b32c compacted to: files[ 0 1 0 0 0 0 0 ]
-2025/12/10-15:47:56.705 b32c Delete type=2 #5
-2025/12/10-15:47:56.705 b32c Delete type=2 #8
-2025/12/10-15:47:56.705 b32c Delete type=2 #11
-2025/12/10-15:47:56.705 b32c Delete type=2 #14
+2025/12/10-16:01:07.842 9a4c Recovering log #19
+2025/12/10-16:01:07.842 9a4c Level-0 table #21: started
+2025/12/10-16:01:07.854 9a4c Level-0 table #21: 237 bytes OK
+2025/12/10-16:01:07.857 9a4c Delete type=0 #19
+2025/12/10-16:01:07.858 9a4c Delete type=3 #17

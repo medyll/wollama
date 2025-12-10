@@ -88,7 +88,9 @@ const convertSchema = (tableName: string, tableDef: any) => {
 };
 
 
-let dbPromise: Promise<any> | null = null;
+// HMR helper: Store the promise on the global object to prevent multiple DB instances during hot reload
+const globalAny: any = typeof window !== 'undefined' ? window : global;
+let dbPromise: Promise<any> | null = globalAny.__wollama_db_promise || null;
 
 const _createDatabase = async () => {
     const db = await createRxDatabase({
@@ -102,14 +104,19 @@ const _createDatabase = async () => {
     });
 
     // Create collections based on shared schema
-    const collections: any = {};
+    const collectionsToAdd: any = {};
     for (const [tableName, tableDef] of Object.entries(appSchema)) {
-        collections[tableName] = {
-            schema: convertSchema(tableName, tableDef)
-        };
+        // Only add collection if it doesn't exist
+        if (!db.collections[tableName]) {
+            collectionsToAdd[tableName] = {
+                schema: convertSchema(tableName, tableDef)
+            };
+        }
     }
 
-    await db.addCollections(collections);
+    if (Object.keys(collectionsToAdd).length > 0) {
+        await db.addCollections(collectionsToAdd);
+    }
 
     return db;
 };
@@ -164,6 +171,7 @@ export const disableReplication = async () => {
 export const getDatabase = () => {
     if (!dbPromise) {
         dbPromise = _createDatabase();
+        globalAny.__wollama_db_promise = dbPromise;
     }
     return dbPromise;
 };
@@ -174,6 +182,7 @@ export const destroyDatabase = async () => {
         const db = await dbPromise;
         await db.remove();
         dbPromise = null;
+        globalAny.__wollama_db_promise = null;
         console.log('Database destroyed');
     }
 };
