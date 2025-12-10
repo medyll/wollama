@@ -102,6 +102,12 @@ Represents the human user.
 - `default_temperature`: Number
 - `auto_play_audio`: Boolean
 
+### UserPrompts
+Custom instructions injected into the system prompt.
+- `prompt_id`: UUID (PK)
+- `content`: String (Text Long)
+- `is_active`: Boolean
+
 ### Companion
 Represents the AI configuration (Personality).
 
@@ -343,6 +349,10 @@ onMount(() => {
     - **Auto-scroll:** Smart auto-scroll to bottom on new messages, disabled if user is manually scrolling up.
 - **Navigation:**
     - **Mobile:** Drawer layout for navigation.
+
+### Context Management & Prompts
+- **Dynamic Context:** Architecture to inject user profile and active files into the LLM context.
+- **User Prompts:** New feature in Settings to manage custom instructions (phrases) that are automatically injected into the System Prompt.
     - **Desktop:** Collapsible Sidebar.
     - **User Menu:** Extracted to TopBar for better accessibility.
 - **Android:**
