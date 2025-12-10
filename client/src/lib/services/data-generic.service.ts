@@ -108,6 +108,17 @@ export class DataGenericService<T> extends AbstractGenericService<T> {
     async create(item: T): Promise<T> {
         const collection = await this.getCollection();
         const data = this.cleanData(item);
+
+        // Handle auto fields
+        const fields = this.tableDef.fields;
+        for (const [key, fieldDef] of Object.entries(fields) as [string, any][]) {
+            if (fieldDef.auto && fieldDef.type === 'timestamp') {
+                if (!data[key]) {
+                    data[key] = Date.now();
+                }
+            }
+        }
+
         const doc = await collection.insert(data);
         return doc.toJSON() as T;
     }
@@ -123,6 +134,15 @@ export class DataGenericService<T> extends AbstractGenericService<T> {
         const doc = await collection.findOne(id).exec();
         if (doc) {
             const data = this.cleanData(item);
+
+            // Handle auto fields for update
+            const fields = this.tableDef.fields;
+            for (const [key, fieldDef] of Object.entries(fields) as [string, any][]) {
+                if (fieldDef.auto && fieldDef.type === 'timestamp' && key !== 'created_at') {
+                    data[key] = Date.now();
+                }
+            }
+
             await doc.patch(data);
             return doc.toJSON() as T;
         }

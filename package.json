@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev:client": "npm run dev -w @wollama/client",
+    "dev:electron": "npm run electron:dev -w @wollama/client",
     "dev:server": "npm run dev -w @wollama/server",
     "build": "npm run build -w @wollama/client",
     "test:server": "npm run test:unit -w @wollama/server",
