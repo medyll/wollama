@@ -10,6 +10,7 @@ import { config } from './config.js';
 import { SttService } from './services/stt.service.js';
 import { TtsService } from './services/tts.service.js';
 import { OllamaService } from './services/ollama.service.js';
+import { PromptService } from './services/prompt.service.js';
 import { logger } from './utils/logger.js';
 
 import cors from 'cors';
@@ -90,7 +91,41 @@ app.post('/api/audio/speak', async (req, res) => {
 
 app.post('/api/chat/generate', async (req, res) => {
     try {
-        const { model, messages, stream } = req.body;
+        const { model, messages, stream, context } = req.body;
+
+        // Process Context if available
+        if (context) {
+            // 1. Update System Prompt
+            const systemMsgIndex = messages.findIndex((m: any) => m.role === 'system');
+            let baseSystemPrompt = '';
+            if (systemMsgIndex !== -1) {
+                baseSystemPrompt = messages[systemMsgIndex].content;
+            }
+            
+            const newSystemPrompt = PromptService.buildSystemPrompt(baseSystemPrompt, context.profile);
+            
+            if (systemMsgIndex !== -1) {
+                messages[systemMsgIndex].content = newSystemPrompt;
+            } else {
+                messages.unshift({ role: 'system', content: newSystemPrompt });
+            }
+
+            // 2. Enrich Last User Message
+            let lastUserMsgIndex = -1;
+            for (let i = messages.length - 1; i >= 0; i--) {
+                if (messages[i].role === 'user') {
+                    lastUserMsgIndex = i;
+                    break;
+                }
+            }
+
+            if (lastUserMsgIndex !== -1) {
+                messages[lastUserMsgIndex].content = PromptService.enrichUserMessage(
+                    messages[lastUserMsgIndex].content, 
+                    context.files
+                );
+            }
+        }
         
         if (stream) {
             // Don't set headers immediately, wait until we have the stream or at least know the request is valid

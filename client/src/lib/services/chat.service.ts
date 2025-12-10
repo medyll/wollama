@@ -1,5 +1,6 @@
 import { getDatabase } from '$lib/db';
 import { userState } from '$lib/state/user.svelte';
+import { contextState } from '$lib/state/context.svelte';
 
 export class ChatService {
     
@@ -181,7 +182,8 @@ export class ChatService {
                 body: JSON.stringify({
                     model: userState.preferences.defaultModel,
                     messages: ollamaMessages,
-                    stream: true
+                    stream: true,
+                    context: contextState.getPayload()
                 })
             });
 
