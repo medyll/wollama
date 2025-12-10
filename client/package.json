@@ -1,6 +1,7 @@
 {
   "name": "@wollama/client",
   "version": "0.0.9",
+  "main": "electron/main.js",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
