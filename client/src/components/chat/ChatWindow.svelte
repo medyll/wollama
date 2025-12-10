@@ -299,15 +299,8 @@
                         </div>
                     {/if}
                     <div class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}">
-                        {message.status}
                         {#if message.images && message.images.length > 0}
-                    <div 
-                        class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}"
-                        onclick={handleMessageClick}
-                        onkeydown={(e) => e.key === 'Enter' && handleMessageClick(e as unknown as MouseEvent)}
-                        role="button"
-                        tabindex="0"
-                    >
+                            <div class="mb-2 space-y-2">
                                 {#each message.images as img}
                                     {#if img.startsWith('data:image')}
                                         <img src={img} alt="attachment" class="max-w-full h-auto rounded-lg max-h-64" />

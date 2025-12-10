@@ -67,11 +67,13 @@ export class DataGenericService<T> extends AbstractGenericService<T> {
         }));
     }
 
-    async getAll(orderBy?: string, orderDirection: 'asc' | 'desc' = 'desc'): Promise<T[]> {
+    async getAll(orderBy?: string | Record<string, 'asc' | 'desc'>[], orderDirection: 'asc' | 'desc' = 'desc'): Promise<T[]> {
         const collection = await this.getCollection();
         let query = collection.find();
         
-        if (orderBy && this.tableDef.fields[orderBy]) {
+        if (Array.isArray(orderBy)) {
+            query = query.sort(orderBy as any);
+        } else if (orderBy && typeof orderBy === 'string' && this.tableDef.fields[orderBy]) {
             query = query.sort({ [orderBy]: orderDirection });
         }
         
@@ -178,11 +180,13 @@ export class DataGenericService<T> extends AbstractGenericService<T> {
         return query;
     }
 
-    async getListQuery(orderBy?: string, orderDirection: 'asc' | 'desc' = 'desc') {
+    async getListQuery(orderBy?: string | Record<string, 'asc' | 'desc'>[], orderDirection: 'asc' | 'desc' = 'desc') {
         const collection = await this.getCollection();
         let query = collection.find();
         
-        if (orderBy && this.tableDef.fields[orderBy]) {
+        if (Array.isArray(orderBy)) {
+            query = query.sort(orderBy as any);
+        } else if (orderBy && typeof orderBy === 'string' && this.tableDef.fields[orderBy]) {
             query = query.sort({ [orderBy]: orderDirection });
         }
         return query;

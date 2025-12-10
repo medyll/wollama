@@ -25,17 +25,32 @@
     let cardLines = $derived(tableDef?.template?.card_lines || []);
     let presentationField = $derived(tableDef?.template?.presentation || 'id');
     
+    let tableColumns = $derived.by(() => {
+        if (tableDef?.template?.table_columns) {
+            return tableDef.template.table_columns;
+        }
+        if (tableDef?.template?.card_lines && tableDef.template.card_lines.length > 0) {
+            return tableDef.template.card_lines;
+        }
+        return [presentationField];
+    });
+
     let dataService = $derived(new DataGenericService(tableName));
 
     $effect(() => {
         loadData(tableName, orderBy, orderDirection as 'asc' | 'desc');
     });
 
-    async function loadData(table: string, order: string, direction: 'asc' | 'desc') {
+    async function loadData(table: string, order: string | { field: string, direction: 'asc' | 'desc' }[], direction: 'asc' | 'desc') {
         if (!table) return;
         loading = true;
         try {
-            const query = await dataService.getListQuery(order, direction);
+            let sortParam: any = order;
+            if (Array.isArray(order)) {
+                sortParam = order.map(o => ({ [o.field]: o.direction }));
+            }
+
+            const query = await dataService.getListQuery(sortParam, direction);
 
             // Subscribe to data
             query.$.subscribe(async (docs: any[]) => {
@@ -106,11 +121,8 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>{presentationField}</th>
-                            {#each cardLines as line}
-                                {#if line !== presentationField}
-                                    <th>{line}</th>
-                                {/if}
+                            {#each tableColumns as col}
+                                <th class="capitalize">{col.split('.').pop()}</th>
                             {/each}
                             {#if editable || deletable}
                                 <th>Actions</th>
@@ -123,11 +135,14 @@
                                 class="hover {onRowClick ? 'cursor-pointer' : ''}" 
                                 onclick={() => onRowClick && onRowClick(item)}
                             >
-                                <td class="font-bold">{item[presentationField]}</td>
-                                {#each cardLines as line}
-                                    {#if line !== presentationField}
-                                        <td>{getDisplayValue(item, line)}</td>
-                                    {/if}
+                                {#each tableColumns as col}
+                                    <td>
+                                        {#if col === presentationField}
+                                            <span class="font-bold">{getDisplayValue(item, col)}</span>
+                                        {:else}
+                                            {getDisplayValue(item, col)}
+                                        {/if}
+                                    </td>
                                 {/each}
                                 {#if editable || deletable}
                                     <td class="flex gap-2">

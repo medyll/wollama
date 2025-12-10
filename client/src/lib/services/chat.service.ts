@@ -102,7 +102,7 @@ export class ChatService {
             content,
             status,
             images,
-            created_at: new Date().toISOString(),
+            created_at: Date.now(),
             model: userState.preferences.defaultModel
         });
 
@@ -110,7 +110,7 @@ export class ChatService {
         const chat = await this.getChat(chatId);
         if (chat) {
             await chat.patch({
-                updated_at: new Date().toISOString()
+                updated_at: Date.now()
             });
         }
 
