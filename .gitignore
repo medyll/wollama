@@ -14,7 +14,8 @@ client/.svelte-kit
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 src-tauri/database/*
-**/db_data/*
+server/db_data/
+**/db_data/
 /data/*
 /server/bin/*
 /client/android/gradle/*
