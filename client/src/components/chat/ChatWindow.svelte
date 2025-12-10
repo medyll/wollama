@@ -8,6 +8,7 @@
     import { parseMarkdown } from '$lib/utils/markdown';
     import CompanionSelector from '$components/ui/CompanionSelector.svelte';
     import MessageActions from '$components/chat/MessageActions.svelte';
+    import ThinkingMessage from '$components/chat/ThinkingMessage.svelte';
     import ChatInput from '$components/chat/ChatInput.svelte';
     import Icon from '@iconify/svelte';
     import type { Companion } from '$types/data';
@@ -320,9 +321,14 @@
                                 <div class="skeleton h-4 w-full opacity-50"></div>
                             </div>
                         {:else}
-                            <div class="prose prose-sm max-w-none dark:prose-invert wrap-break-word">
-                                {@html parseMarkdown(message.content)}
-                            </div>
+                            {#if message.role === 'assistant'}
+                                <ThinkingMessage content={message.content} />
+                            {:else}
+                                <div class="prose prose-sm max-w-none dark:prose-invert wrap-break-word">
+                                    {@html parseMarkdown(message.content)}
+                                </div>
+                            {/if}
+
                             {#if message.role === 'assistant' && message.status !== 'streaming'}
                                 <MessageActions 
                                     message={message} 
