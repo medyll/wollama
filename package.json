@@ -16,7 +16,9 @@
     "test:server": "npm run test:unit -w @wollama/server",
     "lint": "npm run lint -w @wollama/client",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "standard-version",
+    "changelog": "standard-version --skip.bump --skip.commit --skip.tag"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.2.0",
