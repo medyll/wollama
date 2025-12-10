@@ -1,1 +1,5 @@
-2025/12/10-13:23:21.992 8980 Delete type=3 #1
+2025/12/10-13:36:00.012 4bb0 Recovering log #3
+2025/12/10-13:36:00.012 4bb0 Level-0 table #5: started
+2025/12/10-13:36:00.020 4bb0 Level-0 table #5: 339 bytes OK
+2025/12/10-13:36:00.023 4bb0 Delete type=0 #3
+2025/12/10-13:36:00.023 4bb0 Delete type=3 #2

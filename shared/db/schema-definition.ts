@@ -35,6 +35,7 @@ export interface TableDefinition {
     template?: {
         presentation: string;
         card_lines?: string[];
+        table_columns?: string[];
     };
 }
 

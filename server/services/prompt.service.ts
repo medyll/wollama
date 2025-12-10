@@ -3,21 +3,25 @@ export class PromptService {
     static buildSystemPrompt(baseSystemPrompt: string, profile: any, userPrompts: any[] = []): string {
         let prompt = baseSystemPrompt || "You are a helpful AI assistant.";
         
+        prompt += "\n\n[CONTEXT & INSTRUCTIONS]";
+        
         // Level 1: Profile & Preferences
         if (profile) {
-            prompt += `\n\nUser Profile:\n`;
-            if (profile.nickname) prompt += `- Name: ${profile.nickname}\n`;
-            if (profile.locale) prompt += `- Language: ${profile.locale}\n`;
-            if (profile.theme) prompt += `- Theme Preference: ${profile.theme}\n`;
+            prompt += `\nUser Profile (For your adaptation, do not repeat this):`;
+            if (profile.nickname) prompt += `\n- Name: ${profile.nickname}`;
+            if (profile.locale) prompt += `\n- Language: ${profile.locale}`;
+            if (profile.theme) prompt += `\n- Theme Preference: ${profile.theme}`;
         }
 
         // Level 1.5: User Custom Prompts
         if (userPrompts && userPrompts.length > 0) {
-            prompt += `\n\nUser Instructions:\n`;
+            prompt += `\n\nCustom User Instructions (Apply these rules):`;
             userPrompts.forEach(p => {
-                prompt += `- ${p.content}\n`;
+                prompt += `\n- ${p.content}`;
             });
         }
+        
+        prompt += "\n[END CONTEXT]";
         
         return prompt;
     }

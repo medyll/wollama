@@ -1,5 +1,5 @@
-2025/12/10-13:35:59.996 2490 Recovering log #3
-2025/12/10-13:35:59.996 2490 Level-0 table #5: started
-2025/12/10-13:36:00.005 2490 Level-0 table #5: 339 bytes OK
-2025/12/10-13:36:00.012 2490 Delete type=0 #3
-2025/12/10-13:36:00.012 2490 Delete type=3 #2
+2025/12/10-15:41:16.614 addc Recovering log #6
+2025/12/10-15:41:16.614 addc Level-0 table #8: started
+2025/12/10-15:41:16.626 addc Level-0 table #8: 237 bytes OK
+2025/12/10-15:41:16.630 addc Delete type=0 #6
+2025/12/10-15:41:16.630 addc Delete type=3 #4
