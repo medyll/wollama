@@ -1,5 +1,5 @@
-2025/12/10-16:47:48.284 ab34 Recovering log #22
-2025/12/10-16:47:48.284 ab34 Level-0 table #24: started
-2025/12/10-16:47:48.296 ab34 Level-0 table #24: 4050 bytes OK
-2025/12/10-16:47:48.303 ab34 Delete type=0 #22
-2025/12/10-16:47:48.303 ab34 Delete type=3 #20
+2025/12/10-18:39:16.649 18c8 Recovering log #3
+2025/12/10-18:39:16.649 18c8 Level-0 table #5: started
+2025/12/10-18:39:16.655 18c8 Level-0 table #5: 4558 bytes OK
+2025/12/10-18:39:16.658 18c8 Delete type=0 #3
+2025/12/10-18:39:16.658 18c8 Delete type=3 #2
