@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "test": "vitest",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\""
@@ -51,6 +52,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.13.1",
     "globals": "^16.5.0",
+    "jsdom": "^27.3.0",
     "mdsvex": "^0.12.6",
     "postcss": "^8.5.6",
     "postcss-import": "^16.1.1",
@@ -67,6 +69,7 @@
     "typescript": "^5.9.3",
     "unplugin-icons": "^22.5.0",
     "vite": "^7.2.7",
+    "vitest": "^4.0.15",
     "wait-on": "^9.0.3"
   }
 }
