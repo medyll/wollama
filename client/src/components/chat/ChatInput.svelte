@@ -77,7 +77,7 @@
     });
 </script>
 
-<div class="w-full md:max-w-[760px] mx-auto">
+<div class="w-full md:max-w-[1150px] mx-auto">
     <!-- Top Bar: Companion, Audio, Delete -->
     <div class="flex justify-between items-center mb-2 px-2">
         <!-- Left: Companion -->
@@ -138,7 +138,7 @@
             bind:this={textareaRef}
             placeholder={t('ui.type_message')} 
             aria-label={t('ui.type_message')}
-            class="textarea textarea-ghost w-full resize-none focus:outline-none bg-transparent px-2 py-2 min-h-12 text-base max-h-[50vh] overflow-y-auto" 
+            class="textarea textarea-ghost w-full resize-none focus:outline-none bg-transparent px-2 py-2 min-h-12 text-base max-h-[180px] overflow-y-auto" 
             rows="1"
             bind:value={value}
             oninput={autoResize}

@@ -1,6 +1,8 @@
 import { getDatabase } from '$lib/db';
 import { userState } from '$lib/state/user.svelte';
 import { contextState } from '$lib/state/context.svelte';
+import { toast } from '$lib/state/notifications.svelte';
+import { t } from '$lib/state/i18n.svelte';
 
 export class ChatService {
     
@@ -232,6 +234,9 @@ export class ChatService {
                         }
                         if (json.done) {
                             await this.updateMessage(assistantMsgId, fullContent, 'done');
+                            if (!toast.isFocused) {
+                                toast.info(t('chat.response_received') || 'Response received');
+                            }
                         }
                     } catch (e) {
                         if (e instanceof Error && e.message !== 'JSON.parse') {
@@ -247,6 +252,7 @@ export class ChatService {
         } catch (error) {
             console.error('Generation error:', error);
             const errorMessage = error instanceof Error ? error.message : 'Error generating response.';
+            toast.error(errorMessage);
             await this.updateMessage(assistantMsgId, errorMessage, 'error');
             throw error;
         }

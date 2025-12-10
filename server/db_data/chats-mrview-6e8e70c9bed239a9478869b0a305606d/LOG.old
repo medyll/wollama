@@ -1,5 +1,5 @@
-2025/12/10-15:58:39.948 a8f4 Recovering log #15
-2025/12/10-15:58:39.948 a8f4 Level-0 table #18: started
-2025/12/10-15:58:39.957 a8f4 Level-0 table #18: 237 bytes OK
-2025/12/10-15:58:39.961 a8f4 Delete type=0 #15
-2025/12/10-15:58:39.962 a8f4 Delete type=3 #13
+2025/12/10-16:01:07.880 9a4c Recovering log #19
+2025/12/10-16:01:07.880 9a4c Level-0 table #21: started
+2025/12/10-16:01:07.890 9a4c Level-0 table #21: 237 bytes OK
+2025/12/10-16:01:07.895 9a4c Delete type=0 #19
+2025/12/10-16:01:07.895 9a4c Delete type=3 #17
