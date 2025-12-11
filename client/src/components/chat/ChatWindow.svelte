@@ -132,6 +132,7 @@
             }
         } catch (e) {
             console.error('Error sending message:', e);
+            toast.error(t('chat.send_error') || 'Error sending message');
         }
     }
 
@@ -322,7 +323,7 @@
                             </div>
                         {:else}
                             {#if message.role === 'assistant'}
-                                <ThinkingMessage content={message.content} />
+                                <ThinkingMessage content={message.content || ''} />
                             {:else}
                                 <div class="prose prose-sm max-w-none dark:prose-invert wrap-break-word">
                                     {@html parseMarkdown(message.content)}

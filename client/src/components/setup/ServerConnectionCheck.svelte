@@ -22,6 +22,8 @@
             clearTimeout(timeoutId);
 
             if (res.ok) {
+                const data = await res.json();
+                
                 if (!connectionState.isConnected) {
                     toast.success(t('status.connection_restored'));
                 } else if (!isAuto) {
@@ -29,6 +31,17 @@
                 }
                 
                 connectionState.setConnected(true);
+                
+                // Check Ollama status
+                const ollamaUp = !!data.ollama;
+                if (connectionState.isOllamaConnected && !ollamaUp) {
+                    toast.warning('Ollama service is down. Chat features unavailable.');
+                } else if (!connectionState.isOllamaConnected && ollamaUp && connectionState.isConnected) {
+                    // Only show restored if we were previously connected but ollama was down
+                    // Actually, let's just update the state silently or maybe a small toast
+                }
+                connectionState.setOllamaConnected(ollamaUp);
+
                 connectionState.showModal = false;
             } else {
                 throw new Error('Status ' + res.status);
@@ -84,11 +97,21 @@
 <!-- Section: Connection Modal -->
 <div class="modal modal-open bg-black/50 backdrop-blur-sm z-50" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal-box shadow-2xl">
-    <h3 id="modal-title" class="font-bold text-lg text-error flex items-center gap-2">
+    <h3 id="modal-title" class={`font-bold text-lg flex items-center gap-2 ${!connectionState.isConnected ? 'text-error' : 'text-warning'}`}>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-        {t('status.server_inaccessible')}
+        {#if !connectionState.isConnected}
+            {t('status.server_inaccessible')}
+        {:else}
+            Ollama Service Unavailable
+        {/if}
     </h3>
-    <p class="py-4">{t('status.check_server')}</p>
+    <p class="py-4">
+        {#if !connectionState.isConnected}
+            {t('status.check_server')}
+        {:else}
+            The backend server is connected, but the Ollama AI engine is not responding. Please check your Ollama installation.
+        {/if}
+    </p>
     
     <div class="form-control w-full">
         <label class="label" for="server-url-input">

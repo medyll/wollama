@@ -1,29 +1,11 @@
 <script lang="ts">
     import { parseMarkdown } from '$lib/utils/markdown';
+    import { parseThinking } from '$lib/utils/thinking';
     import Icon from '@iconify/svelte';
 
     let { content } = $props();
 
-    let parsed = $derived.by(() => {
-        const thinkStart = content.indexOf('<think>');
-        if (thinkStart === -1) {
-            return { pre: null, thinking: null, response: content, isThinking: false };
-        }
-
-        const pre = content.substring(0, thinkStart);
-        const thinkEnd = content.indexOf('</think>');
-        
-        if (thinkEnd === -1) {
-            // Still thinking, no closing tag yet
-            const thinkContent = content.substring(thinkStart + 7);
-            return { pre, thinking: thinkContent, response: null, isThinking: true };
-        }
-
-        // Finished thinking
-        const thinkContent = content.substring(thinkStart + 7, thinkEnd);
-        const restContent = content.substring(thinkEnd + 8);
-        return { pre, thinking: thinkContent, response: restContent, isThinking: false };
-    });
+    let parsed = $derived(parseThinking(content));
 
     let isOpen = $state(true);
     

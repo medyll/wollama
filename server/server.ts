@@ -21,6 +21,11 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = config.server.port;
 
+// Server State
+const serverState = {
+    ollamaReady: false
+};
+
 // Multer setup for memory storage
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -51,7 +56,10 @@ app.use(express.json());
 
 // API Routes
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok' });
+    res.json({ 
+        status: 'ok',
+        ollama: serverState.ollamaReady
+    });
 });
 
 // Audio Routes
@@ -265,6 +273,20 @@ const isOllamaRunning = async () => {
     }
 };
 
+const killLocalOllama = async () => {
+    try {
+        if (process.platform === 'win32') {
+            try { await execAsync('taskkill /IM "ollama app.exe" /F'); } catch {}
+            try { await execAsync('taskkill /IM "ollama.exe" /F'); } catch {}
+        } else {
+            await execAsync('pkill -f ollama');
+        }
+        logger.info('OLLAMA', 'Killed local Ollama process.');
+    } catch (e) {
+        // Ignore errors
+    }
+};
+
 const startLocalOllama = async () => {
     if (await isOllamaRunning()) {
         logger.info('OLLAMA', 'Local Ollama process detected running.');
@@ -275,18 +297,38 @@ const startLocalOllama = async () => {
         logger.info('OLLAMA', 'Attempting to find and start local Ollama instance...');
         
         if (process.platform === 'win32') {
-            // Try to find ollama executable path
-            const { stdout: whereOutput } = await execAsync('where ollama');
-            const ollamaPath = whereOutput.split('\n')[0].trim();
+            let ollamaPath = '';
+            try {
+                // Try to find ollama executable path via PATH
+                const { stdout: whereOutput } = await execAsync('where ollama');
+                ollamaPath = whereOutput.split('\n')[0].trim();
+            } catch (e) {
+                // Fallback to common default installation paths
+                const localAppData = process.env.LOCALAPPDATA || '';
+                const commonPaths = [
+                    path.join(localAppData, 'Programs', 'Ollama', 'ollama.exe'),
+                    path.join(localAppData, 'Ollama', 'ollama.exe'),
+                    path.join(process.env.USERPROFILE || '', 'AppData', 'Local', 'Programs', 'Ollama', 'ollama.exe')
+                ];
+
+                for (const p of commonPaths) {
+                    if (fs.existsSync(p)) {
+                        ollamaPath = p;
+                        logger.info('OLLAMA', `Found Ollama at fallback path: ${ollamaPath}`);
+                        break;
+                    }
+                }
+            }
             
             if (ollamaPath) {
                 // Usually "ollama app.exe" is in the same folder or similar
-                const appPath = path.join(path.dirname(ollamaPath), 'ollama app.exe');
+                // If "where ollama" returns the CLI, we might want to run "ollama serve" instead of the app
+                // But let's try to run "ollama serve" directly if we found the CLI
                 
-                logger.info('OLLAMA', `Found Ollama at: ${appPath}`);
+                logger.info('OLLAMA', `Found Ollama at: ${ollamaPath}`);
                 
                 // Start the process detached
-                const child = spawn(appPath, [], {
+                const child = spawn(ollamaPath, ['serve'], {
                     detached: true,
                     stdio: 'ignore'
                 });
@@ -357,6 +399,7 @@ const initializeOllama = async () => {
                 logger.success('OLLAMA', `Model '${defaultModel}' is ready`);
             }
             
+            serverState.ollamaReady = true;
             return; // Success, exit function
 
         } catch (error: any) {
@@ -365,7 +408,15 @@ const initializeOllama = async () => {
             
             // If first attempt fails and it looks like the service is down (and local), try to start it
             if (i === 0 && isLocalHost(config.ollama.host)) {
-                logger.warn('OLLAMA', 'Connection failed. Trying to start local instance...');
+                logger.warn('OLLAMA', 'Connection failed.');
+                
+                if (await isOllamaRunning()) {
+                    logger.warn('OLLAMA', 'Ollama process is running but unreachable. Restarting...');
+                    await killLocalOllama();
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+
+                logger.info('OLLAMA', 'Starting local instance...');
                 const started = await startLocalOllama();
                 if (started) {
                     // Give it more time to start
