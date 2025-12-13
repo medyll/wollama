@@ -29,7 +29,7 @@ jobs:
       run: npm run lint
 
     - name: Run Server Unit Tests
-      run: npm run test:unit:server
+      run: npm run test:server
 
     - name: Build
       run: npm run build
