@@ -5,7 +5,7 @@ import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript-eslint';
-import svelteConfig from './svelte.config.js';
+import svelteConfig from './client/svelte.config.js';
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
 export default ts.config(
@@ -27,16 +27,35 @@ export default ts.config(
 		}
 	},
 	{
-		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
+		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js', '**/*.ts', '**/*.js'],
 		ignores: ['eslint.config.js', 'svelte.config.js'],
 
 		languageOptions: {
 			parserOptions: {
-				projectService: true,
+				projectService: {
+					allowDefaultProject: [
+						'*.js',
+						'*.ts',
+						'client/*.js',
+						'client/*.ts',
+						'client/electron/*.js',
+						'server/*.ts',
+						'server/*.js'
+					]
+				},
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser,
 				svelteConfig
 			}
+		},
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'off',
+			'@typescript-eslint/no-unused-vars': 'warn',
+			'svelte/require-each-key': 'off',
+			'svelte/no-at-html-tags': 'off',
+			'svelte/no-navigation-without-resolve': 'off',
+			'@typescript-eslint/no-unused-expressions': 'off',
+			'@typescript-eslint/ban-ts-comment': 'off'
 		}
 	}
 );

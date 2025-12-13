@@ -1,0 +1,9 @@
+.svelte-kit
+build
+dist
+coverage
+.env
+.env.*
+src/_old
+_old
+**/_old/**
