@@ -1,386 +1,388 @@
 <script lang="ts">
-    import { t } from '$lib/state/i18n.svelte';
-    import { userState } from '$lib/state/user.svelte';
-    import { uiState } from '$lib/state/ui.svelte';
-    import { toast } from '$lib/state/notifications.svelte';
-    import { audioService } from '$lib/services/audio.service';
-    import { chatService } from '$lib/services/chat.service';
-    import { parseMarkdown } from '$lib/utils/markdown';
-    import CompanionSelector from '$components/ui/CompanionSelector.svelte';
-    import MessageActions from '$components/chat/MessageActions.svelte';
-    import ThinkingMessage from '$components/chat/ThinkingMessage.svelte';
-    import ChatInput from '$components/chat/ChatInput.svelte';
-    import Icon from '@iconify/svelte';
-    import type { Companion } from '$types/data';
-    import { goto } from '$app/navigation';
+	import { t } from '$lib/state/i18n.svelte';
+	import { userState } from '$lib/state/user.svelte';
+	import { uiState } from '$lib/state/ui.svelte';
+	import { toast } from '$lib/state/notifications.svelte';
+	import { audioService } from '$lib/services/audio.service';
+	import { chatService } from '$lib/services/chat.service';
+	import { parseMarkdown } from '$lib/utils/markdown';
+	import CompanionSelector from '$components/ui/CompanionSelector.svelte';
+	import MessageActions from '$components/chat/MessageActions.svelte';
+	import ThinkingMessage from '$components/chat/ThinkingMessage.svelte';
+	import ChatInput from '$components/chat/ChatInput.svelte';
+	import Icon from '@iconify/svelte';
+	import type { Companion } from '$types/data';
+	import { goto } from '$app/navigation';
 
-    let { chatId = $bindable(undefined), initialCompanionId = undefined } = $props();
+	let { chatId = $bindable(undefined), initialCompanionId = undefined } = $props();
 
-    // Placeholder for chat logic
-    let messageInput = $state('');
-    let isCompagnonModalOpen = $state(false);
-    let isRecording = $state(false);
-    let selectedFiles = $state<string[]>([]);
+	// Placeholder for chat logic
+	let messageInput = $state('');
+	let isCompagnonModalOpen = $state(false);
+	let isRecording = $state(false);
+	let selectedFiles = $state<string[]>([]);
 
-    let currentCompagnon: Companion = $state({ 
-        companion_id: '1',
-        name: t('ui.general_assistant'), 
-        model: userState.preferences.defaultModel,
-        system_prompt: 'You are a helpful assistant.',
-        created_at: Date.now()
-    });
-    
-    let messages = $state<any[]>([]);
-    let chatContainer = $state<HTMLDivElement>();
-    let userHasScrolledUp = $state(false);
+	let currentCompagnon: Companion = $state({
+		companion_id: '1',
+		name: t('ui.general_assistant'),
+		model: userState.preferences.defaultModel,
+		system_prompt: 'You are a helpful assistant.',
+		created_at: Date.now()
+	});
 
-    function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
-        if (chatContainer) {
-            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior });
-        }
-    }
+	let messages = $state<any[]>([]);
+	let chatContainer = $state<HTMLDivElement>();
+	let userHasScrolledUp = $state(false);
 
-    function handleScroll() {
-        if (!chatContainer) return;
-        const { scrollTop, scrollHeight, clientHeight } = chatContainer;
-        // If we are close to bottom (within 50px), reset the flag
-        const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
-        userHasScrolledUp = !isAtBottom;
-    }
+	function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
+		if (chatContainer) {
+			chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior });
+		}
+	}
 
-    $effect(() => {
-        if (!chatId) {
-            messages = [];
-            uiState.clearTitle();
-            return;
-        }
+	function handleScroll() {
+		if (!chatContainer) return;
+		const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+		// If we are close to bottom (within 50px), reset the flag
+		const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+		userHasScrolledUp = !isAtBottom;
+	}
 
-        let sub: any;
-        
-        (async () => {
-            // Load chat details to get title
-            const chat = await chatService.getChat(chatId);
-            if (chat) {
-                uiState.setTitle(chat.title);
-            }
+	$effect(() => {
+		if (!chatId) {
+			messages = [];
+			uiState.clearTitle();
+			return;
+		}
 
-            const obs = await chatService.getMessages(chatId);
-            sub = obs.subscribe((data: any[]) => {
-                messages = data;
-                // Auto-scroll on new messages if user hasn't scrolled up
-                if (!userHasScrolledUp) {
-                    // Use setTimeout to ensure DOM is updated
-                    setTimeout(() => scrollToBottom(), 0);
-                }
-            });
-        })();
+		let sub: any;
 
-        return () => {
-            if (sub) sub.unsubscribe();
-            uiState.clearTitle();
-        };
-    });
+		(async () => {
+			// Load chat details to get title
+			const chat = await chatService.getChat(chatId);
+			if (chat) {
+				uiState.setTitle(chat.title);
+			}
 
-    async function sendMessage() {
-        if (!messageInput.trim() && selectedFiles.length === 0) return;
-        
-        const content = messageInput;
-        const filesToSend = [...selectedFiles];
-        
-        messageInput = '';
-        selectedFiles = [];
-        
-        // Force scroll to bottom when sending
-        userHasScrolledUp = false;
-        setTimeout(() => scrollToBottom(), 0);
+			const obs = await chatService.getMessages(chatId);
+			sub = obs.subscribe((data: any[]) => {
+				messages = data;
+				// Auto-scroll on new messages if user hasn't scrolled up
+				if (!userHasScrolledUp) {
+					// Use setTimeout to ensure DOM is updated
+					setTimeout(() => scrollToBottom(), 0);
+				}
+			});
+		})();
 
-        let targetChatId = chatId;
+		return () => {
+			if (sub) sub.unsubscribe();
+			uiState.clearTitle();
+		};
+	});
 
-        try {
-            if (!targetChatId) {
-                // Create chat first
-                // Use initialCompanionId if set and user hasn't selected a different one (assuming default is '1')
-                const companionIdToUse = (currentCompagnon.companion_id === '1' && initialCompanionId) 
-                    ? initialCompanionId 
-                    : currentCompagnon.companion_id;
-                
-                try {
-                    targetChatId = await chatService.createChat(undefined, undefined, companionIdToUse);
-                    // Update URL without reloading
-                    goto(`/chat/${targetChatId}`, { replaceState: true });
-                    // Update local state so we don't create it again if user spams
-                    chatId = targetChatId;
-                } catch (e) {
-                    console.error('Error creating chat:', e);
-                    toast.error(t('chat.create_error') || 'Error creating chat');
-                    return;
-                }
-            }
+	async function sendMessage() {
+		if (!messageInput.trim() && selectedFiles.length === 0) return;
 
-            try {
-                await chatService.addMessage(targetChatId, 'user', content, 'sent', filesToSend);
-            } catch (e) {
-                console.error('Error adding user message:', e);
-                toast.error(t('chat.send_error') || 'Error saving message');
-                return;
-            }
-            
-            // Get fresh history from DB including the message we just added
-            let history;
-            try {
-                const messagesDocs = await chatService.getChatHistory(targetChatId);
-                history = messagesDocs.map((m: any) => ({ 
-                    role: m.role, 
-                    content: m.content,
-                    images: m.images 
-                }));
-            } catch (e) {
-                console.error('Error fetching chat history:', e);
-                // Continue anyway, maybe we can generate without full history or it will fail next
-            }
-            
-            if (history) {
-                try {
-                    const responseText = await chatService.generateResponse(targetChatId, history);
+		const content = messageInput;
+		const filesToSend = [...selectedFiles];
 
-                    if (userState.preferences.auto_play_audio && responseText) {
-                        try {
-                            await audioService.speak(responseText, currentCompagnon.voice_id);
-                        } catch (e) {
-                            console.error('TTS Error', e);
-                        }
-                    }
-                } catch (e) {
-                    console.error('Error generating response:', e);
-                    // Error is already handled in chatService.generateResponse (toast + message update)
-                }
-            }
-        } catch (e) {
-            console.error('Unexpected error in sendMessage:', e);
-            const errMsg = e instanceof Error ? e.message : 'Unknown error';
-            toast.error(`${t('chat.send_error') || 'Error sending message'}: ${errMsg}`);
-        }
-    }
+		messageInput = '';
+		selectedFiles = [];
 
-    let isTranscribing = $state(false);
+		// Force scroll to bottom when sending
+		userHasScrolledUp = false;
+		setTimeout(() => scrollToBottom(), 0);
 
-    async function toggleRecording() {
-        if (isRecording) {
-            try {
-                const audioBlob = await audioService.stopRecording();
-                isRecording = false;
-                isTranscribing = true;
-                
-                // Transcribe audio
-                try {
-                    const text = await audioService.transcribe(audioBlob);
-                    if (text) {
-                        messageInput = (messageInput + ' ' + text).trim();
-                        // We do NOT send automatically anymore, allowing user to review/edit
-                        // sendMessage(); 
-                    }
-                } catch (err) {
-                    console.error('Transcription failed', err);
-                    toast.error(t('status.error') || 'Transcription failed');
-                } finally {
-                    isTranscribing = false;
-                }
-            } catch (error) {
-                console.error('Error stopping recording:', error);
-                isRecording = false;
-                isTranscribing = false;
-            }
-        } else {
-            try {
-                await audioService.startRecording();
-                isRecording = true;
-            } catch (error) {
-                console.error('Error starting recording:', error);
-                toast.error('Could not access microphone');
-            }
-        }
-    }
+		let targetChatId = chatId;
 
-    function onCompagnonSelected(compagnon: Companion) {
-        currentCompagnon = compagnon;
-        // Logic to update chat context with new compagnon
-        if (messages.length > 0) {
-             messages.push({
-                id: messages.length + 1,
-                role: 'system',
-                content: `${t('ui.interlocutor_changed')} ${compagnon.name}`
-            });
-        }
-    }
+		try {
+			if (!targetChatId) {
+				// Create chat first
+				// Use initialCompanionId if set and user hasn't selected a different one (assuming default is '1')
+				const companionIdToUse =
+					currentCompagnon.companion_id === '1' && initialCompanionId
+						? initialCompanionId
+						: currentCompagnon.companion_id;
 
-    async function regenerateResponse() {
-        if (!chatId || messages.length === 0) return;
-        
-        // We assume we are regenerating the last response (which should be from assistant)
-        // Or if the last message is from user, we just generate.
-        const lastMsg = messages[messages.length - 1];
-        
-        let history;
-        let messageIdToUpdate: string | undefined;
+				try {
+					targetChatId = await chatService.createChat(undefined, undefined, companionIdToUse);
+					// Update URL without reloading
+					goto(`/chat/${targetChatId}`, { replaceState: true });
+					// Update local state so we don't create it again if user spams
+					chatId = targetChatId;
+				} catch (e) {
+					console.error('Error creating chat:', e);
+					toast.error(t('chat.create_error') || 'Error creating chat');
+					return;
+				}
+			}
 
-        if (lastMsg.role === 'assistant') {
-            // Exclude the last assistant message to regenerate it
-            history = messages.slice(0, -1).map((m: any) => ({ 
-                role: m.role, 
-                content: m.content,
-                images: m.images 
-            }));
-            messageIdToUpdate = lastMsg.message_id;
-        } else {
-            // Last message is user, just generate
-            history = messages.map((m: any) => ({ 
-                role: m.role, 
-                content: m.content,
-                images: m.images 
-            }));
-        }
+			try {
+				await chatService.addMessage(targetChatId, 'user', content, 'sent', filesToSend);
+			} catch (e) {
+				console.error('Error adding user message:', e);
+				toast.error(t('chat.send_error') || 'Error saving message');
+				return;
+			}
 
-        try {
-            const responseText = await chatService.generateResponse(chatId, history, messageIdToUpdate);
-            if (userState.preferences.auto_play_audio && responseText) {
-                await audioService.speak(responseText, currentCompagnon.voice_id);
-            }
-        } catch (e) {
-            console.error('Error regenerating response:', e);
-        }
-    }
+			// Get fresh history from DB including the message we just added
+			let history;
+			try {
+				const messagesDocs = await chatService.getChatHistory(targetChatId);
+				history = messagesDocs.map((m: any) => ({
+					role: m.role,
+					content: m.content,
+					images: m.images
+				}));
+			} catch (e) {
+				console.error('Error fetching chat history:', e);
+				// Continue anyway, maybe we can generate without full history or it will fail next
+			}
 
-    function handleMessageClick(event: MouseEvent) {
-        const target = event.target as HTMLElement;
-        const btn = target.closest('.copy-btn');
-        if (btn) {
-            const code = decodeURIComponent(btn.getAttribute('data-code') || '');
-            if (code) {
-                navigator.clipboard.writeText(code).then(() => {
-                    toast.success(t('ui.copied_to_clipboard') || 'Copied to clipboard');
-                });
-            }
-        }
-    }
+			if (history) {
+				try {
+					const responseText = await chatService.generateResponse(targetChatId, history);
 
+					if (userState.preferences.auto_play_audio && responseText) {
+						try {
+							await audioService.speak(responseText, currentCompagnon.voice_id);
+						} catch (e) {
+							console.error('TTS Error', e);
+						}
+					}
+				} catch (e) {
+					console.error('Error generating response:', e);
+					// Error is already handled in chatService.generateResponse (toast + message update)
+				}
+			}
+		} catch (e) {
+			console.error('Unexpected error in sendMessage:', e);
+			const errMsg = e instanceof Error ? e.message : 'Unknown error';
+			toast.error(`${t('chat.send_error') || 'Error sending message'}: ${errMsg}`);
+		}
+	}
+
+	let isTranscribing = $state(false);
+
+	async function toggleRecording() {
+		if (isRecording) {
+			try {
+				const audioBlob = await audioService.stopRecording();
+				isRecording = false;
+				isTranscribing = true;
+
+				// Transcribe audio
+				try {
+					const text = await audioService.transcribe(audioBlob);
+					if (text) {
+						messageInput = (messageInput + ' ' + text).trim();
+						// We do NOT send automatically anymore, allowing user to review/edit
+						// sendMessage();
+					}
+				} catch (err) {
+					console.error('Transcription failed', err);
+					toast.error(t('status.error') || 'Transcription failed');
+				} finally {
+					isTranscribing = false;
+				}
+			} catch (error) {
+				console.error('Error stopping recording:', error);
+				isRecording = false;
+				isTranscribing = false;
+			}
+		} else {
+			try {
+				await audioService.startRecording();
+				isRecording = true;
+			} catch (error) {
+				console.error('Error starting recording:', error);
+				toast.error('Could not access microphone');
+			}
+		}
+	}
+
+	function onCompagnonSelected(compagnon: Companion) {
+		currentCompagnon = compagnon;
+		// Logic to update chat context with new compagnon
+		if (messages.length > 0) {
+			messages.push({
+				id: messages.length + 1,
+				role: 'system',
+				content: `${t('ui.interlocutor_changed')} ${compagnon.name}`
+			});
+		}
+	}
+
+	async function regenerateResponse() {
+		if (!chatId || messages.length === 0) return;
+
+		// We assume we are regenerating the last response (which should be from assistant)
+		// Or if the last message is from user, we just generate.
+		const lastMsg = messages[messages.length - 1];
+
+		let history;
+		let messageIdToUpdate: string | undefined;
+
+		if (lastMsg.role === 'assistant') {
+			// Exclude the last assistant message to regenerate it
+			history = messages.slice(0, -1).map((m: any) => ({
+				role: m.role,
+				content: m.content,
+				images: m.images
+			}));
+			messageIdToUpdate = lastMsg.message_id;
+		} else {
+			// Last message is user, just generate
+			history = messages.map((m: any) => ({
+				role: m.role,
+				content: m.content,
+				images: m.images
+			}));
+		}
+
+		try {
+			const responseText = await chatService.generateResponse(chatId, history, messageIdToUpdate);
+			if (userState.preferences.auto_play_audio && responseText) {
+				await audioService.speak(responseText, currentCompagnon.voice_id);
+			}
+		} catch (e) {
+			console.error('Error regenerating response:', e);
+		}
+	}
+
+	function handleMessageClick(event: MouseEvent) {
+		const target = event.target as HTMLElement;
+		const btn = target.closest('.copy-btn');
+		if (btn) {
+			const code = decodeURIComponent(btn.getAttribute('data-code') || '');
+			if (code) {
+				navigator.clipboard.writeText(code).then(() => {
+					toast.success(t('ui.copied_to_clipboard') || 'Copied to clipboard');
+				});
+			}
+		}
+	}
 </script>
- 
+
 <CompanionSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
 <div class="absolute inset-0 flex flex-col overflow-hidden">
-    <!-- Section: Header Removed (Moved to Input Area) -->
+	<!-- Section: Header Removed (Moved to Input Area) -->
 
-    {#if messages.length === 0}
-        <!-- Section: Empty State -->
-        <div class="flex-1 flex flex-col items-center justify-center p-4 overflow-y-auto">
-            <div class="max-w-md flex flex-col items-center w-full">
-                <img src="/assets/lama.png" alt="Wollama" class="w-32 h-32 object-contain mb-6 opacity-90" />
-                <h1 class="text-3xl font-bold mb-2">{t('ui.ready_to_chat')}</h1>
-                <p class="mb-8 opacity-70">{t('ui.select_chat_help')}</p>
-                
-                <div class="w-full">
-                    <ChatInput 
-                        bind:value={messageInput}
-                        bind:files={selectedFiles}
-                        isRecording={isRecording}
-                        isTranscribing={isTranscribing}
-                        currentCompagnon={currentCompagnon}
-                        chatId={chatId}
-                        onsend={sendMessage}
-                        onrecord={toggleRecording}
-                        oncompanionclick={() => isCompagnonModalOpen = true}
-                    />
-                </div>
-            </div>
-        </div>
-    {:else}
-        <!-- Section: Messages Area -->
-        <div 
-            class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0" 
-            role="log"
-            aria-label="Chat messages"
-            bind:this={chatContainer}
-            onscroll={handleScroll}
-        >
-            {#each messages as message, i}
-                <div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
-                    <div class="chat-image avatar placeholder self-start">
-                        {#if message.role === 'user'}
-                            <div class="bg-neutral text-neutral-content rounded-full w-10">
-                                <span>U</span>
-                            </div>
-                        {:else}
-                            {#if currentCompagnon.avatar}
-                                <div class="w-10 rounded-full">
-                                    <img src={currentCompagnon.avatar} alt={currentCompagnon.name} />
-                                </div>
-                            {:else}
-                                <div class="bg-primary text-primary-content rounded-full w-10">
-                                    <span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span>
-                                </div>
-                            {/if}
-                        {/if}
-                    </div>
-                    {#if message.role !== 'user'}
-                        <div class="chat-header opacity-50 text-xs mb-1">
-                            {currentCompagnon.name}
-                        </div>
-                    {/if}
-                    <div class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'bg-transparent text-base-content p-0'}">
-                        {#if message.images && message.images.length > 0}
-                            <div class="mb-2 space-y-2">
-                                {#each message.images as img}
-                                    {#if img.startsWith('data:image')}
-                                        <img src={img} alt="attachment" class="max-w-full h-auto rounded-lg max-h-64" />
-                                    {:else}
-                                        <div class="flex items-center gap-2 p-2 bg-base-100/20 rounded-lg">
-                                            <Icon icon="lucide:file" class="w-6 h-6" />
-                                            <span class="text-xs opacity-70">File attached</span>
-                                        </div>
-                                    {/if}
-                                {/each}
-                            </div>
-                        {/if}
-                        {#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
-                            <div class="flex w-52 flex-col gap-4 p-2">
-                                <div class="skeleton h-4 w-28 opacity-50"></div>
-                                <div class="skeleton h-4 w-full opacity-50"></div>
-                                <div class="skeleton h-4 w-full opacity-50"></div>
-                            </div>
-                        {:else}
-                            {#if message.role === 'assistant'}
-                                <ThinkingMessage content={message.content || ''} />
-                            {:else}
-                                <div class="prose prose-sm max-w-none dark:prose-invert wrap-break-word">
-                                    {@html parseMarkdown(message.content)}
-                                </div>
-                            {/if}
+	{#if messages.length === 0}
+		<!-- Section: Empty State -->
+		<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto p-4">
+			<div class="flex w-full max-w-md flex-col items-center">
+				<img src="/assets/lama.png" alt="Wollama" class="mb-6 h-32 w-32 object-contain opacity-90" />
+				<h1 class="mb-2 text-3xl font-bold">{t('ui.ready_to_chat')}</h1>
+				<p class="mb-8 opacity-70">{t('ui.select_chat_help')}</p>
 
-                            {#if message.role === 'assistant' && message.status !== 'streaming'}
-                                <MessageActions 
-                                    message={message} 
-                                    onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined} 
-                                />
-                            {/if}
-                        {/if}
-                    </div>
-                </div>
-            {/each}
-        </div>
+				<div class="w-full">
+					<ChatInput
+						bind:value={messageInput}
+						bind:files={selectedFiles}
+						{isRecording}
+						{isTranscribing}
+						{currentCompagnon}
+						{chatId}
+						onsend={sendMessage}
+						onrecord={toggleRecording}
+						oncompanionclick={() => (isCompagnonModalOpen = true)}
+					/>
+				</div>
+			</div>
+		</div>
+	{:else}
+		<!-- Section: Messages Area -->
+		<div
+			class="min-h-0 flex-1 space-y-4 overflow-y-auto p-4"
+			role="log"
+			aria-label="Chat messages"
+			bind:this={chatContainer}
+			onscroll={handleScroll}
+		>
+			{#each messages as message, i}
+				<div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
+					<div class="chat-image avatar placeholder self-start">
+						{#if message.role === 'user'}
+							<div class="bg-neutral text-neutral-content w-10 rounded-full">
+								<span>U</span>
+							</div>
+						{:else if currentCompagnon.avatar}
+							<div class="w-10 rounded-full">
+								<img src={currentCompagnon.avatar} alt={currentCompagnon.name} />
+							</div>
+						{:else}
+							<div class="bg-primary text-primary-content w-10 rounded-full">
+								<span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span>
+							</div>
+						{/if}
+					</div>
+					{#if message.role !== 'user'}
+						<div class="chat-header mb-1 text-xs opacity-50">
+							{currentCompagnon.name}
+						</div>
+					{/if}
+					<div
+						class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user'
+							? 'chat-bubble-primary'
+							: 'text-base-content bg-transparent p-0'}"
+					>
+						{#if message.images && message.images.length > 0}
+							<div class="mb-2 space-y-2">
+								{#each message.images as img}
+									{#if img.startsWith('data:image')}
+										<img src={img} alt="attachment" class="h-auto max-h-64 max-w-full rounded-lg" />
+									{:else}
+										<div class="bg-base-100/20 flex items-center gap-2 rounded-lg p-2">
+											<Icon icon="lucide:file" class="h-6 w-6" />
+											<span class="text-xs opacity-70">File attached</span>
+										</div>
+									{/if}
+								{/each}
+							</div>
+						{/if}
+						{#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
+							<div class="flex w-52 flex-col gap-4 p-2">
+								<div class="skeleton h-4 w-28 opacity-50"></div>
+								<div class="skeleton h-4 w-full opacity-50"></div>
+								<div class="skeleton h-4 w-full opacity-50"></div>
+							</div>
+						{:else}
+							{#if message.role === 'assistant'}
+								<ThinkingMessage content={message.content || ''} />
+							{:else}
+								<div class="prose prose-sm dark:prose-invert max-w-none wrap-break-word">
+									{@html parseMarkdown(message.content)}
+								</div>
+							{/if}
 
-        <!-- Section: Input Area (Bottom) -->
-        <div class="p-0 md:p-4 bg-base-100 w-full">
-            <ChatInput 
-                bind:value={messageInput}
-                bind:files={selectedFiles}
-                isRecording={isRecording}
-                isTranscribing={isTranscribing}
-                currentCompagnon={currentCompagnon}
-                chatId={chatId}
-                onsend={sendMessage}
-                onrecord={toggleRecording}
-                oncompanionclick={() => isCompagnonModalOpen = true}
-            />
-        </div>
-    {/if}
+							{#if message.role === 'assistant' && message.status !== 'streaming'}
+								<MessageActions
+									{message}
+									onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined}
+								/>
+							{/if}
+						{/if}
+					</div>
+				</div>
+			{/each}
+		</div>
+
+		<!-- Section: Input Area (Bottom) -->
+		<div class="bg-base-100 w-full p-0 md:p-4">
+			<ChatInput
+				bind:value={messageInput}
+				bind:files={selectedFiles}
+				{isRecording}
+				{isTranscribing}
+				{currentCompagnon}
+				{chatId}
+				onsend={sendMessage}
+				onrecord={toggleRecording}
+				oncompanionclick={() => (isCompagnonModalOpen = true)}
+			/>
+		</div>
+	{/if}
 </div>

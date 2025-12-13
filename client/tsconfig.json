@@ -19,9 +19,5 @@
 		".svelte-kit/ambient.d.ts",
 		".svelte-kit/non-ambient.d.ts"
 	],
-	"exclude": [
-		"./node_modules/**",
-		"./src-tauri/**",
-		"./src/_old/**"
-	]
+	"exclude": ["./node_modules/**", "./src-tauri/**", "./src/_old/**"]
 }

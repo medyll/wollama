@@ -1,9 +1,9 @@
 {
-  "name": "@wollama/shared",
-  "version": "0.0.9",
-  "type": "module",
-  "main": "index.ts",
-  "devDependencies": {
-    "typescript": "^5.9.3"
-  }
+	"name": "@wollama/shared",
+	"version": "0.0.9",
+	"type": "module",
+	"main": "index.ts",
+	"devDependencies": {
+		"typescript": "^5.9.3"
+	}
 }

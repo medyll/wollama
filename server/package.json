@@ -1,41 +1,41 @@
 {
-  "name": "@wollama/server",
-  "version": "0.0.9",
-  "type": "module",
-  "scripts": {
-    "dev": "tsx server.ts",
-    "test": "concurrently \"npm run dev\" \"npx tsx test-server.ts\" --kill-others --success first",
-    "test:unit": "vitest run",
-    "setup:audio": "node setup-audio.js"
-  },
-  "dependencies": {
-    "@types/multer": "^2.0.0",
-    "ajv": "^8.17.1",
-    "cheerio": "^1.1.2",
-    "cors": "^2.8.5",
-    "express": "^5.2.1",
-    "express-pouchdb": "^4.2.0",
-    "i18n": "^0.15.3",
-    "jsdom": "^27.3.0",
-    "multer": "^2.0.2",
-    "ollama": "^0.6.3",
-    "ollama-node": "^0.1.28",
-    "pouchdb": "^9.0.0",
-    "pouchdb-adapter-http": "^9.0.0",
-    "pouchdb-adapter-idb": "^9.0.0",
-    "pouchdb-find": "^9.0.0",
-    "ts-deepmerge": "^7.0.3"
-  },
-  "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/pouchdb": "^6.4.2",
-    "@types/pouchdb-find": "^7.3.3",
-    "adm-zip": "^0.5.16",
-    "concurrently": "^9.2.1",
-    "cross-env": "^10.1.0",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.15"
-  }
+	"name": "@wollama/server",
+	"version": "0.0.9",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx server.ts",
+		"test": "concurrently \"npm run dev\" \"npx tsx test-server.ts\" --kill-others --success first",
+		"test:unit": "vitest run",
+		"setup:audio": "node setup-audio.js"
+	},
+	"dependencies": {
+		"@types/multer": "^2.0.0",
+		"ajv": "^8.17.1",
+		"cheerio": "^1.1.2",
+		"cors": "^2.8.5",
+		"express": "^5.2.1",
+		"express-pouchdb": "^4.2.0",
+		"i18n": "^0.15.3",
+		"jsdom": "^27.3.0",
+		"multer": "^2.0.2",
+		"ollama": "^0.6.3",
+		"ollama-node": "^0.1.28",
+		"pouchdb": "^9.0.0",
+		"pouchdb-adapter-http": "^9.0.0",
+		"pouchdb-adapter-idb": "^9.0.0",
+		"pouchdb-find": "^9.0.0",
+		"ts-deepmerge": "^7.0.3"
+	},
+	"devDependencies": {
+		"@types/cors": "^2.8.19",
+		"@types/pouchdb": "^6.4.2",
+		"@types/pouchdb-find": "^7.3.3",
+		"adm-zip": "^0.5.16",
+		"concurrently": "^9.2.1",
+		"cross-env": "^10.1.0",
+		"ts-node": "^10.9.2",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.15"
+	}
 }

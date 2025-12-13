@@ -10,6 +10,9 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
 export default ts.config(
 	includeIgnoreFile(gitignorePath),
+	{
+		ignores: ['**/_old/**']
+	},
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
@@ -24,14 +27,14 @@ export default ts.config(
 		}
 	},
 	{
-		files:           ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
-		ignores:         ['eslint.config.js', 'svelte.config.js'],
+		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
+		ignores: ['eslint.config.js', 'svelte.config.js'],
 
 		languageOptions: {
 			parserOptions: {
-				projectService:      true,
+				projectService: true,
 				extraFileExtensions: ['.svelte'],
-				parser:              ts.parser,
+				parser: ts.parser,
 				svelteConfig
 			}
 		}

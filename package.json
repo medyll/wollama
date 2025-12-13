@@ -1,39 +1,39 @@
 {
-  "name": "wollama-monorepo",
-  "version": "0.0.9",
-  "private": true,
-  "workspaces": [
-    "client",
-    "server",
-    "shared"
-  ],
-  "scripts": {
-    "dev:client": "npm run dev -w @wollama/client",
-    "dev:electron": "npm run electron:dev -w @wollama/client",
-    "dev:server": "npm run dev -w @wollama/server",
-    "build": "npm run build -w @wollama/client",
-    "check": "npm run check -w @wollama/client",
-    "test:client": "npm run test -w @wollama/client",
-    "test:server": "npm run test:unit -w @wollama/server",
-    "lint": "npm run lint -w @wollama/client",
-    "format": "prettier --write .",
-    "prepare": "husky",
-    "release": "standard-version",
-    "changelog": "standard-version --skip.bump --skip.commit --skip.tag"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^20.2.0",
-    "@commitlint/config-conventional": "^20.2.0",
-    "concurrently": "^9.2.1",
-    "cz-customizable": "^7.0.0",
-    "husky": "^9.1.7",
-    "prettier": "^3.7.4",
-    "standard-version": "^9.5.0",
-    "typescript": "^5.9.3"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-customizable"
-    }
-  }
+	"name": "wollama-monorepo",
+	"version": "0.0.9",
+	"private": true,
+	"workspaces": [
+		"client",
+		"server",
+		"shared"
+	],
+	"scripts": {
+		"dev:client": "npm run dev -w @wollama/client",
+		"dev:electron": "npm run electron:dev -w @wollama/client",
+		"dev:server": "npm run dev -w @wollama/server",
+		"build": "npm run build -w @wollama/client",
+		"check": "npm run check -w @wollama/client",
+		"test:client": "npm run test -w @wollama/client",
+		"test:server": "npm run test:unit -w @wollama/server",
+		"lint": "npm run lint -w @wollama/client",
+		"format": "prettier --write .",
+		"prepare": "husky",
+		"release": "standard-version",
+		"changelog": "standard-version --skip.bump --skip.commit --skip.tag"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^20.2.0",
+		"@commitlint/config-conventional": "^20.2.0",
+		"concurrently": "^9.2.1",
+		"cz-customizable": "^7.0.0",
+		"husky": "^9.1.7",
+		"prettier": "^3.7.4",
+		"standard-version": "^9.5.0",
+		"typescript": "^5.9.3"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-customizable"
+		}
+	}
 }
