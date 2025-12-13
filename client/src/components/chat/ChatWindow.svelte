@@ -94,9 +94,9 @@
         userHasScrolledUp = false;
         setTimeout(() => scrollToBottom(), 0);
 
-        try {
-            let targetChatId = chatId;
+        let targetChatId = chatId;
 
+        try {
             if (!targetChatId) {
                 // Create chat first
                 // Use initialCompanionId if set and user hasn't selected a different one (assuming default is '1')
@@ -104,35 +104,61 @@
                     ? initialCompanionId 
                     : currentCompagnon.companion_id;
                 
-                targetChatId = await chatService.createChat(undefined, undefined, companionIdToUse);
-                // Update URL without reloading
-                goto(`/chat/${targetChatId}`, { replaceState: true });
-                // Update local state so we don't create it again if user spams
-                chatId = targetChatId;
+                try {
+                    targetChatId = await chatService.createChat(undefined, undefined, companionIdToUse);
+                    // Update URL without reloading
+                    goto(`/chat/${targetChatId}`, { replaceState: true });
+                    // Update local state so we don't create it again if user spams
+                    chatId = targetChatId;
+                } catch (e) {
+                    console.error('Error creating chat:', e);
+                    toast.error(t('chat.create_error') || 'Error creating chat');
+                    return;
+                }
             }
 
-            await chatService.addMessage(targetChatId, 'user', content, 'sent', filesToSend);
+            try {
+                await chatService.addMessage(targetChatId, 'user', content, 'sent', filesToSend);
+            } catch (e) {
+                console.error('Error adding user message:', e);
+                toast.error(t('chat.send_error') || 'Error saving message');
+                return;
+            }
             
             // Get fresh history from DB including the message we just added
-            const messagesDocs = await chatService.getChatHistory(targetChatId);
-            const history = messagesDocs.map((m: any) => ({ 
-                role: m.role, 
-                content: m.content,
-                images: m.images 
-            }));
+            let history;
+            try {
+                const messagesDocs = await chatService.getChatHistory(targetChatId);
+                history = messagesDocs.map((m: any) => ({ 
+                    role: m.role, 
+                    content: m.content,
+                    images: m.images 
+                }));
+            } catch (e) {
+                console.error('Error fetching chat history:', e);
+                // Continue anyway, maybe we can generate without full history or it will fail next
+            }
             
-            const responseText = await chatService.generateResponse(targetChatId, history);
-
-            if (userState.preferences.auto_play_audio && responseText) {
+            if (history) {
                 try {
-                    await audioService.speak(responseText, currentCompagnon.voice_id);
+                    const responseText = await chatService.generateResponse(targetChatId, history);
+
+                    if (userState.preferences.auto_play_audio && responseText) {
+                        try {
+                            await audioService.speak(responseText, currentCompagnon.voice_id);
+                        } catch (e) {
+                            console.error('TTS Error', e);
+                        }
+                    }
                 } catch (e) {
-                    console.error('TTS Error', e);
+                    console.error('Error generating response:', e);
+                    // Error is already handled in chatService.generateResponse (toast + message update)
                 }
             }
         } catch (e) {
-            console.error('Error sending message:', e);
-            toast.error(t('chat.send_error') || 'Error sending message');
+            console.error('Unexpected error in sendMessage:', e);
+            const errMsg = e instanceof Error ? e.message : 'Unknown error';
+            toast.error(`${t('chat.send_error') || 'Error sending message'}: ${errMsg}`);
         }
     }
 

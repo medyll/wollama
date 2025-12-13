@@ -2,7 +2,7 @@ import { createRxDatabase, addRxPlugin } from 'rxdb';
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
 import { replicateCouchDB } from 'rxdb/plugins/replication-couchdb';
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
-import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
+import { RxDBDevModePlugin, disableWarnings } from 'rxdb/plugins/dev-mode';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { wrappedValidateAjvStorage } from 'rxdb/plugins/validate-ajv';
 import { appSchema } from '../../../shared/db/database-scheme';
@@ -14,6 +14,7 @@ addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBLeaderElectionPlugin);
 if (import.meta.env.DEV) {
     addRxPlugin(RxDBDevModePlugin);
+    disableWarnings();
 }
 
 // Convert our shared schema to RxDB schema format
@@ -94,7 +95,7 @@ let dbPromise: Promise<any> | null = globalAny.__wollama_db_promise || null;
 
 const _createDatabase = async () => {
     const db = await createRxDatabase({
-        name: 'wollama_client_db_v10', // Bumped version to force fresh DB (v10 fixes schema conflict)
+        name: 'wollama_client_db_v11', // Bumped version to force fresh DB (v11 fixes schema conflict)
         storage: wrappedValidateAjvStorage({
             storage: getRxStorageDexie()
         }),

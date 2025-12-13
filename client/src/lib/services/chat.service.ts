@@ -159,6 +159,25 @@ export class ChatService {
             }
         }
 
+        // Inject Active User Prompts
+        try {
+            const db = await getDatabase();
+            const activePrompts = await db.user_prompts.find({
+                selector: {
+                    is_active: true
+                }
+            }).exec();
+
+            if (activePrompts && activePrompts.length > 0) {
+                const userContext = activePrompts.map((p: any) => p.content).join('\n');
+                if (userContext.trim()) {
+                    systemPrompt += `\n\nUser Context:\n${userContext}`;
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to fetch user prompts:', e);
+        }
+
         // Prepare messages for Ollama: strip base64 prefix from images
         const ollamaMessages = messageHistory.map(msg => {
             const newMsg: { role: string; content: string; images?: string[] } = { role: msg.role, content: msg.content };
