@@ -174,8 +174,17 @@ export class ChatService {
 				if (!companion) {
 					companion = await db.companions.findOne(chat.companion_id).exec();
 				}
-				if (companion && companion.mood && companion.mood !== 'neutral') {
-					systemPrompt += `\n\nIMPORTANT: You are currently in a '${companion.mood}' mood. Your responses must reflect this emotion strongly.`;
+
+				if (companion) {
+					// Use the companion's current system prompt to ensure we have the latest version
+					// and to fix issues where the chat might have been created with the wrong prompt.
+					if (companion.system_prompt) {
+						systemPrompt = companion.system_prompt;
+					}
+
+					if (companion.mood && companion.mood !== 'neutral') {
+						systemPrompt += `\n\nIMPORTANT: You are currently in a '${companion.mood}' mood. Your responses must reflect this emotion strongly.`;
+					}
 				}
 			}
 		}
