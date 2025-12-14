@@ -99,8 +99,7 @@
 	</nav>
 
 	<div class="  flex flex-col gap-2 p-4">
-		
-		<div class="px-2 flex justify-end">
+		<div class="flex justify-end px-2">
 			<SidebarCollapse />
 		</div>
 		<button

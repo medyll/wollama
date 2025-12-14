@@ -1,19 +1,24 @@
 export class ConnectionState {
-    isConnected = $state(true);
-    isChecking = $state(false);
-    showModal = $state(false);
+	isConnected = $state(true);
+	isOllamaConnected = $state(false);
+	isChecking = $state(false);
+	showModal = $state(false);
 
-    setConnected(status: boolean) {
-        this.isConnected = status;
-    }
+	setConnected(status: boolean) {
+		this.isConnected = status;
+	}
 
-    setChecking(status: boolean) {
-        this.isChecking = status;
-    }
+	setOllamaConnected(status: boolean) {
+		this.isOllamaConnected = status;
+	}
 
-    toggleModal() {
-        this.showModal = !this.showModal;
-    }
+	setChecking(status: boolean) {
+		this.isChecking = status;
+	}
+
+	toggleModal() {
+		this.showModal = !this.showModal;
+	}
 }
 
 export const connectionState = new ConnectionState();

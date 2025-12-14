@@ -24,28 +24,26 @@
 		onclick={handleSignIn}
 		disabled={isSigningIn}
 		title={t('ui.signIn')}
-        aria-label={t('ui.signIn')}
+		aria-label={t('ui.signIn')}
 	>
 		{#if isSigningIn}
 			<span class="loading loading-spinner loading-xs"></span>
 		{:else}
-			<Icon icon="lucide:log-in" class="h-4 w-4 mr-2" />
+			<Icon icon="lucide:log-in" class="mr-2 h-4 w-4" />
 			{t('ui.signIn')}
 		{/if}
 	</button>
 {:else}
-    <!-- Section: User Profile -->
-	<div class="flex items-center gap-2 bg-base-200 rounded-lg px-2 py-1">
+	<!-- Section: User Profile -->
+	<div class="bg-base-200 flex items-center gap-2 rounded-lg px-2 py-1">
 		{#if userState.photoURL}
 			<img src={userState.photoURL} alt="Avatar" class="h-8 w-8 rounded-full" />
 		{:else}
-			<div
-				class="bg-primary text-primary-content flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bold"
-			>
+			<div class="bg-primary text-primary-content flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bold">
 				{userState.nickname ? userState.nickname[0].toUpperCase() : 'U'}
 			</div>
 		{/if}
-		<div class="hidden md:block min-w-0 max-w-[100px]">
+		<div class="hidden max-w-[100px] min-w-0 md:block">
 			<p class="truncate text-xs font-bold">{userState.nickname || 'User'}</p>
 			<p class="truncate text-[10px] opacity-70">Sync ON</p>
 		</div>

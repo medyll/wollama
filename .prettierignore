@@ -3,3 +3,17 @@ package-lock.json
 pnpm-lock.yaml
 yarn.lock
 src-tauri
+
+# Build & Dependencies
+node_modules
+.svelte-kit
+build
+dist
+coverage
+.env
+.env.*
+
+# Legacy
+**/_old/**
+_old
+

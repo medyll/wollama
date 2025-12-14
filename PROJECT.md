@@ -1,40 +1,45 @@
 # TOTAL PROJECT: TECHNICAL CONTEXT, ARCHITECTURE & DATA
 
 ## 1. PROJECT DEFINITION
+
 Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and voice (STT/TTS) capabilities.
-* **Hosting:** Self-hosted Node.js server on Windows (compiled as .exe).
-* **Clients:** 
-    *   **Web:** Browser-based interface.
-    *   **Desktop:** Windows, Linux, macOS (via Electron).
-    *   **Mobile:** Android, iOS (via Capacitor).
-*   **Target AI:** Ollama (Local).
-*   **Target UX:** Responsive (Mobile First) & Themable (Light/Dark/Custom).
-*   **Internationalization:** The application is multi-language (i18n) with support for English, French, German, Spanish, Italian.
+
+- **Hosting:** Self-hosted Node.js server on Windows (compiled as .exe).
+- **Clients:**
+    - **Web:** Browser-based interface.
+    - **Desktop:** Windows, Linux, macOS (via Electron).
+    - **Mobile:** Android, iOS (via Capacitor).
+- **Target AI:** Ollama (Local).
+- **Target UX:** Responsive (Mobile First) & Themable (Light/Dark/Custom).
+- **Internationalization:** The application is multi-language (i18n) with support for English, French, German, Spanish, Italian.
 
 ## 2. TECHNICAL STACK (MANDATORY)
 
 ### Frontend (Client)
-* **Framework:** Svelte 5 (Runes syntax `$state`, `$effect` mandatory).
-* **Build System:** Vite.
-* **CSS Framework:** Tailwind CSS + **DaisyUI**.
-    * *Note:* Use DaisyUI themes for "Themable" management via `data-theme` attribute. with light dark theme or any other color
-* **Mobile Engine:** Capacitor.
-* **Desktop Engine:** Electron.
-* **Markdown Renderer:** `marked` library.
+
+- **Framework:** Svelte 5 (Runes syntax `$state`, `$effect` mandatory).
+- **Build System:** Vite.
+- **CSS Framework:** Tailwind CSS + **DaisyUI**.
+    - _Note:_ Use DaisyUI themes for "Themable" management via `data-theme` attribute. with light dark theme or any other color
+- **Mobile Engine:** Capacitor.
+- **Desktop Engine:** Electron.
+- **Markdown Renderer:** `marked` library.
 
 ### Backend (Server)
-* **Runtime:** Node.js v20+.
-* **Server Framework:** Express.js.
-* **Packaging:** `pkg` (Binary compilation).
-* **Database:** PouchDB (LevelDB adapter) + express-pouchdb.
-* **API:** REST + PouchDB Sync Protocol.
+
+- **Runtime:** Node.js v20+.
+- **Server Framework:** Express.js.
+- **Packaging:** `pkg` (Binary compilation).
+- **Database:** PouchDB (LevelDB adapter) + express-pouchdb.
+- **API:** REST + PouchDB Sync Protocol.
 
 ### AI & Audio
-* **LLM:** Ollama API (Streaming enabled).
-* **STT (Input):** Whisper (via Ollama or OpenAI API compatible).
-* **TTS (Output):** Web Speech API (Front) or **Piper** (Local Neural TTS) on Backend.
-* **Analysis:** Real-time Tone/Sentiment detection of user input.
-* **Expressivity:** Adaptive Voice Mood/Style generation in server responses.
+
+- **LLM:** Ollama API (Streaming enabled).
+- **STT (Input):** Whisper (via Ollama or OpenAI API compatible).
+- **TTS (Output):** Web Speech API (Front) or **Piper** (Local Neural TTS) on Backend.
+- **Analysis:** Real-time Tone/Sentiment detection of user input.
+- **Expressivity:** Adaptive Voice Mood/Style generation in server responses.
 
 ## 3. MONOREPO STRUCTURE
 
@@ -79,6 +84,7 @@ Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and 
 ## 4. DATA MODEL (SIMPLIFIED SCHEMA)
 
 **Architecture:** Offline-First with Sync.
+
 - **Client:** RxDB (IndexedDB/Dexie)
 - **Server:** PouchDB (LevelDB)
 - **Sync:** CouchDB Replication Protocol
@@ -86,6 +92,7 @@ Cross-platform AI chat application (Mobile & Desktop) with text (Streaming) and 
 **Convention:** Primary and foreign IDs must be prefixed by the entity name.
 
 ### User
+
 Represents the human user.
 
 - `user_id`: UUID (PK)
@@ -93,6 +100,7 @@ Represents the human user.
 - `created_at`: Timestamp
 
 ### UserPreferences
+
 - `user_preferences_id`: UUID (PK)
 - `user_id`: Link → User
 - `theme`: String
@@ -102,7 +110,16 @@ Represents the human user.
 - `default_temperature`: Number
 - `auto_play_audio`: Boolean
 
+### UserPrompts
+
+Custom instructions injected into the system prompt.
+
+- `prompt_id`: UUID (PK)
+- `content`: String (Text Long)
+- `is_active`: Boolean
+
 ### Companion
+
 Represents the AI configuration (Personality).
 
 - `companion_id`: UUID (PK)
@@ -116,6 +133,7 @@ Represents the AI configuration (Personality).
 - `is_locked`: Boolean
 
 ### Chat (Session)
+
 A conversation between a User and a Companion.
 
 - `chat_id`: UUID (PK)
@@ -129,6 +147,7 @@ A conversation between a User and a Companion.
 - `updated_at`: Timestamp
 
 ### Message
+
 A single exchange in a Chat.
 
 - `message_id`: UUID (PK)
@@ -151,7 +170,7 @@ A single exchange in a Chat.
 2. **Persistence:** Client inserts message into RxDB (`status: 'sent'`).
 3. **Sync:** RxDB replicates to Server PouchDB.
 4. **Processing:** Server detects new message (Change Stream) OR Client calls API.
-   * *Current Implementation:* Client calls Server API for generation, Server streams response back.
+    - _Current Implementation:_ Client calls Server API for generation, Server streams response back.
 5. **Response:** Server streams chunks to Client.
 6. **Update:** Client updates RxDB message content progressively (`status: 'streaming'`).
 7. **Finalization:** Message marked as `done`.
@@ -170,84 +189,99 @@ A single exchange in a Chat.
 **Objective:** Integrate Whisper (STT) and Piper (TTS) into a modern JavaScript application targeting three environments: Web, Desktop (Electron), and Mobile (Capacitor). The application must be offline-first.
 
 ### 1. Web Environment (Browser)
+
 **Execution must be delegated to the Server.**
-*   **Strategy:** The browser does not run the models locally (No WASM).
-*   **STT:** The client records audio (MediaRecorder) and uploads the Blob to the Node.js Server. The Server processes it via Whisper and returns the text.
-*   **TTS:** The client requests audio from the Server. The Server generates it via Piper and streams the audio file back.
+
+- **Strategy:** The browser does not run the models locally (No WASM).
+- **STT:** The client records audio (MediaRecorder) and uploads the Blob to the Node.js Server. The Server processes it via Whisper and returns the text.
+- **TTS:** The client requests audio from the Server. The Server generates it via Piper and streams the audio file back.
 
 ### 2. Desktop Environment (Electron)
+
 Execution must prioritize native performance via **Node.js Child Processes**, bypassing the browser layer.
-*   **Strategy:** Embed optimized precompiled binaries (C++) (AVX/CUDA/CoreML) of `whisper.cpp` and `piper`.
-*   **Implementation:** Control these binaries via `child_process.spawn`.
-    *   *Piper:* Send text via `stdin` and retrieve PCM audio stream via `stdout`.
-    *   *Whisper:* Pass audio file as argument or via stream to get transcription.
+
+- **Strategy:** Embed optimized precompiled binaries (C++) (AVX/CUDA/CoreML) of `whisper.cpp` and `piper`.
+- **Implementation:** Control these binaries via `child_process.spawn`.
+    - _Piper:_ Send text via `stdin` and retrieve PCM audio stream via `stdout`.
+    - _Whisper:_ Pass audio file as argument or via stream to get transcription.
 
 ### 3. Mobile Environment (Capacitor iOS/Android)
+
 Hybrid approach depending on performance needs.
-*   **High Performance Option (Recommended):** Develop or use a **Custom Capacitor Plugin**. This plugin acts as a bridge to native C++ libraries (via JNI on Android and Swift/Objective-C on iOS) to exploit phone NPU/GPU.
-*   **Fallback:** Delegate to Server (like Web Environment) if offline mode is not strictly required for Audio, or if the device is too old.
+
+- **High Performance Option (Recommended):** Develop or use a **Custom Capacitor Plugin**. This plugin acts as a bridge to native C++ libraries (via JNI on Android and Swift/Objective-C on iOS) to exploit phone NPU/GPU.
+- **Fallback:** Delegate to Server (like Web Environment) if offline mode is not strictly required for Audio, or if the device is too old.
 
 ### 4. Critical Points & Technical Constraints
+
 The code generating AI must strictly follow these rules:
 
-*   **Unified Architecture:** Code must be modular (e.g., Adapter Pattern) to dynamically switch between `spawn` implementation (Electron), `Server API` implementation (Web), and `Native Plugin` implementation (Mobile) based on detected runtime environment.
-*   **Offline-First (Data):** While Audio processing might require a server connection for the Web client, the textual chat and data synchronization must remain offline-first.
+- **Unified Architecture:** Code must be modular (e.g., Adapter Pattern) to dynamically switch between `spawn` implementation (Electron), `Server API` implementation (Web), and `Native Plugin` implementation (Mobile) based on detected runtime environment.
+- **Offline-First (Data):** While Audio processing might require a server connection for the Web client, the textual chat and data synchronization must remain offline-first.
 
 ## 7. AFFECTIVE COMPUTING MODULE (EMOTION MANAGEMENT)
 
 ### 1. OBJECTIVE
+
 1.  **Input:** Detect user emotional state (Joy, Anger, Sadness, Neutral).
 2.  **Output:** Modulate AI response (Tone, Laughter, Sighs) via TTS.
 
 ### 2. EMOTIONAL FLOW
 
 #### A. Detection (User Input)
-*Selected Option (MVP Node.js): Semantic Analysis of Transcribed Text.*
+
+_Selected Option (MVP Node.js): Semantic Analysis of Transcribed Text._
 
 1.  **Audio -> Text:** `stt.service.ts` transcribes audio via Whisper.
 2.  **Text -> Emotion Label:**
-    *   *Method:* Pass text through a micro-analysis module (e.g., `sentiment` library or a lightweight specific LLM prompt).
-    *   *Result:* JSON `{ "sentiment": "happy", "score": 0.8 }`.
+    - _Method:_ Pass text through a micro-analysis module (e.g., `sentiment` library or a lightweight specific LLM prompt).
+    - _Result:_ JSON `{ "sentiment": "happy", "score": 0.8 }`.
 3.  **Context Injection:** Inject state before sending the main prompt to Ollama.
-    *   *Final Prompt:* `[SYSTEM: User is HAPPY.] User: Hi Jarvis!`
+    - _Final Prompt:_ `[SYSTEM: User is HAPPY.] User: Hi Jarvis!`
 
 #### B. Expression (AI Output)
-*Key Technology: SSML (Speech Synthesis Markup Language).*
+
+_Key Technology: SSML (Speech Synthesis Markup Language)._
 
 1.  **System Prompt:** Configure AI to use tags.
-    *   *Instruction:* "If you find something funny, use the tag `<break time="500ms" />` for a pause or `*laughs*`."
+    - _Instruction:_ "If you find something funny, use the tag `<break time="500ms" />` for a pause or `*laughs*`."
 2.  **LLM Generation:**
-    *   *Raw Response:* `That's hilarious! <laugh>Hahaha</laugh>, I wouldn't have thought of that.`
+    - _Raw Response:_ `That's hilarious! <laugh>Hahaha</laugh>, I wouldn't have thought of that.`
 3.  **TTS Parser:** `tts.service.ts` detects tags.
-    *   If TTS engine supports SSML (e.g., Google Cloud, Azure, some Coqui models) -> Direct send.
-    *   If TTS engine is basic -> Service injects a pre-recorded sound file (`laugh.mp3`) replacing the `<laugh>` tag.
+    - If TTS engine supports SSML (e.g., Google Cloud, Azure, some Coqui models) -> Direct send.
+    - If TTS engine is basic -> Service injects a pre-recorded sound file (`laugh.mp3`) replacing the `<laugh>` tag.
 
 ### 3. TECHNICAL IMPLEMENTATION
 
 #### Backend (`server/services/emotion.service.ts`)
-*   **Analyzer:** Use `natural` or `sentiment` (Node.js libs) for fast polarity detection (+/-) of transcribed text.
-*   **Audio Injector (Fallback):** If TTS cannot laugh:
+
+- **Analyzer:** Use `natural` or `sentiment` (Node.js libs) for fast polarity detection (+/-) of transcribed text.
+- **Audio Injector (Fallback):** If TTS cannot laugh:
     1.  Split text: `["That's hilarious!", "<laugh>", "I wouldn't have thought of that."]`
     2.  Generate Audio 1 + Load `laugh.wav` + Generate Audio 2.
     3.  Concatenate audio buffers using `ffmpeg` or a buffer concatenation utility.
 
 #### System Prompt (Ollama)
+
 Add to `system_prompt` in DB: ( and in config)
+
 > "You are an expressive AI. Adapt your tone to the user's emotion.
 > To express physical emotions, use these exact tokens:
+>
 > - [LAUGH] to laugh.
 > - [SIGH] to sigh.
 > - [CLEARS_THROAT] to clear throat.
-> Only use these tokens if the context truly warrants it."
+>   Only use these tokens if the context truly warrants it."
 
 ### 4. DATA MODEL IMPACT
 
 Add to **Message** table:
+
 - `detected_emotion`: String (e.g., "anger", "joy") - stored for analytics or future memory.
 
 ## 8. AI DIRECTIVES (FOR CODING)
 
-- **Svelte 5 Strict:** Use Runes exclusively (``, ``, ``). No old syntax.
+- **Svelte 5 Strict:** Use Runes exclusively (`, `, ``). No old syntax.
 - **Responsive UI:** Mobile First Design. Tailwind breakpoints (`md:`, `lg:`) for sidebar/chat.
 - **Theming:** `data-theme` attribute on `<html>` managed by Svelte to toggle DaisyUI themes.
 - **DaisyUI:** Use semantic classes (`chat`, `chat-start`, `chat-bubble`).
@@ -276,21 +310,22 @@ import { goto } from '/navigation';
 import { App } from '@capacitor/app';
 
 onMount(() => {
-    App.addListener('appUrlOpen', data => {
-        // Cleanup: "myapp://chat/123" -> "/chat/123"
-        const slug = data.url.split('.com').pop(); 
-        if (slug) goto(slug);
-    });
+	App.addListener('appUrlOpen', (data) => {
+		// Cleanup: "myapp://chat/123" -> "/chat/123"
+		const slug = data.url.split('.com').pop();
+		if (slug) goto(slug);
+	});
 });
 ```
 
 ## 9. SCREEN LIST (UI MAP)
 
 ### Layout & Navigation (Responsive)
+
 - **Top Bar (Header):**
-    - **Left:** Mobile Menu Toggle (Navicon) - *Visible only on Mobile*.
+    - **Left:** Mobile Menu Toggle (Navicon) - _Visible only on Mobile_.
     - **Center:** App Title ("Wollama").
-    - **Right:** 
+    - **Right:**
         - Connection Status Indicator.
         - Language Selector.
         - **User Menu:** Avatar/Initial (or Sign In button). Displays nickname and sync status on Desktop.
@@ -304,8 +339,9 @@ onMount(() => {
     - **Behavior:** Overlay (Drawer), auto-closes on navigation. No collapse mode.
 
 ### Main Screens
+
 - **Welcome (`/`)**: Loading, logo, automatic redirection.
-- **Settings (`/settings`)**: 
+- **Settings (`/settings`)**:
     - Initial configuration (Nickname, Server).
     - Model Management: List installed models, Pull new models (with progress bar).
     - Back button to return to home/chat.
@@ -323,6 +359,7 @@ onMount(() => {
             - **Copy:** Button to copy content to clipboard (Must trigger a toast notification).
 
 ### Modals & Overlays
+
 - **Compagnon Selector**: AI choice grid (Name, Description, Model). Accessible from the chat header.
 - **Settings (Coming Soon)**: Advanced configuration.
 
@@ -336,6 +373,7 @@ onMount(() => {
 ## 11. CURRENT STATE & RECENT CHANGES (Dec 2025)
 
 ### UI/UX Improvements
+
 - **Chat Interface:**
     - **Input Area:** Redesigned with auto-resizing textarea (max 50vh), transparent background, and bottom toolbar for attachments/send/mic.
     - **Message Bubbles:** Rounded corners (2xl) with removed "tail" and top corners flattened for a cleaner look.
@@ -343,8 +381,15 @@ onMount(() => {
     - **Auto-scroll:** Smart auto-scroll to bottom on new messages, disabled if user is manually scrolling up.
 - **Navigation:**
     - **Mobile:** Drawer layout for navigation.
+    - **Generic UI Components:**
+        - Enhanced `GenericList` and `DataCard` with full CRUD capabilities (Create, Read, Update, Delete).
+        - Implemented confirmation dialogs for destructive actions.
+
+### Context Management & Prompts
+
+- **Dynamic Context:** Architecture to inject user profile and active files into the LLM context.
+- **User Prompts:** New feature in Settings to manage custom instructions (phrases) that are automatically injected into the System Prompt.
     - **Desktop:** Collapsible Sidebar.
     - **User Menu:** Extracted to TopBar for better accessibility.
 - **Android:**
     - Updated build configuration to use **Java 21 (LTS)**.
-

@@ -1,23 +1,23 @@
 export class UIState {
-    pageTitle = $state('');
-    sidebarCollapsed = $state(false);
-    sidebarOpen = $state(true);
+	pageTitle = $state('');
+	sidebarCollapsed = $state(false);
+	sidebarOpen = $state(true);
 
-    setTitle(title: string) {
-        this.pageTitle = title;
-    }
+	setTitle(title: string) {
+		this.pageTitle = title;
+	}
 
-    clearTitle() {
-        this.pageTitle = '';
-    }
+	clearTitle() {
+		this.pageTitle = '';
+	}
 
-    toggleSidebar() {
-        this.sidebarCollapsed = !this.sidebarCollapsed;
-    }
+	toggleSidebar() {
+		this.sidebarCollapsed = !this.sidebarCollapsed;
+	}
 
-    toggleSidebarVisibility() {
-        this.sidebarOpen = !this.sidebarOpen;
-    }
+	toggleSidebarVisibility() {
+		this.sidebarOpen = !this.sidebarOpen;
+	}
 }
 
 export const uiState = new UIState();

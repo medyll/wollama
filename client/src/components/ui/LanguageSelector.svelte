@@ -1,39 +1,24 @@
 <script lang="ts">
-    import { userState } from '$lib/state/user.svelte';
-    import { translations } from '../../locales/translations.js';
+	import { userState } from '$lib/state/user.svelte';
+	import DataSelector from '$components/ui_data/DataSelector.svelte';
 
-    const locales = Object.keys(translations);
-    
-    function changeLocale(newLocale: string) {
-        console.log('Changing locale to:', newLocale);
-        userState.preferences.locale = newLocale;
-        userState.save();
-    }
+	let { class: className = '' } = $props();
+
+	$effect(() => {
+		// React to locale changes and save
+		// We access the property to track it
+		const _ = userState.preferences.locale;
+		// Save to persistence
+		userState.save();
+	});
 </script>
 
-<div class="dropdown dropdown-end">
-    <!-- Section: Trigger -->
-    <div tabindex="0" role="button" class="btn btn-ghost btn-sm m-1" aria-label="Select Language">
-        {(userState.preferences.locale || 'en').toUpperCase()}
-        <svg width="12px" height="12px" class="h-2 w-2 fill-current opacity-60 inline-block ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048"><path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path></svg>
-    </div>
-    <!-- Section: Dropdown Menu -->
-    <ul class="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52">
-        {#each locales as locale}
-            <li>
-                <button 
-                    class:active={userState.preferences.locale === locale}
-                    onclick={() => {
-                        changeLocale(locale);
-                        // Close dropdown by removing focus (optional hack for DaisyUI dropdowns)
-                        if (document.activeElement instanceof HTMLElement) {
-                            document.activeElement.blur();
-                        }
-                    }}
-                >
-                    {locale.toUpperCase()}
-                </button>
-            </li>
-        {/each}
-    </ul>
+<div class={className}>
+	<DataSelector
+		tableName="languages"
+		bind:selectedId={userState.preferences.locale}
+		mode="dropdown"
+		class="select-sm select-ghost w-full max-w-xs"
+		placeholder="Select Language"
+	/>
 </div>

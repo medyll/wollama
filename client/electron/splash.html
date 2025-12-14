@@ -1,60 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading...</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-family: sans-serif;
-            user-select: none;
-        }
-        .loader {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        .splash-logo {
-            width: 128px;
-            height: 128px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #ffffff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-        }
-        h2 {
-            font-size: 1.1rem;
-            font-weight: 300;
-            letter-spacing: 1px;
-            margin: 0;
-            opacity: 0.8;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-</head>
-<body>
-    <div class="loader">
-        <img src="../static/assets/lama.png" alt="Wollama" class="splash-logo">
-        <div class="spinner"></div>
-        <h2>Loading Wollama...</h2>
-    </div>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Loading...</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				background-color: #1a1a1a;
+				color: #ffffff;
+				font-family: sans-serif;
+				user-select: none;
+			}
+			.loader {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 20px;
+			}
+			.splash-logo {
+				width: 128px;
+				height: 128px;
+				object-fit: contain;
+				margin-bottom: 10px;
+			}
+			.spinner {
+				border: 3px solid rgba(255, 255, 255, 0.1);
+				border-left-color: #ffffff;
+				border-radius: 50%;
+				width: 30px;
+				height: 30px;
+				animation: spin 1s linear infinite;
+			}
+			h2 {
+				font-size: 1.1rem;
+				font-weight: 300;
+				letter-spacing: 1px;
+				margin: 0;
+				opacity: 0.8;
+			}
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="loader">
+			<img src="../static/assets/lama.png" alt="Wollama" class="splash-logo" />
+			<div class="spinner"></div>
+			<h2>Loading Wollama...</h2>
+		</div>
+	</body>
 </html>

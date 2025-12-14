@@ -30,7 +30,7 @@ export interface Message {
 	images?: MessageImage[];
 	urls?: MessageUrl[];
 	audio_file_path?: string;
-	
+
 	// Legacy fields support if needed
 	resume?: string;
 }
@@ -41,6 +41,7 @@ export interface Chat {
 	companion_id?: string; // UUID (Companion)
 
 	title: string;
+	description?: string;
 	created_at: number; // Timestamp
 	updated_at: number; // Timestamp
 
@@ -50,7 +51,7 @@ export interface Chat {
 	system_prompt?: string;
 	context?: number[]; // Last context
 	model?: string; // Current model used in this chat
-	
+
 	// Navigation/UI
 	messages?: Message[]; // Optional, for loading full chat
 }
@@ -65,20 +66,32 @@ export interface Companion {
 	description?: string;
 	system_prompt: string;
 	model: string; // Ollama model name
-	
+
 	// Audio
 	voice_id?: string;
 	voice_tone?: 'neutral' | 'fast' | 'slow' | 'deep' | 'high';
 	mood?: 'neutral' | 'happy' | 'sad' | 'angry' | 'sarcastic' | 'professional' | 'friendly';
-	
+
 	// Metadata
 	avatar?: string;
 	created_at: number;
 	updated_at?: number;
-	
+
 	// Legacy/Enhanced
-	specialization?: 'character development' | 'plot outline' | 'world building' | 'dialogue' | 'general';
+	specialization?:
+		| 'character development'
+		| 'plot outline'
+		| 'world building'
+		| 'dialogue'
+		| 'general'
+		| 'coding'
+		| 'storytelling';
 	is_locked?: boolean; // ia_lock
+}
+
+export interface UserCompanion extends Companion {
+	user_id: string; // UUID
+	original_companion_id?: string; // UUID (if forked from system companion)
 }
 
 export interface UserPreferences {
@@ -93,4 +106,11 @@ export interface User {
 	username: string;
 	preferences: UserPreferences;
 	created_at: number;
+}
+
+export interface Tag {
+	tag_id: string; // UUID
+	name: string;
+	created_at: number;
+	updated_at?: number;
 }
