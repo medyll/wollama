@@ -78,6 +78,7 @@
 		return () => {
 			if (sub) sub.unsubscribe();
 			uiState.clearTitle();
+			audioService.stopAudio();
 		};
 	});
 
@@ -268,6 +269,17 @@
 <CompanionSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
 <div class="absolute inset-0 flex flex-col overflow-hidden">
+	{#if uiState.isAudioPlaying}
+		<button
+			class="btn btn-circle btn-error fixed top-20 right-4 z-50 shadow-lg"
+			onclick={() => audioService.stopAudio()}
+			aria-label="Stop Audio"
+			title="Stop Audio"
+		>
+			<Icon icon="lucide:square" class="h-6 w-6 fill-current" />
+		</button>
+	{/if}
+
 	<!-- Section: Header Removed (Moved to Input Area) -->
 
 	{#if messages.length === 0}

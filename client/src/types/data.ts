@@ -70,7 +70,7 @@ export interface Companion {
 	// Audio
 	voice_id?: string;
 	voice_tone?: 'neutral' | 'fast' | 'slow' | 'deep' | 'high';
-	mood?: 'neutral' | 'happy' | 'sad' | 'angry' | 'sarcastic' | 'professional' | 'friendly';
+	mood?: 'neutral' | 'happy' | 'sad' | 'angry' | 'sarcastic' | 'professional' | 'friendly' | 'sexy';
 
 	// Metadata
 	avatar?: string;
@@ -85,6 +85,8 @@ export interface Companion {
 		| 'dialogue'
 		| 'general'
 		| 'coding'
+		| 'prompt-engineering'
+		| 'roleplay'
 		| 'storytelling';
 	is_locked?: boolean; // ia_lock
 }

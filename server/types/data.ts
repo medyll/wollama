@@ -69,7 +69,7 @@ export interface Companion {
 	// Audio
 	voice_id?: string;
 	voice_tone?: 'neutral' | 'fast' | 'slow' | 'deep' | 'high';
-	mood?: 'neutral' | 'happy' | 'sad' | 'angry' | 'sarcastic' | 'professional' | 'friendly';
+	mood?: 'neutral' | 'happy' | 'sad' | 'angry' | 'sarcastic' | 'professional' | 'friendly' | 'sexy';
 
 	// Metadata
 	avatar?: string;
