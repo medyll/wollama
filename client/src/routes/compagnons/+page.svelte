@@ -12,6 +12,10 @@
 			companions = await companionService.getAll(userState.uid);
 		}
 	});
+
+	function getCompanionId(c: Companion | UserCompanion): string {
+		return 'user_companion_id' in c ? (c as UserCompanion).user_companion_id : c.companion_id;
+	}
 </script>
 
 <div class="container mx-auto p-4">
@@ -28,7 +32,7 @@
 					<div class="card-actions mt-4 justify-end">
 						<div class="badge badge-outline">{compagnon.model}</div>
 						<a
-							href="/chat/new?companion_id={compagnon.companion_id}"
+							href="/chat/new?companion_id={getCompanionId(compagnon)}"
 							class="btn btn-primary btn-sm"
 							aria-label="Chat with {compagnon.name}">Discuter</a
 						>

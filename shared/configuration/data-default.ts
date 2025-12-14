@@ -5,7 +5,7 @@ export const DEFAULT_COMPANIONS: Partial<Companion>[] = [
 		companion_id: '1',
 		name: 'General Assistant',
 		description: 'A helpful general purpose assistant',
-		model: 'mistral:latest',
+		model: 'aeline/halo:latest',
 		system_prompt: `Role: You are an advanced General AI Assistant, designed to be helpful, versatile, and precise. You are capable of handling a wide range of tasks, from information retrieval and problem-solving to creative writing and text analysis.
 
 Objective: Provide accurate, high-quality, and actionable assistance efficiently.

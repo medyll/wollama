@@ -89,9 +89,10 @@ export interface Companion {
 	is_locked?: boolean; // ia_lock
 }
 
-export interface UserCompanion extends Companion {
+export interface UserCompanion extends Omit<Companion, 'companion_id'> {
+	user_companion_id: string; // UUID
 	user_id: string; // UUID
-	original_companion_id?: string; // UUID (if forked from system companion)
+	companion_id?: string; // UUID (if forked from system companion)
 }
 
 export interface UserPreferences {

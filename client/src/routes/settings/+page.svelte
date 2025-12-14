@@ -26,6 +26,8 @@
 	let isMonitoringMic = $state(false);
 	let stopMonitoring: (() => void) | null = null;
 	let isCreatingPrompt = $state(false);
+	let isEditingCompanion = $state(false);
+	let editingCompanionId = $state<string | undefined>(undefined);
 
 	const themes = [
 		'light',
@@ -513,6 +515,44 @@
 				</div>
 			</div>
 
+			<!-- Section: Companions -->
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'companions'}
+					onchange={() => (activeSection = activeSection === 'companions' ? null : 'companions')}
+					aria-label="Toggle Companions"
+				/>
+				<div class="collapse-title text-lg font-medium">
+					{t('ui.companions') || 'Companions'}
+				</div>
+				<div class="collapse-content">
+					<div class="pt-4">
+						<div class="mb-4 flex justify-end">
+							<button
+								class="btn btn-primary btn-sm"
+								onclick={() => {
+									editingCompanionId = undefined;
+									isEditingCompanion = true;
+								}}
+							>
+								<Icon icon="lucide:plus" class="mr-2 h-4 w-4" />
+								{t('ui.add') || 'Add'}
+							</button>
+						</div>
+						<GenericList
+							tableName="user_companions"
+							editable={true}
+							deletable={true}
+							onEdit={(item: any) => {
+								editingCompanionId = item.companion_id;
+								isEditingCompanion = true;
+							}}
+						/>
+					</div>
+				</div>
+			</div>
+
 			<!-- Section: Server Configuration -->
 			<div class="collapse-arrow join-item border-base-300 collapse border">
 				<input
@@ -589,4 +629,5 @@
 	</div>
 
 	<DataUpdate tableName="user_prompts" bind:isOpen={isCreatingPrompt} />
+	<DataUpdate tableName="user_companions" bind:isOpen={isEditingCompanion} id={editingCompanionId} />
 </div>

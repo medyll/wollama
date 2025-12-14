@@ -2,9 +2,15 @@
 	import { appSchema } from '../../../../shared/db/database-scheme';
 	import { DataGenericService } from '$lib/services/data-generic.service';
 
-	let { tableName, id = undefined, isOpen = $bindable(false), onSave = undefined } = $props();
+	let {
+		tableName,
+		id = undefined,
+		isOpen = $bindable(false),
+		onSave = undefined,
+		data = {}
+	} = $props();
 
-	let formData = $state<any>({});
+	let formData = $state<any>({ ...data });
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
@@ -12,20 +18,24 @@
 	let dataService = $derived(new DataGenericService(tableName));
 
 	$effect(() => {
-		if (isOpen && id) {
-			loadData();
+		if (isOpen) {
+			if (id) {
+				loadData();
+			} else {
+				formData = { ...data };
+			}
 		}
 	});
 
 	async function loadData() {
 		loading = true;
 		try {
-			const data = await dataService.get(id);
-			if (data) {
+			const dbData = await dataService.get(id);
+			if (dbData) {
 				// Filter out internal fields and resolved fields
-				const cleanData = { ...(data as any) };
+				const cleanData = { ...(dbData as any) };
 				delete cleanData._resolved;
-				formData = cleanData;
+				formData = { ...cleanData, ...data };
 			}
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Unknown error';
@@ -63,10 +73,47 @@
 		if (fieldName === tableDef.primaryKey) return false;
 		return true;
 	}
+
+	let regularFields = $derived(
+		Object.entries(tableDef.fields).filter(([fieldName, fieldDef]) => {
+			if (!isFieldEditable(fieldName, fieldDef)) return false;
+			return !(tableDef.fk && tableDef.fk[fieldName]);
+		})
+	);
+
+	let fkFields = $derived(
+		Object.entries(tableDef.fields).filter(([fieldName, fieldDef]) => {
+			if (!isFieldEditable(fieldName, fieldDef)) return false;
+			return !!(tableDef.fk && tableDef.fk[fieldName]);
+		})
+	);
 </script>
 
+{#snippet fieldInput(fieldName: string, fieldDef: any)}
+	<label class="form-control">
+		<div class="label">
+			<span class="label-text capitalize">{fieldName.replace(/_/g, ' ')}</span>
+		</div>
+		{#if fieldDef.type === 'boolean' || (fieldDef.ui && fieldDef.ui.type === 'toggle')}
+			<input type="checkbox" class="toggle" bind:checked={formData[fieldName]} />
+		{:else if fieldDef.type === 'text-long' || (fieldDef.ui && fieldDef.ui.type === 'textarea')}
+			<textarea class="textarea textarea-bordered h-24" bind:value={formData[fieldName]}></textarea>
+		{:else if fieldDef.type === 'number' || (fieldDef.ui && fieldDef.ui.type === 'slider')}
+			<input type="number" class="input input-bordered" bind:value={formData[fieldName]} />
+		{:else if fieldDef.enum}
+			<select class="select select-bordered" bind:value={formData[fieldName]}>
+				{#each fieldDef.enum as option}
+					<option value={option}>{option}</option>
+				{/each}
+			</select>
+		{:else}
+			<input type="text" class="input input-bordered" bind:value={formData[fieldName]} />
+		{/if}
+	</label>
+{/snippet}
+
 <dialog class="modal" class:modal-open={isOpen}>
-	<div class="modal-box">
+	<div class="modal-box w-11/12 max-w-5xl">
 		<h3 class="mb-4 text-lg font-bold">Edit {tableName}</h3>
 
 		{#if loading}
@@ -79,31 +126,26 @@
 					<span>{error}</span>
 				</div>
 			{/if}
-			<div class="flex max-h-[60vh] flex-col gap-4 overflow-y-auto p-1">
-				{#each Object.entries(tableDef.fields) as [fieldName, fieldDef]}
-					{#if isFieldEditable(fieldName, fieldDef)}
-						<label class="form-control">
-							<div class="label">
-								<span class="label-text capitalize">{fieldName.replace(/_/g, ' ')}</span>
-							</div>
-							{#if fieldDef.type === 'boolean' || (fieldDef.ui && fieldDef.ui.type === 'toggle')}
-								<input type="checkbox" class="toggle" bind:checked={formData[fieldName]} />
-							{:else if fieldDef.type === 'text-long' || (fieldDef.ui && fieldDef.ui.type === 'textarea')}
-								<textarea class="textarea textarea-bordered h-24" bind:value={formData[fieldName]}></textarea>
-							{:else if fieldDef.type === 'number' || (fieldDef.ui && fieldDef.ui.type === 'slider')}
-								<input type="number" class="input input-bordered" bind:value={formData[fieldName]} />
-							{:else if fieldDef.enum}
-								<select class="select select-bordered" bind:value={formData[fieldName]}>
-									{#each fieldDef.enum as option}
-										<option value={option}>{option}</option>
-									{/each}
-								</select>
-							{:else}
-								<input type="text" class="input input-bordered" bind:value={formData[fieldName]} />
-							{/if}
-						</label>
+			<div class="flex max-h-[70vh] flex-col gap-4 overflow-y-auto p-1">
+				<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+					<!-- Left Column: Regular Fields -->
+					<div class="flex flex-col gap-4">
+						<h4 class="font-semibold opacity-50">General</h4>
+						{#each regularFields as [fieldName, fieldDef]}
+							{@render fieldInput(fieldName, fieldDef)}
+						{/each}
+					</div>
+
+					<!-- Right Column: FK Fields -->
+					{#if fkFields.length > 0}
+						<div class="flex flex-col gap-4 border-l pl-0 md:pl-6">
+							<h4 class="font-semibold opacity-50">Relations</h4>
+							{#each fkFields as [fieldName, fieldDef]}
+								{@render fieldInput(fieldName, fieldDef)}
+							{/each}
+						</div>
 					{/if}
-				{/each}
+				</div>
 			</div>
 		{/if}
 

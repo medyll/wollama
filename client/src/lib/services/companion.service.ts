@@ -12,7 +12,7 @@ export class CompanionService {
 
 	/**
 	 * Get all companions available for a user (System + User defined)
-	 * User defined companions override system companions if they are forks (have original_companion_id)
+	 * User defined companions override system companions if they are forks (have companion_id)
 	 */
 	async getAll(userId: string): Promise<(Companion | UserCompanion)[]> {
 		const systemCompanions = await this.systemService.getAll();
@@ -21,8 +21,8 @@ export class CompanionService {
 		// Track which system companions are overridden
 		const overriddenIds = new Set<string>();
 		for (const uc of userCompanions) {
-			if (uc.original_companion_id) {
-				overriddenIds.add(uc.original_companion_id);
+			if (uc.companion_id) {
+				overriddenIds.add(uc.companion_id);
 			}
 		}
 
@@ -50,10 +50,10 @@ export class CompanionService {
 		return await this.systemService.get(id);
 	}
 
-	async create(companion: Omit<UserCompanion, 'companion_id' | 'created_at' | 'updated_at'>): Promise<UserCompanion> {
+	async create(companion: Omit<UserCompanion, 'user_companion_id' | 'created_at' | 'updated_at'>): Promise<UserCompanion> {
 		const newCompanion: UserCompanion = {
 			...companion,
-			companion_id: crypto.randomUUID(),
+			user_companion_id: crypto.randomUUID(),
 			created_at: Date.now(),
 			updated_at: Date.now()
 		};
@@ -66,7 +66,7 @@ export class CompanionService {
 		// But the UI should handle "Edit" by checking if it's a system companion first.
 		
 		// Check if it exists in user_companions
-		const existing = await this.userService.get(companion.companion_id);
+		const existing = await this.userService.get(companion.user_companion_id);
 		if (existing) {
 			return await this.userService.update({
 				...companion,
@@ -96,9 +96,9 @@ export class CompanionService {
 
 		const newCompanion: UserCompanion = {
 			...systemComp,
-			companion_id: crypto.randomUUID(),
+			user_companion_id: crypto.randomUUID(),
 			user_id: userId,
-			original_companion_id: systemComp.companion_id,
+			companion_id: systemComp.companion_id,
 			created_at: Date.now(),
 			updated_at: Date.now()
 		};

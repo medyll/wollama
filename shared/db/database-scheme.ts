@@ -18,7 +18,7 @@ export const appSchema: DatabaseSchema = {
 	user_preferences: {
 		primaryKey: 'user_preferences_id',
 		fk: {
-			user_id: { table: 'users', required: true }
+			user_id: { table: 'users', required: true, multiple: false }
 		},
 		fields: {
 			user_preferences_id: { type: 'uuid', required: true },
@@ -56,20 +56,20 @@ export const appSchema: DatabaseSchema = {
 		}
 	},
 	user_companions: {
-		primaryKey: 'companion_id',
+		primaryKey: 'user_companion_id',
 		indexes: ['name', 'user_id'],
 		template: {
 			presentation: 'name',
 			card_lines: ['description', 'model', 'specialization']
 		},
 		fk: {
-			user_id: { table: 'users', required: true },
-			original_companion_id: { table: 'companions', required: false }
+			user_id: { table: 'users', required: true, multiple: true },
+			companion_id: { table: 'companions', required: false, multiple: true }
 		},
 		fields: {
-			companion_id: { type: 'uuid', required: true },
+			user_companion_id: { type: 'uuid', required: true },
 			user_id: { type: 'uuid', required: true },
-			original_companion_id: { type: 'uuid' },
+			companion_id: { type: 'uuid' },
 			name: { type: 'string', required: true },
 			description: { type: 'string', ui: { type: 'textarea' } },
 			system_prompt: { type: 'text-long', required: true, ui: { type: 'textarea', rows: 10 } },
@@ -92,8 +92,8 @@ export const appSchema: DatabaseSchema = {
 			card_lines: ['title', 'model', 'companion_id.name']
 		},
 		fk: {
-			user_id: { table: 'users', required: true },
-			companion_id: { table: 'companions', required: false }
+			user_id: { table: 'users', required: true, multiple: true },
+			companion_id: { table: 'companions', required: false, multiple: true }
 		},
 		fields: {
 			chat_id: { type: 'uuid', required: true },
@@ -118,7 +118,7 @@ export const appSchema: DatabaseSchema = {
 			card_lines: ['role', 'content', 'model']
 		},
 		fk: {
-			chat_id: { table: 'chats', required: true }
+			chat_id: { table: 'chats', required: true, multiple: true }
 		},
 		fields: {
 			message_id: { type: 'uuid', required: true },

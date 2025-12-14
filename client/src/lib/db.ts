@@ -101,7 +101,7 @@ let dbPromise: Promise<any> | null = globalAny.__wollama_db_promise || null;
 
 const _createDatabase = async () => {
 	const db = await createRxDatabase({
-		name: 'wollama_client_db_v11', // Bumped version to force fresh DB (v11 fixes schema conflict)
+		name: 'wollama_client_db_v12',  
 		storage: wrappedValidateAjvStorage({
 			storage: getRxStorageDexie()
 		}),

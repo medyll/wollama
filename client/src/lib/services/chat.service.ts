@@ -365,7 +365,10 @@ export class ChatService {
 				})
 				.exec();
 
-			const companionIds = [...companions, ...userCompanions].map((c: any) => c.companion_id);
+			const companionIds = [
+				...companions.map((c: any) => c.companion_id),
+				...userCompanions.map((c: any) => c.user_companion_id)
+			];
 			if (companionIds.length > 0) {
 				const chats = await db.chats
 					.find({
