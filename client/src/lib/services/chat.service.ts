@@ -27,7 +27,14 @@ export class ChatService {
 
 			let systemPrompt = '';
 			if (companionId) {
-				const companion = await db.companions.findOne(companionId).exec();
+				// Check user_companions first (custom/overridden)
+				let companion = await db.user_companions.findOne(companionId).exec();
+				
+				// If not found, check system companions
+				if (!companion) {
+					companion = await db.companions.findOne(companionId).exec();
+				}
+
 				if (companion) {
 					systemPrompt = companion.system_prompt;
 				}
@@ -163,7 +170,10 @@ export class ChatService {
 			// Inject Mood if companion exists
 			if (chat.companion_id) {
 				const db = await getDatabase();
-				const companion = await db.companions.findOne(chat.companion_id).exec();
+				let companion = await db.user_companions.findOne(chat.companion_id).exec();
+				if (!companion) {
+					companion = await db.companions.findOne(chat.companion_id).exec();
+				}
 				if (companion && companion.mood && companion.mood !== 'neutral') {
 					systemPrompt += `\n\nIMPORTANT: You are currently in a '${companion.mood}' mood. Your responses must reflect this emotion strongly.`;
 				}
@@ -346,7 +356,16 @@ export class ChatService {
 				})
 				.exec();
 
-			const companionIds = companions.map((c: any) => c.companion_id);
+			const userCompanions = await db.user_companions
+				.find({
+					selector: {
+						name: { $regex: regex },
+						user_id: userId
+					}
+				})
+				.exec();
+
+			const companionIds = [...companions, ...userCompanions].map((c: any) => c.companion_id);
 			if (companionIds.length > 0) {
 				const chats = await db.chats
 					.find({

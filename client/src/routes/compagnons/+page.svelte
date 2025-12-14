@@ -1,34 +1,17 @@
 <script lang="ts">
-	import type { Companion } from '$types/data';
+	import type { Companion, UserCompanion } from '$types/data';
 	import { userState } from '$lib/state/user.svelte';
+	import { CompanionService } from '$lib/services/companion.service';
+	import { onMount } from 'svelte';
 
-	// Mock Data
-	const companions: Companion[] = [
-		{
-			companion_id: '1',
-			name: 'Assistant Général',
-			description: 'Un assistant polyvalent pour toutes vos tâches.',
-			model: userState.preferences.defaultModel,
-			system_prompt: 'You are a helpful assistant.',
-			created_at: Date.now()
-		},
-		{
-			companion_id: '2',
-			name: 'Codeur Expert',
-			description: 'Spécialisé en développement logiciel.',
-			model: 'codellama',
-			system_prompt: 'You are an expert programmer.',
-			created_at: Date.now()
-		},
-		{
-			companion_id: '3',
-			name: 'Traducteur',
-			description: 'Traduit vos textes en plusieurs langues.',
-			model: 'llama2',
-			system_prompt: 'You are a translator.',
-			created_at: Date.now()
+	let companions: (Companion | UserCompanion)[] = $state([]);
+	const companionService = new CompanionService();
+
+	onMount(async () => {
+		if (userState.uid) {
+			companions = await companionService.getAll(userState.uid);
 		}
-	];
+	});
 </script>
 
 <div class="container mx-auto p-4">
