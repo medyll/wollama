@@ -2,13 +2,7 @@
 	import { appSchema } from '../../../../shared/db/database-scheme';
 	import { DataGenericService } from '$lib/services/data-generic.service';
 
-	let {
-		tableName,
-		id = undefined,
-		isOpen = $bindable(false),
-		onSave = undefined,
-		data = {}
-	} = $props();
+	let { tableName, id = undefined, isOpen = $bindable(false), onSave = undefined, data = {} } = $props();
 
 	let formData = $state<any>({ ...data });
 	let loading = $state(false);

@@ -26,7 +26,6 @@ export class DataInitializer {
 				const pk = service.PrimaryKey;
 
 				for (const item of defaultData) {
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					const id = (item as any)[pk];
 					let exists = false;
 

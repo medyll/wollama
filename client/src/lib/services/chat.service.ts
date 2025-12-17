@@ -29,7 +29,7 @@ export class ChatService {
 			if (companionId) {
 				// Check user_companions first (custom/overridden)
 				let companion = await db.user_companions.findOne(companionId).exec();
-				
+
 				// If not found, check system companions
 				if (!companion) {
 					companion = await db.companions.findOne(companionId).exec();

@@ -64,7 +64,7 @@ export class CompanionService {
 		// We can only update user companions
 		// If the ID belongs to a system companion, we should probably fork it (create a new UserCompanion)
 		// But the UI should handle "Edit" by checking if it's a system companion first.
-		
+
 		// Check if it exists in user_companions
 		const existing = await this.userService.get(companion.user_companion_id);
 		if (existing) {
@@ -73,7 +73,7 @@ export class CompanionService {
 				updated_at: Date.now()
 			});
 		} else {
-			throw new Error("Cannot update a system companion directly. Please fork it first.");
+			throw new Error('Cannot update a system companion directly. Please fork it first.');
 		}
 	}
 
@@ -83,7 +83,7 @@ export class CompanionService {
 		if (existing) {
 			await this.userService.delete(id);
 		} else {
-			throw new Error("Cannot delete a system companion.");
+			throw new Error('Cannot delete a system companion.');
 		}
 	}
 
@@ -92,7 +92,7 @@ export class CompanionService {
 	 */
 	async fork(systemCompanionId: string, userId: string): Promise<UserCompanion> {
 		const systemComp = await this.systemService.get(systemCompanionId);
-		if (!systemComp) throw new Error("System companion not found");
+		if (!systemComp) throw new Error('System companion not found');
 
 		const newCompanion: UserCompanion = {
 			...systemComp,
