@@ -31,7 +31,7 @@ export interface TableDefinition {
 	primaryKey: string;
 	indexes?: string[];
 	fields: Record<string, FieldDefinition>;
-	fk?: Record<string, { table: string; required?: boolean }>;
+	fk?: Record<string, { table: string; required?: boolean; multiple?: boolean }>;
 	template?: {
 		presentation: string;
 		card_lines?: string[];
