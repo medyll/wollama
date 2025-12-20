@@ -3,6 +3,7 @@ export class UIState {
 	sidebarCollapsed = $state(false);
 	sidebarOpen = $state(true);
 	isAudioPlaying = $state(false);
+	activeCompanionId = $state<string | undefined>(undefined);
 
 	setTitle(title: string) {
 		this.pageTitle = title;
@@ -22,6 +23,10 @@ export class UIState {
 
 	setAudioPlaying(playing: boolean) {
 		this.isAudioPlaying = playing;
+	}
+
+	setActiveCompanionId(id: string | undefined) {
+		this.activeCompanionId = id;
 	}
 }
 

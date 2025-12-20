@@ -5,6 +5,7 @@
 	import { toast } from '$lib/state/notifications.svelte';
 	import { audioService } from '$lib/services/audio.service';
 	import { chatService } from '$lib/services/chat.service';
+	import { companionService } from '$lib/services/companion.service';
 	import { parseMarkdown } from '$lib/utils/markdown';
 	import CompanionSelector from '$components/ui/CompanionSelector.svelte';
 	import MessageActions from '$components/chat/MessageActions.svelte';
@@ -52,6 +53,17 @@
 		if (!chatId) {
 			messages = [];
 			uiState.clearTitle();
+
+			if (initialCompanionId) {
+				(async () => {
+					const comp = await companionService.get(initialCompanionId);
+					if (comp) {
+						currentCompagnon = comp as Companion;
+						// Clear the global state so it doesn't persist
+						uiState.setActiveCompanionId(undefined);
+					}
+				})();
+			}
 			return;
 		}
 
@@ -62,6 +74,12 @@
 			const chat = await chatService.getChat(chatId);
 			if (chat) {
 				uiState.setTitle(chat.title);
+				if (chat.companion_id) {
+					const comp = await companionService.get(chat.companion_id);
+					if (comp) {
+						currentCompagnon = comp as Companion;
+					}
+				}
 			}
 
 			const obs = await chatService.getMessages(chatId);

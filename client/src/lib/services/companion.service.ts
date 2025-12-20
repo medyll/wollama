@@ -106,3 +106,5 @@ export class CompanionService {
 		return await this.userService.create(newCompanion);
 	}
 }
+
+export const companionService = new CompanionService();

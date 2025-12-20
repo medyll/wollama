@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Companion, UserCompanion } from '$types/data';
 	import { userState } from '$lib/state/user.svelte';
+	import { uiState } from '$lib/state/ui.svelte';
 	import { CompanionService } from '$lib/services/companion.service';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	let companions: (Companion | UserCompanion)[] = $state([]);
 	const companionService = new CompanionService();
@@ -15,6 +17,11 @@
 
 	function getCompanionId(c: Companion | UserCompanion): string {
 		return 'user_companion_id' in c ? (c as UserCompanion).user_companion_id : c.companion_id;
+	}
+
+	function startChat(compagnon: Companion | UserCompanion) {
+		uiState.setActiveCompanionId(getCompanionId(compagnon));
+		goto('/chat/new');
 	}
 </script>
 
@@ -31,10 +38,10 @@
 					<p>{compagnon.description}</p>
 					<div class="card-actions mt-4 justify-end">
 						<div class="badge badge-outline">{compagnon.model}</div>
-						<a
-							href="/chat/new?companion_id={getCompanionId(compagnon)}"
+						<button
+							onclick={() => startChat(compagnon)}
 							class="btn btn-primary btn-sm"
-							aria-label="Chat with {compagnon.name}">Discuter</a
+							aria-label="Chat with {compagnon.name}">Discuter</button
 						>
 					</div>
 				</div>
