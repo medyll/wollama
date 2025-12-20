@@ -4,6 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tsx server.ts",
+		"check": "tsc --noEmit",
 		"test": "concurrently \"npm run dev\" \"npx tsx test-server.ts\" --kill-others --success first",
 		"test:unit": "vitest run",
 		"setup:audio": "node setup-audio.js"
