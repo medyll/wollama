@@ -286,7 +286,7 @@
 
 <CompanionSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
-<div class="absolute inset-0 flex flex-col overflow-hidden">
+<div class="absolute inset-0 flex flex-col overflow-y-auto" bind:this={chatContainer} onscroll={handleScroll}>
 	{#if uiState.isAudioPlaying}
 		<button
 			class="btn btn-circle btn-error fixed top-20 right-4 z-50 shadow-lg"
@@ -302,7 +302,7 @@
 
 	{#if messages.length === 0}
 		<!-- Section: Empty State -->
-		<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto p-4">
+		<div class="flex flex-1 flex-col items-center justify-center p-4">
 			<div class="flex w-full max-w-md flex-col items-center">
 				<img src="/assets/lama.png" alt="Wollama" class="mb-6 h-32 w-32 object-contain opacity-90" />
 				<h1 class="mb-2 text-3xl font-bold">{t('ui.ready_to_chat')}</h1>
@@ -325,13 +325,7 @@
 		</div>
 	{:else}
 		<!-- Section: Messages Area -->
-		<div
-			class="min-h-0 flex-1 space-y-4 overflow-y-auto p-4"
-			role="log"
-			aria-label="Chat messages"
-			bind:this={chatContainer}
-			onscroll={handleScroll}
-		>
+		<div class="flex-1 space-y-4 p-4" role="log" aria-label="Chat messages">
 			{#each messages as message, i}
 				<div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
 					<div class="chat-image avatar placeholder self-start">
@@ -399,7 +393,7 @@
 		</div>
 
 		<!-- Section: Input Area (Bottom) -->
-		<div class="bg-base-100 w-full p-0 md:p-4">
+		<div class="bg-base-100 sticky bottom-0 z-20 w-full p-0 md:p-4">
 			<ChatInput
 				bind:value={messageInput}
 				bind:files={selectedFiles}
