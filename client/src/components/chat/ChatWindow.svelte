@@ -294,7 +294,7 @@
 			aria-label="Stop Audio"
 			title="Stop Audio"
 		>
-			<Icon icon="lucide:square" class="h-6 w-6 fill-current" />
+			<Icon icon="fluent:stop-24-filled" class="h-6 w-6 fill-current" />
 		</button>
 	{/if}
 

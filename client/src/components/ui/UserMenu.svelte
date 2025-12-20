@@ -29,7 +29,7 @@
 		{#if isSigningIn}
 			<span class="loading loading-spinner loading-xs"></span>
 		{:else}
-			<Icon icon="lucide:log-in" class="mr-2 h-4 w-4" />
+			<Icon icon="fluent:person-arrow-right-24-regular" class="mr-2 h-4 w-4" />
 			{t('ui.signIn')}
 		{/if}
 	</button>

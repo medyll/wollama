@@ -12,6 +12,6 @@
 		aria-label={title}
 		{title}
 	>
-		<Icon icon="lucide:menu" class="inline-block h-5 w-5" />
+		<Icon icon="fluent:navigation-24-regular" class="inline-block h-5 w-5" />
 	</button>
 {/if}

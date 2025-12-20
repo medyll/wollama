@@ -59,14 +59,14 @@
 			class="bg-error/10 text-error animate-in slide-in-from-right-4 fade-in absolute top-0 right-0 z-10 flex h-full items-center gap-2 overflow-hidden rounded-lg p-1 pr-2 whitespace-nowrap duration-200"
 		>
 			<button class="btn btn-xs btn-ghost btn-circle" onclick={cancel} aria-label="Cancel">
-				<Icon icon="lucide:x" class="h-4 w-4" />
+				<Icon icon="fluent:dismiss-24-regular" class="h-4 w-4" />
 			</button>
 			<span class="text-xs font-bold">Confirm?</span>
 			<button class="btn btn-xs btn-error" onclick={handleClick} disabled={isLoading} aria-label="Confirm">
 				{#if isLoading}
 					<span class="loading loading-spinner loading-xs"></span>
 				{:else}
-					<Icon icon="lucide:check" class="h-4 w-4" />
+					<Icon icon="fluent:checkmark-24-regular" class="h-4 w-4" />
 				{/if}
 			</button>
 		</div>

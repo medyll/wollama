@@ -55,9 +55,9 @@
 	<!-- Section: Copy -->
 	<button class="btn btn-ghost btn-xs btn-square" onclick={copyToClipboard} title="Copy" aria-label="Copy to clipboard">
 		{#if isCopied}
-			<Icon icon="lucide:check" class="text-success h-4 w-4" />
+			<Icon icon="fluent:checkmark-24-regular" class="text-success h-4 w-4" />
 		{:else}
-			<Icon icon="lucide:copy" class="h-4 w-4" />
+			<Icon icon="fluent:copy-24-regular" class="h-4 w-4" />
 		{/if}
 	</button>
 
@@ -69,12 +69,12 @@
 			title="Regenerate"
 			aria-label="Regenerate response"
 		>
-			<Icon icon="lucide:refresh-cw" class="h-4 w-4" />
+			<Icon icon="fluent:arrow-clockwise-24-regular" class="h-4 w-4" />
 		</button>
 	{/if}
 
 	<!-- Section: Share -->
 	<button class="btn btn-ghost btn-xs btn-square" title="Share" aria-label="Share">
-		<Icon icon="lucide:share-2" class="h-4 w-4" />
+		<Icon icon="fluent:share-24-regular" class="h-4 w-4" />
 	</button>
 </div>

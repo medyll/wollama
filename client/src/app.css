@@ -22,3 +22,63 @@
 @import 'daisyui/theme/black.css';
 @import 'daisyui/theme/luxury.css';
 @import 'daisyui/theme/dracula.css';
+
+[data-theme='fluent-light'] {
+	font-family: 'Segoe UI Variable', 'Segoe UI', 'Segoe UI Web (West European)', -apple-system,
+		BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+	--color-base-100: #ffffff;
+	--color-base-200: #f3f3f3;
+	--color-base-300: #e5e5e5;
+	--color-base-content: #1f1f1f;
+	--color-primary: #0078d4;
+	--color-primary-content: #ffffff;
+	--color-secondary: #e0e0e0;
+	--color-secondary-content: #000000;
+	--color-accent: #0078d4;
+	--color-accent-content: #ffffff;
+	--color-neutral: #202020;
+	--color-neutral-content: #ffffff;
+	--color-info: #0078d4;
+	--color-success: #107c10;
+	--color-warning: #d83b01;
+	--color-error: #c50f1f;
+	--rounded-box: 0.5rem;
+	--rounded-btn: 0.25rem;
+	--rounded-badge: 1rem;
+	--animation-btn: 0.1s;
+	--animation-input: 0.1s;
+	--btn-focus-scale: 0.98;
+	--border-btn: 1px;
+	--tab-border: 1px;
+	--tab-radius: 0.5rem;
+}
+
+[data-theme='fluent-dark'] {
+	font-family: 'Segoe UI Variable', 'Segoe UI', 'Segoe UI Web (West European)', -apple-system,
+		BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+	--color-base-100: #202020;
+	--color-base-200: #2b2b2b;
+	--color-base-300: #3a3a3a;
+	--color-base-content: #ffffff;
+	--color-primary: #60cdff;
+	--color-primary-content: #000000;
+	--color-secondary: #454545;
+	--color-secondary-content: #ffffff;
+	--color-accent: #60cdff;
+	--color-accent-content: #000000;
+	--color-neutral: #f3f3f3;
+	--color-neutral-content: #000000;
+	--color-info: #60cdff;
+	--color-success: #54b054;
+	--color-warning: #fce100;
+	--color-error: #ff99a4;
+	--rounded-box: 0.5rem;
+	--rounded-btn: 0.25rem;
+	--rounded-badge: 1rem;
+	--animation-btn: 0.1s;
+	--animation-input: 0.1s;
+	--btn-focus-scale: 0.98;
+	--border-btn: 1px;
+	--tab-border: 1px;
+	--tab-radius: 0.5rem;
+}

@@ -10,5 +10,5 @@
 	aria-label={uiState.sidebarCollapsed ? t('ui.expand') : t('ui.collapse')}
 	title={uiState.sidebarCollapsed ? t('ui.expand') : t('ui.collapse')}
 >
-	<Icon icon="lucide:panel-left" class="h-5 w-5" />
+	<Icon icon="fluent:panel-left-24-regular" class="h-5 w-5" />
 </button>

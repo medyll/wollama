@@ -99,7 +99,7 @@
 						}}
 						aria-label="Edit"
 					>
-						<Icon icon="lucide:edit-2" class="h-4 w-4" />
+						<Icon icon="fluent:edit-24-regular" class="h-4 w-4" />
 					</button>
 				{/if}
 				{#if deletable}
@@ -111,7 +111,7 @@
 						}}
 						aria-label="Delete"
 					>
-						<Icon icon="lucide:trash-2" class="h-4 w-4" />
+						<Icon icon="fluent:delete-24-regular" class="h-4 w-4" />
 					</button>
 				{/if}
 				<!-- We can add a slot here later -->

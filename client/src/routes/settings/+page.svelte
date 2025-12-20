@@ -30,6 +30,8 @@
 	let editingCompanionId = $state<string | undefined>(undefined);
 
 	const themes = [
+		'fluent-light',
+		'fluent-dark',
 		'light',
 		'dark',
 		'cupcake',

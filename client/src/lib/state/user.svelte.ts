@@ -16,7 +16,7 @@ export class UserState {
 	preferences = $state({
 		serverUrl: 'http://localhost:3000',
 		locale: 'en',
-		theme: 'light',
+		theme: 'fluent-light',
 		defaultModel: 'mistral:latest',
 		defaultCompanion: '1', // Default to General Assistant
 		defaultTemperature: 0.7,
