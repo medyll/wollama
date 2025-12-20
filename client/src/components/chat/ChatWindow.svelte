@@ -374,10 +374,8 @@
 							</div>
 						{/if}
 						{#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
-							<div class="flex w-52 flex-col gap-4 p-2">
-								<div class="skeleton h-4 w-28 opacity-50"></div>
-								<div class="skeleton h-4 w-full opacity-50"></div>
-								<div class="skeleton h-4 w-full opacity-50"></div>
+							<div class="bg-base-200/50 flex w-fit items-center rounded-2xl px-4 py-2">
+								<span class="loading loading-dots loading-sm opacity-50"></span>
 							</div>
 						{:else}
 							{#if message.role === 'assistant'}
