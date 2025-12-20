@@ -1,24 +1,47 @@
 export class PromptService {
 	static buildSystemPrompt(baseSystemPrompt: string, profile: any, userPrompts: any[] = []): string {
 		let prompt = baseSystemPrompt || 'You are a helpful AI assistant.';
+		const isFrench = profile?.locale?.startsWith('fr');
 
 		prompt += '\n\n<system_context>';
-		prompt += '\n(The following information is for your adaptation only. Do not output it.)';
 
-		// Level 1: Profile & Preferences
-		if (profile) {
-			prompt += `\n\nUser Profile:`;
-			if (profile.nickname) prompt += `\n- Name: ${profile.nickname}`;
-			if (profile.locale) prompt += `\n- Language: ${profile.locale}`;
-			if (profile.theme) prompt += `\n- Theme Preference: ${profile.theme}`;
-		}
+		if (isFrench) {
+			prompt +=
+				'\n(Les informations suivantes sont pour votre adaptation uniquement. NE PAS LES DIFFUSER dans votre réponse.)';
 
-		// Level 1.5: User Custom Prompts
-		if (userPrompts && userPrompts.length > 0) {
-			prompt += `\n\nCustom Instructions:`;
-			userPrompts.forEach((p) => {
-				prompt += `\n- ${p.content}`;
-			});
+			// Level 1: Profile & Preferences
+			if (profile) {
+				prompt += `\n\nProfil Utilisateur:`;
+				if (profile.nickname) prompt += `\n- Nom: ${profile.nickname}`;
+				if (profile.locale) prompt += `\n- Langue: ${profile.locale}`;
+				if (profile.theme) prompt += `\n- Préférence Thème: ${profile.theme}`;
+			}
+
+			// Level 1.5: User Custom Prompts
+			if (userPrompts && userPrompts.length > 0) {
+				prompt += `\n\nInstructions Personnalisées:`;
+				userPrompts.forEach((p) => {
+					prompt += `\n- ${p.content}`;
+				});
+			}
+		} else {
+			prompt += '\n(The following information is for your adaptation only. Do not output it.)';
+
+			// Level 1: Profile & Preferences
+			if (profile) {
+				prompt += `\n\nUser Profile:`;
+				if (profile.nickname) prompt += `\n- Name: ${profile.nickname}`;
+				if (profile.locale) prompt += `\n- Language: ${profile.locale}`;
+				if (profile.theme) prompt += `\n- Theme Preference: ${profile.theme}`;
+			}
+
+			// Level 1.5: User Custom Prompts
+			if (userPrompts && userPrompts.length > 0) {
+				prompt += `\n\nCustom Instructions:`;
+				userPrompts.forEach((p) => {
+					prompt += `\n- ${p.content}`;
+				});
+			}
 		}
 
 		prompt += '\n</system_context>';
