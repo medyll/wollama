@@ -79,7 +79,7 @@
 
 <div class="mx-auto w-full md:max-w-[1150px]">
 	<!-- Top Bar: Companion, Audio, Delete -->
-	<div class="mb-2 flex items-center justify-between px-2">
+	<div class="relative mb-4 flex items-center justify-between px-2">
 		<!-- Left: Companion -->
 		<div
 			class="flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-70"
@@ -93,7 +93,7 @@
 		</div>
 
 		<!-- Center: Audio Toggle -->
-		<div class="flex justify-center">
+		<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
 			<AudioToggle />
 		</div>
 
