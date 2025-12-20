@@ -178,7 +178,7 @@
 	});
 </script>
 
-<div class="bg-base-200 h-full overflow-y-auto p-4 md:p-8">
+<div class="bg-base-200 absolute inset-0 overflow-y-auto p-4 md:p-8">
 	<div class="mx-auto max-w-3xl">
 		<!-- Section: Header -->
 		<div class="mb-8 flex items-center justify-between">
