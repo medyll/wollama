@@ -1,40 +1,96 @@
 # GitHub Copilot Instructions for Wollama
 
-## Project Context
+## 1. Project Context & Principles
 
-**Wollama** is a cross-platform AI chat application (Mobile & Desktop) undergoing a complete rewrite.
+**Wollama** is a cross-platform AI chat application (Web, Desktop/Electron, Mobile/Capacitor) built as a **Monorepo**.
 
-- **Source of Truth:** The `PROJECT.md` file contains all functional specifications, architecture, and data models. Refer to it systematically.
-- **Code State:** This is a migration/rewrite. **DO NOT USE** folders named `_old`. They are obsolete archives.
-- **Language:** The instructions file is in English, but follow user preference for conversation language.
+- **Source of Truth:** `PROJECT.md` contains all functional specs, architecture, and data models. **Read it first.**
+- **Code State:** This is a complete rewrite. **NEVER** use or reference folders named `_old`.
+- **Mobile First:** UI must be designed for mobile touch targets and responsiveness first, then adapted for desktop.
+- **Offline-First:** Data is local-first (RxDB on client) and syncs to server (PouchDB).
 
-## Technical Stack (Strict)
+## 2. Technical Stack (Strict Versions)
 
-- **Framework:** Svelte 5 (Runes mandatory: `$state`, `$derived`, `$effect`, `$props`).
+### Frontend (`client/`)
+
+- **Framework:** Svelte 5 (Runes syntax `$state`, `$derived`, `$effect`, `$props` **MANDATORY**).
 - **Build:** Vite + SvelteKit (Static Adapter).
-- **Styles:** Tailwind CSS v4 (via `@tailwindcss/vite`) + DaisyUI.
-- **Engine:** Tauri (Desktop) / Capacitor (Mobile).
-- **Database:** See `PROJECT.md` (JSON Flat file / SQLite).
+- **Styling:** Tailwind CSS v4 + DaisyUI v5. Use `data-theme` for theming.
+- **Mobile:** Capacitor v8 (Android/iOS).
+- **Desktop:** Electron v39.
 
-## Development Conventions
+### Backend (`server/`)
+
+- **Runtime:** Node.js v20+ (ES Modules).
+- **Framework:** Express v5.
+- **Database:** PouchDB v9 (LevelDB adapter).
+- **AI:** Ollama (local), Whisper (STT), Piper (TTS).
+
+### Shared (`shared/`)
+
+- **Types & Schemas:** Shared TypeScript interfaces and database schemas.
+
+## 3. Monorepo Workflows
+
+Run commands from the **root** directory:
+
+- **Development:**
+    - Client (Web): `npm run dev:client`
+    - Server: `npm run dev:server`
+    - Electron: `npm run dev:electron`
+- **Testing:**
+    - Client: `npm run test:client` (Vitest)
+    - Server: `npm run test:server` (Vitest)
+- **Linting:** `npm run lint` (Prettier + ESLint)
+
+### IDE Setup (VS Code)
+
+- **Extensions:** Install `Svelte for VS Code`, `ESLint`, `Prettier`, and `Tailwind CSS`.
+- **Formatting:** Configured to run **Prettier** and **ESLint --fix** on save.
+- **Settings:** Workspace settings are in `.vscode/settings.json`.
+
+## 4. Architecture & Data Flow
+
+### Data Synchronization
+
+- **Client:** Uses **RxDB** (`client/src/lib/db.ts`) with Dexie storage.
+- **Server:** Uses **PouchDB** (`server/db/database.ts`) with `pouchdb-find`.
+- **Sync:** CouchDB Replication Protocol.
+- **Schema:** Defined in `shared/db/database-scheme.ts`. **Always update this file first** when changing data models.
+
+### Component Structure (`client/src/`)
+
+- **`components/`**: Reusable UI components.
+- **`lib/`**: Business logic, state, and services.
+    - `lib/state/`: Svelte 5 reactive state files (`.svelte.ts`).
+    - `lib/services/`: API clients and hardware integration.
+- **`routes/`**: SvelteKit file-based routing.
+
+## 5. Coding Conventions
 
 ### Svelte 5
 
-- Use Runes syntax exclusively. No `export let` or `$:`.
-- Use `snippets` (`{#snippet}`) instead of `slots`.
-- Event handling via props (e.g., `onclick`) and not `createEventDispatcher`.
+- **Runes Only:** Use `$state`, `$derived`, `$effect`, `$props`.
+- **No Legacy:** Do NOT use `export let`, `$:`, or `createEventDispatcher`.
+- **Events:** Pass callback props (e.g., `onclick`) instead of dispatching events.
+- **Snippets:** Use `{#snippet}` instead of `<slot>`.
 
-### Architecture & Files
+### TypeScript
 
-- **New Components:** Must be created in `src/components/` (outside of `_old`).
-- **Business Logic:** Must be implemented in `src/lib/` (outside of `_old`).
-- **Imports:** Use aliases `$lib`, `$components`, `$types`.
+- **Strict Mode:** No `any`. Define interfaces in `shared/` if used across workspaces.
+- **Imports:** Use aliases:
+    - Client: `$lib`, `$components`, `$types`.
+    - Server: Relative imports or configured paths.
 
-### Workflow
+### Styling
 
-- If a feature is described in `PROJECT.md` but missing from the code, it must be implemented from scratch, without blindly copying old code.
-- Code must be modular and typed (Strict TypeScript).
+- Use Tailwind utility classes.
+- Use DaisyUI components for consistency.
+- Ensure dark/light mode compatibility via DaisyUI themes.
 
-## Specific Rules
+## 6. Key Files to Reference
 
-- **Mobile First:** The interface must be designed for mobile first (Responsive).
+- `PROJECT.md`: Full specifications.
+- `shared/db/database-scheme.ts`: Database schema definitions.
+- `client/src/lib/db.ts`: Client-side database logic.
+- `server/server.ts`: Backend entry point.

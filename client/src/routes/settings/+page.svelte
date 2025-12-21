@@ -126,7 +126,7 @@
 			} else {
 				throw new Error('Status not OK');
 			}
-		} catch (e) {
+		} catch {
 			toast.error(t('settings.server_error'));
 		} finally {
 			isVerifying = false;
@@ -154,6 +154,11 @@
 		await downloadState.pullModel(newModelName);
 		newModelName = '';
 		loadModels();
+	}
+
+	function selectModel(modelName: string) {
+		userState.preferences.defaultModel = modelName;
+		userState.save();
 	}
 
 	$effect(() => {
@@ -397,44 +402,105 @@
 					{t('settings.ai')}
 				</div>
 				<div class="collapse-content">
-					<div class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
-						<div class="form-control flex-row items-center justify-between gap-4">
-							<label class="label whitespace-nowrap" for="model">
-								<span class="label-text">{t('settings.default_model')}</span>
-							</label>
-							<div class="flex w-full max-w-xs flex-col">
-								<select
-									id="model"
-									class="select select-bordered w-full"
-									bind:value={userState.preferences.defaultModel}
-								>
-									{#if isLoadingModels}
-										<option disabled>Loading...</option>
-									{:else}
-										{#each installedModels as model}
-											<option value={model.name}>{model.name}</option>
-										{/each}
-										<!-- Fallback if list is empty or current model not in list -->
-										{#if !installedModels.find((m) => m.name === userState.preferences.defaultModel)}
-											<option value={userState.preferences.defaultModel}
-												>{userState.preferences.defaultModel}</option
-											>
-										{/if}
-									{/if}
-								</select>
-								<div class="label pb-0">
-									<span class="label-text-alt">{t('settings.model_help')}</span>
-								</div>
+					<div class="grid grid-cols-1 gap-4 pt-4">
+						<!-- Modèle sélectionné actuel -->
+						<div class="form-control">
+							<div class="label">
+								<span class="label-text font-medium">{t('settings.default_model')}</span>
+							</div>
+							<div class="badge badge-primary badge-lg p-4">
+								{userState.preferences.defaultModel || 'None selected'}
+							</div>
+							<div class="label pb-0">
+								<span class="label-text-alt">{t('settings.model_help')}</span>
 							</div>
 						</div>
 
-						<div class="form-control flex-row items-center justify-between gap-4">
-							<label class="label whitespace-nowrap" for="companion">
-								<span class="label-text">{t('ui.choose_companion')}</span>
+						<!-- Liste des modèles installés -->
+						<div class="form-control">
+							<div class="label">
+								<span class="label-text font-medium">Installed Models</span>
+							</div>
+							{#if isLoadingModels}
+								<div class="flex justify-center py-8">
+									<span class="loading loading-spinner loading-lg"></span>
+								</div>
+							{:else if installedModels.length === 0}
+								<div class="alert alert-info">
+									<Icon icon="lucide:info" class="h-5 w-5" />
+									<span>No models installed. Download one below.</span>
+								</div>
+							{:else}
+								<div class="border-base-300 overflow-x-auto rounded-lg border">
+									<div class="max-h-80 overflow-y-auto">
+										<table class="table-pin-rows table-xs table">
+											<thead>
+												<tr>
+													<th class="w-12"></th>
+													<th>Name</th>
+													<th>Size</th>
+													<th>Modified</th>
+													<th class="text-right">Action</th>
+												</tr>
+											</thead>
+											<tbody>
+												{#each installedModels as model}
+													{@const isSelected = model.name === userState.preferences.defaultModel}
+													<tr
+														class="hover cursor-pointer {isSelected ? 'bg-primary/10' : ''}"
+														onclick={() => selectModel(model.name)}
+													>
+														<td>
+															{#if isSelected}
+																<Icon icon="lucide:check-circle" class="text-primary h-5 w-5" />
+															{:else}
+																<Icon icon="lucide:circle" class="h-5 w-5 opacity-30" />
+															{/if}
+														</td>
+														<td class="font-mono text-sm">{model.name}</td>
+														<td class="text-xs opacity-70">
+															{#if model.size}
+																{(model.size / 1024 / 1024 / 1024).toFixed(2)} GB
+															{:else}
+																-
+															{/if}
+														</td>
+														<td class="text-xs opacity-70">
+															{#if model.modified_at}
+																{new Date(model.modified_at).toLocaleDateString()}
+															{:else}
+																-
+															{/if}
+														</td>
+														<td class="text-right">
+															<button
+																class="btn btn-ghost btn-xs"
+																onclick={(e) => {
+																	e.stopPropagation();
+																	selectModel(model.name);
+																}}
+																aria-label="Select model"
+															>
+																Select
+															</button>
+														</td>
+													</tr>
+												{/each}
+											</tbody>
+										</table>
+									</div>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Companion Selection -->
+						<div class="form-control">
+							<label class="label" for="companion">
+								<span class="label-text font-medium">{t('ui.choose_companion')}</span>
 							</label>
 							<select
 								id="companion"
-								class="select select-bordered w-full max-w-xs"
+								class="select select-bordered w-full"
 								bind:value={userState.preferences.defaultCompanion}
 							>
 								{#each companions as companion}
@@ -446,21 +512,16 @@
 							</select>
 						</div>
 
-						<div class="form-control flex-row items-center justify-between gap-4 md:col-span-2">
-							<label class="label whitespace-nowrap" for="temp">
-								<span class="label-text"
+						<!-- Temperature -->
+						<div class="form-control">
+							<label class="label" for="temp">
+								<span class="label-text font-medium"
 									>{t('settings.temperature')} ({userState.preferences.defaultTemperature})</span
 								>
 							</label>
-							<div class="w-full max-w-xs">
-								<input
-									type="range"
-									id="temp"
-									min="0"
-									max="1"
-									step="0.1"
-									class="range range-primary"
-									bind:value={userState.preferences.defaultTemperature}
+							<div class="w-full">
+								id="temp" min="0" max="1" step="0.1" class="range range-primary" bind:value={userState.preferences
+									.defaultTemperature}
 								/>
 								<div class="flex w-full justify-between px-2 text-xs">
 									<span>{t('settings.precise')}</span>

@@ -1,4 +1,3 @@
- 
 import { Ollama } from 'ollama';
 import { config } from '../config.js';
 

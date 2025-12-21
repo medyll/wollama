@@ -182,9 +182,9 @@ export class ChatService {
 						systemPrompt = companion.system_prompt;
 					}
 
-					if (companion.mood && companion.mood !== 'neutral') {
+					/* if (companion.mood && companion.mood !== 'neutral') {
 						systemPrompt += `\n\nIMPORTANT: You are currently in a '${companion.mood}' mood. Your responses must reflect this emotion strongly.`;
-					}
+					} */
 				}
 			}
 		}

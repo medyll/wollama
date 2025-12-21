@@ -91,7 +91,9 @@ export const SttService = {
 					// Cleanup input file
 					try {
 						await fs.promises.unlink(tempInputFile);
-					} catch {}
+					} catch {
+						// Ignore cleanup errors
+					}
 
 					if (code === 0) {
 						// Clean up the output (trim whitespace)
@@ -112,7 +114,9 @@ export const SttService = {
 			console.error('Error in local transcription:', e);
 			try {
 				await fs.promises.unlink(tempInputFile);
-			} catch {}
+			} catch {
+				// Ignore cleanup errors
+			}
 			return 'Erreur interne de transcription';
 		}
 	}

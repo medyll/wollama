@@ -2,6 +2,7 @@
 	"name": "wollama-monorepo",
 	"version": "0.0.9",
 	"private": true,
+	"type": "module",
 	"workspaces": [
 		"client",
 		"server",

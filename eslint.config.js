@@ -33,15 +33,7 @@ export default ts.config(
 		languageOptions: {
 			parserOptions: {
 				projectService: {
-					allowDefaultProject: [
-						'*.js',
-						'*.ts',
-						'client/*.js',
-						'client/*.ts',
-						'client/electron/*.js',
-						'server/*.ts',
-						'server/*.js'
-					]
+					allowDefaultProject: ['*.js', '*.ts', 'client/*.js', 'client/*.ts', 'client/electron/*.js', 'server/*.js']
 				},
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser,

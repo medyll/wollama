@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { OllamaService } from './ollama.service';
+import { OllamaService } from './ollama.service.js';
 
 describe('OllamaService', () => {
 	beforeEach(() => {

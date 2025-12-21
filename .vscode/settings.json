@@ -1,4 +1,13 @@
 {
 	"svelte.enable-ts-plugin": true,
-	"java.configuration.updateBuildConfiguration": "interactive"
+	"java.configuration.updateBuildConfiguration": "interactive",
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"[svelte]": {
+		"editor.defaultFormatter": "svelte.svelte-vscode"
+	},
+	"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "svelte"]
 }

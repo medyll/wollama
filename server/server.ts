@@ -1,8 +1,6 @@
 import express from 'express';
-import { createServer } from 'http';
 import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
 import expressPouchDB from 'express-pouchdb';
 import multer from 'multer';
 import { dbManager } from './db/database.js';
@@ -14,9 +12,6 @@ import { PromptService } from './services/prompt.service.js';
 import { logger } from './utils/logger.js';
 
 import cors from 'cors';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = config.server.port;
@@ -145,6 +140,8 @@ app.post('/api/chat/generate', async (req, res) => {
 					context.files
 				);
 			}
+
+			console.log('Final Messages with Context:', messages);
 		}
 
 		if (stream) {
@@ -282,15 +279,19 @@ const killLocalOllama = async () => {
 		if (process.platform === 'win32') {
 			try {
 				await execAsync('taskkill /IM "ollama app.exe" /F');
-			} catch {}
+			} catch {
+				// Ignore errors
+			}
 			try {
 				await execAsync('taskkill /IM "ollama.exe" /F');
-			} catch {}
+			} catch {
+				// Ignore errors
+			}
 		} else {
 			await execAsync('pkill -f ollama');
 		}
 		logger.info('OLLAMA', 'Killed local Ollama process.');
-	} catch (e) {
+	} catch {
 		// Ignore errors
 	}
 };
@@ -307,10 +308,10 @@ const startLocalOllama = async () => {
 		if (process.platform === 'win32') {
 			let ollamaPath = '';
 			try {
-				// Try to find ollama executable path via PATH
+				// Try ind ollama executable path via PATH
 				const { stdout: whereOutput } = await execAsync('where ollama');
 				ollamaPath = whereOutput.split('\n')[0].trim();
-			} catch (e) {
+			} catch {
 				// Fallback to common default installation paths
 				const localAppData = process.env.LOCALAPPDATA || '';
 				const commonPaths = [
@@ -354,11 +355,11 @@ const startLocalOllama = async () => {
 				detached: true,
 				stdio: 'ignore'
 			});
-			child.unref();
+			child.f();
 			logger.success('OLLAMA', 'Started local Ollama instance (Linux)');
 			return true;
 		}
-	} catch (e) {
+	} catch {
 		logger.warn('OLLAMA', 'Could not auto-start local Ollama');
 	}
 	return false;
@@ -408,11 +409,9 @@ const initializeOllama = async () => {
 				logger.success('OLLAMA', `Model '${defaultModel}' is ready`);
 			}
 
-			serverState.ollamaReady = true;
 			return; // Success, exit function
 		} catch (error: any) {
 			const isLastAttempt = i === maxRetries - 1;
-			const isConnectionRefused = error.code === 'ECONNREFUSED' || error.cause?.code === 'ECONNREFUSED';
 
 			// If first attempt fails and it looks like the service is down (and local), try to start it
 			if (i === 0 && isLocalHost(config.ollama.host)) {

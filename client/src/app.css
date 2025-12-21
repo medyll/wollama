@@ -24,8 +24,15 @@
 @import 'daisyui/theme/dracula.css';
 
 [data-theme='fluent-light'] {
-	font-family: 'Segoe UI Variable', 'Segoe UI', 'Segoe UI Web (West European)', -apple-system,
-		BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+	font-family:
+		'Segoe UI Variable',
+		'Segoe UI',
+		'Segoe UI Web (West European)',
+		-apple-system,
+		BlinkMacSystemFont,
+		Roboto,
+		'Helvetica Neue',
+		sans-serif;
 	--color-base-100: #ffffff;
 	--color-base-200: #f3f3f3;
 	--color-base-300: #e5e5e5;
@@ -54,8 +61,15 @@
 }
 
 [data-theme='fluent-dark'] {
-	font-family: 'Segoe UI Variable', 'Segoe UI', 'Segoe UI Web (West European)', -apple-system,
-		BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+	font-family:
+		'Segoe UI Variable',
+		'Segoe UI',
+		'Segoe UI Web (West European)',
+		-apple-system,
+		BlinkMacSystemFont,
+		Roboto,
+		'Helvetica Neue',
+		sans-serif;
 	--color-base-100: #202020;
 	--color-base-200: #2b2b2b;
 	--color-base-300: #3a3a3a;

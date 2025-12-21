@@ -37,11 +37,9 @@
 </script>
 
 <aside
-	class="bg-base-300 border-base-content/10 flex h-full flex-col border-r transition-all duration-300 {uiState.sidebarOpen
-		? uiState.sidebarCollapsed
-			? 'w-20'
-			: 'w-64'
-		: 'w-0 overflow-hidden'}"
+	class="bg-base-300 border-base-content/10 flex flex-col transition-all duration-300 {uiState.sidebarOpen
+		? (uiState.sidebarCollapsed ? 'w-20' : 'w-64') + ' m-2 h-[calc(100%-1rem)] rounded-xl border'
+		: 'h-full w-0 overflow-hidden'}"
 	aria-label="Sidebar"
 >
 	<div class="flex flex-col gap-2 p-2">
