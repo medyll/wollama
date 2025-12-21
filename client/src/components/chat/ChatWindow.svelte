@@ -125,7 +125,7 @@
 						: currentCompagnon.companion_id;
 
 				try {
-					targetChatId = await chatService.createChat(undefined, undefined, companionIdToUse);
+					targetChatId = await chatService.createChat(undefined, currentCompagnon.model, companionIdToUse);
 					// Update URL without reloading
 					goto(`/chat/${targetChatId}`, { replaceState: true });
 					// Update local state so we don't create it again if user spams

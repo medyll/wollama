@@ -112,6 +112,9 @@ export class ChatService {
 		const db = await getDatabase();
 		const messageId = crypto.randomUUID();
 
+		// Fetch chat to get the correct model
+		const chat = await this.getChat(chatId);
+
 		await db.messages.insert({
 			message_id: messageId,
 			chat_id: chatId,
@@ -120,11 +123,10 @@ export class ChatService {
 			status,
 			images,
 			created_at: Date.now(),
-			model: userState.preferences.defaultModel
+			model: chat?.model || userState.preferences.defaultModel
 		});
 
 		// Update chat updated_at
-		const chat = await this.getChat(chatId);
 		if (chat) {
 			await chat.patch({
 				updated_at: Date.now()
@@ -213,7 +215,7 @@ export class ChatService {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					model: userState.preferences.defaultModel,
+					model: chat?.model || userState.preferences.defaultModel,
 					messages: ollamaMessages,
 					stream: true,
 					context: contextState.getPayload()

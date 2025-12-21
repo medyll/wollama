@@ -9,6 +9,7 @@ export const OllamaService = {
 
 	// Chat & Generate
 	async chat(payload: any) {
+		console.log('OllamaService.chat payload:', payload);
 		return await ollama.chat(payload);
 	},
 
