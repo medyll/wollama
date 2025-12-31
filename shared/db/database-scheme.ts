@@ -166,7 +166,21 @@ export const appSchema: DatabaseSchema = {
 		},
 		fields: {
 			prompt_id: { type: 'uuid', required: true },
-			content: { type: 'text-long', required: true, ui: { type: 'textarea', rows: 3, label: 'Prompt / Phrase' } },
+			content: {
+				type: 'text-long',
+				required: true,
+				ui: { type: 'textarea', rows: 3, label: 'Prompt / Phrase' },
+				ai: {
+					trigger: 'auto_pre',
+					systemPrompt: `You are an expert prompt engineer. Your task is to rewrite the user's instruction to be a clear, concise, and effective system prompt for an LLM. It should define a user preference or behavior.
+IMPORTANT:
+1. Output ONLY the raw rewritten prompt.
+2. Do NOT include any prefixes, labels, titles, or explanations.
+3. Do not use any quotation marks or formatting.
+4. Write in the THIRD PERSON, referring to "the user" (or "l'utilisateur", "el usuario", etc. depending on the language).
+5. The rewritten prompt MUST be in the language corresponding to the locale '{{locale}}'.`
+				}
+			},
 			is_active: { type: 'boolean', ui: { type: 'toggle', label: 'Active' }, default: true },
 			created_at: { type: 'timestamp', required: true, auto: true },
 			updated_at: { type: 'timestamp', auto: true }

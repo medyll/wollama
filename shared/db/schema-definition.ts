@@ -25,6 +25,12 @@ export interface FieldDefinition {
 		type: string;
 		[key: string]: any;
 	};
+	ai?: {
+		model?: string;
+		systemPrompt: string;
+		trigger: 'manual' | 'auto_pre' | 'auto_post';
+		outputMode?: 'replace' | 'append';
+	};
 }
 
 export interface TableDefinition {

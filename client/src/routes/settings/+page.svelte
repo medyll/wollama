@@ -273,7 +273,7 @@
 								Add Prompt
 							</button>
 						</div>
-						<DataGenericList tableName="user_prompts" displayType="card" editable={true} />
+						<DataGenericList tableName="user_prompts" displayType="card" editable={true} deletable={true} />
 					</div>
 				</div>
 			</div>

@@ -3,7 +3,7 @@
 	"version": "0.0.9",
 	"type": "module",
 	"scripts": {
-		"dev": "tsx server.ts",
+		"dev": "tsx watch server.ts",
 		"check": "tsc --noEmit",
 		"test": "concurrently \"npm run dev\" \"npx tsx test-server.ts\" --kill-others --success first",
 		"test:unit": "vitest run",

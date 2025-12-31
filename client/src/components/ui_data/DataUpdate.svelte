@@ -44,69 +44,136 @@
 		}
 	}
 
-	async function handleSave() {
-		loading = true;
-		try {
-			if (id) {
-				const dataToSave = { ...formData, [tableDef.primaryKey]: id };
-				await dataService.update(dataToSave);
-			} else {
-				// Create
-				const dataToSave = { ...formData };
-				if (tableDef.fields[tableDef.primaryKey].type === 'uuid') {
-					dataToSave[tableDef.primaryKey] = crypto.randomUUID();
-				}
-				await dataService.create(dataToSave);
-			}
+	async function processAiField(content: string, aiDef: any) {
+		if (!content) return null;
 
-			if (onSave) onSave(formData);
-			isOpen = false;
-		} catch (e) {
-			const msg = e instanceof Error ? e.message : 'Unknown error';
-			error = msg.split('\n')[0];
-		} finally {
-			loading = false;
-		}
-	}
-
-	async function optimizePrompt(fieldName: string) {
-		const currentContent = formData[fieldName];
-		if (!currentContent) return;
-
-		isOptimizing = true;
 		try {
 			const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
 			const locale = userState.preferences.locale;
+
+			// Replace placeholders in system prompt
+			let systemPrompt = aiDef.systemPrompt.replace('{{locale}}', locale);
+
 			const response = await fetch(`${serverUrl}/api/chat/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: userState.preferences.defaultModel,
+					model: aiDef.model || userState.preferences.defaultModel,
 					stream: false,
 					messages: [
 						{
 							role: 'system',
-							content: `You are an expert prompt engineer. Your task is to rewrite the user's instruction to be a clear, concise, and effective system prompt for an LLM. It should define a user preference or behavior.
-IMPORTANT:
-1. Output ONLY the raw rewritten prompt.
-2. Do NOT include any prefixes, labels, titles, or explanations.
-3. Do not use quotation marks or any other enclosing characters.
-4. Write in the THIRD PERSON, referring to "the user" (or "l'utilisateur", "el usuario", etc. depending on the language).
-5. The rewritten prompt MUST be in the language corresponding to the locale '${locale}'.`
+							content: systemPrompt
 						},
-						{ role: 'user', content: `Rewrite this instruction: "${currentContent}"` }
+						{ role: 'user', content: `Rewrite this instruction: "${content}"` }
 					]
 				})
 			});
 
 			const data = await response.json();
 			if (data.message?.content) {
-				formData[fieldName] = data.message.content.trim();
-				toast.success('Prompt optimized!');
+				return data.message.content.trim();
 			}
 		} catch (e) {
 			console.error(e);
-			toast.error('Optimization failed');
+			throw e;
+		}
+		return null;
+	}
+
+	async function handleSave() {
+		loading = true;
+		try {
+			let dataToSave = { ...formData };
+
+			// Auto Pre-processing
+			for (const [fieldName, fieldDef] of Object.entries(tableDef.fields)) {
+				if (fieldDef.ai && fieldDef.ai.trigger === 'auto_pre') {
+					toast.info(`Processing ${fieldName} with AI...`);
+					const content = dataToSave[fieldName];
+					const result = await processAiField(content, fieldDef.ai);
+
+					if (result) {
+						if (fieldDef.ai.outputMode === 'append') {
+							dataToSave[fieldName] = (dataToSave[fieldName] + '\n' + result).trim();
+						} else {
+							dataToSave[fieldName] = result;
+						}
+					}
+				}
+			}
+
+			let savedData;
+			if (id) {
+				dataToSave[tableDef.primaryKey] = id;
+				savedData = await dataService.update(dataToSave);
+			} else {
+				// Create
+				if (tableDef.fields[tableDef.primaryKey].type === 'uuid') {
+					dataToSave[tableDef.primaryKey] = crypto.randomUUID();
+				}
+				savedData = await dataService.create(dataToSave);
+			}
+
+			// Auto Post-processing
+			let hasPostUpdates = false;
+			let postUpdatePayload = { ...(savedData as any) };
+
+			for (const [fieldName, fieldDef] of Object.entries(tableDef.fields)) {
+				if (fieldDef.ai && fieldDef.ai.trigger === 'auto_post') {
+					toast.info(`Post-processing ${fieldName} with AI...`);
+					const content = postUpdatePayload[fieldName];
+					const result = await processAiField(content, fieldDef.ai);
+
+					if (result) {
+						if (fieldDef.ai.outputMode === 'append') {
+							postUpdatePayload[fieldName] = (postUpdatePayload[fieldName] + '\n' + result).trim();
+						} else {
+							postUpdatePayload[fieldName] = result;
+						}
+						hasPostUpdates = true;
+					}
+				}
+			}
+
+			if (hasPostUpdates && savedData) {
+				await dataService.update(postUpdatePayload);
+			}
+
+			if (onSave) onSave(formData);
+			isOpen = false;
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : 'Unknown error';
+			// Ignore conflict errors (409) if we just saved successfully
+			if (msg.includes('409') || msg.includes('conflict')) {
+				if (onSave) onSave(formData);
+				isOpen = false;
+				return;
+			}
+			error = msg.split('\n')[0];
+			toast.error('Save failed: ' + error);
+		} finally {
+			loading = false;
+		}
+	}
+
+	async function handleAiAction(fieldName: string, aiDef: any) {
+		const content = formData[fieldName];
+		if (!content) return;
+
+		isOptimizing = true;
+		try {
+			const result = await processAiField(content, aiDef);
+			if (result) {
+				if (aiDef.outputMode === 'append') {
+					formData[fieldName] = (formData[fieldName] + '\n' + result).trim();
+				} else {
+					formData[fieldName] = result;
+				}
+				toast.success('AI Action completed!');
+			}
+		} catch (e) {
+			toast.error('AI Action failed');
 		} finally {
 			isOptimizing = false;
 		}
@@ -143,10 +210,10 @@ IMPORTANT:
 		{:else if fieldDef.type === 'text-long' || (fieldDef.ui && fieldDef.ui.type === 'textarea')}
 			<div class="relative">
 				<textarea class="textarea textarea-bordered h-24 w-full" bind:value={formData[fieldName]}></textarea>
-				{#if tableName === 'user_prompts' && fieldName === 'content'}
+				{#if fieldDef.ai && fieldDef.ai.trigger === 'manual'}
 					<button
 						class="btn btn-circle btn-ghost btn-sm absolute right-2 bottom-2"
-						onclick={() => optimizePrompt(fieldName)}
+						onclick={() => handleAiAction(fieldName, fieldDef.ai)}
 						disabled={isOptimizing}
 						title="Optimize with AI"
 					>
