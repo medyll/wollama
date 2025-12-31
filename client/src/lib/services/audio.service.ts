@@ -179,6 +179,7 @@ export class AudioService {
 		const formData = new FormData();
 		const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm';
 		formData.append('file', audioBlob, `recording.${ext}`);
+		formData.append('language', userState.preferences.locale || 'auto');
 
 		const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
 		try {

@@ -12,14 +12,14 @@ if (ffmpegPath) {
 
 // Service for Speech-to-Text (Whisper)
 export const SttService = {
-	async transcribe(audioBuffer: Buffer, filename: string = 'audio.wav'): Promise<string> {
+	async transcribe(audioBuffer: Buffer, filename: string = 'audio.wav', language: string = 'auto'): Promise<string> {
 		if (!config.stt.enabled) {
 			console.log('STT is disabled. Returning mock transcription.');
 			return 'Transcription simulée (STT désactivé)';
 		}
 
 		if (config.stt.provider === 'local') {
-			return this.transcribeLocal(audioBuffer);
+			return this.transcribeLocal(audioBuffer, language);
 		}
 
 		try {
@@ -27,6 +27,9 @@ export const SttService = {
 			const blob = new Blob([audioBuffer], { type: 'audio/wav' });
 			formData.append('file', blob, filename);
 			formData.append('model', 'whisper-1'); // Default model name for OpenAI API
+			if (language && language !== 'auto') {
+				formData.append('language', language);
+			}
 
 			const response = await fetch(config.stt.url, {
 				method: 'POST',
@@ -45,7 +48,7 @@ export const SttService = {
 		}
 	},
 
-	async transcribeLocal(audioBuffer: Buffer): Promise<string> {
+	async transcribeLocal(audioBuffer: Buffer, language: string = 'auto'): Promise<string> {
 		const binaryPath = config.stt.binaryPath;
 		const modelPath = config.stt.modelPath;
 
@@ -94,6 +97,9 @@ export const SttService = {
 			console.log(`[STT] WAV file ready. Size: ${wavStats.size} bytes`);
 
 			return new Promise((resolve, reject) => {
+				// Clean language code (e.g. 'fr-FR' -> 'fr')
+				const langCode = language === 'auto' ? 'auto' : language.split(/[-_]/)[0].toLowerCase();
+
 				const args = [
 					'-m',
 					modelPath,
@@ -101,7 +107,7 @@ export const SttService = {
 					tempWavFile,
 					'-nt', // No timestamps
 					'-l',
-					'auto' // Auto-detect language
+					langCode
 				];
 				console.log(`[STT] Spawning Whisper: ${binaryPath} ${args.join(' ')}`);
 

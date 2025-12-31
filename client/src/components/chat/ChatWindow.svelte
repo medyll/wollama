@@ -192,17 +192,19 @@
 				isTranscribing = true;
 
 				// Transcribe audio
+				let text = '';
 				try {
-					const text = await audioService.transcribe(audioBlob);
-					if (text) {
-						messageInput = (messageInput + ' ' + text).trim();
-						await sendMessage();
-					}
+					text = await audioService.transcribe(audioBlob);
 				} catch (err) {
 					console.error('Transcription failed', err);
 					toast.error(t('status.error') || 'Transcription failed');
 				} finally {
 					isTranscribing = false;
+				}
+
+				if (text) {
+					messageInput = (messageInput + ' ' + text).trim();
+					await sendMessage();
 				}
 			} catch (error) {
 				console.error('Error stopping recording:', error);

@@ -70,7 +70,8 @@ app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
 			res.status(400).json({ error: 'No file uploaded' });
 			return;
 		}
-		const text = await SttService.transcribe(req.file.buffer, req.file.originalname);
+		const language = req.body.language || 'auto';
+		const text = await SttService.transcribe(req.file.buffer, req.file.originalname, language);
 		res.json({ text });
 	} catch (error) {
 		console.error('Transcription error:', error);
