@@ -103,7 +103,7 @@
 							: t('status.connected')}
 				>
 					<Icon
-						icon="lucide:server"
+						icon="lucide:dot"
 						class={`h-5 w-5 ${
 							!connectionState.isConnected
 								? 'text-error'

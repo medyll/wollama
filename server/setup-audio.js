@@ -219,10 +219,26 @@ const setupWhisper = async () => {
 			if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
 			extractZip(zipPath, tempDir);
-			fs.renameSync(path.join(tempDir, 'main.exe'), expectedExe);
+
+			// Move all files (including DLLs) to WHISPER_DIR
+			const files = fs.readdirSync(tempDir);
+			for (const file of files) {
+				const src = path.join(tempDir, file);
+				const dest = path.join(WHISPER_DIR, file);
+				// Overwrite if exists
+				if (fs.existsSync(dest)) {
+					try {
+						fs.unlinkSync(dest);
+					} catch (e) {
+						console.warn(`Could not delete existing file ${dest}:`, e);
+					}
+				}
+				fs.renameSync(src, dest);
+			}
+
 			fs.rmSync(tempDir, { recursive: true, force: true });
 			fs.unlinkSync(zipPath);
-			console.log('Whisper installed.');
+			console.log('Whisper installed (with DLLs).');
 		} else {
 			console.log('Downloading Whisper source code to build...');
 			const url = 'https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.5.4.zip';

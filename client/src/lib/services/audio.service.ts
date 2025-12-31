@@ -214,7 +214,12 @@ export class AudioService {
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ text, voiceId: effectiveVoiceId, voiceTone })
+				body: JSON.stringify({
+					text,
+					voiceId: effectiveVoiceId,
+					voiceTone,
+					locale: userState.preferences.locale // Explicitly pass locale
+				})
 			});
 
 			if (!response.ok) {

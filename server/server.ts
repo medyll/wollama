@@ -80,7 +80,7 @@ app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
 
 app.post('/api/audio/speak', async (req, res) => {
 	try {
-		const { text, voiceId, voiceTone, emotionTags, parameters } = req.body;
+		const { text, voiceId, voiceTone, emotionTags, parameters, locale } = req.body;
 		if (!text) {
 			res.status(400).json({ error: 'Text is required' });
 			return;
@@ -89,7 +89,8 @@ app.post('/api/audio/speak', async (req, res) => {
 		// Check if we should use Emotional TTS (Chatterbox)
 		if (emotionTags && emotionTags.length > 0 && sidecarService.isReady) {
 			try {
-				const audioBuffer = await sidecarService.synthesize(text, emotionTags, parameters || {});
+				// Pass locale (or default to 'en') to sidecar
+				const audioBuffer = await sidecarService.synthesize(text, emotionTags, parameters || {}, locale || 'en');
 				res.set('Content-Type', 'audio/wav');
 				res.send(audioBuffer);
 				return;
@@ -99,7 +100,24 @@ app.post('/api/audio/speak', async (req, res) => {
 			}
 		}
 
-		const audioBuffer = await TtsService.speak(text, voiceId, voiceTone);
+		// Use voiceId if provided, otherwise try to use locale as voiceId (e.g. 'fr', 'en')
+		// TtsService.speak handles mapping 'fr' -> 'fr_FR-siwis-medium.onnx'
+		let effectiveVoiceId = voiceId;
+		const openAIVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+
+		// If we are in local mode and the requested voice is an OpenAI voice (default in client),
+		// or if no voice is provided, use the locale to ensure we pick a model in the right language.
+		if (
+			!effectiveVoiceId ||
+			effectiveVoiceId === 'chatterbox' ||
+			(config.tts.provider === 'local' && openAIVoices.includes(effectiveVoiceId))
+		) {
+			effectiveVoiceId = locale || 'en';
+		}
+
+		console.log(`[API] /audio/speak - voiceId: ${voiceId}, locale: ${locale} -> effective: ${effectiveVoiceId}`);
+
+		const audioBuffer = await TtsService.speak(text, effectiveVoiceId, voiceTone);
 		if (!audioBuffer) {
 			res.status(500).json({ error: 'TTS failed or disabled' });
 			return;

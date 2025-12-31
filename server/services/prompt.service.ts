@@ -11,7 +11,7 @@ export class PromptService {
 			if (profile.locale) prompt += `\n- Language: ${profile.locale}`;
 			prompt += `\n</user_profile>`;
 		}
-
+		console.log({ profile });
 		// Level 1.5: User Custom Prompts
 		if (userPrompts && userPrompts.length > 0) {
 			prompt += `\n\n<custom_instructions>`;

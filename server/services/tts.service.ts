@@ -59,6 +59,8 @@ export const TtsService = {
 		const binaryPath = config.tts.binaryPath;
 		const modelDir = config.tts.modelDir;
 
+		console.log(`[TtsService] speakLocal called with voiceId: '${voiceId}', tone: '${voiceTone}'`);
+
 		// Map voiceId (or language code) to model filename
 		// Simple mapping strategy: check if voiceId matches a known model, or try to find a model for the language
 		let modelName = config.tts.defaultVoice;
@@ -71,14 +73,25 @@ export const TtsService = {
 			// If voiceId is a language code (e.g. "fr", "fr-FR")
 			else {
 				const lang = voiceId.split('-')[0].toLowerCase();
+				console.log(`[TtsService] Detected language code: '${lang}'`);
+
 				if (lang === 'fr') modelName = 'fr_FR-siwis-medium.onnx';
 				else if (lang === 'en') modelName = 'en_US-lessac-medium.onnx';
 				else if (lang === 'de') modelName = 'de_DE-thorsten-medium.onnx';
 				else if (lang === 'es') modelName = 'es_ES-sharvard-medium.onnx';
 				else if (lang === 'it') modelName = 'it_IT-riccardo-x_low.onnx';
+				else {
+					// Try to find any model starting with the language code
+					const files = fs.readdirSync(modelDir);
+					const match = files.find((f) => f.startsWith(lang) && f.endsWith('.onnx'));
+					if (match) {
+						modelName = match;
+					}
+				}
 			}
 		}
 
+		console.log(`[TtsService] Selected model: '${modelName}'`);
 		const modelPath = path.join(modelDir, modelName);
 
 		if (!fs.existsSync(binaryPath)) {
@@ -129,7 +142,7 @@ export const TtsService = {
 			piper.stdin.end();
 
 			piper.stderr.on('data', (data) => {
-				console.error(`[Piper stderr]: ${data}`);
+				console.error(`[Piper]: ${data}`);
 			});
 
 			piper.on('close', async (code) => {

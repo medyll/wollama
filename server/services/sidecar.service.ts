@@ -76,7 +76,7 @@ export class SidecarService {
 		}
 	}
 
-	async synthesize(text: string, emotionTags: string[], parameters: any): Promise<Buffer> {
+	async synthesize(text: string, emotionTags: string[], parameters: any, language: string = 'en'): Promise<Buffer> {
 		if (!this.isReady || !this.endpoint) {
 			throw new Error('Sidecar is not ready');
 		}
@@ -88,7 +88,8 @@ export class SidecarService {
 				body: JSON.stringify({
 					text,
 					emotion_tags: emotionTags,
-					parameters
+					parameters,
+					language // Pass language to Python sidecar
 				})
 			});
 

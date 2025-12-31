@@ -17,6 +17,7 @@ export class EmotionalTtsService {
 					text,
 					voiceId: 'chatterbox', // Special ID to trigger emotional TTS if tags are present
 					voiceTone: 'neutral',
+					locale: userState.preferences.locale, // Pass the user's locale
 					emotionTags,
 					parameters
 				})

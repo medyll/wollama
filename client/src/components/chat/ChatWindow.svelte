@@ -196,8 +196,7 @@
 					const text = await audioService.transcribe(audioBlob);
 					if (text) {
 						messageInput = (messageInput + ' ' + text).trim();
-						// We do NOT send automatically anymore, allowing user to review/edit
-						// sendMessage();
+						await sendMessage();
 					}
 				} catch (err) {
 					console.error('Transcription failed', err);

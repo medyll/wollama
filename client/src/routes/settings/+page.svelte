@@ -13,6 +13,8 @@
 	import GenericList from '$components/ui_data/GenericList.svelte';
 	import DataUpdate from '$components/ui_data/DataUpdate.svelte';
 
+	import { onDestroy } from 'svelte';
+
 	let localServerUrl = $state(userState.preferences.serverUrl);
 	let isVerifying = $state(false);
 	let installedModels = $state<any[]>([]);
@@ -28,6 +30,20 @@
 	let isCreatingPrompt = $state(false);
 	let isEditingCompanion = $state(false);
 	let editingCompanionId = $state<string | undefined>(undefined);
+
+	// Auto-save preferences when they change
+	$effect(() => {
+		// Track all preferences changes by serializing
+		JSON.stringify(userState.preferences);
+		userState.save();
+	});
+
+	onDestroy(() => {
+		if (stopMonitoring) {
+			stopMonitoring();
+			isMonitoringMic = false;
+		}
+	});
 
 	const themes = [
 		'fluent-light',
