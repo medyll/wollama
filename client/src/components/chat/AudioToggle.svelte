@@ -9,6 +9,7 @@
 <label
 	class="swap swap-rotate btn btn-circle btn-lg bg-base-200 hover:bg-base-300 border-base-content/10 border shadow-sm transition-all duration-200 hover:scale-110"
 	aria-label={t('ui.toggle_audio')}
+	title={t('ui.toggle_audio')}
 >
 	<!-- this hidden checkbox controls the state -->
 	<input type="checkbox" bind:checked={userState.preferences.auto_play_audio} onchange={() => userState.save()} />

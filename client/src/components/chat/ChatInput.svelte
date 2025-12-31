@@ -87,6 +87,8 @@
 			role="button"
 			tabindex="0"
 			onkeydown={(e) => e.key === 'Enter' && oncompanionclick()}
+			title={t('ui.choose_companion') || 'Choose companion'}
+			aria-label={t('ui.choose_companion') || 'Choose companion'}
 		>
 			<span class="text-xs font-medium opacity-70">{currentCompagnon.name}</span>
 			<span class="badge badge-xs badge-ghost opacity-50">{currentCompagnon.model}</span>
@@ -123,6 +125,7 @@
 					<button
 						class="btn btn-circle btn-xs btn-error absolute -top-2 -right-2 opacity-0 shadow-md transition-opacity group-hover:opacity-100"
 						onclick={() => removeFile(i)}
+						title={t('ui.remove_file') || 'Remove file'}
 						aria-label={t('ui.remove_file') || 'Remove file'}>✕</button
 					>
 				</div>
@@ -131,13 +134,13 @@
 	{/if}
 
 	<div
-		class="bg-base-200 border-base-content/10 focus-within:border-primary rounded-2xl border p-2 shadow-sm transition-colors"
+		class="bg-base-200 border-base-content/10 focus-within:border-primary relative rounded-2xl border p-2 shadow-sm transition-colors"
 	>
 		<textarea
 			bind:this={textareaRef}
 			placeholder={t('ui.type_message')}
 			aria-label={t('ui.type_message')}
-			class="textarea textarea-ghost max-h-[180px] min-h-12 w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-base focus:outline-none"
+			class="textarea textarea-ghost relative z-0 max-h-[180px] min-h-12 w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-base focus:outline-none"
 			rows="1"
 			bind:value
 			oninput={autoResize}
@@ -149,11 +152,16 @@
 			}}
 		></textarea>
 
-		<div class="mt-1 flex items-center justify-between px-1">
+		<div class="relative z-10 mt-1 flex items-center justify-between px-1">
 			<!-- Left: Attachments -->
 			<div>
 				<input type="file" class="hidden" multiple bind:this={fileInput} onchange={handleFileSelect} />
-				<button class="btn btn-ghost btn-sm btn-circle" aria-label="Add attachment" onclick={triggerFileInput}>
+				<button
+					class="btn btn-ghost btn-sm btn-circle"
+					aria-label={t('ui.add_attachment') || 'Add attachment'}
+					title={t('ui.add_attachment') || 'Add attachment'}
+					onclick={triggerFileInput}
+				>
 					<Icon icon="lucide:paperclip" class="h-5 w-5 opacity-70" />
 				</button>
 			</div>
@@ -164,7 +172,12 @@
 					<button
 						class="btn btn-circle btn-sm {isRecording ? 'btn-error animate-pulse' : 'btn-ghost'}"
 						onclick={onrecord}
-						aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+						aria-label={isRecording
+							? t('ui.stop_recording') || 'Stop recording'
+							: t('ui.start_recording') || 'Start recording'}
+						title={isRecording
+							? t('ui.stop_recording') || 'Stop recording'
+							: t('ui.start_recording') || 'Start recording'}
 						disabled={isTranscribing}
 					>
 						{#if isTranscribing}
@@ -176,7 +189,12 @@
 						{/if}
 					</button>
 				{:else}
-					<button class="btn btn-primary btn-sm btn-circle" onclick={onsend} aria-label="Send message">
+					<button
+						class="btn btn-primary btn-sm btn-circle"
+						onclick={onsend}
+						aria-label={t('ui.send_message') || 'Send message'}
+						title={t('ui.send_message') || 'Send message'}
+					>
 						<Icon icon="lucide:send-horizontal" class="h-5 w-5" />
 					</button>
 				{/if}

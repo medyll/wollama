@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { appSchema } from '../../../../shared/db/database-scheme';
 	import { DataGenericService } from '$lib/services/data-generic.service';
+	import { userState } from '$lib/state/user.svelte';
+	import { toast } from '$lib/state/notifications.svelte';
+	import Icon from '@iconify/svelte';
 
 	let { tableName, id = undefined, isOpen = $bindable(false), onSave = undefined, data = {} } = $props();
 
 	let formData = $state<any>({ ...data });
 	let loading = $state(false);
 	let error = $state<string | null>(null);
+	let isOptimizing = $state(false);
 
 	let tableDef = $derived(appSchema[tableName]);
 	let dataService = $derived(new DataGenericService(tableName));
@@ -62,6 +66,49 @@
 		}
 	}
 
+	async function optimizePrompt(fieldName: string) {
+		const currentContent = formData[fieldName];
+		if (!currentContent) return;
+
+		isOptimizing = true;
+		try {
+			const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
+			const locale = userState.preferences.locale;
+			const response = await fetch(`${serverUrl}/api/chat/generate`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model: userState.preferences.defaultModel,
+					stream: false,
+					messages: [
+						{
+							role: 'system',
+							content: `You are an expert prompt engineer. Your task is to rewrite the user's instruction to be a clear, concise, and effective system prompt for an LLM. It should define a user preference or behavior.
+IMPORTANT:
+1. Output ONLY the raw rewritten prompt.
+2. Do NOT include any prefixes, labels, titles, or explanations.
+3. Do not use quotation marks or any other enclosing characters.
+4. Write in the THIRD PERSON, referring to "the user" (or "l'utilisateur", "el usuario", etc. depending on the language).
+5. The rewritten prompt MUST be in the language corresponding to the locale '${locale}'.`
+						},
+						{ role: 'user', content: `Rewrite this instruction: "${currentContent}"` }
+					]
+				})
+			});
+
+			const data = await response.json();
+			if (data.message?.content) {
+				formData[fieldName] = data.message.content.trim();
+				toast.success('Prompt optimized!');
+			}
+		} catch (e) {
+			console.error(e);
+			toast.error('Optimization failed');
+		} finally {
+			isOptimizing = false;
+		}
+	}
+
 	function isFieldEditable(fieldName: string, fieldDef: any) {
 		if (fieldDef.auto) return false;
 		if (fieldName === tableDef.primaryKey) return false;
@@ -91,7 +138,23 @@
 		{#if fieldDef.type === 'boolean' || (fieldDef.ui && fieldDef.ui.type === 'toggle')}
 			<input type="checkbox" class="toggle" bind:checked={formData[fieldName]} />
 		{:else if fieldDef.type === 'text-long' || (fieldDef.ui && fieldDef.ui.type === 'textarea')}
-			<textarea class="textarea textarea-bordered h-24" bind:value={formData[fieldName]}></textarea>
+			<div class="relative">
+				<textarea class="textarea textarea-bordered h-24 w-full" bind:value={formData[fieldName]}></textarea>
+				{#if tableName === 'user_prompts' && fieldName === 'content'}
+					<button
+						class="btn btn-circle btn-ghost btn-sm absolute right-2 bottom-2"
+						onclick={() => optimizePrompt(fieldName)}
+						disabled={isOptimizing}
+						title="Optimize with AI"
+					>
+						{#if isOptimizing}
+							<span class="loading loading-spinner loading-xs"></span>
+						{:else}
+							<Icon icon="lucide:sparkles" class="text-primary" />
+						{/if}
+					</button>
+				{/if}
+			</div>
 		{:else if fieldDef.type === 'number' || (fieldDef.ui && fieldDef.ui.type === 'slider')}
 			<input type="number" class="input input-bordered" bind:value={formData[fieldName]} />
 		{:else if fieldDef.enum}

@@ -106,7 +106,14 @@ export const translations = {
 			startondate: 'date',
 			thisWeek: 'this week',
 			use_model: 'use model',
-			file_too_large: 'File {{name}} is too large (max 2MB)'
+			file_too_large: 'File {{name}} is too large (max 2MB)',
+			remove_file: 'Remove file',
+			add_attachment: 'Add attachment',
+			start_recording: 'Start recording',
+			stop_recording: 'Stop recording',
+			send_message: 'Send message',
+			toggle_audio: 'Toggle audio auto-play',
+			copied_to_clipboard: 'Copied to clipboard'
 		},
 		chat: {
 			categorize: 'categorize',

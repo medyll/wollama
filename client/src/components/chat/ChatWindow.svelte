@@ -37,7 +37,12 @@
 
 	function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
 		if (chatContainer) {
-			chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior });
+			// Use requestAnimationFrame to ensure layout is complete
+			requestAnimationFrame(() => {
+				if (chatContainer) {
+					chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior });
+				}
+			});
 		}
 	}
 
@@ -326,7 +331,13 @@
 		</div>
 	{:else}
 		<!-- Section: Messages Area -->
-		<div class="flex-1 space-y-4 p-4" role="log" aria-label="Chat messages">
+		<div
+			class="flex-1 space-y-4 overflow-y-auto p-4"
+			role="log"
+			aria-label="Chat messages"
+			bind:this={chatContainer}
+			onscroll={handleScroll}
+		>
 			{#each messages as message, i}
 				<div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
 					<div class="chat-image avatar placeholder self-start">
@@ -394,7 +405,7 @@
 		</div>
 
 		<!-- Section: Input Area (Bottom) -->
-		<div class="bg-base-100 sticky bottom-0 z-20 w-full p-0 md:p-4">
+		<div class="bg-base-100 z-20 w-full p-0 shadow-lg md:p-4">
 			<ChatInput
 				bind:value={messageInput}
 				bind:files={selectedFiles}

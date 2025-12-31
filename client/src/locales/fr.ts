@@ -101,6 +101,13 @@ export default {
 			thisWeek: 'cette semaine',
 			use_model: 'utiliser le modèle',
 			file_too_large: 'Le fichier {{name}} est trop volumineux (max 2Mo)',
+			remove_file: 'Supprimer le fichier',
+			add_attachment: 'Ajouter une pièce jointe',
+			start_recording: "Commencer l'enregistrement",
+			stop_recording: "Arrêter l'enregistrement",
+			send_message: 'Envoyer le message',
+			toggle_audio: 'Activer/Désactiver la lecture audio automatique',
+			copied_to_clipboard: 'Copié dans le presse-papier',
 			spaces: 'espaces',
 			myLib: 'bibliothèque',
 			configuration: {
