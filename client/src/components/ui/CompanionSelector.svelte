@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Companion } from '$types/data';
 	import { t } from '$lib/state/i18n.svelte';
-	import GenericList from '$components/ui_data/GenericList.svelte';
+	import DataGenericList from '$components/ui_data/DataGenericList.svelte';
 
 	let { isOpen = $bindable(false), onSelect } = $props();
 
@@ -23,7 +23,7 @@
 		<h3 id="companion-modal-title" class="mb-4 flex-none text-lg font-bold">{t('ui.choose_companion')}</h3>
 
 		<div class="flex-1 overflow-y-auto">
-			<GenericList
+			<DataGenericList
 				tableName="companions"
 				displayType="card"
 				orderBy="name"

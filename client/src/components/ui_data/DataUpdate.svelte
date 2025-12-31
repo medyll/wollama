@@ -33,10 +33,12 @@
 				// Filter out internal fields and resolved fields
 				const cleanData = { ...(dbData as any) };
 				delete cleanData._resolved;
+				delete cleanData._rev;
 				formData = { ...cleanData, ...data };
 			}
 		} catch (e) {
-			error = e instanceof Error ? e.message : 'Unknown error';
+			const msg = e instanceof Error ? e.message : 'Unknown error';
+			error = msg.split('\n')[0];
 		} finally {
 			loading = false;
 		}
@@ -60,7 +62,8 @@
 			if (onSave) onSave(formData);
 			isOpen = false;
 		} catch (e) {
-			error = e instanceof Error ? e.message : 'Unknown error';
+			const msg = e instanceof Error ? e.message : 'Unknown error';
+			error = msg.split('\n')[0];
 		} finally {
 			loading = false;
 		}

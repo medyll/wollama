@@ -382,7 +382,7 @@ onMount(() => {
 - **Navigation:**
     - **Mobile:** Drawer layout for navigation.
     - **Generic UI Components:**
-        - Enhanced `GenericList` and `DataCard` with full CRUD capabilities (Create, Read, Update, Delete).
+        - Enhanced `DataGenericList` and `DataCard` with full CRUD capabilities (Create, Read, Update, Delete).
         - Implemented confirmation dialogs for destructive actions.
 
 ### Context Management & Prompts

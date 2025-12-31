@@ -10,7 +10,7 @@
 	import { DataGenericService } from '$lib/services/data-generic.service';
 	import { destroyDatabase } from '$lib/db';
 	import type { Companion } from '$types/data';
-	import GenericList from '$components/ui_data/GenericList.svelte';
+	import DataGenericList from '$components/ui_data/DataGenericList.svelte';
 	import DataUpdate from '$components/ui_data/DataUpdate.svelte';
 
 	import { onDestroy } from 'svelte';
@@ -273,7 +273,7 @@
 								Add Prompt
 							</button>
 						</div>
-						<GenericList tableName="user_prompts" displayType="card" editable={true} />
+						<DataGenericList tableName="user_prompts" displayType="card" editable={true} />
 					</div>
 				</div>
 			</div>
@@ -619,7 +619,7 @@
 								{t('ui.add') || 'Add'}
 							</button>
 						</div>
-						<GenericList
+						<DataGenericList
 							tableName="user_companions"
 							editable={true}
 							deletable={true}
