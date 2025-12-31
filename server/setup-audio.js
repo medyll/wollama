@@ -36,8 +36,31 @@ const downloadFile = (url, dest) => {
 		const file = fs.createWriteStream(dest);
 		https
 			.get(url, (response) => {
-				if (response.statusCode === 302 || response.statusCode === 301) {
-					downloadFile(response.headers.location, dest).then(resolve).catch(reject);
+				// Handle Redirects (301, 302, 303, 307, 308)
+				if (
+					response.statusCode === 301 ||
+					response.statusCode === 302 ||
+					response.statusCode === 303 ||
+					response.statusCode === 307 ||
+					response.statusCode === 308
+				) {
+					if (!response.headers.location) {
+						reject(new Error(`Redirect with no location header: ${response.statusCode}`));
+						return;
+					}
+					// Handle relative redirects if necessary (though usually absolute)
+					let redirectUrl = response.headers.location;
+					if (redirectUrl.startsWith('/')) {
+						const u = new URL(url);
+						redirectUrl = `${u.protocol}//${u.host}${redirectUrl}`;
+					}
+
+					downloadFile(redirectUrl, dest).then(resolve).catch(reject);
+					return;
+				}
+
+				if (response.statusCode !== 200) {
+					reject(new Error(`Failed to download ${url}: ${response.statusCode}`));
 					return;
 				}
 

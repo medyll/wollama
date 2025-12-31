@@ -9,6 +9,7 @@ import { SttService } from './services/stt.service.js';
 import { TtsService } from './services/tts.service.js';
 import { OllamaService } from './services/ollama.service.js';
 import { PromptService } from './services/prompt.service.js';
+import { sidecarService } from './services/sidecar.service.js';
 import { logger } from './utils/logger.js';
 
 import cors from 'cors';
@@ -79,11 +80,25 @@ app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
 
 app.post('/api/audio/speak', async (req, res) => {
 	try {
-		const { text, voiceId, voiceTone } = req.body;
+		const { text, voiceId, voiceTone, emotionTags, parameters } = req.body;
 		if (!text) {
 			res.status(400).json({ error: 'Text is required' });
 			return;
 		}
+
+		// Check if we should use Emotional TTS (Chatterbox)
+		if (emotionTags && emotionTags.length > 0 && sidecarService.isReady) {
+			try {
+				const audioBuffer = await sidecarService.synthesize(text, emotionTags, parameters || {});
+				res.set('Content-Type', 'audio/wav');
+				res.send(audioBuffer);
+				return;
+			} catch (e) {
+				console.warn('Emotional TTS failed, falling back to standard TTS', e);
+				// Fallback to standard TTS below
+			}
+		}
+
 		const audioBuffer = await TtsService.speak(text, voiceId, voiceTone);
 		if (!audioBuffer) {
 			res.status(500).json({ error: 'TTS failed or disabled' });
@@ -140,8 +155,6 @@ app.post('/api/chat/generate', async (req, res) => {
 					context.files
 				);
 			}
-
-			console.log('Final Messages with Context:', messages);
 		}
 
 		if (stream) {
@@ -489,6 +502,13 @@ const ensureAudioSetup = async () => {
 };
 
 const initializeTTS = async () => {
+	// Initialize Sidecar (Chatterbox)
+	try {
+		await sidecarService.start();
+	} catch (error) {
+		logger.error('TTS', 'Failed to start Emotional TTS Sidecar');
+	}
+
 	if (config.tts.enabled) {
 		if (config.tts.provider === 'local') {
 			logger.info('TTS', `Checking Local TTS (Piper)...`);
@@ -525,4 +545,15 @@ app.listen(port, async () => {
 	await ensureAudioSetup();
 	await initializeOllama();
 	await initializeTTS();
+});
+
+// Graceful Shutdown
+process.on('SIGTERM', () => {
+	sidecarService.stop();
+	process.exit(0);
+});
+
+process.on('SIGINT', () => {
+	sidecarService.stop();
+	process.exit(0);
 });

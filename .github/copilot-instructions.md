@@ -2,95 +2,56 @@
 
 ## 1. Project Context & Principles
 
-**Wollama** is a cross-platform AI chat application (Web, Desktop/Electron, Mobile/Capacitor) built as a **Monorepo**.
+**Wollama** is a cross-platform AI chat app (Web, Desktop/Electron, Mobile/Capacitor) built as a **Monorepo**.
 
-- **Source of Truth:** `PROJECT.md` contains all functional specs, architecture, and data models. **Read it first.**
-- **Code State:** This is a complete rewrite. **NEVER** use or reference folders named `_old`.
-- **Mobile First:** UI must be designed for mobile touch targets and responsiveness first, then adapted for desktop.
-- **Offline-First:** Data is local-first (RxDB on client) and syncs to server (PouchDB).
+- **Source of Truth:** `PROJECT.md`. **Read it first.**
+- **Code State:** Complete rewrite. **NEVER** reference `_old` folders.
+- **Mobile First:** Design for touch/responsiveness first.
+- **Offline-First:** Local-first data (RxDB) syncs to server (PouchDB).
 
 ## 2. Technical Stack (Strict Versions)
 
-### Frontend (`client/`)
+- **Frontend (`client/`):** Svelte 5 (Runes `$state`, `$derived` **MANDATORY**), Vite 7, Tailwind v4, DaisyUI v5, Capacitor v8, Electron v39.
+- **Backend (`server/`):** Node.js v20+, Express v5, PouchDB v9 (LevelDB), Ollama, Whisper, Piper.
+- **Shared (`shared/`):** TypeScript interfaces & schemas.
 
-- **Framework:** Svelte 5 (Runes syntax `$state`, `$derived`, `$effect`, `$props` **MANDATORY**).
-- **Build:** Vite + SvelteKit (Static Adapter).
-- **Styling:** Tailwind CSS v4 + DaisyUI v5. Use `data-theme` for theming.
-- **Mobile:** Capacitor v8 (Android/iOS).
-- **Desktop:** Electron v39.
+## 3. Monorepo Workflows (Run from root)
 
-### Backend (`server/`)
-
-- **Runtime:** Node.js v20+ (ES Modules).
-- **Framework:** Express v5.
-- **Database:** PouchDB v9 (LevelDB adapter).
-- **AI:** Ollama (local), Whisper (STT), Piper (TTS).
-
-### Shared (`shared/`)
-
-- **Types & Schemas:** Shared TypeScript interfaces and database schemas.
-
-## 3. Monorepo Workflows
-
-Run commands from the **root** directory:
-
-- **Development:**
-    - Client (Web): `npm run dev:client`
-    - Server: `npm run dev:server`
-    - Electron: `npm run dev:electron`
-- **Testing:**
-    - Client: `npm run test:client` (Vitest)
-    - Server: `npm run test:server` (Vitest)
-- **Linting:** `npm run lint` (Prettier + ESLint)
-
-### IDE Setup (VS Code)
-
-- **Extensions:** Install `Svelte for VS Code`, `ESLint`, `Prettier`, and `Tailwind CSS`.
-- **Formatting:** Configured to run **Prettier** and **ESLint --fix** on save.
-- **Settings:** Workspace settings are in `.vscode/settings.json`.
+- **Dev:** `npm run dev:client` (Web), `npm run dev:server` (Backend), `npm run dev:electron` (Desktop).
+- **Setup:** `npm run setup:audio` (Download ONNX models).
+- **Test:** `npm run test:client`, `npm run test:server` (Vitest).
+- **Lint:** `npm run lint` (Prettier + ESLint).
 
 ## 4. Architecture & Data Flow
 
-### Data Synchronization
+- **Data Sync:** RxDB (`client/src/lib/db.ts`) <-> PouchDB (`server/db/database.ts`) via CouchDB replication.
+- **Schema:** Update `shared/db/database-scheme.ts` **FIRST**.
+- **Audio Strategy:**
+    - **Web:** Server-side processing (Whisper/Piper).
+    - **Desktop:** Native Node.js child processes.
+    - **Mobile:** Capacitor Plugin (Native Bridge).
 
-- **Client:** Uses **RxDB** (`client/src/lib/db.ts`) with Dexie storage.
-- **Server:** Uses **PouchDB** (`server/db/database.ts`) with `pouchdb-find`.
-- **Sync:** CouchDB Replication Protocol.
-- **Schema:** Defined in `shared/db/database-scheme.ts`. **Always update this file first** when changing data models.
+### Emotional TTS Sidecar (Chatterbox Turbo)
 
-### Component Structure (`client/src/`)
-
-- **`components/`**: Reusable UI components.
-- **`lib/`**: Business logic, state, and services.
-    - `lib/state/`: Svelte 5 reactive state files (`.svelte.ts`).
-    - `lib/services/`: API clients and hardware integration.
-- **`routes/`**: SvelteKit file-based routing.
+- **Architecture:** Server (Node.js) spawns a Python FastAPI sidecar (Chatterbox Turbo) for expressive TTS.
+- **Communication:**
+    - **Lifecycle:** Managed by Server `child_process.spawn`.
+    - **Protocol:** REST/WebSocket on `localhost:[DYNAMIC_PORT]`.
+- **Generation Protocol:**
+    - **Ollama Output:** JSON `{ "text": "...", "emotion_tags": "[laugh]", "parameters": {...} }` or Inline `Text [gasp] text.`.
+- **Audio Flow:** Server -> FastAPI (`/synthesize`) -> Stream/Buffer -> Client (Web Audio API).
+- **Models:** Lazy loaded.
 
 ## 5. Coding Conventions
 
-### Svelte 5
+- **Svelte 5:** Runes ONLY. No `export let`, `$:` or `createEventDispatcher`. Use `{#snippet}`.
+- **Styling:** Tailwind utility classes + DaisyUI components.
+- **TypeScript:** Strict mode. Use aliases (`$lib`, `$components`).
+- **Imports:** Client uses `$lib`, Server uses relative paths.
 
-- **Runes Only:** Use `$state`, `$derived`, `$effect`, `$props`.
-- **No Legacy:** Do NOT use `export let`, `$:`, or `createEventDispatcher`.
-- **Events:** Pass callback props (e.g., `onclick`) instead of dispatching events.
-- **Snippets:** Use `{#snippet}` instead of `<slot>`.
+## 6. Key Files
 
-### TypeScript
-
-- **Strict Mode:** No `any`. Define interfaces in `shared/` if used across workspaces.
-- **Imports:** Use aliases:
-    - Client: `$lib`, `$components`, `$types`.
-    - Server: Relative imports or configured paths.
-
-### Styling
-
-- Use Tailwind utility classes.
-- Use DaisyUI components for consistency.
-- Ensure dark/light mode compatibility via DaisyUI themes.
-
-## 6. Key Files to Reference
-
-- `PROJECT.md`: Full specifications.
-- `shared/db/database-scheme.ts`: Database schema definitions.
-- `client/src/lib/db.ts`: Client-side database logic.
-- `server/server.ts`: Backend entry point.
+- `PROJECT.md`: Specs.
+- `shared/db/database-scheme.ts`: DB Schema.
+- `client/src/lib/db.ts`: Client DB logic.
+- `server/server.ts`: Backend entry.

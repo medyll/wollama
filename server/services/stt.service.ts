@@ -67,14 +67,20 @@ export const SttService = {
 				// We might need to parse it or use a specific flag for clean output.
 				// For simplicity, let's try to capture stdout and clean it up.
 
-				const whisper = spawn(binaryPath, [
-					'-m',
-					modelPath,
-					'-f',
-					tempInputFile,
-					'-nt', // No timestamps
-					'--no-prints' // Don't print progress
-				]);
+				const whisper = spawn(
+					binaryPath,
+					[
+						'-m',
+						modelPath,
+						'-f',
+						tempInputFile,
+						'-nt', // No timestamps
+						'--no-prints' // Don't print progress
+					],
+					{
+						cwd: path.dirname(binaryPath)
+					}
+				);
 
 				let output = '';
 				let errorOutput = '';

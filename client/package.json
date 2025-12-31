@@ -12,7 +12,39 @@
 		"test": "vitest",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\""
+		"electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+		"build:sidecar": "pyinstaller --clean --onefile --name chatterbox --distpath ./resources/extraResources ../packages/chatterbox/main.py",
+		"package": "npm run build && npm run build:sidecar && electron-builder"
+	},
+	"build": {
+		"appId": "com.wollama.app",
+		"productName": "Wollama",
+		"directories": {
+			"output": "dist_electron"
+		},
+		"files": [
+			"build/**/*",
+			"electron/**/*",
+			"package.json"
+		],
+		"extraResources": [
+			{
+				"from": "resources/extraResources",
+				"to": "extraResources",
+				"filter": [
+					"**/*"
+				]
+			}
+		],
+		"win": {
+			"target": "nsis"
+		},
+		"mac": {
+			"target": "dmg"
+		},
+		"linux": {
+			"target": "AppImage"
+		}
 	},
 	"dependencies": {
 		"@capacitor/android": "^8.0.0",
@@ -47,6 +79,7 @@
 		"concurrently": "^9.2.1",
 		"daisyui": "^5.5.8",
 		"electron": "^39.2.6",
+		"electron-builder": "^24.13.3",
 		"electron-serve": "^3.0.0",
 		"eslint": "^9.39.1",
 		"eslint-config-prettier": "^10.1.8",

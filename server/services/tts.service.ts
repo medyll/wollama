@@ -120,10 +120,17 @@ export const TtsService = {
 
 		return new Promise((resolve) => {
 			// Use --output_file to get a proper WAV file with headers
-			const piper = spawn(binaryPath, ['--model', modelPath, '--output_file', tempFile, '--length_scale', lengthScale]);
+			// IMPORTANT: Set cwd to the binary directory so it can find DLLs/dependencies
+			const piper = spawn(binaryPath, ['--model', modelPath, '--output_file', tempFile, '--length_scale', lengthScale], {
+				cwd: path.dirname(binaryPath)
+			});
 
 			piper.stdin.write(text);
 			piper.stdin.end();
+
+			piper.stderr.on('data', (data) => {
+				console.error(`[Piper stderr]: ${data}`);
+			});
 
 			piper.on('close', async (code) => {
 				if (code === 0) {
