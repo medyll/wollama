@@ -223,7 +223,8 @@
 					onchange={() => (activeSection = activeSection === 'profile' ? null : 'profile')}
 					aria-label="Toggle User Profile"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:user" class="h-5 w-5" />
 					{t('ui.userProfile')}
 				</div>
 				<div class="collapse-content">
@@ -286,7 +287,8 @@
 					onchange={() => (activeSection = activeSection === 'interface' ? null : 'interface')}
 					aria-label="Toggle Interface"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:palette" class="h-5 w-5" />
 					{t('settings.interface')}
 				</div>
 				<div class="collapse-content">
@@ -414,7 +416,8 @@
 					onchange={() => (activeSection = activeSection === 'ai' ? null : 'ai')}
 					aria-label="Toggle AI Configuration"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:brain-circuit" class="h-5 w-5" />
 					{t('settings.ai')}
 				</div>
 				<div class="collapse-content">
@@ -602,7 +605,8 @@
 					onchange={() => (activeSection = activeSection === 'companions' ? null : 'companions')}
 					aria-label="Toggle Companions"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:users" class="h-5 w-5" />
 					{t('ui.companions') || 'Companions'}
 				</div>
 				<div class="collapse-content">
@@ -640,7 +644,8 @@
 					onchange={() => (activeSection = activeSection === 'server' ? null : 'server')}
 					aria-label="Toggle Server Configuration"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:server" class="h-5 w-5" />
 					{t('settings.server_connection')}
 				</div>
 				<div class="collapse-content">
@@ -684,7 +689,8 @@
 					onchange={() => (activeSection = activeSection === 'danger' ? null : 'danger')}
 					aria-label="Toggle Danger Zone"
 				/>
-				<div class="collapse-title text-error text-lg font-medium">
+				<div class="collapse-title text-error flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:alert-triangle" class="h-5 w-5" />
 					{t('settings.danger_zone') || 'Danger Zone'}
 				</div>
 				<div class="collapse-content">
