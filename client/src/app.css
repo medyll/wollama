@@ -101,17 +101,23 @@
 dialog {
 	position: fixed;
 	inset: 0;
-	z-index: 50;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	background-color: transparent;
 	overflow-y: auto;
+	/* Hidden by default, only visible when [open] */
+	z-index: -1;
+	pointer-events: none;
+}
+
+dialog[open] {
+	z-index: 9999;
+	pointer-events: auto;
 }
 
 dialog::backdrop {
 	background-color: rgba(0, 0, 0, 0.5);
-	z-index: 40;
 }
 
 dialog[open]::backdrop {

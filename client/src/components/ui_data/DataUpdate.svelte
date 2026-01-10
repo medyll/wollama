@@ -280,13 +280,12 @@
 <dialog
 	bind:this={dialogRef}
 	class="modal"
-	style="z-index: {isOpen ? 50 : -1}"
 	oncancel={(e) => {
 		e.preventDefault();
 		isOpen = false;
 	}}
 >
-	<div class="modal-box relative z-50 w-11/12 max-w-4xl">
+	<div class="modal-box relative w-11/12 max-w-4xl">
 		<button
 			class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
 			onclick={() => {
@@ -362,7 +361,7 @@
 	</div>
 	<!-- Backdrop: Clicking outside closes the modal -->
 	<!-- svelte-ignore a11y_consider_explicit_label -->
-	<form method="dialog" class="modal-backdrop z-40">
+	<form method="dialog" class="modal-backdrop">
 		<button
 			type="submit"
 			onclick={(e) => {
