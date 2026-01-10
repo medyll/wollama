@@ -43,6 +43,12 @@
 		// Initialize default data
 		await DataInitializer.initializeDefaults();
 
+		// Check onboarding status - redirect if not completed
+		if (!userState.preferences.onboarding_completed) {
+			goto('/onboarding');
+			return;
+		}
+
 		App.addListener('appUrlOpen', (data) => {
 			// Cleanup: "myapp://chat/123" -> "/chat/123"
 			// Adjust logic based on actual scheme

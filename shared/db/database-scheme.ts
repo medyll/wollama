@@ -29,6 +29,7 @@ export const appSchema: DatabaseSchema = {
 			server_url: { type: 'string', ui: { type: 'url' } },
 			default_model: { type: 'string' },
 			default_temperature: { type: 'number', ui: { type: 'slider', min: 0, max: 1, step: 0.1 } },
+			onboarding_completed: { type: 'boolean', ui: { type: 'toggle' }, default: false },
 			updated_at: { type: 'timestamp', auto: true }
 		}
 	},

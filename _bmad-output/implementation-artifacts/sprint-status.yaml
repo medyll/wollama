@@ -1,0 +1,80 @@
+# generated: 2026-01-09
+# project: wollama
+# project_key: wollama
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+# sprint status tracking file
+# metadata is duplicated: comments above and YAML keys below for parsing
+
+generated: 2026-01-09
+project: wollama
+project_key: wollama
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+    epic-1: in-progress
+    1-1-display-onboarding-wizard-on-first-launch: review
+    1-2-capture-and-validate-ollama-server-url: review
+    1-3-handle-connection-failures-gracefully: ready-for-dev
+    1-4-persist-server-configuration: backlog
+    epic-1-retrospective: optional
+
+    epic-2: backlog
+    2-1-display-system-provided-default-companions: backlog
+    2-2-create-user-owned-companion-by-customizing-a-default: backlog
+    2-3-persist-user-companions-across-app-updates: backlog
+    2-4-display-companion-ownership-clearly: backlog
+    epic-2-retrospective: optional
+
+    epic-3: backlog
+    3-1-create-a-new-chat-session: backlog
+    3-2-send-text-message-and-display-streaming-response: backlog
+    3-3-store-chat-history-locally: backlog
+    3-4-display-chat-list-ordered-by-recency: backlog
+    epic-3-retrospective: optional
+
+    epic-4: backlog
+    4-1-queue-offline-changes-and-sync-on-reconnect: backlog
+    4-2-sync-changes-across-multiple-devices: backlog
+    4-3-resolve-sync-conflicts-last-write-wins: backlog
+    4-4-handle-server-disconnection-gracefully: backlog
+    epic-4-retrospective: optional
+
+    epic-5: backlog
+    5-1-unit-tests-for-companion-ownership-model: backlog
+    5-2-integration-tests-for-offline-online-sync: backlog
+    5-3-e2e-test-for-onboarding-journey: backlog
+    5-4-e2e-test-for-multi-device-sync: backlog
+    5-5-mock-ollama-server-for-testing: backlog
+    epic-5-retrospective: optional
