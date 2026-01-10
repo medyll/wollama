@@ -1,4 +1,5 @@
 import { translations } from '../../locales/translations.js';
+import { browser } from '$app/environment';
 
 export class UserState {
 	nickname = $state('');
@@ -28,8 +29,8 @@ export class UserState {
 	});
 
 	constructor() {
-		// Load from localStorage if available
-		if (typeof localStorage !== 'undefined') {
+		// Load from localStorage if available (browser-only)
+		if (browser && typeof localStorage !== 'undefined') {
 			const stored = localStorage.getItem('wollama_user');
 			if (stored) {
 				const data = JSON.parse(stored);
@@ -54,7 +55,7 @@ export class UserState {
 				}
 			} else {
 				// First start: Detect browser language
-				if (typeof navigator !== 'undefined') {
+				if (browser && typeof navigator !== 'undefined') {
 					const browserLang = navigator.language.split('-')[0];
 					if (browserLang in translations) {
 						this.preferences.locale = browserLang;
@@ -92,7 +93,7 @@ export class UserState {
 
 	save() {
 		this.isConfigured = true;
-		if (typeof localStorage !== 'undefined') {
+		if (browser && typeof localStorage !== 'undefined') {
 			localStorage.setItem(
 				'wollama_user',
 				JSON.stringify({
@@ -133,7 +134,7 @@ export class UserState {
 			onboarding_completed: false
 		};
 
-		if (typeof localStorage !== 'undefined') {
+		if (browser && typeof localStorage !== 'undefined') {
 			localStorage.removeItem('wollama_user');
 		}
 	}
