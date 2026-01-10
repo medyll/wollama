@@ -96,3 +96,38 @@
 	--tab-border: 1px;
 	--tab-radius: 0.5rem;
 }
+
+/* Modal fixes: Proper z-index stacking and backdrop behavior */
+dialog {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: transparent;
+	overflow-y: auto;
+}
+
+dialog::backdrop {
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 40;
+}
+
+dialog[open]::backdrop {
+	animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+/* Prevent body scroll when modal is open */
+body:has(dialog[open]) {
+	overflow: hidden;
+}

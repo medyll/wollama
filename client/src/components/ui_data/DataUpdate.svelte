@@ -7,10 +7,11 @@
 
 	let { tableName, id = undefined, isOpen = $bindable(false), onSave = undefined, data = {} } = $props();
 
-	let formData = $state<any>({ ...data });
+	let formData = $state<any>({});
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 	let isOptimizing = $state(false);
+	let dialogRef: HTMLDialogElement | undefined = $state();
 
 	let tableDef = $derived(appSchema[tableName]);
 	let dataService = $derived(new DataGenericService(tableName));
@@ -22,6 +23,14 @@
 			} else {
 				formData = { ...data };
 			}
+			// Show modal
+			dialogRef?.showModal?.();
+		} else {
+			// Close modal
+			dialogRef?.close?.();
+			// Reset state when modal closes
+			formData = {};
+			error = null;
 		}
 	});
 
@@ -268,10 +277,23 @@
 	</div>
 {/snippet}
 
-<dialog class="modal" class:modal-open={isOpen}>
-	<div class="modal-box w-11/12 max-w-4xl">
-		<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2" onclick={() => (isOpen = false)} aria-label="Close"
-			>✕</button
+<dialog
+	bind:this={dialogRef}
+	class="modal"
+	style="z-index: {isOpen ? 50 : -1}"
+	oncancel={(e) => {
+		e.preventDefault();
+		isOpen = false;
+	}}
+>
+	<div class="modal-box relative z-50 w-11/12 max-w-4xl">
+		<button
+			class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
+			onclick={() => {
+				isOpen = false;
+			}}
+			aria-label="Close"
+			tabindex="0">✕</button
 		>
 
 		<h3 class="mb-6 text-xl font-bold capitalize">
@@ -320,8 +342,16 @@
 			</div>
 		{/if}
 
-		<div class="modal-action mt-6">
-			<button class="btn btn-ghost" onclick={() => (isOpen = false)}>Cancel</button>
+		<div class="modal-action mt-6 gap-3">
+			<button
+				class="btn btn-ghost"
+				onclick={() => {
+					isOpen = false;
+				}}
+				tabindex="0"
+			>
+				Cancel
+			</button>
 			<button class="btn btn-primary" onclick={handleSave} disabled={loading}>
 				{#if loading}
 					<span class="loading loading-spinner loading-sm"></span>
@@ -330,7 +360,17 @@
 			</button>
 		</div>
 	</div>
-	<form method="dialog" class="modal-backdrop">
-		<button onclick={() => (isOpen = false)}>close</button>
+	<!-- Backdrop: Clicking outside closes the modal -->
+	<!-- svelte-ignore a11y_consider_explicit_label -->
+	<form method="dialog" class="modal-backdrop z-40">
+		<button
+			type="submit"
+			onclick={(e) => {
+				e.preventDefault();
+				isOpen = false;
+			}}
+			tabindex="-1"
+			style="width: 100%; height: 100%; cursor: default; border: none; background: transparent; padding: 0;"
+		></button>
 	</form>
 </dialog>
