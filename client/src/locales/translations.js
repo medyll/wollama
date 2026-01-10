@@ -119,7 +119,16 @@ export const translations = {
 			categorize: 'categorize',
 			delete_chat: 'delete',
 			guess_chat_title: 'guess title',
-			describe: 'describe'
+			describe: 'describe',
+			server_unavailable:
+				'Server is currently unavailable. Your message was saved locally and will be sent when connection is restored.'
+		},
+		sync: {
+			offline: 'Offline',
+			syncing: 'Syncing...',
+			error: 'Sync failed',
+			errors_persisted: 'Some items failed to sync',
+			sync_complete: 'Sync complete'
 		},
 		setup: {
 			subtitle: 'Choose how you want to start your journey.'

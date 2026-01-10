@@ -11,14 +11,13 @@
 	import SidebarTrigger from '$components/ui/SidebarTrigger.svelte';
 	import UserMenu from '$components/ui/UserMenu.svelte';
 	import SyncStatus from '$components/ui/SyncStatus.svelte';
+	import OfflineIndicator from '$components/ui/OfflineIndicator.svelte';
 	import { connectionState } from '$lib/state/connection.svelte';
 	import { uiState } from '$lib/state/ui.svelte';
 	import { userState } from '$lib/state/user.svelte';
 	import { downloadState } from '$lib/state/downloads.svelte';
 	import { DataInitializer } from '$lib/services/data-initializer';
-	import { t } from '$lib/state/i18n.svelte';
 	import { page } from '$app/stores';
-	import Icon from '@iconify/svelte';
 	import { enableReplication, disableReplication } from '$lib/db';
 	let { children } = $props();
 
@@ -83,6 +82,7 @@
 <ServerConnectionCheck />
 <SplashScreen />
 <SyncStatus />
+<OfflineIndicator />
 
 {#if userState.preferences.onboarding_completed}
 	<div class="drawer md:drawer-open h-screen overflow-hidden">

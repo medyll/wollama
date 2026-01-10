@@ -1,5 +1,6 @@
 import { getDatabase } from '$lib/db';
 import { userState } from '$lib/state/user.svelte';
+import { connectionState } from '$lib/state/connection.svelte';
 import { contextState } from '$lib/state/context.svelte';
 import { toast } from '$lib/state/notifications.svelte';
 import { t } from '$lib/state/i18n.svelte';
@@ -163,6 +164,16 @@ export class ChatService {
 			assistantMsgId = await this.addMessage(chatId, 'assistant', '', 'streaming');
 		}
 
+		// Story 4.4: Check if server is available before attempting generation
+		if (!connectionState.isConnected) {
+			const offlineMsg =
+				t('chat.server_unavailable') ||
+				'Server is currently unavailable. Your message was saved locally and will be sent when connection is restored.';
+			toast.warning(offlineMsg);
+			await this.updateMessage(assistantMsgId, offlineMsg, 'error');
+			throw new Error('Server unavailable - working in offline mode');
+		}
+
 		// Fetch chat to get system prompt
 		const chat = await this.getChat(chatId);
 		let systemPrompt = '';
@@ -237,6 +248,14 @@ export class ChatService {
 					} catch {
 						// Ignore JSON parse error
 					}
+
+					// Story 4.4: Distinguish between server errors and network errors
+					if (response.status >= 500) {
+						throw new Error(`Server error: ${errorMessage}`);
+					} else if (response.status >= 400) {
+						throw new Error(`Client error: ${errorMessage}`);
+					}
+
 					throw new Error(errorMessage);
 				}
 
