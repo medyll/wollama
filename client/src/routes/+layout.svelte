@@ -40,34 +40,37 @@
 		}
 	});
 
-	onMount(async () => {
-		// Initialize default data
-		await DataInitializer.initializeDefaults();
+	onMount(() => {
+		// Wrap async work to avoid returning a Promise from onMount
+		(async () => {
+			// Initialize default data
+			await DataInitializer.initializeDefaults();
 
-		// Check onboarding status - redirect if not completed
-		if (!userState.preferences.onboarding_completed) {
-			goto('/onboarding');
-			return;
-		}
-
-		// Start sync if user is authenticated
-		if (userState.uid) {
-			try {
-				await enableReplication(userState.uid, userState.token || '');
-				console.log('Replication started for user:', userState.uid);
-				connectionState.setConnected(true);
-			} catch (err) {
-				console.error('Failed to start replication:', err);
-				connectionState.setConnected(false);
+			// Check onboarding status - redirect if not completed
+			if (!userState.preferences.onboarding_completed) {
+				goto('/onboarding');
+				return;
 			}
-		}
 
-		App.addListener('appUrlOpen', (data) => {
-			// Cleanup: "myapp://chat/123" -> "/chat/123"
-			// Adjust logic based on actual scheme
-			const slug = data.url.split('.com').pop();
-			if (slug) goto(slug);
-		});
+			// Start sync if user is authenticated
+			if (userState.uid) {
+				try {
+					await enableReplication(userState.uid, userState.token || '');
+					console.log('Replication started for user:', userState.uid);
+					connectionState.setConnected(true);
+				} catch (err) {
+					console.error('Failed to start replication:', err);
+					connectionState.setConnected(false);
+				}
+			}
+
+			App.addListener('appUrlOpen', (data) => {
+				// Cleanup: "myapp://chat/123" -> "/chat/123"
+				// Adjust logic based on actual scheme
+				const slug = data.url.split('.com').pop();
+				if (slug) goto(slug);
+			});
+		})();
 
 		// Cleanup on unmount
 		return () => {
