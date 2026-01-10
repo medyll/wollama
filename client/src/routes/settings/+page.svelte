@@ -31,6 +31,28 @@
 	let isEditingCompanion = $state(false);
 	let editingCompanionId = $state<string | undefined>(undefined);
 
+	// Auth settings
+	let secureProfile = $state(userState.isSecured);
+	let newPassword = $state('');
+	let authError = $state('');
+
+	function saveAuthSettings() {
+		authError = '';
+		if (secureProfile) {
+			if (!newPassword.trim()) {
+				authError = 'Password is required when security is enabled';
+				return;
+			}
+			userState.setLocalProtection(newPassword.trim());
+		} else {
+			userState.password = null;
+			userState.isSecured = false;
+			userState.save();
+		}
+		toast.success('Authentication settings saved');
+		newPassword = '';
+	}
+
 	// Auto-save preferences when they change
 	$effect(() => {
 		// Track all preferences changes by serializing
@@ -249,6 +271,56 @@
 							<div class="flex h-12 w-full max-w-xs items-center">
 								<LanguageSelector />
 							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Section: Authentication -->
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'auth'}
+					onchange={() => (activeSection = activeSection === 'auth' ? null : 'auth')}
+					aria-label="Toggle Authentication"
+				/>
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:lock" class="h-5 w-5" />
+					Authentication
+				</div>
+				<div class="collapse-content">
+					<div class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+						<div class="form-control">
+							<label class="label cursor-pointer justify-start gap-4">
+								<input type="checkbox" class="checkbox checkbox-primary" bind:checked={secureProfile} />
+								<span class="label-text">Secure with password (shared machine)</span>
+							</label>
+						</div>
+
+						{#if secureProfile}
+							<div class="form-control">
+								<label class="label" for="new-password">
+									<span class="label-text">Set/Change Password</span>
+								</label>
+								<input
+									type="password"
+									id="new-password"
+									placeholder="Enter new password"
+									class="input input-bordered w-full"
+									bind:value={newPassword}
+								/>
+							</div>
+						{/if}
+
+						{#if authError}
+							<div class="alert alert-error py-2 text-sm">
+								<Icon icon="lucide:alert-circle" class="h-4 w-4" />
+								<span>{authError}</span>
+							</div>
+						{/if}
+
+						<div class="form-control">
+							<button class="btn btn-primary" onclick={saveAuthSettings}>Save</button>
 						</div>
 					</div>
 				</div>

@@ -118,27 +118,6 @@
 							></progress>
 						</div>
 					{/if}
-					<button
-						class="btn btn-ghost btn-circle"
-						onclick={() => connectionState.toggleModal()}
-						aria-label="Connection Status"
-						title={!connectionState.isConnected
-							? t('status.error')
-							: !connectionState.isOllamaConnected
-								? 'Ollama Service Down'
-								: t('status.connected')}
-					>
-						<Icon
-							icon="lucide:dot"
-							class={`h-5 w-5 ${
-								!connectionState.isConnected
-									? 'text-error'
-									: !connectionState.isOllamaConnected
-										? 'text-warning'
-										: 'text-success'
-							}`}
-						/>
-					</button>
 					<UserMenu />
 				</div>
 			</header>

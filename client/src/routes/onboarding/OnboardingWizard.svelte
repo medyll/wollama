@@ -9,13 +9,20 @@
 	import { DataGenericService } from '$lib/services/data-generic.service';
 
 	let currentStep = $state(0);
-	const totalSteps = 4; // Intro + Server URL config + Import companions + Companion selection
+	const totalSteps = 5; // Profile/Auth + Server URL config + Import companions + Companion selection + Complete
 
-	// Step 0: Intro
+	// Step 0: Profile & Auth setup
 	// Step 1: Server URL configuration (Ollama)
 	// Step 2: Import default companions
 	// Step 3: Companion selection
+	// Step 4: Complete
 	let serverUrl = $state(userState.preferences.ollamaUrl || 'http://localhost:11434');
+	// Profile/Auth state
+	let nickname = $state(userState.nickname || '');
+	let isSharedMachine = $state(userState.isSecured || false);
+	let password = $state('');
+	let email = $state(userState.email || '');
+	let profileError = $state('');
 	let selectedCompanion: UserCompanion | null = $state(null);
 	let isTestingConnection = $state(false);
 	let connectionMessage = $state('');
@@ -27,10 +34,9 @@
 
 	const steps = [
 		{
-			title: 'Welcome to Wollama',
-			description:
-				'Wollama is a local AI chat application that lets you chat with AI models running on your machine via Ollama.',
-			icon: 'mdi:chat-processing-outline'
+			title: 'Set Up Your Profile',
+			description: 'Choose a nickname and optional password (for shared machines).',
+			icon: 'mdi:account-cog-outline'
 		},
 		{
 			title: 'Configure Ollama Server',
@@ -49,6 +55,19 @@
 		}
 	];
 
+	function validateProfileStep() {
+		profileError = '';
+		if (!nickname.trim()) {
+			profileError = 'Nickname is required';
+			return false;
+		}
+		if (isSharedMachine && !password.trim()) {
+			profileError = 'Password is required for shared machines';
+			return false;
+		}
+		return true;
+	}
+
 	async function handleNext() {
 		// If on server config step, validate before proceeding
 		if (currentStep === 1) {
@@ -56,6 +75,21 @@
 			if (!connectionSuccess) {
 				return; // Don't advance if validation failed
 			}
+		}
+
+		// If on profile step, persist profile/auth state
+		if (currentStep === 0) {
+			if (!validateProfileStep()) return;
+			userState.nickname = nickname.trim();
+			if (isSharedMachine) {
+				userState.setLocalProtection(password);
+				userState.email = email.trim() || null;
+			} else {
+				// Ensure local protection is disabled
+				userState.password = null;
+				userState.isSecured = false;
+			}
+			userState.save();
 		}
 
 		// If on import step, trigger import automatically
@@ -220,6 +254,65 @@
 				<p class="text-base-content/70 mb-8 text-center">
 					{steps[currentStep].description}
 				</p>
+
+				<!-- Step 0: Profile & Auth -->
+				{#if currentStep === 0}
+					<div class="space-y-4">
+						<div class="form-control">
+							<label class="label" for="nickname">
+								<span class="label-text">Nickname</span>
+							</label>
+							<input
+								type="text"
+								id="nickname"
+								placeholder="How should we call you?"
+								class="input input-bordered w-full"
+								bind:value={nickname}
+							/>
+						</div>
+
+						<div class="form-control">
+							<label class="label cursor-pointer justify-start gap-4">
+								<input type="checkbox" class="checkbox checkbox-primary" bind:checked={isSharedMachine} />
+								<span class="label-text">This is a shared machine (Secure my profile)</span>
+							</label>
+						</div>
+
+						{#if isSharedMachine}
+							<div class="form-control">
+								<label class="label" for="password">
+									<span class="label-text">Password / PIN</span>
+								</label>
+								<input
+									type="password"
+									id="password"
+									placeholder="Enter a secure password"
+									class="input input-bordered w-full"
+									bind:value={password}
+								/>
+							</div>
+							<div class="form-control">
+								<label class="label" for="email">
+									<span class="label-text">Email (Optional)</span>
+								</label>
+								<input
+									type="email"
+									id="email"
+									placeholder="For recovery"
+									class="input input-bordered w-full"
+									bind:value={email}
+								/>
+							</div>
+						{/if}
+
+						{#if profileError}
+							<div class="alert alert-error py-2 text-sm">
+								<Icon icon="lucide:alert-circle" class="h-4 w-4" />
+								<span>{profileError}</span>
+							</div>
+						{/if}
+					</div>
+				{/if}
 
 				<!-- Step 1: Server URL Configuration Form -->
 				{#if currentStep === 1}
