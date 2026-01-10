@@ -10,6 +10,7 @@
 	import Sidebar from '$components/ui/Sidebar.svelte';
 	import SidebarTrigger from '$components/ui/SidebarTrigger.svelte';
 	import UserMenu from '$components/ui/UserMenu.svelte';
+	import SyncStatus from '$components/ui/SyncStatus.svelte';
 	import { connectionState } from '$lib/state/connection.svelte';
 	import { uiState } from '$lib/state/ui.svelte';
 	import { userState } from '$lib/state/user.svelte';
@@ -18,7 +19,7 @@
 	import { t } from '$lib/state/i18n.svelte';
 	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
-
+	import { enableReplication, disableReplication } from '$lib/db';
 	let { children } = $props();
 
 	$effect(() => {
@@ -49,18 +50,36 @@
 			return;
 		}
 
+		// Start sync if user is authenticated
+		if (userState.uid) {
+			try {
+				await enableReplication(userState.uid, userState.token || '');
+				console.log('Replication started for user:', userState.uid);
+				connectionState.setConnected(true);
+			} catch (err) {
+				console.error('Failed to start replication:', err);
+				connectionState.setConnected(false);
+			}
+		}
+
 		App.addListener('appUrlOpen', (data) => {
 			// Cleanup: "myapp://chat/123" -> "/chat/123"
 			// Adjust logic based on actual scheme
 			const slug = data.url.split('.com').pop();
 			if (slug) goto(slug);
 		});
+
+		// Cleanup on unmount
+		return () => {
+			disableReplication().catch((err) => console.error('Failed to disable replication:', err));
+		};
 	});
 </script>
 
 <ToastContainer />
 <ServerConnectionCheck />
 <SplashScreen />
+<SyncStatus />
 
 {#if userState.preferences.onboarding_completed}
 	<div class="drawer md:drawer-open h-screen overflow-hidden">

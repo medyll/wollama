@@ -86,7 +86,6 @@
 					{/if}
 				{/each}
 			</div>
-
 			<!-- Actions (Slot) -->
 			<div class="card-actions mt-4 justify-end">
 				{#if editable}

@@ -208,90 +208,111 @@ export class ChatService {
 			ollamaMessages.unshift({ role: 'system', content: systemPrompt });
 		}
 
-		try {
-			const response = await fetch(`${serverUrl}/api/chat/generate`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					model: chat?.model || userState.preferences.defaultModel,
-					messages: ollamaMessages,
-					stream: true,
-					context: contextState.getPayload()
-				})
-			});
+		// Retry logic with exponential backoff
+		const maxRetries = 3;
+		let lastError: Error | null = null;
 
-			if (!response.ok) {
-				let errorMessage = 'Generation failed';
-				try {
-					const errorData = await response.json();
-					if (errorData?.error?.message) {
-						errorMessage = errorData.error.message;
-					}
-				} catch {
-					// Ignore JSON parse error
-				}
-				throw new Error(errorMessage);
-			}
+		for (let attempt = 0; attempt < maxRetries; attempt++) {
+			try {
+				const response = await fetch(`${serverUrl}/api/chat/generate`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						model: chat?.model || userState.preferences.defaultModel,
+						messages: ollamaMessages,
+						stream: true,
+						context: contextState.getPayload()
+					})
+				});
 
-			if (!response.body) throw new Error('No response body');
-
-			const reader = response.body.getReader();
-			const decoder = new TextDecoder();
-			let fullContent = '';
-
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-
-				const chunk = decoder.decode(value, { stream: true });
-				// Parse NDJSON (Newline Delimited JSON)
-				const lines = chunk.split('\n').filter((line) => line.trim() !== '');
-
-				for (const line of lines) {
+				if (!response.ok) {
+					let errorMessage = 'Generation failed';
 					try {
-						const json = JSON.parse(line);
-
-						// Handle error in stream
-						if (json.error) {
-							throw new Error(json.error);
+						const errorData = await response.json();
+						if (errorData?.error?.message) {
+							errorMessage = errorData.error.message;
 						}
+					} catch {
+						// Ignore JSON parse error
+					}
+					throw new Error(errorMessage);
+				}
 
-						if (json.message?.content) {
-							fullContent += json.message.content;
-							// Update UI/DB progressively
-							// Optimization: Maybe don't write to DB on every chunk if it's too fast,
-							// but for now let's try direct updates.
-							await this.updateMessage(assistantMsgId, fullContent, 'streaming');
-						}
-						if (json.done) {
-							await this.updateMessage(assistantMsgId, fullContent, 'done');
-							if (!toast.isFocused) {
-								toast.info(t('chat.response_received') || 'Response received');
+				if (!response.body) throw new Error('No response body');
+
+				const reader = response.body.getReader();
+				const decoder = new TextDecoder();
+				let fullContent = '';
+
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
+
+					const chunk = decoder.decode(value, { stream: true });
+					// Parse NDJSON (Newline Delimited JSON)
+					const lines = chunk.split('\n').filter((line) => line.trim() !== '');
+
+					for (const line of lines) {
+						try {
+							const json = JSON.parse(line);
+
+							// Handle error in stream
+							if (json.error) {
+								throw new Error(json.error);
 							}
-							// Trigger metadata update in background
-							MetadataService.updateChatMetadata(chatId).catch((err) =>
-								console.error('Metadata update failed', err)
-							);
+
+							if (json.message?.content) {
+								fullContent += json.message.content;
+								// Update UI/DB progressively
+								// Optimization: Maybe don't write to DB on every chunk if it's too fast,
+								// but for now let's try direct updates.
+								await this.updateMessage(assistantMsgId, fullContent, 'streaming');
+							}
+							if (json.done) {
+								await this.updateMessage(assistantMsgId, fullContent, 'done');
+								if (!toast.isFocused) {
+									toast.info(t('chat.response_received') || 'Response received');
+								}
+								// Trigger metadata update in background
+								MetadataService.updateChatMetadata(chatId).catch((err) =>
+									console.error('Metadata update failed', err)
+								);
+							}
+						} catch (e) {
+							if (e instanceof Error && e.message !== 'JSON.parse') {
+								throw e;
+							}
+							console.error('Error parsing chunk', e);
 						}
-					} catch (e) {
-						if (e instanceof Error && e.message !== 'JSON.parse') {
-							throw e;
-						}
-						console.error('Error parsing chunk', e);
 					}
 				}
-			}
 
-			return fullContent;
-		} catch (error) {
-			console.error('Generation error:', error);
-			const errorMessage = error instanceof Error ? error.message : 'Error generating response.';
+				return fullContent;
+			} catch (err) {
+				lastError = err as Error;
+				const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff: 1s, 2s, 4s
+
+				if (attempt < maxRetries - 1) {
+					console.warn(`Generation attempt ${attempt + 1} failed, retrying in ${waitTime}ms:`, err);
+					await new Promise((resolve) => setTimeout(resolve, waitTime));
+				} else {
+					console.error('Max retries reached for generation');
+				}
+			}
+		}
+
+		// All retries failed
+		if (lastError) {
+			console.error('Generation failed after retries:', lastError);
+			const errorMessage = lastError instanceof Error ? lastError.message : 'Error generating response after retries.';
 			toast.error(errorMessage);
 			await this.updateMessage(assistantMsgId, errorMessage, 'error');
-			throw error;
+			throw lastError;
 		}
+
+		throw new Error('Generation failed');
 	}
 
 	async search(

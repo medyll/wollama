@@ -110,7 +110,7 @@ Implement a structured consolidation across 5 epics:
 
 - **Schema Source of Truth:** `shared/db/database-scheme.ts` (single schema for client RxDB + server PouchDB)
 - **Client DB:** `client/src/lib/db.ts` - RxDB with Dexie storage, CouchDB replication
-    - Database name: `wollama_client_db_v12`
+    - Database name: `wollama_client_db_v13`
     - Storage: `wrappedValidateAjvStorage` with Dexie backend
     - Replication: Per-user database on server (`user_{userId}_{tableName}`)
     - Reactive queries: RxDB's `collection.find().$.subscribe()`
