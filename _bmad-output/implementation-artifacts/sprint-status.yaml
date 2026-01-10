@@ -1,4 +1,4 @@
-# generated: 2026-01-09
+# generated: 2026-01-10
 # project: wollama
 # project_key: wollama
 # tracking_system: file-system
@@ -36,41 +36,46 @@
 # sprint status tracking file
 # metadata is duplicated: comments above and YAML keys below for parsing
 
-generated: 2026-01-09
+generated: 2026-01-10
 project: wollama
 project_key: wollama
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts
 
 development_status:
+    # EPIC 1: Onboarding & Server Connection
     epic-1: in-progress
-    1-1-display-onboarding-wizard-on-first-launch: review
-    1-2-capture-and-validate-ollama-server-url: review
+    1-1-display-onboarding-wizard-on-first-launch: ready-for-dev
+    1-2-capture-and-validate-ollama-server-url: ready-for-dev
     1-3-handle-connection-failures-gracefully: ready-for-dev
-    1-4-persist-server-configuration: backlog
+    1-4-persist-server-configuration: ready-for-dev
     epic-1-retrospective: optional
 
-    epic-2: backlog
-    2-1-display-system-provided-default-companions: backlog
-    2-2-create-user-owned-companion-by-customizing-a-default: backlog
-    2-3-persist-user-companions-across-app-updates: backlog
-    2-4-display-companion-ownership-clearly: backlog
+    # EPIC 2: Companion System
+    epic-2: done
+    2-1-display-system-provided-default-companions: done
+    2-2-create-user-owned-companion-by-customizing-a-default: done
+    2-3-persist-user-companions-across-app-updates: done
+    2-4-display-companion-ownership-clearly: done
     epic-2-retrospective: optional
 
-    epic-3: backlog
-    3-1-create-a-new-chat-session: backlog
-    3-2-send-text-message-and-display-streaming-response: backlog
-    3-3-store-chat-history-locally: backlog
-    3-4-display-chat-list-ordered-by-recency: backlog
+    # EPIC 3: Chat Interface & Messaging
+    epic-3: done
+    3-1-create-a-new-chat-session: done
+    3-2-send-text-message-and-display-streaming-response: done
+    3-3-store-chat-history-locally: done
+    3-4-display-chat-list-ordered-by-recency: done
     epic-3-retrospective: optional
 
-    epic-4: backlog
-    4-1-queue-offline-changes-and-sync-on-reconnect: backlog
-    4-2-sync-changes-across-multiple-devices: backlog
-    4-3-resolve-sync-conflicts-last-write-wins: backlog
-    4-4-handle-server-disconnection-gracefully: backlog
+    # EPIC 4: Data Sync & Offline Support
+    epic-4: done
+    4-1-queue-offline-changes-and-sync-on-reconnect: done
+    4-2-sync-changes-across-multiple-devices: done
+    4-3-resolve-sync-conflicts-last-write-wins: done
+    4-4-handle-server-disconnection-gracefully: done
     epic-4-retrospective: optional
 
+    # EPIC 5: Test Coverage & Reliability
     epic-5: backlog
     5-1-unit-tests-for-companion-ownership-model: backlog
     5-2-integration-tests-for-offline-online-sync: backlog
@@ -78,3 +83,19 @@ development_status:
     5-4-e2e-test-for-multi-device-sync: backlog
     5-5-mock-ollama-server-for-testing: backlog
     epic-5-retrospective: optional
+
+    # EPIC 6: Voice Features (STT/TTS)
+    epic-6: backlog
+    6-1-web-platform-server-side-stt-tts-processing: backlog
+    6-2-desktop-platform-native-child-process-stt-tts: backlog
+    6-3-mobile-platform-native-bridge-with-server-fallback: backlog
+    6-4-voice-ui-controls-and-feedback: backlog
+    epic-6-retrospective: optional
+
+    # EPIC 7: Accessibility & Localization
+    epic-7: backlog
+    7-1-wcag-2-1-aa-compliance-semantic-html-aria: backlog
+    7-2-full-keyboard-navigation: backlog
+    7-3-screen-reader-support-with-live-regions: backlog
+    7-4-complete-i18n-coverage-with-existing-framework: backlog
+    epic-7-retrospective: optional

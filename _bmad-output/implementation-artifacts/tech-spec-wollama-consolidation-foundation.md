@@ -742,3 +742,506 @@ Implement a structured consolidation across 5 epics:
 - **Copy-on-Customize:** User never modifies system companions directly; always creates a personal copy first
 - **Offline-First:** All data operations work offline; sync happens in background when online
 - **Last-Write-Wins (LWW):** Simple conflict resolution strategy using `updated_at` timestamps for MVP
+
+---
+
+## Epic 6: Voice Features (STT/TTS) - Implementation Plan
+
+### Technical Architecture
+
+**Voice Processing Strategy:**
+
+- **Web:** Server-side processing (Whisper for STT, Piper for TTS via Node.js child processes)
+- **Desktop:** Native child processes spawned by Electron main process (lower latency)
+- **Mobile:** Capacitor audio plugin with server fallback
+
+**Audio Formats:**
+
+- **Input (STT):** 16kHz mono WAV (Whisper requirement)
+- **Output (TTS):** MP3/OGG (web-compatible streaming format)
+
+**Service Abstraction:**
+
+```typescript
+interface IPlatformAudioService {
+	recordAudio(): Promise<AudioBlob>;
+	transcribe(audio: AudioBlob): Promise<string>;
+	synthesize(text: string): Promise<AudioBlob>;
+	playAudio(audio: AudioBlob): Promise<void>;
+}
+```
+
+**Implementations:**
+
+- `WebAudioService` - Uses MediaRecorder API + server endpoints
+- `ElectronAudioService` - Uses IPC to main process + native binaries
+- `CapacitorAudioService` - Uses Capacitor plugins + server fallback
+
+### Server-Side Voice Infrastructure
+
+**New Services:**
+
+**1. WhisperService (`server/services/whisper.service.ts`)**
+
+```typescript
+class WhisperService {
+	private whisperPath = './bin/whisper/whisper-cpp';
+
+	async transcribe(audioPath: string): Promise<string> {
+		// Spawn whisper-cpp child process
+		// Args: -f audio.wav -m models/ggml-base.bin -otxt
+		// Return transcribed text
+	}
+}
+```
+
+**2. PiperService (`server/services/piper.service.ts`)**
+
+```typescript
+class PiperService {
+	private piperPath = './bin/piper/piper';
+
+	async synthesize(text: string, voice: string = 'en_US-lessac'): Promise<Buffer> {
+		// Spawn piper child process
+		// Echo text | piper --model voice.onnx --output_file -
+		// Return audio buffer (WAV)
+	}
+}
+```
+
+**3. AudioService (`server/services/audio.service.ts`)**
+
+```typescript
+class AudioService {
+	constructor(
+		private whisperService: WhisperService,
+		private piperService: PiperService
+	) {}
+
+	async transcribeAudio(audioBuffer: Buffer): Promise<{ text: string }> {
+		// Save buffer to temp file
+		// Call whisperService.transcribe()
+		// Clean up temp file
+		// Return { text }
+	}
+
+	async synthesizeSpeech(text: string, voice?: string): Promise<Buffer> {
+		// Call piperService.synthesize()
+		// Convert WAV to MP3 if needed (ffmpeg)
+		// Return audio buffer
+	}
+}
+```
+
+**New API Endpoints (`server/server.ts`):**
+
+```typescript
+// POST /api/voice/transcribe
+// Body: FormData with audio file (multipart/form-data)
+// Response: { text: string }
+
+// POST /api/voice/synthesize
+// Body: { text: string, voice?: string }
+// Response: Audio stream (Content-Type: audio/mpeg)
+```
+
+### Client-Side Voice Architecture
+
+**Platform Detection (`client/src/lib/utils/platform.ts`):**
+
+```typescript
+export function getPlatformType(): 'web' | 'electron' | 'capacitor' {
+	if (window.Capacitor) return 'capacitor';
+	if (window.require) return 'electron';
+	return 'web';
+}
+
+export function getAudioService(): IPlatformAudioService {
+	const platform = getPlatformType();
+	switch (platform) {
+		case 'web':
+			return new WebAudioService();
+		case 'electron':
+			return new ElectronAudioService();
+		case 'capacitor':
+			return new CapacitorAudioService();
+	}
+}
+```
+
+**WebAudioService (`client/src/lib/services/web-audio.service.ts`):**
+
+```typescript
+class WebAudioService implements IPlatformAudioService {
+	private mediaRecorder?: MediaRecorder;
+
+	async recordAudio(): Promise<AudioBlob> {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		this.mediaRecorder = new MediaRecorder(stream);
+		// Record audio chunks, return blob
+	}
+
+	async transcribe(audio: AudioBlob): Promise<string> {
+		const formData = new FormData();
+		formData.append('audio', audio);
+		const response = await fetch('/api/voice/transcribe', {
+			method: 'POST',
+			body: formData
+		});
+		const { text } = await response.json();
+		return text;
+	}
+
+	async synthesize(text: string): Promise<AudioBlob> {
+		const response = await fetch('/api/voice/synthesize', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ text })
+		});
+		return await response.blob();
+	}
+
+	async playAudio(audio: AudioBlob): Promise<void> {
+		const audioElement = new Audio(URL.createObjectURL(audio));
+		await audioElement.play();
+	}
+}
+```
+
+**ElectronAudioService (`client/src/lib/services/electron-audio.service.ts`):**
+
+```typescript
+class ElectronAudioService implements IPlatformAudioService {
+	async transcribe(audio: AudioBlob): Promise<string> {
+		// Send audio to main process via IPC
+		const text = await window.ipcRenderer.invoke('audio:transcribe', audio);
+		return text;
+	}
+
+	async synthesize(text: string): Promise<AudioBlob> {
+		// Send text to main process via IPC
+		const audioBuffer = await window.ipcRenderer.invoke('audio:synthesize', text);
+		return new Blob([audioBuffer], { type: 'audio/wav' });
+	}
+}
+```
+
+**Electron IPC Handlers (`electron/audio-handler.js`):**
+
+```javascript
+const { spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+ipcMain.handle('audio:transcribe', async (event, audioBlob) => {
+	const tempPath = path.join(os.tmpdir(), `audio-${Date.now()}.wav`);
+	fs.writeFileSync(tempPath, Buffer.from(audioBlob));
+
+	return new Promise((resolve, reject) => {
+		const whisper = spawn('./bin/whisper/whisper-cpp', ['-f', tempPath, '-m', './bin/whisper/models/ggml-base.bin', '-otxt']);
+
+		let output = '';
+		whisper.stdout.on('data', (data) => (output += data));
+		whisper.on('close', () => {
+			fs.unlinkSync(tempPath);
+			resolve(output.trim());
+		});
+	});
+});
+
+ipcMain.handle('audio:synthesize', async (event, text) => {
+	return new Promise((resolve) => {
+		const piper = spawn('./bin/piper/piper', ['--model', './bin/piper/voices/en_US-lessac.onnx', '--output_file', '-']);
+
+		piper.stdin.write(text);
+		piper.stdin.end();
+
+		const chunks = [];
+		piper.stdout.on('data', (chunk) => chunks.push(chunk));
+		piper.on('close', () => resolve(Buffer.concat(chunks)));
+	});
+});
+```
+
+### Voice UI Components
+
+**VoiceButton Component (`client/src/components/audio/VoiceButton.svelte`):**
+
+```svelte
+<script lang="ts">
+	import { getAudioService } from '$lib/utils/platform';
+	import { t } from '$lib/state/i18n.svelte';
+
+	let isRecording = $state(false);
+	let isProcessing = $state(false);
+
+	const audioService = getAudioService();
+
+	async function handleRecordClick() {
+		if (isRecording) {
+			isRecording = false;
+			isProcessing = true;
+
+			const audio = await audioService.recordAudio();
+			const text = await audioService.transcribe(audio);
+
+			// Emit transcribed text to parent
+			ontranscribe?.(text);
+
+			isProcessing = false;
+		} else {
+			isRecording = true;
+			await audioService.recordAudio();
+		}
+	}
+</script>
+
+<button
+	class="btn btn-circle"
+	class:btn-error={isRecording}
+	class:btn-disabled={isProcessing}
+	onclick={handleRecordClick}
+	aria-label={t(isRecording ? 'audio.stop_recording' : 'audio.start_recording')}
+>
+	{#if isProcessing}
+		<span class="loading loading-spinner"></span>
+	{:else if isRecording}
+		<span class="animate-pulse">🎙️</span>
+	{:else}
+		🎤
+	{/if}
+</button>
+```
+
+**AudioPlayer Component (`client/src/components/audio/AudioPlayer.svelte`):**
+
+```svelte
+<script lang="ts">
+	import { getAudioService } from '$lib/utils/platform';
+
+	let { audioBlob } = $props<{ audioBlob: Blob }>();
+	let isPlaying = $state(false);
+
+	const audioService = getAudioService();
+
+	async function handlePlay() {
+		isPlaying = true;
+		await audioService.playAudio(audioBlob);
+		isPlaying = false;
+	}
+</script>
+
+<button class="btn btn-sm btn-primary" onclick={handlePlay} disabled={isPlaying}>
+	{#if isPlaying}
+		⏸️ Pause
+	{:else}
+		▶️ Play
+	{/if}
+</button>
+```
+
+### Implementation Tasks (Epic 6)
+
+**Story 6.1: Web Platform - Server-Side STT/TTS**
+
+- [ ] Task 6.1.1: Create WhisperService (server/services/whisper.service.ts)
+- [ ] Task 6.1.2: Create PiperService (server/services/piper.service.ts)
+- [ ] Task 6.1.3: Create AudioService (server/services/audio.service.ts)
+- [ ] Task 6.1.4: Add API endpoints /api/voice/transcribe and /api/voice/synthesize
+- [ ] Task 6.1.5: Create WebAudioService (client/src/lib/services/web-audio.service.ts)
+- [ ] Task 6.1.6: Create VoiceButton component
+- [ ] Task 6.1.7: Create AudioPlayer component
+- [ ] Task 6.1.8: Add voice translations to i18n (audio.start_recording, audio.stop_recording, etc.)
+
+**Story 6.2: Desktop Platform - Native Child Processes**
+
+- [ ] Task 6.2.1: Create Electron IPC handlers (electron/audio-handler.js)
+- [ ] Task 6.2.2: Create ElectronAudioService (client/src/lib/services/electron-audio.service.ts)
+- [ ] Task 6.2.3: Test native Whisper/Piper execution in Electron main process
+- [ ] Task 6.2.4: Implement fallback to server if binaries unavailable
+
+**Story 6.3: Mobile Platform - Native Bridge**
+
+- [ ] Task 6.3.1: Research Capacitor audio plugins (capacitor-voice-recorder, native-audio)
+- [ ] Task 6.3.2: Create CapacitorAudioService (client/src/lib/services/capacitor-audio.service.ts)
+- [ ] Task 6.3.3: Implement permission request flow for microphone
+- [ ] Task 6.3.4: Test server fallback on mobile
+
+**Story 6.4: Voice UI Controls**
+
+- [ ] Task 6.4.1: Integrate VoiceButton into chat interface
+- [ ] Task 6.4.2: Add visual feedback (listening animation, waveform)
+- [ ] Task 6.4.3: Implement undo/re-record functionality
+- [ ] Task 6.4.4: Handle permission denied errors with helpful messages
+
+---
+
+## Epic 7: Accessibility & i18n - Implementation Plan
+
+### Existing i18n System Analysis
+
+**Current Implementation:**
+
+- ✅ Custom i18n with Svelte 5 Runes (`client/src/lib/state/i18n.svelte.ts`)
+- ✅ Reactive `t()` function using `userState.preferences.locale`
+- ✅ Translation files: `client/src/locales/translations.js`
+- ✅ 5 languages supported: en, fr, de, es, it
+- ✅ Dot notation for nested keys (e.g., `t('settings.general')`)
+- ✅ Variable interpolation (`{{varName}}`)
+- ✅ Fallback to English if translation missing
+
+**What's Missing:**
+
+- ❌ Not all UI strings externalized (some hardcoded English text remains)
+- ❌ Date/time localization not implemented (use Intl.DateTimeFormat)
+- ❌ Browser language auto-detection on first launch
+
+### Accessibility Architecture
+
+**ARIA Strategy:**
+
+- Add `aria-label`, `aria-describedby`, `aria-live` to components
+- Use semantic HTML (`<nav>`, `<main>`, `<header>`, `<footer>`)
+- Proper heading hierarchy (h1 → h2 → h3)
+- Form field labels with `<label for="id">`
+
+**Keyboard Navigation:**
+
+- Focus management with `svelte-focus-trap` for modals
+- Arrow key navigation for lists (companions, chats)
+- Escape key to close modals
+- Visible focus indicators (`:focus-visible`)
+
+**Screen Reader Support:**
+
+- Live regions (`aria-live="polite"`) for chat messages
+- Status announcements for loading/errors
+- Descriptive button labels
+
+### Implementation Tasks (Epic 7)
+
+**Story 7.1: WCAG 2.1 AA Compliance**
+
+- [ ] Task 7.1.1: Audit existing components for semantic HTML issues
+- [ ] Task 7.1.2: Add ARIA labels to all interactive elements
+    - Buttons: `aria-label` for icon-only buttons
+    - Forms: Associate `<label>` with inputs using `for` attribute
+    - Errors: Use `aria-describedby` for error messages
+- [ ] Task 7.1.3: Verify color contrast ratios using axe DevTools
+    - Test all text on backgrounds (min 4.5:1 for normal text)
+    - Fix any failing contrast ratios in DaisyUI theme
+- [ ] Task 7.1.4: Fix heading hierarchy
+    - Ensure h1 on every page (app title)
+    - Logical h2 → h3 structure (no skips)
+- [ ] Task 7.1.5: Add landmark regions
+    - `<header role="banner">` for app header
+    - `<nav role="navigation">` for sidebar
+    - `<main role="main">` for content area
+    - `<footer role="contentinfo">` if applicable
+
+**Story 7.2: Full Keyboard Navigation**
+
+- [ ] Task 7.2.1: Install `svelte-focus-trap` for modals
+- [ ] Task 7.2.2: Implement focus trap in modal components
+    - OnboardingWizard modal
+    - CompanionSelector dialog
+    - Settings modal
+- [ ] Task 7.2.3: Add visible focus indicators
+    - CSS: `:focus-visible { outline: 2px solid var(--primary); }`
+    - Test tab order through all interactive elements
+- [ ] Task 7.2.4: Implement arrow key navigation for lists
+    - Companion list: ↑↓ to select, Enter to open
+    - Chat list: ↑↓ to select, Enter to open chat
+    - Use `onkeydown` event handlers
+- [ ] Task 7.2.5: Test Escape key for modal close
+    - All modals should close on Escape
+    - Focus should return to trigger element
+
+**Story 7.3: Screen Reader Support**
+
+- [ ] Task 7.3.1: Add live region for chat messages
+    ```svelte
+    <div aria-live="polite" aria-atomic="true" class="sr-only">
+    	{#if latestMessage}
+    		{latestMessage.role === 'assistant' ? t('ui.assistant') : t('ui.you')}: {latestMessage.content}
+    	{/if}
+    </div>
+    ```
+- [ ] Task 7.3.2: Add loading state announcements
+    - Connection status: "Connecting to server..."
+    - Message generation: "Assistant is typing..."
+    - Use `aria-live="polite"`
+- [ ] Task 7.3.3: Add error announcements
+    - Use `aria-live="assertive"` for errors
+    - Example: "Error: Unable to connect to server"
+- [ ] Task 7.3.4: Test with screen readers
+    - Windows: NVDA (free)
+    - macOS: VoiceOver (built-in)
+    - Verify all critical flows work
+
+**Story 7.4: Complete i18n Coverage**
+
+- [ ] Task 7.4.1: Audit codebase for hardcoded English strings
+    - Search for string literals in components: `grep -r '"[A-Z]' client/src/components`
+    - List all hardcoded strings needing translation
+- [ ] Task 7.4.2: Add missing translations to all 5 language files
+    - `client/src/locales/translations.js` (en)
+    - `client/src/locales/fr.ts` (fr)
+    - `client/src/locales/de.ts` (de)
+    - `client/src/locales/es.ts` (es)
+    - `client/src/locales/it.ts` (it)
+    - Epic 6 voice keys: audio.start_recording, audio.stop_recording, audio.transcribing, audio.error_permission
+- [ ] Task 7.4.3: Replace hardcoded strings with `t()` calls
+    - Example: `"Save"` → `{t('common.save')}`
+    - Test that UI updates reactively when locale changes
+- [ ] Task 7.4.4: Implement date/time localization
+    ```typescript
+    function formatDate(timestamp: number, locale: string): string {
+    	return new Intl.DateTimeFormat(locale, {
+    		year: 'numeric',
+    		month: 'short',
+    		day: 'numeric',
+    		hour: '2-digit',
+    		minute: '2-digit'
+    	}).format(new Date(timestamp));
+    }
+    ```
+- [ ] Task 7.4.5: Add browser language auto-detection
+    ```typescript
+    // In client/src/lib/state/user.svelte.ts
+    if (!userState.preferences.locale) {
+    	const browserLang = navigator.language.split('-')[0]; // 'en-US' → 'en'
+    	const supportedLangs = ['en', 'fr', 'de', 'es', 'it'];
+    	userState.preferences.locale = supportedLangs.includes(browserLang) ? browserLang : 'en';
+    }
+    ```
+- [ ] Task 7.4.6: Test language switching in settings
+    - Change locale in settings dropdown
+    - Verify UI updates without page reload (Svelte 5 reactivity)
+    - Verify locale persists to localStorage
+
+---
+
+## Updated Summary
+
+**Total Epics: 7**
+**Total Stories: 29**
+**Total Tasks: ~100**
+
+**Implementation Status:**
+
+- ✅ Epic 1-4: Already implemented (Onboarding, Companions, Chat, Sync)
+- 🔜 Epic 5: Testing & Quality (next priority)
+- 🔜 Epic 6: Voice Features (4 stories, 16 tasks)
+- 🔜 Epic 7: Accessibility & i18n (4 stories, 17 tasks)
+
+**Architecture Additions:**
+
+- Voice: Server-side Whisper/Piper + platform abstraction (Web/Desktop/Mobile)
+- Accessibility: ARIA labels, keyboard nav, screen reader support, focus management
+- i18n: Leverage existing system, complete translation coverage, date/time localization
+
+**Requirements Coverage: 100%**
+
+- 21/21 Functional Requirements ✅
+- 20/20 Non-Functional Requirements ✅

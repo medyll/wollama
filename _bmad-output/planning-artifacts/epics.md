@@ -461,3 +461,211 @@ So that I can test the app without requiring a real Ollama instance.
 3. Epic 3 (Chat/Messaging) - Core feature
 4. Epic 4 (Sync & Offline) - Foundation robustness
 5. Epic 5 (Testing) - Runs parallel with development, validates each epic
+
+---
+
+## Epic 6: Voice Features (STT/TTS)
+
+**Goal:** Enable voice input (Speech-to-Text) and output (Text-to-Speech) across all three platforms (Web, Desktop, Mobile) with platform-appropriate implementations for optimal performance and user experience.
+
+**Requirements Addressed:** FR-501, FR-502, FR-503
+
+### Story 6.1: Web Platform - Server-Side STT/TTS Processing
+
+As a web user,
+I want to use voice input and output in my browser,
+So that I can interact hands-free with companions without installing additional software.
+
+**Acceptance Criteria:**
+
+**Given** I'm using the web version of Wollama
+**When** I click the microphone button and speak
+**Then** my audio is recorded and sent to the server
+**And** the server processes it with Whisper (STT) and returns the transcribed text
+**And** the transcribed text appears in the message input field
+**When** the assistant responds
+**Then** I can click "Play Audio" to hear the response
+**And** the server synthesizes speech with Piper (TTS) and streams audio back
+**And** the audio plays in my browser with clear quality (16kHz mono WAV/MP3)
+
+### Story 6.2: Desktop Platform - Native Child Process STT/TTS
+
+As a desktop (Electron) user,
+I want faster voice processing with lower latency,
+So that my voice interactions feel instantaneous and responsive.
+
+**Acceptance Criteria:**
+
+**Given** I'm using the desktop version of Wollama
+**When** I use voice input
+**Then** Electron main process spawns Whisper as a native child process
+**And** audio is processed locally without server round-trip
+**And** transcription latency is <2 seconds for typical utterances
+**When** TTS is requested
+**Then** Piper runs as a native child process in the main process
+**And** audio generation latency is <1 second
+**And** if native binaries are unavailable, the app falls back to server processing gracefully
+
+### Story 6.3: Mobile Platform - Native Bridge with Server Fallback
+
+As a mobile user,
+I want voice input and output on the go,
+So that I can use Wollama while driving, walking, or in hands-free scenarios.
+
+**Acceptance Criteria:**
+
+**Given** I'm using the mobile version of Wollama (Capacitor)
+**When** I tap the microphone button
+**Then** the app requests microphone permission if not granted
+**And** if permission granted, records audio using native APIs (iOS/Android)
+**And** audio is sent to server for Whisper processing
+**When** TTS is requested
+**Then** server synthesizes audio with Piper and streams to mobile
+**And** audio playback uses native mobile audio APIs for best quality
+**And** if native audio bridge unavailable, fallback to server-side processing works seamlessly
+
+### Story 6.4: Voice UI Controls and Feedback
+
+As a user on any platform,
+I want clear visual feedback for voice interactions,
+So that I know when the app is listening, processing, or speaking.
+
+**Acceptance Criteria:**
+
+**Given** I'm on any screen with voice capability
+**When** I look at the UI
+**Then** I see a microphone button with clear affordance (icon + label)
+**When** I click the microphone button
+**Then** the button animates to show "listening" state (pulsing or waveform)
+**And** a visual indicator shows audio is being captured
+**When** audio processing completes
+**Then** the transcribed text appears in the message input
+**And** an undo button lets me re-record if transcription was incorrect
+**When** TTS audio plays
+**Then** playback controls appear (play, pause, stop, volume)
+**And** a progress indicator shows playback position
+**When** microphone permission is denied
+**Then** a clear error message explains how to grant permission in device settings
+
+---
+
+## Epic 7: Accessibility & Internationalization
+
+**Goal:** Ensure the application is usable by people with disabilities (WCAG 2.1 AA compliance) and supports multiple languages (English, French, German, Spanish, Italian) using the existing i18n system.
+
+**Requirements Addressed:** NFR-401, NFR-402, NFR-403, NFR-404
+
+### Story 7.1: WCAG 2.1 AA Compliance - Semantic HTML & ARIA
+
+As a user with disabilities,
+I want proper semantic HTML and ARIA labels throughout the app,
+So that assistive technologies (screen readers, voice control) work correctly.
+
+**Acceptance Criteria:**
+
+**Given** I'm navigating the app with assistive technology
+**When** I encounter interactive elements (buttons, links, inputs)
+**Then** each has a proper ARIA role and accessible label
+**And** form inputs have associated `<label>` elements with `for` attributes
+**When** I check color contrast
+**Then** all text meets WCAG AA standards (4.5:1 for normal text, 3:1 for large text)
+**When** I review heading structure
+**Then** headings follow logical hierarchy (h1 → h2 → h3, no skips)
+**And** landmark regions (header, nav, main, footer) are properly defined
+**When** errors occur (form validation, connection issues)
+**Then** error messages are associated with fields via `aria-describedby`
+**And** error states have `aria-invalid="true"`
+
+### Story 7.2: Full Keyboard Navigation
+
+As a keyboard-only user,
+I want to access all features without a mouse,
+So that I can use the app efficiently via keyboard shortcuts and tab navigation.
+
+**Acceptance Criteria:**
+
+**Given** I'm using only the keyboard
+**When** I press Tab
+**Then** focus moves through interactive elements in logical order
+**And** focus indicators are clearly visible (outline or highlight)
+**When** I'm in a modal or dialog
+**Then** focus is trapped inside the modal (Tab doesn't escape to page behind)
+**And** pressing Escape closes the modal and returns focus to trigger element
+**When** I'm viewing a list (companions, chats)
+**Then** arrow keys (↑↓) navigate between list items
+**And** Enter or Space activates the selected item
+**When** I press standard shortcuts (Ctrl+S, Ctrl+N)
+**Then** relevant actions trigger (save, new chat)
+
+### Story 7.3: Screen Reader Support with Live Regions
+
+As a screen reader user,
+I want meaningful announcements for dynamic content,
+So that I'm aware of chat messages, loading states, and errors without seeing the screen.
+
+**Acceptance Criteria:**
+
+**Given** I'm using a screen reader (NVDA, JAWS, VoiceOver)
+**When** a new chat message arrives
+**Then** the screen reader announces "Assistant says: [message text]"
+**And** the announcement uses `aria-live="polite"` to avoid interrupting current reading
+**When** the app is loading or processing
+**Then** status messages are announced ("Connecting to server...", "Generating response...")
+**When** an error occurs
+**Then** the error is announced with severity context ("Error: Unable to connect to server")
+**When** streaming responses appear token-by-token
+**Then** the full message is announced when streaming completes (not each token individually)
+**And** a "typing" indicator announces when streaming starts
+
+### Story 7.4: Complete i18n Coverage with Existing Framework
+
+As a non-English speaker,
+I want the app fully translated in my language,
+So that I can use it comfortably without language barriers.
+
+**Acceptance Criteria:**
+
+**Given** the app uses the existing i18n system (`client/src/lib/state/i18n.svelte.ts`)
+**When** I audit the codebase
+**Then** all UI strings use the `t()` function (no hardcoded English text)
+**And** all translations exist in `client/src/locales/translations.js` for 5 languages:
+
+- English (en) - complete ✅
+- French (fr) - complete ✅
+- German (de) - complete ✅
+- Spanish (es) - complete ✅
+- Italian (it) - complete ✅
+  **When** I change language in settings
+  **Then** the locale is saved to `userState.preferences.locale`
+  **And** the UI updates reactively without page reload (Svelte 5 reactivity)
+  **When** I view dates and times
+  **Then** they format according to my locale using `Intl.DateTimeFormat`
+  **When** I'm a new user
+  **Then** the app detects my browser language and sets it as default
+  **And** if my language isn't supported, it defaults to English
+
+---
+
+## Epic Summary (Updated)
+
+| Epic       | Focus                        | Dependencies             | Estimated Stories |
+| ---------- | ---------------------------- | ------------------------ | ----------------- |
+| Epic 1     | Onboarding & Server Setup    | None (blocks all others) | 4 stories         |
+| Epic 2     | Companion System             | Epic 1                   | 4 stories         |
+| Epic 3     | Chat & Messaging             | Epic 1, 2                | 4 stories         |
+| Epic 4     | Sync & Offline               | Epic 1, 3                | 4 stories         |
+| Epic 5     | Testing & Quality            | All others               | 5 stories         |
+| **Epic 6** | **Voice Features (STT/TTS)** | Epic 1, 3                | **4 stories**     |
+| **Epic 7** | **Accessibility & i18n**     | Epic 1-3                 | **4 stories**     |
+
+**Total Stories: 29**
+
+**Recommended Implementation Order:**
+
+1. Epic 1 (Onboarding) - Unblocks everything
+2. Epic 2 (Companions) - Needed before messaging works
+3. Epic 3 (Chat/Messaging) - Core feature
+4. Epic 4 (Sync & Offline) - Foundation robustness
+5. **Epic 6 (Voice Features)** - Enhances interaction modes
+6. **Epic 7 (Accessibility)** - Ensures inclusive design
+7. Epic 5 (Testing) - Validates all epics (can run in parallel)
