@@ -22,7 +22,9 @@ vi.mock('$app/navigation', () => ({
 	goto: vi.fn()
 }));
 
-// Temporarily skip due to Svelte SSR vs DOM test harness mismatch
+// TODO: Re-enable after SvelteKit SSR vs DOM test environment is resolved
+// Current issue: SvelteKit forces SSR compilation even with generate:'dom' option
+// Need: Custom test renderer or SvelteKit test adapter that fully disables SSR
 describe.skip('Onboarding Page (Story 1.1)', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();

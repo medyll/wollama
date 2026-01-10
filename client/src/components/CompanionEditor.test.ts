@@ -16,7 +16,7 @@ const mockSystemCompanion: Companion = {
 	is_locked: true
 };
 
-// Temporarily skip due to Svelte SSR vs DOM test harness mismatch
+// TODO: Re-enable after SvelteKit SSR vs DOM test environment is resolved
 describe.skip('CompanionEditor - Story 2.2', () => {
 	describe('Form Rendering', () => {
 		it('AC1: Should display form for new companion customization', () => {

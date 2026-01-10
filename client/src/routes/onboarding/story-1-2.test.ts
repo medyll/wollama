@@ -35,7 +35,7 @@ vi.mock('$app/navigation', () => ({
 // Mock Ollama service
 vi.mock('$lib/services/ollama.service');
 
-// Temporarily skip due to Svelte SSR vs DOM test harness mismatch
+// TODO: Re-enable after SvelteKit SSR vs DOM test environment is resolved
 describe.skip('Onboarding Page - Story 1.2 (Server URL Configuration)', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();

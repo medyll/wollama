@@ -35,7 +35,7 @@ const mockSystemCompanions: Companion[] = [
 	}
 ];
 
-// Temporarily skip due to Svelte SSR vs DOM test harness mismatch
+// TODO: Re-enable after SvelteKit SSR vs DOM test environment is resolved
 describe.skip('CompanionSelector - Story 2.1', () => {
 	describe('Rendering', () => {
 		it('AC1: Should display companion selector component', () => {
