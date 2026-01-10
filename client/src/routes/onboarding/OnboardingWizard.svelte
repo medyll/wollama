@@ -10,9 +10,9 @@
 	const totalSteps = 3; // Intro + Server URL config + Companion selection
 
 	// Step 0: Intro
-	// Step 1: Server URL configuration
+	// Step 1: Server URL configuration (Ollama)
 	// Step 2: Companion selection
-	let serverUrl = $state(userState.preferences.serverUrl || 'http://localhost:11434');
+	let serverUrl = $state(userState.preferences.ollamaUrl || 'http://localhost:11434');
 	let selectedCompanion: Companion | null = $state(null);
 	let isTestingConnection = $state(false);
 	let connectionMessage = $state('');
@@ -93,8 +93,8 @@
 				connectionMessage = 'Connected successfully!';
 				connectionSuggestion = '';
 				connectionSuccess = true;
-				// Store the validated URL
-				userState.preferences.serverUrl = normalized;
+				// Store the validated Ollama URL
+				userState.preferences.ollamaUrl = normalized;
 			} else {
 				connectionMessage = result.error || 'Unable to connect';
 				connectionSuggestion = result.suggestion || 'Make sure Ollama is running and reachable';
@@ -111,16 +111,14 @@
 
 	async function completeOnboarding() {
 		// Mark onboarding as complete and navigate to chat
-		if (userState.uid) {
-			try {
-				// Store onboarding completion in preferences
-				Object.assign(userState.preferences, { onboarding_completed: true });
-				userState.save();
-				// Navigate to chat (server is now configured)
-				goto('/chat');
-			} catch (error) {
-				console.error('Failed to complete onboarding:', error);
-			}
+		try {
+			// Store onboarding completion in preferences
+			Object.assign(userState.preferences, { onboarding_completed: true });
+			userState.save();
+			// Navigate to chat (server is now configured)
+			goto('/chat');
+		} catch (error) {
+			console.error('Failed to complete onboarding:', error);
 		}
 	}
 

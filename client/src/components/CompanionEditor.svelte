@@ -44,8 +44,8 @@
 
 		// Try to fetch available models from Ollama server
 		try {
-			const serverUrl = userState.preferences.serverUrl || 'http://localhost:11434';
-			const response = await fetch(`${serverUrl}/api/tags`);
+			const ollamaUrl = userState.preferences.ollamaUrl || 'http://localhost:11434';
+			const response = await fetch(`${ollamaUrl}/api/tags`);
 			if (response.ok) {
 				const data = await response.json();
 				availableModels = data.models.map((m: any) => m.name);

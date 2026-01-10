@@ -14,7 +14,8 @@ export class UserState {
 	isSecured = $state(false);
 
 	preferences = $state({
-		serverUrl: 'http://localhost:3000',
+		ollamaUrl: 'http://localhost:11434', // Ollama service
+		serverUrl: 'http://localhost:3000', // Wollama application server
 		locale: 'en',
 		theme: 'fluent-light',
 		defaultModel: 'mistral:latest',
@@ -22,7 +23,8 @@ export class UserState {
 		defaultTemperature: 0.7,
 		auto_play_audio: false,
 		audioInputId: '',
-		audioOutputId: ''
+		audioOutputId: '',
+		onboarding_completed: false
 	});
 
 	constructor() {
@@ -118,15 +120,17 @@ export class UserState {
 
 		// Reset preferences to defaults
 		this.preferences = {
+			ollamaUrl: 'http://localhost:11434',
 			serverUrl: 'http://localhost:3000',
 			locale: 'en',
-			theme: 'light',
+			theme: 'fluent-light',
 			defaultModel: 'mistral:latest',
 			defaultCompanion: '1',
 			defaultTemperature: 0.7,
 			auto_play_audio: false,
-			audioInputId: 'default',
-			audioOutputId: 'default'
+			audioInputId: '',
+			audioOutputId: '',
+			onboarding_completed: false
 		};
 
 		if (typeof localStorage !== 'undefined') {

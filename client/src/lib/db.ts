@@ -96,12 +96,13 @@ const convertSchema = (tableName: string, tableDef: any) => {
 };
 
 // HMR helper: Store the promise on the global object to prevent multiple DB instances during hot reload
+// don't forget to update the version number in createRxDatabase() when changing the schema
 const globalAny: any = typeof window !== 'undefined' ? window : global;
 let dbPromise: Promise<any> | null = globalAny.__wollama_db_promise || null;
 
 const _createDatabase = async () => {
 	const db = await createRxDatabase({
-		name: 'wollama_client_db_v12',
+		name: 'wollama_client_db_v14',
 		storage: wrappedValidateAjvStorage({
 			storage: getRxStorageDexie()
 		}),

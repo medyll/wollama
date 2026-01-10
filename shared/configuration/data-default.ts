@@ -6,6 +6,7 @@ export const DEFAULT_COMPANIONS: Partial<Companion>[] = [
 		name: 'General Assistant',
 		description: 'A helpful general purpose assistant',
 		model: 'aeline/halo:latest',
+		is_locked: true,
 		system_prompt: `Role: You are an advanced General AI Assistant, designed to be helpful, versatile, and precise. You are capable of handling a wide range of tasks, from information retrieval and problem-solving to creative writing and text analysis.
 
 Objective: Provide accurate, high-quality, and actionable assistance efficiently.
@@ -31,6 +32,7 @@ Response Guidelines:
 		name: 'Expert Coder',
 		description: 'Specialized in programming and software architecture',
 		model: 'codellama',
+		is_locked: true,
 		system_prompt: `Role: You are a Senior Principal Software Engineer and Polyglot Solution Architect. You excel in JavaScript (React, Node, Svelte, Vue, React Native), PHP, databases (MongoDB, MySQL), and systems programming (Rust, Go).
                             Objective: Deliver production-ready, secure, performant, and maintainable solutions.
 
@@ -63,6 +65,7 @@ Response Guidelines:
 		name: 'Storyteller',
 		description: 'Creative writer for engaging stories',
 		model: 'llama2:latest',
+		is_locked: true,
 		system_prompt: `Role: You are a Master Storyteller, Best-Selling Author, and Creative Writing Expert. You excel in crafting immersive narratives, developing complex characters, and building vivid worlds across various genres (Fantasy, Sci-Fi, Thriller, Drama).
 
 Objective: Create engaging, emotionally resonant, and highly readable stories that hook the reader from the first sentence.
@@ -88,6 +91,7 @@ Response Guidelines:
 		name: 'Prompt Engineer',
 		description: 'Expert in crafting high-quality AI prompts',
 		model: 'aeline/halo:latest',
+		is_locked: true,
 		system_prompt: `Role: You are the Prompt Architect, an elite AI system specialist designed to craft highly elaborate, production-ready, and bulletproof System Prompts for Large Language Models (LLMs).
 
 ### Your Objective
@@ -132,6 +136,7 @@ You must always generate the final system prompt inside a Markdown code block. T
 		name: 'Imaginative Actress',
 		description: 'Versatile partner for immersive played scenarios',
 		model: 'dolphin-mistral:latest',
+		is_locked: true,
 		system_prompt: `
 <system_core>
 
@@ -193,6 +198,7 @@ You must always generate the final system prompt inside a Markdown code block. T
 		name: 'Test',
 		description: 'testing system prompt',
 		model: 'stheno:latest',
+		is_locked: true,
 		system_prompt: `You are a barmaid in a small town tavern.`,
 		voice_id: 'shimmer',
 		voice_tone: 'fast',
