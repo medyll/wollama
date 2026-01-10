@@ -201,84 +201,133 @@
 </script>
 
 {#snippet fieldInput(fieldName: string, fieldDef: any)}
-	<label class="form-control">
-		<div class="label">
-			<span class="label-text capitalize">{fieldName.replace(/_/g, ' ')}</span>
+	<div class="form-control w-full">
+		<label class="label pb-1" for={`field-${fieldName}`}>
+			<span class="label-text w-32 shrink-0 text-sm font-medium capitalize">{fieldName.replace(/_/g, ' ')}</span>
+		</label>
+		<div class="flex-1">
+			{#if fieldDef.type === 'boolean' || (fieldDef.ui && fieldDef.ui.type === 'toggle')}
+				<input
+					type="checkbox"
+					id={`field-${fieldName}`}
+					class="toggle toggle-primary"
+					bind:checked={formData[fieldName]}
+				/>
+			{:else if fieldDef.type === 'text-long' || (fieldDef.ui && fieldDef.ui.type === 'textarea')}
+				<div class="relative">
+					<textarea
+						id={`field-${fieldName}`}
+						class="textarea textarea-bordered h-24 w-full resize-none text-sm"
+						bind:value={formData[fieldName]}
+						placeholder={`Enter ${fieldName.replace(/_/g, ' ')}...`}
+					></textarea>
+					{#if fieldDef.ai && fieldDef.ai.trigger === 'manual'}
+						<button
+							class="btn btn-circle btn-ghost btn-sm absolute right-2 bottom-2"
+							onclick={() => handleAiAction(fieldName, fieldDef.ai)}
+							disabled={isOptimizing}
+							title="Optimize with AI"
+						>
+							{#if isOptimizing}
+								<span class="loading loading-spinner loading-xs"></span>
+							{:else}
+								<Icon icon="lucide:sparkles" class="text-primary" />
+							{/if}
+						</button>
+					{/if}
+				</div>
+			{:else if fieldDef.type === 'number' || (fieldDef.ui && fieldDef.ui.type === 'slider')}
+				<input
+					type="number"
+					id={`field-${fieldName}`}
+					class="input input-bordered input-sm w-full text-sm"
+					bind:value={formData[fieldName]}
+					placeholder="0"
+				/>
+			{:else if fieldDef.enum}
+				<select
+					id={`field-${fieldName}`}
+					class="select select-bordered select-sm w-full text-sm"
+					bind:value={formData[fieldName]}
+				>
+					<option disabled selected value="">Select...</option>
+					{#each fieldDef.enum as option}
+						<option value={option}>{option}</option>
+					{/each}
+				</select>
+			{:else}
+				<input
+					type="text"
+					id={`field-${fieldName}`}
+					class="input input-bordered input-sm w-full text-sm"
+					bind:value={formData[fieldName]}
+					placeholder={`Enter ${fieldName.replace(/_/g, ' ')}...`}
+				/>
+			{/if}
 		</div>
-		{#if fieldDef.type === 'boolean' || (fieldDef.ui && fieldDef.ui.type === 'toggle')}
-			<input type="checkbox" class="toggle" bind:checked={formData[fieldName]} />
-		{:else if fieldDef.type === 'text-long' || (fieldDef.ui && fieldDef.ui.type === 'textarea')}
-			<div class="relative">
-				<textarea class="textarea textarea-bordered h-24 w-full" bind:value={formData[fieldName]}></textarea>
-				{#if fieldDef.ai && fieldDef.ai.trigger === 'manual'}
-					<button
-						class="btn btn-circle btn-ghost btn-sm absolute right-2 bottom-2"
-						onclick={() => handleAiAction(fieldName, fieldDef.ai)}
-						disabled={isOptimizing}
-						title="Optimize with AI"
-					>
-						{#if isOptimizing}
-							<span class="loading loading-spinner loading-xs"></span>
-						{:else}
-							<Icon icon="lucide:sparkles" class="text-primary" />
-						{/if}
-					</button>
-				{/if}
-			</div>
-		{:else if fieldDef.type === 'number' || (fieldDef.ui && fieldDef.ui.type === 'slider')}
-			<input type="number" class="input input-bordered" bind:value={formData[fieldName]} />
-		{:else if fieldDef.enum}
-			<select class="select select-bordered" bind:value={formData[fieldName]}>
-				{#each fieldDef.enum as option}
-					<option value={option}>{option}</option>
-				{/each}
-			</select>
-		{:else}
-			<input type="text" class="input input-bordered" bind:value={formData[fieldName]} />
-		{/if}
-	</label>
+	</div>
 {/snippet}
 
 <dialog class="modal" class:modal-open={isOpen}>
-	<div class="modal-box w-11/12 max-w-5xl">
-		<h3 class="mb-4 text-lg font-bold">Edit {tableName}</h3>
+	<div class="modal-box w-11/12 max-w-4xl">
+		<button class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2" onclick={() => (isOpen = false)} aria-label="Close"
+			>✕</button
+		>
+
+		<h3 class="mb-6 text-xl font-bold capitalize">
+			{id ? 'Edit' : 'Create'}
+			{tableName.replace(/_/g, ' ')}
+		</h3>
 
 		{#if loading}
-			<div class="flex justify-center p-4">
-				<span class="loading loading-spinner"></span>
+			<div class="flex justify-center p-8">
+				<span class="loading loading-spinner loading-lg"></span>
 			</div>
 		{:else}
 			{#if error}
-				<div class="alert alert-error mb-4">
+				<div class="alert alert-error mb-4 shadow-lg">
+					<Icon icon="mdi:alert-circle" />
 					<span>{error}</span>
 				</div>
 			{/if}
-			<div class="flex max-h-[70vh] flex-col gap-4 overflow-y-auto p-1">
-				<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-					<!-- Left Column: Regular Fields -->
-					<div class="flex flex-col gap-4">
-						<h4 class="font-semibold opacity-50">General</h4>
+
+			<div class="max-h-[65vh] space-y-3 overflow-y-auto pr-2">
+				<!-- Regular Fields Section -->
+				{#if regularFields.length > 0}
+					<div class="bg-base-200/30 space-y-3 rounded-lg p-4">
+						<h4 class="mb-3 flex items-center gap-2 text-sm font-semibold tracking-wide uppercase opacity-70">
+							<Icon icon="mdi:format-list-bulleted" class="h-4 w-4" />
+							General Information
+						</h4>
 						{#each regularFields as [fieldName, fieldDef]}
 							{@render fieldInput(fieldName, fieldDef)}
 						{/each}
 					</div>
+				{/if}
 
-					<!-- Right Column: FK Fields -->
-					{#if fkFields.length > 0}
-						<div class="flex flex-col gap-4 border-l pl-0 md:pl-6">
-							<h4 class="font-semibold opacity-50">Relations</h4>
-							{#each fkFields as [fieldName, fieldDef]}
-								{@render fieldInput(fieldName, fieldDef)}
-							{/each}
-						</div>
-					{/if}
-				</div>
+				<!-- FK Fields Section -->
+				{#if fkFields.length > 0}
+					<div class="bg-base-200/30 space-y-3 rounded-lg p-4">
+						<h4 class="mb-3 flex items-center gap-2 text-sm font-semibold tracking-wide uppercase opacity-70">
+							<Icon icon="mdi:link-variant" class="h-4 w-4" />
+							Relations
+						</h4>
+						{#each fkFields as [fieldName, fieldDef]}
+							{@render fieldInput(fieldName, fieldDef)}
+						{/each}
+					</div>
+				{/if}
 			</div>
 		{/if}
 
-		<div class="modal-action">
-			<button class="btn" onclick={() => (isOpen = false)}>Cancel</button>
-			<button class="btn btn-primary" onclick={handleSave} disabled={loading}>Save</button>
+		<div class="modal-action mt-6">
+			<button class="btn btn-ghost" onclick={() => (isOpen = false)}>Cancel</button>
+			<button class="btn btn-primary" onclick={handleSave} disabled={loading}>
+				{#if loading}
+					<span class="loading loading-spinner loading-sm"></span>
+				{/if}
+				Save Changes
+			</button>
 		</div>
 	</div>
 	<form method="dialog" class="modal-backdrop">

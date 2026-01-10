@@ -1,5 +1,6 @@
 import type { DatabaseSchema } from './schema-definition.js';
 
+// don't forget to update the version number in the file client\src\lib\db.ts when changing the schema
 export const appSchema: DatabaseSchema = {
 	users: {
 		primaryKey: 'user_id',

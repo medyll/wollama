@@ -5,14 +5,14 @@
 	import { toast } from '$lib/state/notifications.svelte';
 	import { audioService } from '$lib/services/audio.service';
 	import { chatService } from '$lib/services/chat.service';
-	import { companionService } from '$lib/services/companion.service';
+	import { DataGenericService } from '$lib/services/data-generic.service';
 	import { parseMarkdown } from '$lib/utils/markdown';
 	import CompanionSelector from '$components/ui/CompanionSelector.svelte';
 	import MessageActions from '$components/chat/MessageActions.svelte';
 	import ThinkingMessage from '$components/chat/ThinkingMessage.svelte';
 	import ChatInput from '$components/chat/ChatInput.svelte';
 	import Icon from '@iconify/svelte';
-	import type { Companion } from '$types/data';
+	import type { UserCompanion } from '$types/data';
 	import { goto } from '$app/navigation';
 
 	let { chatId = $bindable(undefined), initialCompanionId = undefined } = $props();
@@ -23,8 +23,9 @@
 	let isRecording = $state(false);
 	let selectedFiles = $state<string[]>([]);
 
-	let currentCompagnon: Companion = $state({
-		companion_id: '1',
+	let currentCompagnon: UserCompanion = $state({
+		user_companion_id: '1',
+		user_id: userState.uid || '',
 		name: t('ui.general_assistant'),
 		model: userState.preferences.defaultModel,
 		system_prompt: 'You are a helpful assistant.',
@@ -61,9 +62,10 @@
 
 			if (initialCompanionId) {
 				(async () => {
-					const comp = await companionService.get(initialCompanionId);
+					const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
+					const comp = await userCompanionService.get(initialCompanionId);
 					if (comp) {
-						currentCompagnon = comp as Companion;
+						currentCompagnon = comp;
 						// Clear the global state so it doesn't persist
 						uiState.setActiveCompanionId(undefined);
 					}
@@ -80,9 +82,10 @@
 			if (chat) {
 				uiState.setTitle(chat.title);
 				if (chat.companion_id) {
-					const comp = await companionService.get(chat.companion_id);
+					const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
+					const comp = await userCompanionService.get(chat.companion_id);
 					if (comp) {
-						currentCompagnon = comp as Companion;
+						currentCompagnon = comp;
 					}
 				}
 			}
@@ -125,9 +128,9 @@
 				// Create chat first
 				// Use initialCompanionId if set and user hasn't selected a different one (assuming default is '1')
 				const companionIdToUse =
-					currentCompagnon.companion_id === '1' && initialCompanionId
+					currentCompagnon.user_companion_id === '1' && initialCompanionId
 						? initialCompanionId
-						: currentCompagnon.companion_id;
+						: currentCompagnon.user_companion_id;
 
 				try {
 					targetChatId = await chatService.createChat(undefined, currentCompagnon.model, companionIdToUse);
@@ -227,7 +230,7 @@
 		}
 	}
 
-	function onCompagnonSelected(compagnon: Companion) {
+	function onCompagnonSelected(compagnon: UserCompanion) {
 		currentCompagnon = compagnon;
 		// Logic to update chat context with new compagnon
 		if (messages.length > 0) {

@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Companion } from '$types/data';
-	import { companionService } from '$lib/services/companion.service';
+	import type { UserCompanion } from '$types/data';
+	import { DataGenericService } from '$lib/services/data-generic.service';
 	import { userState } from '$lib/state/user.svelte';
 
 	interface Props {
-		onSelect: (companion: Companion) => void;
-		onCustomize?: (companion: Companion) => void;
+		onSelect: (companion: UserCompanion) => void;
+		onCustomize?: (companion: UserCompanion) => void;
 	}
 
 	let { onSelect, onCustomize }: Props = $props();
 
-	let companions: Companion[] = $state([]);
+	let companions: UserCompanion[] = $state([]);
 	let isLoading = $state(true);
 	let error: string | null = $state(null);
 	let selectedId: string | null = $state(null);
@@ -21,9 +21,8 @@
 		try {
 			isLoading = true;
 			error = null;
-			const all = await companionService.getAll(userState.uid || '');
-			// Filter to only system companions (is_locked: true)
-			companions = all.filter((c): c is Companion => 'is_locked' in c && c.is_locked === true);
+			const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
+			companions = await userCompanionService.find({ user_id: userState.uid || '' });
 		} catch (err) {
 			error = `Failed to load companions: ${err instanceof Error ? err.message : String(err)}`;
 			console.error('Error loading companions:', err);
@@ -32,8 +31,8 @@
 		}
 	});
 
-	function handleSelect(companion: Companion) {
-		selectedId = companion.companion_id;
+	function handleSelect(companion: UserCompanion) {
+		selectedId = companion.user_companion_id;
 		onSelect(companion);
 	}
 
@@ -43,12 +42,12 @@
 		if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
 			e.preventDefault();
 			focusedIndex = Math.min(index + 1, maxIndex);
-			const nextCard = document.querySelector(`[data-companion-id="${companions[focusedIndex]?.companion_id}"]`);
+			const nextCard = document.querySelector(`[data-companion-id="${companions[focusedIndex]?.user_companion_id}"]`);
 			(nextCard as HTMLElement)?.focus();
 		} else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
 			e.preventDefault();
 			focusedIndex = Math.max(index - 1, 0);
-			const prevCard = document.querySelector(`[data-companion-id="${companions[focusedIndex]?.companion_id}"]`);
+			const prevCard = document.querySelector(`[data-companion-id="${companions[focusedIndex]?.user_companion_id}"]`);
 			(prevCard as HTMLElement)?.focus();
 		} else if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
@@ -86,14 +85,14 @@
 	{:else}
 		<div class="companions-scroll-container">
 			<div class="companions-grid grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-				{#each companions as companion, index (companion.companion_id)}
+				{#each companions as companion, index (companion.user_companion_id)}
 					<button
 						type="button"
-						data-companion-id={companion.companion_id}
+						data-companion-id={companion.user_companion_id}
 						class="companion-card card bg-base-100 cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md"
-						class:ring-2={selectedId === companion.companion_id}
-						class:ring-primary={selectedId === companion.companion_id}
-						aria-pressed={selectedId === companion.companion_id}
+						class:ring-2={selectedId === companion.user_companion_id}
+						class:ring-primary={selectedId === companion.user_companion_id}
+						aria-pressed={selectedId === companion.user_companion_id}
 						aria-label={`Select ${companion.name} companion`}
 						onclick={() => handleSelect(companion)}
 						onkeydown={(e) => handleKeyDown(e, index)}
@@ -124,7 +123,11 @@
 							</h3>
 
 							<!-- Badge -->
-							<div class="badge badge-primary badge-outline badge-xs mx-auto">Default</div>
+							{#if companion.companion_id}
+								<div class="badge badge-primary badge-outline badge-xs mx-auto">From Default</div>
+							{:else}
+								<div class="badge badge-secondary badge-outline badge-xs mx-auto">Personal</div>
+							{/if}
 
 							<!-- Description (minimal) -->
 							{#if companion.description}

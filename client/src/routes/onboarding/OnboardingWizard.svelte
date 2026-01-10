@@ -4,20 +4,26 @@
 	import Icon from '@iconify/svelte';
 	import { testOllamaConnection, normalizeServerUrl } from '$lib/services/ollama.service';
 	import CompanionSelector from '$components/CompanionSelector.svelte';
-	import type { Companion } from '$types/data';
+	import type { UserCompanion } from '$types/data';
+	import { DEFAULT_COMPANIONS } from '../../../../shared/configuration/data-default';
+	import { DataGenericService } from '$lib/services/data-generic.service';
 
 	let currentStep = $state(0);
-	const totalSteps = 3; // Intro + Server URL config + Companion selection
+	const totalSteps = 4; // Intro + Server URL config + Import companions + Companion selection
 
 	// Step 0: Intro
 	// Step 1: Server URL configuration (Ollama)
-	// Step 2: Companion selection
+	// Step 2: Import default companions
+	// Step 3: Companion selection
 	let serverUrl = $state(userState.preferences.ollamaUrl || 'http://localhost:11434');
-	let selectedCompanion: Companion | null = $state(null);
+	let selectedCompanion: UserCompanion | null = $state(null);
 	let isTestingConnection = $state(false);
 	let connectionMessage = $state('');
 	let connectionSuggestion = $state('');
 	let connectionSuccess = $state(false);
+	let isImporting = $state(false);
+	let importProgress = $state(0);
+	let importTotal = $state(0);
 
 	const steps = [
 		{
@@ -30,6 +36,11 @@
 			title: 'Configure Ollama Server',
 			description: 'Enter the address of your Ollama server (usually http://localhost:11434 if running locally)',
 			icon: 'mdi:server-network'
+		},
+		{
+			title: 'Import Default Companions',
+			description: 'We will copy the default companions to your personal collection',
+			icon: 'mdi:account-multiple-plus'
 		},
 		{
 			title: 'Choose Your Companion',
@@ -47,8 +58,15 @@
 			}
 		}
 
+		// If on import step, trigger import automatically
+		if (currentStep === 2 && !isImporting) {
+			// Trigger import when entering this step
+			setTimeout(() => importDefaultCompanions(), 100);
+			return;
+		}
+
 		// If on companion selection step, ensure a companion is selected
-		if (currentStep === 2) {
+		if (currentStep === 3) {
 			if (!selectedCompanion) {
 				alert('Please select a companion to continue');
 				return;
@@ -124,12 +142,57 @@
 
 	function handleSkip() {
 		// On companion selection step (final step), skip by using first available companion or going to chat without selection
-		if (currentStep === 2) {
+		if (currentStep === 3) {
 			completeOnboarding(); // Skip companion selection and go to companions page
 		} else if (currentStep < totalSteps - 1) {
 			currentStep++;
 		} else {
 			completeOnboarding();
+		}
+	}
+
+	async function importDefaultCompanions() {
+		if (isImporting) return;
+
+		isImporting = true;
+		importTotal = DEFAULT_COMPANIONS.length;
+		importProgress = 0;
+
+		try {
+			const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
+
+			for (const companion of DEFAULT_COMPANIONS) {
+				// Create user_companion copy
+				const userCompanion: UserCompanion = {
+					user_companion_id: crypto.randomUUID(),
+					user_id: userState.uid || '',
+					companion_id: companion.companion_id,
+					name: companion.name || '',
+					description: companion.description,
+					system_prompt: companion.system_prompt || '',
+					model: companion.model || '',
+					voice_id: companion.voice_id,
+					voice_tone: companion.voice_tone,
+					mood: companion.mood,
+					avatar: companion.avatar,
+					specialization: companion.specialization,
+					is_locked: false, // User can customize their copies
+					created_at: Date.now(),
+					updated_at: Date.now()
+				};
+
+				await userCompanionService.create(userCompanion);
+				importProgress++;
+			}
+
+			// Auto-advance after successful import
+			setTimeout(() => {
+				isImporting = false;
+				currentStep++;
+			}, 500);
+		} catch (error) {
+			console.error('Failed to import companions:', error);
+			isImporting = false;
 		}
 	}
 </script>
@@ -139,7 +202,7 @@
 </svelte:head>
 
 <div class="from-base-100 to-base-200 flex min-h-screen items-center justify-center bg-linear-to-br p-4">
-	<div class="w-full" class:max-w-md={currentStep !== 2} class:max-w-4xl={currentStep === 2}>
+	<div class="w-full" class:max-w-md={currentStep !== 3} class:max-w-4xl={currentStep === 3}>
 		<!-- Main Card -->
 		<div class="card bg-base-100 shadow-xl">
 			<div class="card-body">
@@ -214,8 +277,25 @@
 					</button>
 				{/if}
 
-				<!-- Step 2: Companion Selection -->
+				<!-- Step 2: Import Default Companions -->
 				{#if currentStep === 2}
+					<div class="flex flex-col items-center justify-center space-y-4 py-8">
+						<div class="w-full max-w-md space-y-3">
+							<progress class="progress progress-primary w-full" value={importProgress} max={importTotal || 1}
+							></progress>
+							<p class="text-center text-sm opacity-70">
+								{#if isImporting}
+									Importing companions... {importProgress}/{importTotal}
+								{:else}
+									Preparing to import companions...
+								{/if}
+							</p>
+						</div>
+					</div>
+				{/if}
+
+				<!-- Step 3: Companion Selection -->
+				{#if currentStep === 3}
 					<CompanionSelector
 						onSelect={(companion) => {
 							selectedCompanion = companion;
@@ -246,7 +326,7 @@
 						onclick={handleNext}
 						disabled={isTestingConnection ||
 							(currentStep === 1 && !connectionSuccess) ||
-							(currentStep === 2 && !selectedCompanion)}
+							(currentStep === 3 && !selectedCompanion)}
 						aria-label={currentStep === totalSteps - 1 ? 'Complete onboarding' : 'Next step'}
 					>
 						{#if currentStep === totalSteps - 1}
