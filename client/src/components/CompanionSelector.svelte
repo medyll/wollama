@@ -6,9 +6,10 @@
 
 	interface Props {
 		onSelect: (companion: Companion) => void;
+		onCustomize?: (companion: Companion) => void;
 	}
 
-	let { onSelect }: Props = $props();
+	let { onSelect, onCustomize }: Props = $props();
 
 	let companions: Companion[] = $state([]);
 	let isLoading = $state(true);
@@ -154,6 +155,23 @@
 								<span title={`Voice tone: ${companion.voice_tone}`}>
 									🎙️ {companion.voice_tone}
 								</span>
+							</div>
+						{/if}
+
+						<!-- Actions -->
+						{#if onCustomize}
+							<div class="actions-section mt-4 flex justify-center gap-2 border-t border-gray-200 pt-3">
+								<button
+									type="button"
+									class="btn btn-secondary btn-sm"
+									onclick={(e) => {
+										e.stopPropagation();
+										onCustomize(companion);
+									}}
+									aria-label={`Customize ${companion.name}`}
+								>
+									Customize
+								</button>
 							</div>
 						{/if}
 					</div>
