@@ -628,7 +628,8 @@
 							editable={true}
 							deletable={true}
 							onEdit={(item: any) => {
-								editingCompanionId = item.companion_id;
+								// Use the correct primary key for user_companions
+								editingCompanionId = item.user_companion_id;
 								isEditingCompanion = true;
 							}}
 						/>
