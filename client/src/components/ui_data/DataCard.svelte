@@ -93,8 +93,13 @@
 						class="btn btn-sm btn-ghost btn-circle"
 						onclick={(e) => {
 							e.stopPropagation();
-							isEditing = true;
-							onEdit && onEdit(item);
+							if (onEdit) {
+								// If parent provides onEdit callback, let parent handle the modal
+								onEdit(item);
+							} else {
+								// Otherwise, handle editing internally
+								isEditing = true;
+							}
 						}}
 						aria-label="Edit"
 					>
@@ -118,7 +123,8 @@
 		</div>
 	</div>
 
-	{#if isEditing}
+	<!-- Internal modal: only used if no onEdit callback is provided -->
+	{#if isEditing && !onEdit}
 		<DataUpdate
 			{tableName}
 			id={item[tableDef.primaryKey]}
