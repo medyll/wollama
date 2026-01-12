@@ -19,3 +19,9 @@ server/db_data/
 /data/*
 /server/bin/*
 /client/android/gradle/*
+playwright-report/
+test-results/
+log.txt
+client/pouch__all_dbs__
+client/_replicator
+client/_users

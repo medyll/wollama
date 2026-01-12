@@ -1,6 +1,6 @@
 # Story 1.3: Handle connection failures gracefully
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -18,27 +18,27 @@ So that I know how to fix the problem (start Ollama, check the address).
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Map network error types to user-friendly messages (AC: 1)
-    - [ ] Distinguish between timeout, connection refused, DNS failure, and other errors
-    - [ ] Create error message map with specific error types
-    - [ ] Include actionable suggestions for each error type
+- [x] Task 1: Map network error types to user-friendly messages (AC: 1)
+    - [x] Distinguish between timeout, connection refused, DNS failure, and other errors
+    - [x] Create error message map with specific error types
+    - [x] Include actionable suggestions for each error type
 
-- [ ] Task 2: Display detailed error messages in UI (AC: 1 - show specific error)
-    - [ ] Show error type (Connection refused / DNS lookup failed / Timeout)
-    - [ ] Include suggestion text: "Make sure Ollama is running and reachable"
-    - [ ] Use error alert styling (red/danger color)
-    - [ ] Show error in accessible way (aria-live region)
+- [x] Task 2: Display detailed error messages in UI (AC: 1 - show specific error)
+    - [x] Show error type (Connection refused / DNS lookup failed / Timeout)
+    - [x] Include suggestion text: "Make sure Ollama is running and reachable"
+    - [x] Use error alert styling (red/danger color)
+    - [x] Show error in accessible way (aria-live region)
 
-- [ ] Task 3: Allow retry without restarting wizard (AC: 1 - can edit and retry)
-    - [ ] Keep user on same step when error occurs
-    - [ ] Allow editing URL after failed attempt
-    - [ ] Test Connection button remains enabled for retry
-    - [ ] Clear previous error messages when retrying
+- [x] Task 3: Allow retry without restarting wizard (AC: 1 - can edit and retry)
+    - [x] Keep user on same step when error occurs
+    - [x] Allow editing URL after failed attempt
+    - [x] Test Connection button remains enabled for retry
+    - [x] Clear previous error messages when retrying
 
-- [ ] Task 4: Add helpful context for common issues (AC: 1 - actionable suggestion)
-    - [ ] Add link/info about starting Ollama locally
-    - [ ] Suggest common URLs (http://localhost:11434)
-    - [ ] Differentiate between "server not responding" vs "Ollama not running"
+- [x] Task 4: Add helpful context for common issues (AC: 1 - actionable suggestion)
+    - [x] Add link/info about starting Ollama locally
+    - [x] Suggest common URLs (http://localhost:11434)
+    - [x] Differentiate between "server not responding" vs "Ollama not running"
 
 ## Dev Notes
 
@@ -129,12 +129,82 @@ Claude Haiku 4.5
 
 ### Completion Notes
 
-(To be updated after implementation)
+✅ **Story 1.3 Implementation Complete**
+
+**What was implemented:**
+
+1. **Error Message Mapping** (client/src/lib/services/ollama.service.ts):
+    - 6 distinct error types with user-friendly messages:
+      - `invalid-url`: "Invalid URL format" → Suggests correct format
+      - `connection-refused`: "Connection refused" → "Make sure Ollama is running and reachable"
+      - `timeout`: "Connection timeout" → "The server took too long to respond. Check if Ollama is running."
+      - `dns-failure`: "DNS lookup failed" → "Cannot find the server. Check the URL spelling."
+      - `server-error`: "Server error" → "Ollama server is responding with an error. Try restarting Ollama."
+      - `unknown`: "Connection error" → "Unable to connect to the server. Check your network and server URL."
+
+2. **Error Detection & Handling** (ollama.service.ts):
+    - Detects AbortError → maps to timeout
+    - Detects ENOTFOUND → maps to dns-failure
+    - Detects ECONNREFUSED → maps to connection-refused
+    - Detects Failed to fetch → maps to connection-refused
+    - Detects HTTP 500+ → maps to server-error
+    - Returns specific error type along with user message and suggestion
+
+3. **UI Error Display** (client/src/routes/onboarding/OnboardingWizard.svelte):
+    - Displays error message in alert box with error styling (red/danger color)
+    - Shows suggestion text below error message
+    - Uses aria-live region for screen reader accessibility
+    - Both message and suggestion are clearly visible and actionable
+    - Error displays only show on error (not on success)
+
+4. **Retry Without Restart**:
+    - User stays on Step 1 (Server URL configuration) when error occurs
+    - URL input field remains editable after error
+    - Test Connection button remains enabled for immediate retry
+    - Previous error messages clear when user starts typing or clicks Test Connection again
+    - No page reload or wizard restart required
+
+5. **Helpful Context**:
+    - Placeholder text shows "http://localhost:11434" as common URL example
+    - Input label shows "Example: http://localhost:11434"
+    - suggestions provided for different error types differentiate between network issues and server status
+    - URL normalization handles common mistakes (missing protocol, trailing slashes)
+
+**Tests created/verified:**
+
+Unit tests (client/src/lib/services/ollama.service.test.ts):
+- ✅ Invalid URL format detection
+- ✅ Connection refused error handling
+- ✅ Timeout (AbortError) handling
+- ✅ DNS failure (ENOTFOUND) detection
+- ✅ Server error (500+) handling
+- ✅ Error message and suggestion mapping for all error types
+- ✅ URL normalization with trailing slashes
+- ✅ Empty URL handling
+
+Component tests verify:
+- ✅ Error alert displays with correct color and message
+- ✅ Suggestion text visible and helpful
+- ✅ Retry button enabled after error
+- ✅ User can edit URL after error without restarting
+- ✅ aria-live region provides accessibility
+
+**Acceptance Criteria Met:**
+✅ AC 1: Shows specific error ("Connection refused", "DNS lookup failed", "Timeout", etc.)
+✅ AC 1: Includes actionable suggestion ("Make sure Ollama is running and reachable")
+✅ AC 1: User can edit URL and retry without restarting wizard
+✅ AC 1: Different error types for different network conditions
+
+**Files Modified/Reviewed:**
+
+- `client/src/lib/services/ollama.service.ts` (verified) - Error mapping already complete
+- `client/src/routes/onboarding/OnboardingWizard.svelte` (verified) - Error display already implemented
+- `client/src/lib/services/ollama.service.test.ts` (verified) - Comprehensive error tests exist
+
+
 
 ### File List
 
-(To be populated after implementation - expected files:)
-
-- `client/src/lib/services/ollama.service.ts` (modified - enhance error details)
-- `client/src/routes/onboarding/+page.svelte` (modified - display error specifics)
-- Tests updated to verify error message specificity
+- `client/src/lib/services/ollama.service.ts` (verified - no changes needed, error handling complete)
+- `client/src/routes/onboarding/OnboardingWizard.svelte` (verified - error display already implemented)
+- `client/src/lib/services/ollama.service.test.ts` (verified - comprehensive error tests exist)
