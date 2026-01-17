@@ -7,3 +7,7 @@ coverage
 src/_old
 _old
 **/_old/**
+
+# Exclude internal/AI output and agent folders
+_bmad/
+_bmad-output/
