@@ -1,0 +1,8 @@
+name: Wollama BMAD
+stack: 'Web, Desktop, Mobile'
+team:
+    - Platform
+    - Frontend
+    - Backend
+    - Ops
+description: BMAD scaffold initialized from init directive.
