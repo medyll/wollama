@@ -6,7 +6,6 @@ import { RxDBDevModePlugin, disableWarnings } from 'rxdb/plugins/dev-mode';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { wrappedValidateAjvStorage } from 'rxdb/plugins/validate-ajv';
 import { appSchema } from '../../../shared/db/database-scheme';
-import type { DatabaseSchema } from '../../../shared/db/schema-definition';
 import { userState } from '$lib/state/user.svelte';
 
 // Add plugins
@@ -96,12 +95,13 @@ const convertSchema = (tableName: string, tableDef: any) => {
 };
 
 // HMR helper: Store the promise on the global object to prevent multiple DB instances during hot reload
+// don't forget to update the version number in createRxDatabase() when changing the schema
 const globalAny: any = typeof window !== 'undefined' ? window : global;
 let dbPromise: Promise<any> | null = globalAny.__wollama_db_promise || null;
 
 const _createDatabase = async () => {
 	const db = await createRxDatabase({
-		name: 'wollama_client_db_v11', // Bumped version to force fresh DB (v11 fixes schema conflict)
+		name: 'wollama_client_db_v15',
 		storage: wrappedValidateAjvStorage({
 			storage: getRxStorageDexie()
 		}),
@@ -131,7 +131,23 @@ const _createDatabase = async () => {
 // Store replication states to be able to cancel them
 const replicationStates: any[] = [];
 
-export const enableReplication = async (userId: string, token: string) => {
+/**
+ * Story 4.3: Implement last-write-wins conflict resolution
+ * Compare timestamps and keep the document with the later updated_at
+ */
+const conflictHandler = (_versionA: any, _versionB: any) => {
+	// RxDB passes the full documents with their metadata
+	// We prefer the version with the later timestamp
+	const timestampA = _versionA.updated_at || _versionA.created_at || 0;
+	const timestampB = _versionB.updated_at || _versionB.created_at || 0;
+
+	console.log(`Conflict resolution: A=${timestampA}, B=${timestampB}`);
+
+	// Return the document with the later timestamp (last-write-wins)
+	return timestampB >= timestampA ? _versionB : _versionA;
+};
+
+export const enableReplication = async (userId: string) => {
 	const db = await getDatabase();
 	const baseUrl = userState.preferences.serverUrl || 'http://localhost:3000';
 	const serverUrl = baseUrl.endsWith('/') ? `${baseUrl}_db/` : `${baseUrl}/_db/`;
@@ -152,6 +168,8 @@ export const enableReplication = async (userId: string, token: string) => {
 			collection: db.collections[tableName],
 			url: serverUrl + remoteName,
 			live: true,
+			// Story 4.3: Add conflict resolution strategy
+			conflictHandler,
 			pull: {
 				// Add Auth headers here if needed
 				// headers: { Authorization: `Bearer ${token}` }

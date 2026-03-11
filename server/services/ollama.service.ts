@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Ollama } from 'ollama';
 import { config } from '../config.js';
 

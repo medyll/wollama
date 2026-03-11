@@ -7,9 +7,14 @@
 	// The SplashScreen component in +layout.svelte handles the initial loading.
 	// This onMount handles client-side navigation back to root.
 	onMount(() => {
-		if (!userState.isConfigured) {
-			goto('/setup');
-		} else if (userState.isSecured && !userState.isAuthenticated) {
+		// First-time experience goes through onboarding (includes profile/auth)
+		if (!userState.preferences.onboarding_completed) {
+			goto('/onboarding');
+			return;
+		}
+
+		// If local protection enabled, require login
+		if (userState.isSecured && !userState.isAuthenticated) {
 			goto('/login');
 		} else {
 			goto('/chat');

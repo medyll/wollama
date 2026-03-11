@@ -1,5 +1,6 @@
 import type { DatabaseSchema } from './schema-definition.js';
 
+// don't forget to update the version number in the file client\src\lib\db.ts when changing the schema
 export const appSchema: DatabaseSchema = {
 	users: {
 		primaryKey: 'user_id',
@@ -18,7 +19,7 @@ export const appSchema: DatabaseSchema = {
 	user_preferences: {
 		primaryKey: 'user_preferences_id',
 		fk: {
-			user_id: { table: 'users', required: true }
+			user_id: { table: 'users', required: true, multiple: false }
 		},
 		fields: {
 			user_preferences_id: { type: 'uuid', required: true },
@@ -29,6 +30,7 @@ export const appSchema: DatabaseSchema = {
 			server_url: { type: 'string', ui: { type: 'url' } },
 			default_model: { type: 'string' },
 			default_temperature: { type: 'number', ui: { type: 'slider', min: 0, max: 1, step: 0.1 } },
+			onboarding_completed: { type: 'boolean', ui: { type: 'toggle' }, default: false },
 			updated_at: { type: 'timestamp', auto: true }
 		}
 	},
@@ -47,7 +49,7 @@ export const appSchema: DatabaseSchema = {
 			model: { type: 'string', required: true },
 			voice_id: { type: 'string' },
 			voice_tone: { type: 'string', enum: ['neutral', 'fast', 'slow', 'deep', 'high'] },
-			mood: { type: 'string', enum: ['neutral', 'happy', 'sad', 'angry', 'sarcastic', 'professional', 'friendly'] },
+			mood: { type: 'string', enum: ['neutral', 'happy', 'sad', 'angry', 'sarcastic', 'professional', 'friendly', 'sexy'] },
 			avatar: { type: 'string', ui: { type: 'image' } },
 			created_at: { type: 'timestamp', required: true, auto: true },
 			updated_at: { type: 'timestamp', auto: true },
@@ -56,27 +58,27 @@ export const appSchema: DatabaseSchema = {
 		}
 	},
 	user_companions: {
-		primaryKey: 'companion_id',
+		primaryKey: 'user_companion_id',
 		indexes: ['name', 'user_id'],
 		template: {
 			presentation: 'name',
 			card_lines: ['description', 'model', 'specialization']
 		},
 		fk: {
-			user_id: { table: 'users', required: true },
-			original_companion_id: { table: 'companions', required: false }
+			user_id: { table: 'users', required: true, multiple: true },
+			companion_id: { table: 'companions', required: false, multiple: true }
 		},
 		fields: {
-			companion_id: { type: 'uuid', required: true },
+			user_companion_id: { type: 'uuid', required: true },
 			user_id: { type: 'uuid', required: true },
-			original_companion_id: { type: 'uuid' },
+			companion_id: { type: 'uuid' },
 			name: { type: 'string', required: true },
 			description: { type: 'string', ui: { type: 'textarea' } },
 			system_prompt: { type: 'text-long', required: true, ui: { type: 'textarea', rows: 10 } },
 			model: { type: 'string', required: true },
 			voice_id: { type: 'string' },
 			voice_tone: { type: 'string', enum: ['neutral', 'fast', 'slow', 'deep', 'high'] },
-			mood: { type: 'string', enum: ['neutral', 'happy', 'sad', 'angry', 'sarcastic', 'professional', 'friendly'] },
+			mood: { type: 'string', enum: ['neutral', 'happy', 'sad', 'angry', 'sarcastic', 'professional', 'friendly', 'sexy'] },
 			avatar: { type: 'string', ui: { type: 'image' } },
 			created_at: { type: 'timestamp', required: true, auto: true },
 			updated_at: { type: 'timestamp', auto: true },
@@ -92,8 +94,8 @@ export const appSchema: DatabaseSchema = {
 			card_lines: ['title', 'model', 'companion_id.name']
 		},
 		fk: {
-			user_id: { table: 'users', required: true },
-			companion_id: { table: 'companions', required: false }
+			user_id: { table: 'users', required: true, multiple: true },
+			companion_id: { table: 'companions', required: false, multiple: true }
 		},
 		fields: {
 			chat_id: { type: 'uuid', required: true },
@@ -118,7 +120,7 @@ export const appSchema: DatabaseSchema = {
 			card_lines: ['role', 'content', 'model']
 		},
 		fk: {
-			chat_id: { table: 'chats', required: true }
+			chat_id: { table: 'chats', required: true, multiple: true }
 		},
 		fields: {
 			message_id: { type: 'uuid', required: true },
@@ -166,7 +168,21 @@ export const appSchema: DatabaseSchema = {
 		},
 		fields: {
 			prompt_id: { type: 'uuid', required: true },
-			content: { type: 'text-long', required: true, ui: { type: 'textarea', rows: 3, label: 'Prompt / Phrase' } },
+			content: {
+				type: 'text-long',
+				required: true,
+				ui: { type: 'textarea', rows: 3, label: 'Prompt / Phrase' },
+				ai: {
+					trigger: 'auto_pre',
+					systemPrompt: `You are an expert prompt engineer. Your task is to rewrite the user's instruction to be a clear, concise, and effective system prompt for an LLM. It should define a user preference or behavior.
+IMPORTANT:
+1. Output ONLY the raw rewritten prompt.
+2. Do NOT include any prefixes, labels, titles, or explanations.
+3. Do not use any quotation marks or formatting.
+4. Write in the THIRD PERSON, referring to "the user" (or "l'utilisateur", "el usuario", etc. depending on the language).
+5. The rewritten prompt MUST be in the language corresponding to the locale '{{locale}}'.`
+				}
+			},
 			is_active: { type: 'boolean', ui: { type: 'toggle', label: 'Active' }, default: true },
 			created_at: { type: 'timestamp', required: true, auto: true },
 			updated_at: { type: 'timestamp', auto: true }

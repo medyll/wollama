@@ -1,4 +1,5 @@
 import { translations } from '../../locales/translations.js';
+import { browser } from '$app/environment';
 
 export class UserState {
 	nickname = $state('');
@@ -14,20 +15,22 @@ export class UserState {
 	isSecured = $state(false);
 
 	preferences = $state({
-		serverUrl: 'http://localhost:3000',
+		ollamaUrl: 'http://localhost:11434', // Ollama service
+		serverUrl: 'http://localhost:3000', // Wollama application server
 		locale: 'en',
-		theme: 'light',
+		theme: 'fluent-light',
 		defaultModel: 'mistral:latest',
 		defaultCompanion: '1', // Default to General Assistant
 		defaultTemperature: 0.7,
 		auto_play_audio: false,
 		audioInputId: '',
-		audioOutputId: ''
+		audioOutputId: '',
+		onboarding_completed: false
 	});
 
 	constructor() {
-		// Load from localStorage if available
-		if (typeof localStorage !== 'undefined') {
+		// Load from localStorage if available (browser-only)
+		if (browser && typeof localStorage !== 'undefined') {
 			const stored = localStorage.getItem('wollama_user');
 			if (stored) {
 				const data = JSON.parse(stored);
@@ -52,7 +55,7 @@ export class UserState {
 				}
 			} else {
 				// First start: Detect browser language
-				if (typeof navigator !== 'undefined') {
+				if (browser && typeof navigator !== 'undefined') {
 					const browserLang = navigator.language.split('-')[0];
 					if (browserLang in translations) {
 						this.preferences.locale = browserLang;
@@ -90,7 +93,7 @@ export class UserState {
 
 	save() {
 		this.isConfigured = true;
-		if (typeof localStorage !== 'undefined') {
+		if (browser && typeof localStorage !== 'undefined') {
 			localStorage.setItem(
 				'wollama_user',
 				JSON.stringify({
@@ -118,18 +121,20 @@ export class UserState {
 
 		// Reset preferences to defaults
 		this.preferences = {
+			ollamaUrl: 'http://localhost:11434',
 			serverUrl: 'http://localhost:3000',
 			locale: 'en',
-			theme: 'light',
+			theme: 'fluent-light',
 			defaultModel: 'mistral:latest',
 			defaultCompanion: '1',
 			defaultTemperature: 0.7,
 			auto_play_audio: false,
-			audioInputId: 'default',
-			audioOutputId: 'default'
+			audioInputId: '',
+			audioOutputId: '',
+			onboarding_completed: false
 		};
 
-		if (typeof localStorage !== 'undefined') {
+		if (browser && typeof localStorage !== 'undefined') {
 			localStorage.removeItem('wollama_user');
 		}
 	}

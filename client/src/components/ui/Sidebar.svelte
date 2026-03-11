@@ -37,11 +37,9 @@
 </script>
 
 <aside
-	class="bg-base-300 border-base-content/10 flex h-full flex-col border-r transition-all duration-300 {uiState.sidebarOpen
-		? uiState.sidebarCollapsed
-			? 'w-20'
-			: 'w-64'
-		: 'w-0 overflow-hidden'}"
+	class="bg-base-300 border-base-content/10 flex flex-col transition-all duration-300 {uiState.sidebarOpen
+		? (uiState.sidebarCollapsed ? 'w-20' : 'w-64') + ' m-2 h-[calc(100%-1rem)] rounded-xl border'
+		: 'h-full w-0 overflow-hidden'}"
 	aria-label="Sidebar"
 >
 	<div class="flex flex-col gap-2 p-2">
@@ -57,13 +55,13 @@
 
 			{#if !uiState.sidebarCollapsed}
 				<button class="btn btn-ghost btn-square btn-sm" aria-label="Search" onclick={() => goto('/search')}>
-					<Icon icon="lucide:search" class="h-5 w-5" />
+					<Icon icon="fluent:search-24-regular" class="h-5 w-5" />
 				</button>
 			{/if}
 		</div>
 		{#if uiState.sidebarCollapsed}
 			<button class="btn btn-ghost btn-square btn-sm mx-auto" aria-label="Search" onclick={() => goto('/search')}>
-				<Icon icon="lucide:search" class="h-5 w-5" />
+				<Icon icon="fluent:search-24-regular" class="h-5 w-5" />
 			</button>
 		{/if}
 
@@ -72,7 +70,7 @@
 			onclick={createNewChat}
 			title={t('ui.newChat')}
 		>
-			<Icon icon="lucide:square-pen" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
+			<Icon icon="fluent:compose-24-regular" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.newChat')}
 			{/if}
@@ -91,7 +89,7 @@
 						: ''}"
 					title={chat.title}
 				>
-					<Icon icon="lucide:message-square" class="mr-2 h-5 w-5 opacity-70" />
+					<Icon icon="fluent:chat-24-regular" class="mr-2 h-5 w-5 opacity-70" />
 					<span class="truncate">{chat.title}</span>
 				</a>
 			{/each}
@@ -107,7 +105,7 @@
 			onclick={() => goto('/settings')}
 			title={t('ui.settings')}
 		>
-			<Icon icon="lucide:settings" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
+			<Icon icon="fluent:settings-24-regular" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.settings')}
 			{/if}

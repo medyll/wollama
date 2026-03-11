@@ -3,17 +3,23 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { spawn } from 'child_process';
+import ffmpeg from 'fluent-ffmpeg';
+import ffmpegPath from 'ffmpeg-static';
+
+if (ffmpegPath) {
+	ffmpeg.setFfmpegPath(ffmpegPath);
+}
 
 // Service for Speech-to-Text (Whisper)
 export const SttService = {
-	async transcribe(audioBuffer: Buffer, filename: string = 'audio.wav'): Promise<string> {
+	async transcribe(audioBuffer: Buffer, filename: string = 'audio.wav', language: string = 'auto'): Promise<string> {
 		if (!config.stt.enabled) {
 			console.log('STT is disabled. Returning mock transcription.');
 			return 'Transcription simulée (STT désactivé)';
 		}
 
 		if (config.stt.provider === 'local') {
-			return this.transcribeLocal(audioBuffer);
+			return this.transcribeLocal(audioBuffer, language);
 		}
 
 		try {
@@ -21,6 +27,9 @@ export const SttService = {
 			const blob = new Blob([audioBuffer], { type: 'audio/wav' });
 			formData.append('file', blob, filename);
 			formData.append('model', 'whisper-1'); // Default model name for OpenAI API
+			if (language && language !== 'auto') {
+				formData.append('language', language);
+			}
 
 			const response = await fetch(config.stt.url, {
 				method: 'POST',
@@ -39,7 +48,7 @@ export const SttService = {
 		}
 	},
 
-	async transcribeLocal(audioBuffer: Buffer): Promise<string> {
+	async transcribeLocal(audioBuffer: Buffer, language: string = 'auto'): Promise<string> {
 		const binaryPath = config.stt.binaryPath;
 		const modelPath = config.stt.modelPath;
 
@@ -52,29 +61,59 @@ export const SttService = {
 			return 'Erreur: Modèle Whisper introuvable';
 		}
 
-		// Create a temp file for the audio input
-		const tempInputFile = path.join(os.tmpdir(), `whisper-in-${Date.now()}-${Math.random().toString(36).substring(7)}.wav`);
+		// Create temp files
+		const tempInputFile = path.join(os.tmpdir(), `whisper-in-${Date.now()}-${Math.random().toString(36).substring(7)}.webm`);
+		const tempWavFile = path.join(os.tmpdir(), `whisper-conv-${Date.now()}-${Math.random().toString(36).substring(7)}.wav`);
+
+		console.log(`[STT] Starting local transcription...`);
+		console.log(`[STT] Binary: ${binaryPath}`);
+		console.log(`[STT] Model: ${modelPath}`);
+		console.log(`[STT] Input (Temp): ${tempInputFile}`);
 
 		try {
 			await fs.promises.writeFile(tempInputFile, audioBuffer);
+			console.log(`[STT] Input file written. Size: ${audioBuffer.length} bytes`);
+
+			// Convert to 16kHz WAV using ffmpeg
+			console.log(`[STT] Converting to 16kHz WAV...`);
+			await new Promise<void>((resolve, reject) => {
+				ffmpeg(tempInputFile)
+					.toFormat('wav')
+					.audioFrequency(16000)
+					.audioChannels(1)
+					.on('end', () => {
+						console.log('[STT] Conversion complete.');
+						resolve();
+					})
+					.on('error', (err) => {
+						console.error('[STT] FFmpeg error:', err);
+						reject(err);
+					})
+					.save(tempWavFile);
+			});
+
+			// Check if WAV file exists and has size
+			const wavStats = await fs.promises.stat(tempWavFile);
+			console.log(`[STT] WAV file ready. Size: ${wavStats.size} bytes`);
 
 			return new Promise((resolve, reject) => {
-				// Assuming whisper.cpp main binary usage:
-				// ./main -m models/ggml-base.en.bin -f input.wav --output-txt --no-timestamps
-				// We'll capture stdout directly if possible, or read the output file.
-				// Many whisper CLIs output to stdout by default or with specific flags.
-				// Let's assume standard whisper.cpp behavior: it prints to stdout but includes metadata.
-				// We might need to parse it or use a specific flag for clean output.
-				// For simplicity, let's try to capture stdout and clean it up.
+				// Clean language code (e.g. 'fr-FR' -> 'fr')
+				const langCode = language === 'auto' ? 'auto' : language.split(/[-_]/)[0].toLowerCase();
 
-				const whisper = spawn(binaryPath, [
+				const args = [
 					'-m',
 					modelPath,
 					'-f',
-					tempInputFile,
+					tempWavFile,
 					'-nt', // No timestamps
-					'--no-prints' // Don't print progress
-				]);
+					'-l',
+					langCode
+				];
+				console.log(`[STT] Spawning Whisper: ${binaryPath} ${args.join(' ')}`);
+
+				const whisper = spawn(binaryPath, args, {
+					cwd: path.dirname(binaryPath)
+				});
 
 				let output = '';
 				let errorOutput = '';
@@ -85,35 +124,46 @@ export const SttService = {
 
 				whisper.stderr.on('data', (data) => {
 					errorOutput += data.toString();
+					console.log(`[Whisper Stderr]: ${data}`);
 				});
 
 				whisper.on('close', async (code) => {
-					// Cleanup input file
+					console.log(`[STT] Whisper exited with code ${code}`);
+
+					// Cleanup temp files
 					try {
-						await fs.promises.unlink(tempInputFile);
-					} catch {}
+						if (fs.existsSync(tempInputFile)) await fs.promises.unlink(tempInputFile);
+						if (fs.existsSync(tempWavFile)) await fs.promises.unlink(tempWavFile);
+					} catch (e) {
+						console.warn('[STT] Cleanup warning:', e);
+					}
 
 					if (code === 0) {
-						// Clean up the output (trim whitespace)
-						resolve(output.trim());
+						const text = output.trim();
+						console.log(`[STT] Transcription result: "${text}"`);
+						resolve(text);
 					} else {
-						console.error(`Whisper process exited with code ${code}`);
-						console.error(`Stderr: ${errorOutput}`);
-						resolve('Erreur lors de la transcription locale');
+						console.error(`[STT] Failed. Code: ${code}`);
+						console.error(`[STT] Stderr: ${errorOutput}`);
+						// Return the error details for debugging
+						resolve(`Erreur STT (Code ${code}): ${errorOutput.slice(0, 100)}...`);
 					}
 				});
 
 				whisper.on('error', (err) => {
-					console.error('Failed to start Whisper:', err);
-					resolve('Erreur: Impossible de lancer Whisper');
+					console.error('[STT] Failed to start Whisper process:', err);
+					resolve(`Erreur lancement Whisper: ${err.message}`);
 				});
 			});
-		} catch (e) {
-			console.error('Error in local transcription:', e);
+		} catch (e: any) {
+			console.error('[STT] Exception during transcription:', e);
 			try {
-				await fs.promises.unlink(tempInputFile);
-			} catch {}
-			return 'Erreur interne de transcription';
+				if (fs.existsSync(tempInputFile)) await fs.promises.unlink(tempInputFile);
+				if (fs.existsSync(tempWavFile)) await fs.promises.unlink(tempWavFile);
+			} catch {
+				// Ignore cleanup errors
+			}
+			return `Erreur interne STT: ${e.message}`;
 		}
 	}
 };

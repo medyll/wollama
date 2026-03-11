@@ -96,7 +96,7 @@
 		</div>
 	{:else if error}
 		<div class="alert alert-error">
-			<Icon icon="lucide:alert-circle" />
+			<Icon icon="fluent:error-circle-24-regular" />
 			<span>{error}</span>
 		</div>
 	{:else if items.length === 0}
@@ -154,7 +154,7 @@
 											}}
 											aria-label="Edit"
 										>
-											<Icon icon="lucide:edit-2" class="h-4 w-4" />
+											<Icon icon="fluent:edit-24-regular" class="h-4 w-4" />
 										</button>
 									{/if}
 									{#if deletable}
@@ -166,7 +166,7 @@
 											}}
 											aria-label="Delete"
 										>
-											<Icon icon="lucide:trash-2" class="h-4 w-4" />
+											<Icon icon="fluent:delete-24-regular" class="h-4 w-4" />
 										</button>
 									{/if}
 								</td>

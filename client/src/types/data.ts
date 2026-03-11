@@ -70,7 +70,7 @@ export interface Companion {
 	// Audio
 	voice_id?: string;
 	voice_tone?: 'neutral' | 'fast' | 'slow' | 'deep' | 'high';
-	mood?: 'neutral' | 'happy' | 'sad' | 'angry' | 'sarcastic' | 'professional' | 'friendly';
+	mood?: 'neutral' | 'happy' | 'sad' | 'angry' | 'sarcastic' | 'professional' | 'friendly' | 'sexy';
 
 	// Metadata
 	avatar?: string;
@@ -85,13 +85,16 @@ export interface Companion {
 		| 'dialogue'
 		| 'general'
 		| 'coding'
+		| 'prompt-engineering'
+		| 'roleplay'
 		| 'storytelling';
 	is_locked?: boolean; // ia_lock
 }
 
-export interface UserCompanion extends Companion {
+export interface UserCompanion extends Omit<Companion, 'companion_id'> {
+	user_companion_id: string; // UUID
 	user_id: string; // UUID
-	original_companion_id?: string; // UUID (if forked from system companion)
+	companion_id?: string; // UUID (if forked from system companion)
 }
 
 export interface UserPreferences {

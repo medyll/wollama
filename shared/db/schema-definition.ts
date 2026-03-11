@@ -25,13 +25,19 @@ export interface FieldDefinition {
 		type: string;
 		[key: string]: any;
 	};
+	ai?: {
+		model?: string;
+		systemPrompt: string;
+		trigger: 'manual' | 'auto_pre' | 'auto_post';
+		outputMode?: 'replace' | 'append';
+	};
 }
 
 export interface TableDefinition {
 	primaryKey: string;
 	indexes?: string[];
 	fields: Record<string, FieldDefinition>;
-	fk?: Record<string, { table: string; required?: boolean }>;
+	fk?: Record<string, { table: string; required?: boolean; multiple?: boolean }>;
 	template?: {
 		presentation: string;
 		card_lines?: string[];

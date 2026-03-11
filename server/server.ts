@@ -1,8 +1,6 @@
 import express from 'express';
-import { createServer } from 'http';
 import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
 import expressPouchDB from 'express-pouchdb';
 import multer from 'multer';
 import { dbManager } from './db/database.js';
@@ -11,14 +9,48 @@ import { SttService } from './services/stt.service.js';
 import { TtsService } from './services/tts.service.js';
 import { OllamaService } from './services/ollama.service.js';
 import { PromptService } from './services/prompt.service.js';
+import { sidecarService } from './services/sidecar.service.js';
 import { logger } from './utils/logger.js';
 
 import cors from 'cors';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import helmet from 'helmet';
 
 const app = express();
+app.set('trust proxy', true);
+
+// Security: Helmet sets secure headers, plus custom CSP/HSTS
+app.use(
+	helmet({
+		contentSecurityPolicy: {
+			directives: {
+				defaultSrc: ["'self'"],
+				scriptSrc: ["'self'", "'unsafe-inline'"],
+				connectSrc: ["'self'", 'https:', 'ws:', 'wss:', 'http:'],
+				imgSrc: ["'self'", 'data:', 'https:'],
+				styleSrc: ["'self'", "'unsafe-inline'"]
+			}
+		}
+	})
+);
+
+// Enforce HSTS for HTTPS responses
+app.use((req, res, next) => {
+	if (req.secure || (req.headers['x-forwarded-proto'] || '').includes('https')) {
+		res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+	}
+	next();
+});
+
+// Redirect HTTP to HTTPS for production (skip localhost)
+app.use((req, res, next) => {
+	if (!req.secure && !(req.headers['x-forwarded-proto'] || '').includes('https')) {
+		const host = req.headers.host || '';
+		if (!host.includes('localhost') && !host.includes('127.0.0.1')) {
+			return res.redirect(301, `https://${host}${req.url}`);
+		}
+	}
+	next();
+});
 const port = config.server.port;
 
 // Server State
@@ -74,7 +106,8 @@ app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
 			res.status(400).json({ error: 'No file uploaded' });
 			return;
 		}
-		const text = await SttService.transcribe(req.file.buffer, req.file.originalname);
+		const language = req.body.language || 'auto';
+		const text = await SttService.transcribe(req.file.buffer, req.file.originalname, language);
 		res.json({ text });
 	} catch (error) {
 		console.error('Transcription error:', error);
@@ -84,12 +117,44 @@ app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
 
 app.post('/api/audio/speak', async (req, res) => {
 	try {
-		const { text, voiceId, voiceTone } = req.body;
+		const { text, voiceId, voiceTone, emotionTags, parameters, locale } = req.body;
 		if (!text) {
 			res.status(400).json({ error: 'Text is required' });
 			return;
 		}
-		const audioBuffer = await TtsService.speak(text, voiceId, voiceTone);
+
+		// Check if we should use Emotional TTS (Chatterbox)
+		if (emotionTags && emotionTags.length > 0 && sidecarService.isReady) {
+			try {
+				// Pass locale (or default to 'en') to sidecar
+				const audioBuffer = await sidecarService.synthesize(text, emotionTags, parameters || {}, locale || 'en');
+				res.set('Content-Type', 'audio/wav');
+				res.send(audioBuffer);
+				return;
+			} catch (e) {
+				console.warn('Emotional TTS failed, falling back to standard TTS', e);
+				// Fallback to standard TTS below
+			}
+		}
+
+		// Use voiceId if provided, otherwise try to use locale as voiceId (e.g. 'fr', 'en')
+		// TtsService.speak handles mapping 'fr' -> 'fr_FR-siwis-medium.onnx'
+		let effectiveVoiceId = voiceId;
+		const openAIVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+
+		// If we are in local mode and the requested voice is an OpenAI voice (default in client),
+		// or if no voice is provided, use the locale to ensure we pick a model in the right language.
+		if (
+			!effectiveVoiceId ||
+			effectiveVoiceId === 'chatterbox' ||
+			(config.tts.provider === 'local' && openAIVoices.includes(effectiveVoiceId))
+		) {
+			effectiveVoiceId = locale || 'en';
+		}
+
+		console.log(`[API] /audio/speak - voiceId: ${voiceId}, locale: ${locale} -> effective: ${effectiveVoiceId}`);
+
+		const audioBuffer = await TtsService.speak(text, effectiveVoiceId, voiceTone);
 		if (!audioBuffer) {
 			res.status(500).json({ error: 'TTS failed or disabled' });
 			return;
@@ -282,15 +347,19 @@ const killLocalOllama = async () => {
 		if (process.platform === 'win32') {
 			try {
 				await execAsync('taskkill /IM "ollama app.exe" /F');
-			} catch {}
+			} catch {
+				// Ignore errors
+			}
 			try {
 				await execAsync('taskkill /IM "ollama.exe" /F');
-			} catch {}
+			} catch {
+				// Ignore errors
+			}
 		} else {
 			await execAsync('pkill -f ollama');
 		}
 		logger.info('OLLAMA', 'Killed local Ollama process.');
-	} catch (e) {
+	} catch {
 		// Ignore errors
 	}
 };
@@ -307,10 +376,10 @@ const startLocalOllama = async () => {
 		if (process.platform === 'win32') {
 			let ollamaPath = '';
 			try {
-				// Try to find ollama executable path via PATH
+				// Try ind ollama executable path via PATH
 				const { stdout: whereOutput } = await execAsync('where ollama');
 				ollamaPath = whereOutput.split('\n')[0].trim();
-			} catch (e) {
+			} catch {
 				// Fallback to common default installation paths
 				const localAppData = process.env.LOCALAPPDATA || '';
 				const commonPaths = [
@@ -354,11 +423,11 @@ const startLocalOllama = async () => {
 				detached: true,
 				stdio: 'ignore'
 			});
-			child.unref();
+			child.f();
 			logger.success('OLLAMA', 'Started local Ollama instance (Linux)');
 			return true;
 		}
-	} catch (e) {
+	} catch {
 		logger.warn('OLLAMA', 'Could not auto-start local Ollama');
 	}
 	return false;
@@ -408,11 +477,9 @@ const initializeOllama = async () => {
 				logger.success('OLLAMA', `Model '${defaultModel}' is ready`);
 			}
 
-			serverState.ollamaReady = true;
 			return; // Success, exit function
 		} catch (error: any) {
 			const isLastAttempt = i === maxRetries - 1;
-			const isConnectionRefused = error.code === 'ECONNREFUSED' || error.cause?.code === 'ECONNREFUSED';
 
 			// If first attempt fails and it looks like the service is down (and local), try to start it
 			if (i === 0 && isLocalHost(config.ollama.host)) {
@@ -490,6 +557,13 @@ const ensureAudioSetup = async () => {
 };
 
 const initializeTTS = async () => {
+	// Initialize Sidecar (Chatterbox)
+	try {
+		await sidecarService.start();
+	} catch (error) {
+		logger.error('TTS', 'Failed to start Emotional TTS Sidecar');
+	}
+
 	if (config.tts.enabled) {
 		if (config.tts.provider === 'local') {
 			logger.info('TTS', `Checking Local TTS (Piper)...`);
@@ -526,4 +600,15 @@ app.listen(port, async () => {
 	await ensureAudioSetup();
 	await initializeOllama();
 	await initializeTTS();
+});
+
+// Graceful Shutdown
+process.on('SIGTERM', () => {
+	sidecarService.stop();
+	process.exit(0);
+});
+
+process.on('SIGINT', () => {
+	sidecarService.stop();
+	process.exit(0);
 });

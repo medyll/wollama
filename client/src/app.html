@@ -13,9 +13,9 @@
 			if (localStorage.theme) {
 				document.documentElement.classList.add(localStorage.theme);
 			} else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-				document.documentElement.classList.add('light');
+				document.documentElement.classList.add('fluent-light');
 			} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-				document.documentElement.classList.add('dark');
+				document.documentElement.classList.add('fluent-dark');
 			}
 		</script>
 		<script>
