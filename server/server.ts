@@ -13,8 +13,44 @@ import { sidecarService } from './services/sidecar.service.js';
 import { logger } from './utils/logger.js';
 
 import cors from 'cors';
+import helmet from 'helmet';
 
 const app = express();
+app.set('trust proxy', true);
+
+// Security: Helmet sets secure headers, plus custom CSP/HSTS
+app.use(
+	helmet({
+		contentSecurityPolicy: {
+			directives: {
+				defaultSrc: ["'self'"],
+				scriptSrc: ["'self'", "'unsafe-inline'"],
+				connectSrc: ["'self'", 'https:', 'ws:', 'wss:', 'http:'],
+				imgSrc: ["'self'", 'data:', 'https:'],
+				styleSrc: ["'self'", "'unsafe-inline'"]
+			}
+		}
+	})
+);
+
+// Enforce HSTS for HTTPS responses
+app.use((req, res, next) => {
+	if (req.secure || (req.headers['x-forwarded-proto'] || '').includes('https')) {
+		res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+	}
+	next();
+});
+
+// Redirect HTTP to HTTPS for production (skip localhost)
+app.use((req, res, next) => {
+	if (!req.secure && !(req.headers['x-forwarded-proto'] || '').includes('https')) {
+		const host = req.headers.host || '';
+		if (!host.includes('localhost') && !host.includes('127.0.0.1')) {
+			return res.redirect(301, `https://${host}${req.url}`);
+		}
+	}
+	next();
+});
 const port = config.server.port;
 
 // Server State
