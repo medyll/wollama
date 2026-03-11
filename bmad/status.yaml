@@ -5,3 +5,18 @@ phases:
     - analysis
     - planning
     - execution
+audit:
+  last_run: "2026-03-11"
+  type: "full"
+  baseline: false
+  score: null
+  project_type: "single-package"
+  packages_scanned: []
+  critical: 2
+  major: 3
+  minor: 1
+  info: 0
+  artifact: "bmad/artifacts/audit-report.md"
+  auto_stories_created:
+    - CODE-QL-001
+    - SEC-001
