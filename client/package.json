@@ -79,6 +79,7 @@
 		"@testing-library/user-event": "^14.5.2",
 		"@types/marked": "^6.0.0",
 		"@types/pouchdb": "^6.4.2",
+		"@vitest/coverage-v8": "^4.0.15",
 		"concurrently": "^9.2.1",
 		"daisyui": "^5.5.8",
 		"electron": "^39.2.6",
