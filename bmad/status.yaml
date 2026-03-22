@@ -1,27 +1,48 @@
 # BMAD Status
 project: wollama
-phase: development
-progress: 35
-next_action: "Compléter CODE-QL-001 : porter la couverture auth >= 85%, enforcer le seuil CI"
-active_role: dev
+phase: planning
+progress: 0
+next_action: "Rédiger PRD complet — agents, skills, hooks"
+active_role: pm
 
 phases:
   - name: planning
-    status: done
+    status: in_progress
   - name: development
-    status: in_progress
+    status: upcoming
   - name: testing
-    status: in_progress
+    status: upcoming
   - name: release
     status: upcoming
 
 artifacts:
-  prd: missing
-  architecture: missing
+  prd: done
+  architecture: done
   tech-spec: missing
-  audit-report: in_progress
+  audit-report: done
 
 sprints:
   - id: 1
-    status: active
-    stories: ["S1-01"]
+    name: "Foundation DB — 4 nouvelles tables + interfaces TS"
+    status: planned
+    stories: []
+  - id: 2
+    name: "Hook Pipeline — middleware pre/post-send"
+    status: planned
+    stories: []
+  - id: 3
+    name: "Skills + Slash commands + Autocomplete"
+    status: planned
+    stories: []
+  - id: 4
+    name: "Agents built-in — WebSearch, PageFetch"
+    status: planned
+    stories: []
+  - id: 5
+    name: "Frontend UX — ToolCallMessage, HookInspector, Settings"
+    status: planned
+    stories: []
+  - id: 6
+    name: "Polish, tests, cross-platform validation"
+    status: planned
+    stories: []
