@@ -1,7 +1,27 @@
-status: analysis
-timestamp: 2026-03-11T12:15:00Z
+# BMAD Status
+project: wollama
+phase: development
+progress: 35
+next_action: "Compléter CODE-QL-001 : porter la couverture auth >= 85%, enforcer le seuil CI"
+active_role: dev
+
 phases:
-    - init
-    - analysis
-    - planning
-    - execution
+  - name: planning
+    status: done
+  - name: development
+    status: in_progress
+  - name: testing
+    status: in_progress
+  - name: release
+    status: upcoming
+
+artifacts:
+  prd: missing
+  architecture: missing
+  tech-spec: missing
+  audit-report: in_progress
+
+sprints:
+  - id: 1
+    status: active
+    stories: ["S1-01"]

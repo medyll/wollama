@@ -40,4 +40,42 @@ describe('AuthService', () => {
 		const { userState } = await import('./state/user.svelte');
 		expect(userState.logout).toHaveBeenCalled();
 	});
+
+	it('signOut calls disableReplication before logout', async () => {
+		const { disableReplication } = await import('./db');
+		const { userState } = await import('./state/user.svelte');
+		await authService.signOut();
+		expect(disableReplication).toHaveBeenCalled();
+		expect(userState.logout).toHaveBeenCalled();
+	});
+
+	it('startSync calls enableReplication with uid and token', async () => {
+		const { enableReplication, getDatabase } = await import('./db');
+		const { userState } = await import('./state/user.svelte');
+		// userState mock already has isAuthenticated: true, uid: 'user_1', token: 'token'
+		await authService.startSync();
+		expect(getDatabase).toHaveBeenCalled();
+		expect(enableReplication).toHaveBeenCalledWith('user_1', 'token');
+	});
+
+	it('startSync does nothing when not authenticated', async () => {
+		const { enableReplication } = await import('./db');
+		const { userState } = await import('./state/user.svelte');
+		// Override mock for this test
+		(userState as any).isAuthenticated = false;
+		await authService.startSync();
+		expect(enableReplication).not.toHaveBeenCalled();
+		// Restore
+		(userState as any).isAuthenticated = true;
+	});
+
+	it('signInWithGoogle calls enableReplication after sign in', async () => {
+		vi.useFakeTimers();
+		const { enableReplication } = await import('./db');
+		const promise = authService.signInWithGoogle();
+		vi.advanceTimersByTime(1000);
+		await promise;
+		vi.useRealTimers();
+		expect(enableReplication).toHaveBeenCalled();
+	});
 });

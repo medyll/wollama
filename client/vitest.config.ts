@@ -23,6 +23,16 @@ export default defineConfig({
 				// Ensure localStorage/sessionStorage are available
 				url: 'http://localhost/'
 			}
+		},
+		coverage: {
+			provider: 'v8',
+			include: ['src/lib/auth.ts', 'src/lib/state/user.svelte.ts'],
+			thresholds: {
+				lines: 85,
+				functions: 85,
+				branches: 85,
+				statements: 85
+			}
 		}
 	}
 });
