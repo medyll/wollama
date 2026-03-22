@@ -10,6 +10,8 @@ import { TtsService } from './services/tts.service.js';
 import { OllamaService } from './services/ollama.service.js';
 import { PromptService } from './services/prompt.service.js';
 import { sidecarService } from './services/sidecar.service.js';
+import { hookRegistry } from './services/hook-registry.service.js';
+import { hookPipeline } from './services/hook-pipeline.service.js';
 import { logger } from './utils/logger.js';
 
 import cors from 'cors';
@@ -133,7 +135,7 @@ app.post('/api/audio/speak', async (req, res) => {
 
 app.post('/api/chat/generate', async (req, res) => {
 	try {
-		const { model, messages, stream, context } = req.body;
+		const { model, messages, stream, context, chat_id, user_id, companion_id } = req.body;
 
 		// Process Context if available
 		if (context) {
@@ -175,6 +177,26 @@ app.post('/api/chat/generate', async (req, res) => {
 				);
 			}
 		}
+
+		// ── Hook Pipeline: pre-send ──────────────────────────────────────────
+		let lastUserIdx = -1;
+		for (let i = messages.length - 1; i >= 0; i--) {
+			if (messages[i].role === 'user') { lastUserIdx = i; break; }
+		}
+		if (lastUserIdx !== -1 && (chat_id || user_id)) {
+			const preSendCtx = hookPipeline.createContext({
+				event: 'pre-send',
+				chat_id: chat_id ?? '',
+				user_id: user_id ?? '',
+				companion_id,
+				content: messages[lastUserIdx].content,
+				role: 'user',
+				skill_invoked: req.body.skill_invoked
+			});
+			const mutated = await hookPipeline.run('pre-send', preSendCtx);
+			messages[lastUserIdx].content = mutated.message.content;
+		}
+		// ────────────────────────────────────────────────────────────────────
 
 		if (stream) {
 			// Don't set headers immediately, wait until we have the stream or at least know the request is valid
@@ -560,6 +582,7 @@ app.listen(port, async () => {
 	logger.info('DB', `PouchDB mounted at /_db`);
 
 	await dbManager.seedCompanions();
+	await hookRegistry.load();
 
 	await ensureAudioSetup();
 	await initializeOllama();

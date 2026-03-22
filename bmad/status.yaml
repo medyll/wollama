@@ -1,9 +1,9 @@
 # BMAD Status
 project: wollama
 phase: planning
-progress: 0
-next_action: "Rédiger PRD complet — agents, skills, hooks"
-active_role: pm
+progress: 30
+next_action: "Sprint 2 done. Démarrer Sprint 3 : SkillResolver + routes /api/skills + SkillAutocomplete.svelte"
+active_role: dev
 
 phases:
   - name: planning
@@ -24,8 +24,8 @@ artifacts:
 sprints:
   - id: 1
     name: "Foundation DB — 4 nouvelles tables + interfaces TS"
-    status: planned
-    stories: []
+    status: active
+    stories: ["S1-01"]
   - id: 2
     name: "Hook Pipeline — middleware pre/post-send"
     status: planned
