@@ -1,48 +1,48 @@
 # BMAD Status
 project: wollama
-phase: planning
-progress: 30
-next_action: "Sprint 2 done. Démarrer Sprint 3 : SkillResolver + routes /api/skills + SkillAutocomplete.svelte"
+phase: development
+progress: 35
+next_action: 'Sprint 3: Implémenter SkillResolver, routes /api/skills, SkillAutocomplete.svelte (en cours)'
 active_role: dev
 
 phases:
-  - name: planning
-    status: in_progress
-  - name: development
-    status: upcoming
-  - name: testing
-    status: upcoming
-  - name: release
-    status: upcoming
+    - name: planning
+      status: done
+    - name: development
+      status: in_progress
+    - name: testing
+      status: upcoming
+    - name: release
+      status: upcoming
 
 artifacts:
-  prd: done
-  architecture: done
-  tech-spec: missing
-  audit-report: done
+    prd: done
+    architecture: done
+    tech-spec: missing
+    audit-report: done
 
 sprints:
-  - id: 1
-    name: "Foundation DB — 4 nouvelles tables + interfaces TS"
-    status: active
-    stories: ["S1-01"]
-  - id: 2
-    name: "Hook Pipeline — middleware pre/post-send"
-    status: planned
-    stories: []
-  - id: 3
-    name: "Skills + Slash commands + Autocomplete"
-    status: planned
-    stories: []
-  - id: 4
-    name: "Agents built-in — WebSearch, PageFetch"
-    status: planned
-    stories: []
-  - id: 5
-    name: "Frontend UX — ToolCallMessage, HookInspector, Settings"
-    status: planned
-    stories: []
-  - id: 6
-    name: "Polish, tests, cross-platform validation"
-    status: planned
-    stories: []
+    - id: 1
+      name: 'Foundation DB — 4 nouvelles tables + interfaces TS'
+      status: active
+      stories: ['S1-01']
+    - id: 2
+      name: 'Hook Pipeline — middleware pre/post-send'
+      status: planned
+      stories: []
+    - id: 3
+      name: 'Skills + Slash commands + Autocomplete'
+      status: planned
+      stories: []
+    - id: 4
+      name: 'Agents built-in — WebSearch, PageFetch'
+      status: planned
+      stories: []
+    - id: 5
+      name: 'Frontend UX — ToolCallMessage, HookInspector, Settings'
+      status: planned
+      stories: []
+    - id: 6
+      name: 'Polish, tests, cross-platform validation'
+      status: planned
+      stories: []
