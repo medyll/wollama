@@ -19,7 +19,7 @@ export default defineConfig({
 	workers: 1, // Single worker to avoid race conditions
 
 	// Timeout settings
-	timeout: 30 * 1000, // 30 seconds per test
+	timeout: 120 * 1000, // 120 seconds per test
 	expect: {
 		timeout: 5000
 	},

@@ -1,8 +1,8 @@
 # BMAD Status
 project: wollama
 phase: development
-progress: 35
-next_action: 'Sprint 3: Implémenter SkillResolver, routes /api/skills, SkillAutocomplete.svelte (en cours)'
+progress: 45
+next_action: 'Sprint 3: Implémenter invocation pipeline pour /api/skills, SkillAutocomplete.svelte (implémentation initiale)'
 active_role: dev
 
 phases:

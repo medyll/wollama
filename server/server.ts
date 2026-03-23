@@ -13,6 +13,7 @@ import { sidecarService } from './services/sidecar.service.js';
 import { hookRegistry } from './services/hook-registry.service.js';
 import { hookPipeline } from './services/hook-pipeline.service.js';
 import { logger } from './utils/logger.js';
+import skillsRouter from './routes/skills.js';
 
 import cors from 'cors';
 
@@ -64,6 +65,9 @@ app.get('/api/health', (req, res) => {
 		ollama: serverState.ollamaReady
 	});
 });
+
+// Skills routes (Sprint 3)
+app.use('/api/skills', skillsRouter);
 
 // Audio Routes
 app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
@@ -584,9 +588,14 @@ app.listen(port, async () => {
 	await dbManager.seedCompanions();
 	await hookRegistry.load();
 
-	await ensureAudioSetup();
-	await initializeOllama();
-	await initializeTTS();
+	// Allow tests to skip heavy external initializations (Ollama, audio, sidecar)
+	if (process.env.SKIP_HEAVY_SETUP !== 'true') {
+		await ensureAudioSetup();
+		await initializeOllama();
+		await initializeTTS();
+	} else {
+		logger.info('SERVER', 'Skipping heavy setup (SKIP_HEAVY_SETUP=true)');
+	}
 });
 
 // Graceful Shutdown

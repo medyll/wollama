@@ -4,6 +4,7 @@
 	import Icon from '@iconify/svelte';
 	import AudioToggle from '$components/chat/AudioToggle.svelte';
 	import DataButton from '$components/ui_data/DataButton.svelte';
+	import SkillAutocomplete from '$components/SkillAutocomplete.svelte';
 	import type { Companion } from '$types/data';
 
 	let {
@@ -30,6 +31,7 @@
 
 	let fileInput: HTMLInputElement;
 	let textareaRef: HTMLTextAreaElement;
+	let showAutocomplete = false;
 
 	function autoResize(e: Event) {
 		const target = e.target as HTMLTextAreaElement;
@@ -74,6 +76,9 @@
 		if (value === '' && textareaRef) {
 			textareaRef.style.height = 'auto';
 		}
+
+		// Show autocomplete when user types a leading slash
+		showAutocomplete = !!(value && value.trim().startsWith('/'));
 	});
 </script>
 
@@ -151,6 +156,35 @@
 				}
 			}}
 		></textarea>
+
+		{#if showAutocomplete}
+			<div class="absolute top-16 right-4 left-4 z-20">
+				<SkillAutocomplete
+					query={value}
+					onSelect={async (skill) => {
+						showAutocomplete = false;
+						// Auto-invoke the selected builtin skill and populate the input with the result
+						try {
+							const slug = skill.slug || skill.name || skill.skill_id;
+							const res = await fetch(`/api/skills/${encodeURIComponent(slug)}/invoke`, {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ args: [] })
+							});
+							const body = await res.json().catch(() => ({}));
+							if (!res.ok) {
+								toast.error(body?.error?.message || body?.error || 'Skill invocation failed');
+							} else {
+								value = body.output || body.result || '';
+								$nextTick(() => textareaRef?.focus());
+							}
+						} catch (e) {
+							toast.error('Skill invocation failed');
+						}
+					}}
+				/>
+			</div>
+		{/if}
 
 		<div class="relative z-10 mt-1 flex items-center justify-between px-1">
 			<!-- Left: Attachments -->
