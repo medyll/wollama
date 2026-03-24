@@ -1,9 +1,12 @@
 # BMAD Status
 project: wollama
 phase: development
-progress: 45
-next_action: 'Sprint 3: Implémenter invocation pipeline pour /api/skills, SkillAutocomplete.svelte (implémentation initiale)'
+progress: 62
+next_action: 'Sprint 3: S3-01 & S3-02 complete — expand skills registry, add e2e tests and UX polish'
+next_command: 'bmad continue'
+next_role: dev
 active_role: dev
+notes: 'S3-01 implemented; S3-02 implemented and tests passing. Committed.'
 
 phases:
     - name: planning
@@ -18,7 +21,7 @@ phases:
 artifacts:
     prd: done
     architecture: done
-    tech-spec: missing
+    tech-spec: done
     audit-report: done
 
 sprints:
@@ -32,8 +35,8 @@ sprints:
       stories: []
     - id: 3
       name: 'Skills + Slash commands + Autocomplete'
-      status: planned
-      stories: []
+      status: in_progress
+      stories: ['S3-01','S3-02']
     - id: 4
       name: 'Agents built-in — WebSearch, PageFetch'
       status: planned
