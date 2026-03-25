@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getDatabase } from '../db';
 import { appSchema } from '../../../../shared/db/database-scheme';
 import type { RxCollection } from 'rxdb';

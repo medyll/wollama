@@ -1,10 +1,12 @@
 import { userState } from '$lib/state/user.svelte';
+import { uiState } from '$lib/state/ui.svelte';
 
 export class AudioService {
 	mediaRecorder: MediaRecorder | null = null;
 	audioChunks: Blob[] = [];
 	isRecording = false;
 	stream: MediaStream | null = null;
+	currentAudio: HTMLAudioElement | null = null;
 
 	async startRecording(): Promise<void> {
 		try {
@@ -68,13 +70,31 @@ export class AudioService {
 		}
 	}
 
+	stopAudio() {
+		if (this.currentAudio) {
+			this.currentAudio.pause();
+			this.currentAudio = null;
+		}
+		if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+			window.speechSynthesis.cancel();
+		}
+		uiState.setAudioPlaying(false);
+	}
+
 	playAudio(audioUrl: string) {
+		this.stopAudio();
 		const audio = new Audio(audioUrl);
+		this.currentAudio = audio;
 		const outputId = userState.preferences.audioOutputId;
 		if (outputId && (audio as any).setSinkId) {
 			(audio as any).setSinkId(outputId).catch((e: any) => console.warn('Failed to set audio output', e));
 		}
+		audio.onended = () => {
+			this.currentAudio = null;
+			uiState.setAudioPlaying(false);
+		};
 		audio.play();
+		uiState.setAudioPlaying(true);
 	}
 
 	async getDevices() {
@@ -159,6 +179,7 @@ export class AudioService {
 		const formData = new FormData();
 		const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm';
 		formData.append('file', audioBlob, `recording.${ext}`);
+		formData.append('language', userState.preferences.locale || 'auto');
 
 		const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
 		try {
@@ -194,7 +215,12 @@ export class AudioService {
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ text, voiceId: effectiveVoiceId, voiceTone })
+				body: JSON.stringify({
+					text,
+					voiceId: effectiveVoiceId,
+					voiceTone,
+					locale: userState.preferences.locale // Explicitly pass locale
+				})
 			});
 
 			if (!response.ok) {
@@ -213,7 +239,7 @@ export class AudioService {
 	speakBrowser(text: string, voiceId?: string, voiceTone: 'neutral' | 'fast' | 'slow' | 'deep' | 'high' = 'neutral') {
 		if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
 			// Cancel any ongoing speech
-			window.speechSynthesis.cancel();
+			this.stopAudio();
 
 			const utterance = new SpeechSynthesisUtterance(text);
 			utterance.lang = userState.preferences.locale || 'en';
@@ -235,7 +261,16 @@ export class AudioService {
 				}
 			}
 
+			utterance.onend = () => {
+				uiState.setAudioPlaying(false);
+			};
+
+			utterance.onerror = () => {
+				uiState.setAudioPlaying(false);
+			};
+
 			window.speechSynthesis.speak(utterance);
+			uiState.setAudioPlaying(true);
 		} else {
 			console.error('Browser does not support speech synthesis');
 		}

@@ -5,13 +5,14 @@
 	import { toast } from '$lib/state/notifications.svelte';
 	import { audioService } from '$lib/services/audio.service';
 	import { chatService } from '$lib/services/chat.service';
+	import { DataGenericService } from '$lib/services/data-generic.service';
 	import { parseMarkdown } from '$lib/utils/markdown';
 	import CompanionSelector from '$components/ui/CompanionSelector.svelte';
 	import MessageActions from '$components/chat/MessageActions.svelte';
 	import ThinkingMessage from '$components/chat/ThinkingMessage.svelte';
 	import ChatInput from '$components/chat/ChatInput.svelte';
 	import Icon from '@iconify/svelte';
-	import type { Companion } from '$types/data';
+	import type { UserCompanion } from '$types/data';
 	import { goto } from '$app/navigation';
 
 	let { chatId = $bindable(undefined), initialCompanionId = undefined } = $props();
@@ -22,8 +23,9 @@
 	let isRecording = $state(false);
 	let selectedFiles = $state<string[]>([]);
 
-	let currentCompagnon: Companion = $state({
-		companion_id: '1',
+	let currentCompagnon: UserCompanion = $state({
+		user_companion_id: '1',
+		user_id: userState.uid || '',
 		name: t('ui.general_assistant'),
 		model: userState.preferences.defaultModel,
 		system_prompt: 'You are a helpful assistant.',
@@ -36,7 +38,12 @@
 
 	function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
 		if (chatContainer) {
-			chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior });
+			// Use requestAnimationFrame to ensure layout is complete
+			requestAnimationFrame(() => {
+				if (chatContainer) {
+					chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior });
+				}
+			});
 		}
 	}
 
@@ -52,6 +59,18 @@
 		if (!chatId) {
 			messages = [];
 			uiState.clearTitle();
+
+			if (initialCompanionId) {
+				(async () => {
+					const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
+					const comp = await userCompanionService.get(initialCompanionId);
+					if (comp) {
+						currentCompagnon = comp;
+						// Clear the global state so it doesn't persist
+						uiState.setActiveCompanionId(undefined);
+					}
+				})();
+			}
 			return;
 		}
 
@@ -62,6 +81,13 @@
 			const chat = await chatService.getChat(chatId);
 			if (chat) {
 				uiState.setTitle(chat.title);
+				if (chat.companion_id) {
+					const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
+					const comp = await userCompanionService.get(chat.companion_id);
+					if (comp) {
+						currentCompagnon = comp;
+					}
+				}
 			}
 
 			const obs = await chatService.getMessages(chatId);
@@ -78,6 +104,7 @@
 		return () => {
 			if (sub) sub.unsubscribe();
 			uiState.clearTitle();
+			audioService.stopAudio();
 		};
 	});
 
@@ -101,12 +128,12 @@
 				// Create chat first
 				// Use initialCompanionId if set and user hasn't selected a different one (assuming default is '1')
 				const companionIdToUse =
-					currentCompagnon.companion_id === '1' && initialCompanionId
+					currentCompagnon.user_companion_id === '1' && initialCompanionId
 						? initialCompanionId
-						: currentCompagnon.companion_id;
+						: currentCompagnon.user_companion_id;
 
 				try {
-					targetChatId = await chatService.createChat(undefined, undefined, companionIdToUse);
+					targetChatId = await chatService.createChat(undefined, currentCompagnon.model, companionIdToUse);
 					// Update URL without reloading
 					goto(`/chat/${targetChatId}`, { replaceState: true });
 					// Update local state so we don't create it again if user spams
@@ -173,18 +200,19 @@
 				isTranscribing = true;
 
 				// Transcribe audio
+				let text = '';
 				try {
-					const text = await audioService.transcribe(audioBlob);
-					if (text) {
-						messageInput = (messageInput + ' ' + text).trim();
-						// We do NOT send automatically anymore, allowing user to review/edit
-						// sendMessage();
-					}
+					text = await audioService.transcribe(audioBlob);
 				} catch (err) {
 					console.error('Transcription failed', err);
 					toast.error(t('status.error') || 'Transcription failed');
 				} finally {
 					isTranscribing = false;
+				}
+
+				if (text) {
+					messageInput = (messageInput + ' ' + text).trim();
+					await sendMessage();
 				}
 			} catch (error) {
 				console.error('Error stopping recording:', error);
@@ -202,7 +230,7 @@
 		}
 	}
 
-	function onCompagnonSelected(compagnon: Companion) {
+	function onCompagnonSelected(compagnon: UserCompanion) {
 		currentCompagnon = compagnon;
 		// Logic to update chat context with new compagnon
 		if (messages.length > 0) {
@@ -267,12 +295,23 @@
 
 <CompanionSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
-<div class="absolute inset-0 flex flex-col overflow-hidden">
+<div class="absolute inset-0 flex flex-col overflow-y-auto" bind:this={chatContainer} onscroll={handleScroll}>
+	{#if uiState.isAudioPlaying}
+		<button
+			class="btn btn-circle btn-error fixed top-20 right-4 z-50 shadow-lg"
+			onclick={() => audioService.stopAudio()}
+			aria-label="Stop Audio"
+			title="Stop Audio"
+		>
+			<Icon icon="fluent:stop-24-filled" class="h-6 w-6 fill-current" />
+		</button>
+	{/if}
+
 	<!-- Section: Header Removed (Moved to Input Area) -->
 
 	{#if messages.length === 0}
 		<!-- Section: Empty State -->
-		<div class="flex flex-1 flex-col items-center justify-center overflow-y-auto p-4">
+		<div class="flex flex-1 flex-col items-center justify-center p-4">
 			<div class="flex w-full max-w-md flex-col items-center">
 				<img src="/assets/lama.png" alt="Wollama" class="mb-6 h-32 w-32 object-contain opacity-90" />
 				<h1 class="mb-2 text-3xl font-bold">{t('ui.ready_to_chat')}</h1>
@@ -296,7 +335,7 @@
 	{:else}
 		<!-- Section: Messages Area -->
 		<div
-			class="min-h-0 flex-1 space-y-4 overflow-y-auto p-4"
+			class="flex-1 space-y-4 overflow-y-auto p-4"
 			role="log"
 			aria-label="Chat messages"
 			bind:this={chatContainer}
@@ -344,10 +383,8 @@
 							</div>
 						{/if}
 						{#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
-							<div class="flex w-52 flex-col gap-4 p-2">
-								<div class="skeleton h-4 w-28 opacity-50"></div>
-								<div class="skeleton h-4 w-full opacity-50"></div>
-								<div class="skeleton h-4 w-full opacity-50"></div>
+							<div class="bg-base-200/50 flex w-fit items-center rounded-2xl px-4 py-2">
+								<span class="loading loading-dots loading-sm opacity-50"></span>
 							</div>
 						{:else}
 							{#if message.role === 'assistant'}
@@ -371,7 +408,7 @@
 		</div>
 
 		<!-- Section: Input Area (Bottom) -->
-		<div class="bg-base-100 w-full p-0 md:p-4">
+		<div class="bg-base-100 z-20 w-full p-0 shadow-lg md:p-4">
 			<ChatInput
 				bind:value={messageInput}
 				bind:files={selectedFiles}

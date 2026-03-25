@@ -106,13 +106,29 @@ export const translations = {
 			startondate: 'date',
 			thisWeek: 'this week',
 			use_model: 'use model',
-			file_too_large: 'File {{name}} is too large (max 2MB)'
+			file_too_large: 'File {{name}} is too large (max 2MB)',
+			remove_file: 'Remove file',
+			add_attachment: 'Add attachment',
+			start_recording: 'Start recording',
+			stop_recording: 'Stop recording',
+			send_message: 'Send message',
+			toggle_audio: 'Toggle audio auto-play',
+			copied_to_clipboard: 'Copied to clipboard'
 		},
 		chat: {
 			categorize: 'categorize',
 			delete_chat: 'delete',
 			guess_chat_title: 'guess title',
-			describe: 'describe'
+			describe: 'describe',
+			server_unavailable:
+				'Server is currently unavailable. Your message was saved locally and will be sent when connection is restored.'
+		},
+		sync: {
+			offline: 'Offline',
+			syncing: 'Syncing...',
+			error: 'Sync failed',
+			errors_persisted: 'Some items failed to sync',
+			sync_complete: 'Sync complete'
 		},
 		setup: {
 			subtitle: 'Choose how you want to start your journey.'

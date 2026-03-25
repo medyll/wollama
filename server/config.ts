@@ -1,4 +1,8 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const config = {
 	server: {
@@ -8,14 +12,14 @@ export const config = {
 	database: {
 		// Directory where PouchDB stores data (LevelDB files)
 		// Defaults to 'data' folder in the project root
-		dir: process.env.DB_PATH ? path.resolve(process.env.DB_PATH) : path.resolve(process.cwd(), 'db_data')
+		dir: process.env.DB_PATH ? path.resolve(process.env.DB_PATH) : path.resolve(__dirname, 'db_data')
 	},
 	pouchdb: {
 		// Configuration for express-pouchdb
 		inMemoryConfig: true,
 		mode: 'minimumForPouchDB' as const, // 'full' | 'minimumForPouchDB' | 'custom'
 		// Path for logs if we wanted to enable file logging (optional)
-		logPath: path.resolve(process.cwd(), 'logs')
+		logPath: path.resolve(__dirname, 'logs')
 	},
 	cors: {
 		origin: process.env.CORS_ORIGIN || '*'
@@ -30,8 +34,8 @@ export const config = {
 		provider: process.env.STT_PROVIDER || 'local', // 'openai' | 'local'
 		binaryPath:
 			process.env.STT_BINARY_PATH ||
-			path.resolve(process.cwd(), 'bin', 'whisper', process.platform === 'win32' ? 'main.exe' : 'main'),
-		modelPath: process.env.STT_MODEL_PATH || path.resolve(process.cwd(), 'bin', 'whisper', 'ggml-base.bin')
+			path.resolve(__dirname, 'bin', 'whisper', process.platform === 'win32' ? 'main.exe' : 'main'),
+		modelPath: process.env.STT_MODEL_PATH || path.resolve(__dirname, 'bin', 'whisper', 'ggml-base.bin')
 	},
 	tts: {
 		url: process.env.TTS_URL || 'http://127.0.0.1:9000/v1/audio/speech',
@@ -39,8 +43,8 @@ export const config = {
 		provider: process.env.TTS_PROVIDER || 'local', // 'openai' | 'local'
 		binaryPath:
 			process.env.TTS_BINARY_PATH ||
-			path.resolve(process.cwd(), 'bin', 'piper', process.platform === 'win32' ? 'piper.exe' : 'piper'),
-		modelDir: path.resolve(process.cwd(), 'bin', 'piper'),
+			path.resolve(__dirname, 'bin', 'piper', process.platform === 'win32' ? 'piper.exe' : 'piper'),
+		modelDir: path.resolve(__dirname, 'bin', 'piper'),
 		defaultVoice: 'en_US-lessac-medium.onnx'
 	}
 };

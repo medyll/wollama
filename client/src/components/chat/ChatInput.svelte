@@ -4,6 +4,7 @@
 	import Icon from '@iconify/svelte';
 	import AudioToggle from '$components/chat/AudioToggle.svelte';
 	import DataButton from '$components/ui_data/DataButton.svelte';
+	import SkillAutocomplete from '$components/SkillAutocomplete.svelte';
 	import type { Companion } from '$types/data';
 
 	let {
@@ -30,6 +31,7 @@
 
 	let fileInput: HTMLInputElement;
 	let textareaRef: HTMLTextAreaElement;
+	let showAutocomplete = false;
 
 	function autoResize(e: Event) {
 		const target = e.target as HTMLTextAreaElement;
@@ -74,12 +76,15 @@
 		if (value === '' && textareaRef) {
 			textareaRef.style.height = 'auto';
 		}
+
+		// Show autocomplete when user types a leading slash
+		showAutocomplete = !!(value && value.trim().startsWith('/'));
 	});
 </script>
 
 <div class="mx-auto w-full md:max-w-[1150px]">
 	<!-- Top Bar: Companion, Audio, Delete -->
-	<div class="mb-2 flex items-center justify-between px-2">
+	<div class="relative mb-4 flex items-center justify-between px-2">
 		<!-- Left: Companion -->
 		<div
 			class="flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-70"
@@ -87,13 +92,15 @@
 			role="button"
 			tabindex="0"
 			onkeydown={(e) => e.key === 'Enter' && oncompanionclick()}
+			title={t('ui.choose_companion') || 'Choose companion'}
+			aria-label={t('ui.choose_companion') || 'Choose companion'}
 		>
 			<span class="text-xs font-medium opacity-70">{currentCompagnon.name}</span>
 			<span class="badge badge-xs badge-ghost opacity-50">{currentCompagnon.model}</span>
 		</div>
 
 		<!-- Center: Audio Toggle -->
-		<div class="flex justify-center">
+		<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
 			<AudioToggle />
 		</div>
 
@@ -123,6 +130,7 @@
 					<button
 						class="btn btn-circle btn-xs btn-error absolute -top-2 -right-2 opacity-0 shadow-md transition-opacity group-hover:opacity-100"
 						onclick={() => removeFile(i)}
+						title={t('ui.remove_file') || 'Remove file'}
 						aria-label={t('ui.remove_file') || 'Remove file'}>✕</button
 					>
 				</div>
@@ -131,13 +139,13 @@
 	{/if}
 
 	<div
-		class="bg-base-200 border-base-content/10 focus-within:border-primary rounded-2xl border p-2 shadow-sm transition-colors"
+		class="bg-base-200 border-base-content/10 focus-within:border-primary relative rounded-2xl border p-2 shadow-sm transition-colors"
 	>
 		<textarea
 			bind:this={textareaRef}
 			placeholder={t('ui.type_message')}
 			aria-label={t('ui.type_message')}
-			class="textarea textarea-ghost max-h-[180px] min-h-12 w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-base focus:outline-none"
+			class="textarea textarea-ghost relative z-0 max-h-[180px] min-h-12 w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-base focus:outline-none"
 			rows="1"
 			bind:value
 			oninput={autoResize}
@@ -149,11 +157,45 @@
 			}}
 		></textarea>
 
-		<div class="mt-1 flex items-center justify-between px-1">
+		{#if showAutocomplete}
+			<div class="absolute top-16 right-4 left-4 z-20">
+				<SkillAutocomplete
+					query={value}
+					onSelect={async (skill) => {
+						showAutocomplete = false;
+						// Auto-invoke the selected builtin skill and populate the input with the result
+						try {
+							const slug = skill.slug || skill.name || skill.skill_id;
+							const res = await fetch(`/api/skills/${encodeURIComponent(slug)}/invoke`, {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ args: [] })
+							});
+							const body = await res.json().catch(() => ({}));
+							if (!res.ok) {
+								toast.error(body?.error?.message || body?.error || 'Skill invocation failed');
+							} else {
+								value = body.output || body.result || '';
+								$nextTick(() => textareaRef?.focus());
+							}
+						} catch (e) {
+							toast.error('Skill invocation failed');
+						}
+					}}
+				/>
+			</div>
+		{/if}
+
+		<div class="relative z-10 mt-1 flex items-center justify-between px-1">
 			<!-- Left: Attachments -->
 			<div>
 				<input type="file" class="hidden" multiple bind:this={fileInput} onchange={handleFileSelect} />
-				<button class="btn btn-ghost btn-sm btn-circle" aria-label="Add attachment" onclick={triggerFileInput}>
+				<button
+					class="btn btn-ghost btn-sm btn-circle"
+					aria-label={t('ui.add_attachment') || 'Add attachment'}
+					title={t('ui.add_attachment') || 'Add attachment'}
+					onclick={triggerFileInput}
+				>
 					<Icon icon="lucide:paperclip" class="h-5 w-5 opacity-70" />
 				</button>
 			</div>
@@ -164,7 +206,12 @@
 					<button
 						class="btn btn-circle btn-sm {isRecording ? 'btn-error animate-pulse' : 'btn-ghost'}"
 						onclick={onrecord}
-						aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+						aria-label={isRecording
+							? t('ui.stop_recording') || 'Stop recording'
+							: t('ui.start_recording') || 'Start recording'}
+						title={isRecording
+							? t('ui.stop_recording') || 'Stop recording'
+							: t('ui.start_recording') || 'Start recording'}
 						disabled={isTranscribing}
 					>
 						{#if isTranscribing}
@@ -176,7 +223,12 @@
 						{/if}
 					</button>
 				{:else}
-					<button class="btn btn-primary btn-sm btn-circle" onclick={onsend} aria-label="Send message">
+					<button
+						class="btn btn-primary btn-sm btn-circle"
+						onclick={onsend}
+						aria-label={t('ui.send_message') || 'Send message'}
+						title={t('ui.send_message') || 'Send message'}
+					>
 						<Icon icon="lucide:send-horizontal" class="h-5 w-5" />
 					</button>
 				{/if}

@@ -1,0 +1,51 @@
+# BMAD Status
+project: wollama
+phase: development
+progress: 62
+next_action: 'CODE-QL-001 closed — next: commit audit branch and merge to main, then continue Sprint 3 UX/e2e'
+next_command: 'bmad continue'
+next_role: dev
+active_role: dev
+notes: 'S3-01 & S3-02 done. CODE-QL-001: auth.service.ts created with 22 passing tests (token gen, validation, expiry, refresh, tamper, concurrency).'
+
+phases:
+    - name: planning
+      status: done
+    - name: development
+      status: in_progress
+    - name: testing
+      status: upcoming
+    - name: release
+      status: upcoming
+
+artifacts:
+    prd: done
+    architecture: done
+    tech-spec: done
+    audit-report: done
+
+sprints:
+    - id: 1
+      name: 'Foundation DB — 4 nouvelles tables + interfaces TS'
+      status: active
+      stories: ['S1-01']
+    - id: 2
+      name: 'Hook Pipeline — middleware pre/post-send'
+      status: planned
+      stories: []
+    - id: 3
+      name: 'Skills + Slash commands + Autocomplete'
+      status: in_progress
+      stories: ['S3-01','S3-02']
+    - id: 4
+      name: 'Agents built-in — WebSearch, PageFetch'
+      status: planned
+      stories: []
+    - id: 5
+      name: 'Frontend UX — ToolCallMessage, HookInspector, Settings'
+      status: planned
+      stories: []
+    - id: 6
+      name: 'Polish, tests, cross-platform validation'
+      status: planned
+      stories: []

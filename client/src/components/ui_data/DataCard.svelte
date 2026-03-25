@@ -86,7 +86,6 @@
 					{/if}
 				{/each}
 			</div>
-
 			<!-- Actions (Slot) -->
 			<div class="card-actions mt-4 justify-end">
 				{#if editable}
@@ -94,12 +93,17 @@
 						class="btn btn-sm btn-ghost btn-circle"
 						onclick={(e) => {
 							e.stopPropagation();
-							isEditing = true;
-							onEdit && onEdit(item);
+							if (onEdit) {
+								// If parent provides onEdit callback, let parent handle the modal
+								onEdit(item);
+							} else {
+								// Otherwise, handle editing internally
+								isEditing = true;
+							}
 						}}
 						aria-label="Edit"
 					>
-						<Icon icon="lucide:edit-2" class="h-4 w-4" />
+						<Icon icon="fluent:edit-24-regular" class="h-4 w-4" />
 					</button>
 				{/if}
 				{#if deletable}
@@ -111,7 +115,7 @@
 						}}
 						aria-label="Delete"
 					>
-						<Icon icon="lucide:trash-2" class="h-4 w-4" />
+						<Icon icon="fluent:delete-24-regular" class="h-4 w-4" />
 					</button>
 				{/if}
 				<!-- We can add a slot here later -->
@@ -119,7 +123,8 @@
 		</div>
 	</div>
 
-	{#if isEditing}
+	<!-- Internal modal: only used if no onEdit callback is provided -->
+	{#if isEditing && !onEdit}
 		<DataUpdate
 			{tableName}
 			id={item[tableDef.primaryKey]}

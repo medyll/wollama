@@ -36,8 +36,31 @@ const downloadFile = (url, dest) => {
 		const file = fs.createWriteStream(dest);
 		https
 			.get(url, (response) => {
-				if (response.statusCode === 302 || response.statusCode === 301) {
-					downloadFile(response.headers.location, dest).then(resolve).catch(reject);
+				// Handle Redirects (301, 302, 303, 307, 308)
+				if (
+					response.statusCode === 301 ||
+					response.statusCode === 302 ||
+					response.statusCode === 303 ||
+					response.statusCode === 307 ||
+					response.statusCode === 308
+				) {
+					if (!response.headers.location) {
+						reject(new Error(`Redirect with no location header: ${response.statusCode}`));
+						return;
+					}
+					// Handle relative redirects if necessary (though usually absolute)
+					let redirectUrl = response.headers.location;
+					if (redirectUrl.startsWith('/')) {
+						const u = new URL(url);
+						redirectUrl = `${u.protocol}//${u.host}${redirectUrl}`;
+					}
+
+					downloadFile(redirectUrl, dest).then(resolve).catch(reject);
+					return;
+				}
+
+				if (response.statusCode !== 200) {
+					reject(new Error(`Failed to download ${url}: ${response.statusCode}`));
 					return;
 				}
 
@@ -196,10 +219,26 @@ const setupWhisper = async () => {
 			if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
 			extractZip(zipPath, tempDir);
-			fs.renameSync(path.join(tempDir, 'main.exe'), expectedExe);
+
+			// Move all files (including DLLs) to WHISPER_DIR
+			const files = fs.readdirSync(tempDir);
+			for (const file of files) {
+				const src = path.join(tempDir, file);
+				const dest = path.join(WHISPER_DIR, file);
+				// Overwrite if exists
+				if (fs.existsSync(dest)) {
+					try {
+						fs.unlinkSync(dest);
+					} catch (e) {
+						console.warn(`Could not delete existing file ${dest}:`, e);
+					}
+				}
+				fs.renameSync(src, dest);
+			}
+
 			fs.rmSync(tempDir, { recursive: true, force: true });
 			fs.unlinkSync(zipPath);
-			console.log('Whisper installed.');
+			console.log('Whisper installed (with DLLs).');
 		} else {
 			console.log('Downloading Whisper source code to build...');
 			const url = 'https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.5.4.zip';

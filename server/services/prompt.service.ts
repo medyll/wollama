@@ -2,27 +2,33 @@ export class PromptService {
 	static buildSystemPrompt(baseSystemPrompt: string, profile: any, userPrompts: any[] = []): string {
 		let prompt = baseSystemPrompt || 'You are a helpful AI assistant.';
 
-		prompt += '\n\n[CONTEXT & INSTRUCTIONS]';
+		// prompt += '\n(The following information is for your adaptation only. Do not output it.)';
 
 		// Level 1: Profile & Preferences
 		if (profile) {
-			prompt += `\nUser Profile (For your adaptation, do not repeat this):`;
+			prompt += `\n<user_profile>`;
 			if (profile.nickname) prompt += `\n- Name: ${profile.nickname}`;
 			if (profile.locale) prompt += `\n- Language: ${profile.locale}`;
-			if (profile.theme) prompt += `\n- Theme Preference: ${profile.theme}`;
+			prompt += `\n</user_profile>`;
 		}
-
+		console.log({ profile });
 		// Level 1.5: User Custom Prompts
 		if (userPrompts && userPrompts.length > 0) {
-			prompt += `\n\nCustom User Instructions (Apply these rules):`;
+			prompt += `\n\n<custom_instructions>`;
 			userPrompts.forEach((p) => {
 				prompt += `\n- ${p.content}`;
 			});
+			prompt += `\n</custom_instructions>`;
 		}
 
-		prompt += '\n[END CONTEXT]';
+		prompt += `\n\n<language_config>
+    TARGET LANGUAGE: FRENCH.
+    CRITICAL: 
+    - Output MUST be in French.
+    - Ignore the language of the examples above, only follow their formatting syntax.
+</language_config>`;
 
-		return prompt;
+		return `<system_context>\n${prompt}\n</system_context>`;
 	}
 
 	static enrichUserMessage(message: string, contextFiles: any[]): string {

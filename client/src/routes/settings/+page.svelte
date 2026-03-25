@@ -10,8 +10,10 @@
 	import { DataGenericService } from '$lib/services/data-generic.service';
 	import { destroyDatabase } from '$lib/db';
 	import type { Companion } from '$types/data';
-	import GenericList from '$components/ui_data/GenericList.svelte';
+	import DataGenericList from '$components/ui_data/DataGenericList.svelte';
 	import DataUpdate from '$components/ui_data/DataUpdate.svelte';
+
+	import { onDestroy } from 'svelte';
 
 	let localServerUrl = $state(userState.preferences.serverUrl);
 	let isVerifying = $state(false);
@@ -26,8 +28,48 @@
 	let isMonitoringMic = $state(false);
 	let stopMonitoring: (() => void) | null = null;
 	let isCreatingPrompt = $state(false);
+	let isEditingCompanion = $state(false);
+	let editingCompanionId = $state<string | undefined>(undefined);
+
+	// Auth settings
+	let secureProfile = $state(userState.isSecured);
+	let newPassword = $state('');
+	let authError = $state('');
+
+	function saveAuthSettings() {
+		authError = '';
+		if (secureProfile) {
+			if (!newPassword.trim()) {
+				authError = 'Password is required when security is enabled';
+				return;
+			}
+			userState.setLocalProtection(newPassword.trim());
+		} else {
+			userState.password = null;
+			userState.isSecured = false;
+			userState.save();
+		}
+		toast.success('Authentication settings saved');
+		newPassword = '';
+	}
+
+	// Auto-save preferences when they change
+	$effect(() => {
+		// Track all preferences changes by serializing
+		JSON.stringify(userState.preferences);
+		userState.save();
+	});
+
+	onDestroy(() => {
+		if (stopMonitoring) {
+			stopMonitoring();
+			isMonitoringMic = false;
+		}
+	});
 
 	const themes = [
+		'fluent-light',
+		'fluent-dark',
 		'light',
 		'dark',
 		'cupcake',
@@ -122,7 +164,7 @@
 			} else {
 				throw new Error('Status not OK');
 			}
-		} catch (e) {
+		} catch {
 			toast.error(t('settings.server_error'));
 		} finally {
 			isVerifying = false;
@@ -152,6 +194,11 @@
 		loadModels();
 	}
 
+	function selectModel(modelName: string) {
+		userState.preferences.defaultModel = modelName;
+		userState.save();
+	}
+
 	$effect(() => {
 		// Auto-save when these properties change
 		userState.nickname;
@@ -174,7 +221,7 @@
 	});
 </script>
 
-<div class="bg-base-200 h-full overflow-y-auto p-4 md:p-8">
+<div class="bg-base-200 absolute inset-0 overflow-y-auto p-4 md:p-8">
 	<div class="mx-auto max-w-3xl">
 		<!-- Section: Header -->
 		<div class="mb-8 flex items-center justify-between">
@@ -198,7 +245,8 @@
 					onchange={() => (activeSection = activeSection === 'profile' ? null : 'profile')}
 					aria-label="Toggle User Profile"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:user" class="h-5 w-5" />
 					{t('ui.userProfile')}
 				</div>
 				<div class="collapse-content">
@@ -228,6 +276,56 @@
 				</div>
 			</div>
 
+			<!-- Section: Authentication -->
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'auth'}
+					onchange={() => (activeSection = activeSection === 'auth' ? null : 'auth')}
+					aria-label="Toggle Authentication"
+				/>
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:lock" class="h-5 w-5" />
+					Authentication
+				</div>
+				<div class="collapse-content">
+					<div class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
+						<div class="form-control">
+							<label class="label cursor-pointer justify-start gap-4">
+								<input type="checkbox" class="checkbox checkbox-primary" bind:checked={secureProfile} />
+								<span class="label-text">Secure with password (shared machine)</span>
+							</label>
+						</div>
+
+						{#if secureProfile}
+							<div class="form-control">
+								<label class="label" for="new-password">
+									<span class="label-text">Set/Change Password</span>
+								</label>
+								<input
+									type="password"
+									id="new-password"
+									placeholder="Enter new password"
+									class="input input-bordered w-full"
+									bind:value={newPassword}
+								/>
+							</div>
+						{/if}
+
+						{#if authError}
+							<div class="alert alert-error py-2 text-sm">
+								<Icon icon="lucide:alert-circle" class="h-4 w-4" />
+								<span>{authError}</span>
+							</div>
+						{/if}
+
+						<div class="form-control">
+							<button class="btn btn-primary" onclick={saveAuthSettings}>Save</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- Section: User Prompts -->
 			<div class="collapse-arrow join-item border-base-300 collapse border">
 				<input
@@ -248,7 +346,7 @@
 								Add Prompt
 							</button>
 						</div>
-						<GenericList tableName="user_prompts" displayType="card" editable={true} />
+						<DataGenericList tableName="user_prompts" displayType="card" editable={true} deletable={true} />
 					</div>
 				</div>
 			</div>
@@ -261,7 +359,8 @@
 					onchange={() => (activeSection = activeSection === 'interface' ? null : 'interface')}
 					aria-label="Toggle Interface"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:palette" class="h-5 w-5" />
 					{t('settings.interface')}
 				</div>
 				<div class="collapse-content">
@@ -389,48 +488,110 @@
 					onchange={() => (activeSection = activeSection === 'ai' ? null : 'ai')}
 					aria-label="Toggle AI Configuration"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:brain-circuit" class="h-5 w-5" />
 					{t('settings.ai')}
 				</div>
 				<div class="collapse-content">
-					<div class="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2">
-						<div class="form-control flex-row items-center justify-between gap-4">
-							<label class="label whitespace-nowrap" for="model">
-								<span class="label-text">{t('settings.default_model')}</span>
-							</label>
-							<div class="flex w-full max-w-xs flex-col">
-								<select
-									id="model"
-									class="select select-bordered w-full"
-									bind:value={userState.preferences.defaultModel}
-								>
-									{#if isLoadingModels}
-										<option disabled>Loading...</option>
-									{:else}
-										{#each installedModels as model}
-											<option value={model.name}>{model.name}</option>
-										{/each}
-										<!-- Fallback if list is empty or current model not in list -->
-										{#if !installedModels.find((m) => m.name === userState.preferences.defaultModel)}
-											<option value={userState.preferences.defaultModel}
-												>{userState.preferences.defaultModel}</option
-											>
-										{/if}
-									{/if}
-								</select>
-								<div class="label pb-0">
-									<span class="label-text-alt">{t('settings.model_help')}</span>
-								</div>
+					<div class="grid grid-cols-1 gap-4 pt-4">
+						<!-- Modèle sélectionné actuel -->
+						<div class="form-control">
+							<div class="label">
+								<span class="label-text font-medium">{t('settings.default_model')}</span>
+							</div>
+							<div class="badge badge-primary badge-lg p-4">
+								{userState.preferences.defaultModel || 'None selected'}
+							</div>
+							<div class="label pb-0">
+								<span class="label-text-alt">{t('settings.model_help')}</span>
 							</div>
 						</div>
 
-						<div class="form-control flex-row items-center justify-between gap-4">
-							<label class="label whitespace-nowrap" for="companion">
-								<span class="label-text">{t('ui.choose_companion')}</span>
+						<!-- Liste des modèles installés -->
+						<div class="form-control">
+							<div class="label">
+								<span class="label-text font-medium">Installed Models</span>
+							</div>
+							{#if isLoadingModels}
+								<div class="flex justify-center py-8">
+									<span class="loading loading-spinner loading-lg"></span>
+								</div>
+							{:else if installedModels.length === 0}
+								<div class="alert alert-info">
+									<Icon icon="lucide:info" class="h-5 w-5" />
+									<span>No models installed. Download one below.</span>
+								</div>
+							{:else}
+								<div class="border-base-300 overflow-x-auto rounded-lg border">
+									<div class="max-h-80 overflow-y-auto">
+										<table class="table-pin-rows table-xs table">
+											<thead>
+												<tr>
+													<th class="w-12"></th>
+													<th>Name</th>
+													<th>Size</th>
+													<th>Modified</th>
+													<th class="text-right">Action</th>
+												</tr>
+											</thead>
+											<tbody>
+												{#each installedModels as model}
+													{@const isSelected = model.name === userState.preferences.defaultModel}
+													<tr
+														class="hover cursor-pointer {isSelected ? 'bg-primary/10' : ''}"
+														onclick={() => selectModel(model.name)}
+													>
+														<td>
+															{#if isSelected}
+																<Icon icon="lucide:check-circle" class="text-primary h-5 w-5" />
+															{:else}
+																<Icon icon="lucide:circle" class="h-5 w-5 opacity-30" />
+															{/if}
+														</td>
+														<td class="font-mono text-sm">{model.name}</td>
+														<td class="text-xs opacity-70">
+															{#if model.size}
+																{(model.size / 1024 / 1024 / 1024).toFixed(2)} GB
+															{:else}
+																-
+															{/if}
+														</td>
+														<td class="text-xs opacity-70">
+															{#if model.modified_at}
+																{new Date(model.modified_at).toLocaleDateString()}
+															{:else}
+																-
+															{/if}
+														</td>
+														<td class="text-right">
+															<button
+																class="btn btn-ghost btn-xs"
+																onclick={(e) => {
+																	e.stopPropagation();
+																	selectModel(model.name);
+																}}
+																aria-label="Select model"
+															>
+																Select
+															</button>
+														</td>
+													</tr>
+												{/each}
+											</tbody>
+										</table>
+									</div>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Companion Selection -->
+						<div class="form-control">
+							<label class="label" for="companion">
+								<span class="label-text font-medium">{t('ui.choose_companion')}</span>
 							</label>
 							<select
 								id="companion"
-								class="select select-bordered w-full max-w-xs"
+								class="select select-bordered w-full"
 								bind:value={userState.preferences.defaultCompanion}
 							>
 								{#each companions as companion}
@@ -442,21 +603,16 @@
 							</select>
 						</div>
 
-						<div class="form-control flex-row items-center justify-between gap-4 md:col-span-2">
-							<label class="label whitespace-nowrap" for="temp">
-								<span class="label-text"
+						<!-- Temperature -->
+						<div class="form-control">
+							<label class="label" for="temp">
+								<span class="label-text font-medium"
 									>{t('settings.temperature')} ({userState.preferences.defaultTemperature})</span
 								>
 							</label>
-							<div class="w-full max-w-xs">
-								<input
-									type="range"
-									id="temp"
-									min="0"
-									max="1"
-									step="0.1"
-									class="range range-primary"
-									bind:value={userState.preferences.defaultTemperature}
+							<div class="w-full">
+								id="temp" min="0" max="1" step="0.1" class="range range-primary" bind:value={userState.preferences
+									.defaultTemperature}
 								/>
 								<div class="flex w-full justify-between px-2 text-xs">
 									<span>{t('settings.precise')}</span>
@@ -513,6 +669,46 @@
 				</div>
 			</div>
 
+			<!-- Section: Companions -->
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'companions'}
+					onchange={() => (activeSection = activeSection === 'companions' ? null : 'companions')}
+					aria-label="Toggle Companions"
+				/>
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:users" class="h-5 w-5" />
+					{t('ui.companions') || 'Companions'}
+				</div>
+				<div class="collapse-content">
+					<div class="pt-4">
+						<div class="mb-4 flex justify-end">
+							<button
+								class="btn btn-primary btn-sm"
+								onclick={() => {
+									editingCompanionId = undefined;
+									isEditingCompanion = true;
+								}}
+							>
+								<Icon icon="lucide:plus" class="mr-2 h-4 w-4" />
+								{t('ui.add') || 'Add'}
+							</button>
+						</div>
+						<DataGenericList
+							tableName="user_companions"
+							editable={true}
+							deletable={true}
+							onEdit={(item: any) => {
+								// Use the correct primary key for user_companions
+								editingCompanionId = item.user_companion_id;
+								isEditingCompanion = true;
+							}}
+						/>
+					</div>
+				</div>
+			</div>
+
 			<!-- Section: Server Configuration -->
 			<div class="collapse-arrow join-item border-base-300 collapse border">
 				<input
@@ -521,7 +717,8 @@
 					onchange={() => (activeSection = activeSection === 'server' ? null : 'server')}
 					aria-label="Toggle Server Configuration"
 				/>
-				<div class="collapse-title text-lg font-medium">
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:server" class="h-5 w-5" />
 					{t('settings.server_connection')}
 				</div>
 				<div class="collapse-content">
@@ -565,7 +762,8 @@
 					onchange={() => (activeSection = activeSection === 'danger' ? null : 'danger')}
 					aria-label="Toggle Danger Zone"
 				/>
-				<div class="collapse-title text-error text-lg font-medium">
+				<div class="collapse-title text-error flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:alert-triangle" class="h-5 w-5" />
 					{t('settings.danger_zone') || 'Danger Zone'}
 				</div>
 				<div class="collapse-content">
@@ -589,4 +787,5 @@
 	</div>
 
 	<DataUpdate tableName="user_prompts" bind:isOpen={isCreatingPrompt} />
+	<DataUpdate tableName="user_companions" bind:isOpen={isEditingCompanion} id={editingCompanionId} />
 </div>

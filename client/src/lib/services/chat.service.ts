@@ -1,5 +1,6 @@
 import { getDatabase } from '$lib/db';
 import { userState } from '$lib/state/user.svelte';
+import { connectionState } from '$lib/state/connection.svelte';
 import { contextState } from '$lib/state/context.svelte';
 import { toast } from '$lib/state/notifications.svelte';
 import { t } from '$lib/state/i18n.svelte';
@@ -27,7 +28,14 @@ export class ChatService {
 
 			let systemPrompt = '';
 			if (companionId) {
-				const companion = await db.companions.findOne(companionId).exec();
+				// Check user_companions first (custom/overridden)
+				let companion = await db.user_companions.findOne(companionId).exec();
+
+				// If not found, check system companions
+				if (!companion) {
+					companion = await db.companions.findOne(companionId).exec();
+				}
+
 				if (companion) {
 					systemPrompt = companion.system_prompt;
 				}
@@ -105,6 +113,9 @@ export class ChatService {
 		const db = await getDatabase();
 		const messageId = crypto.randomUUID();
 
+		// Fetch chat to get the correct model
+		const chat = await this.getChat(chatId);
+
 		await db.messages.insert({
 			message_id: messageId,
 			chat_id: chatId,
@@ -113,11 +124,10 @@ export class ChatService {
 			status,
 			images,
 			created_at: Date.now(),
-			model: userState.preferences.defaultModel
+			model: chat?.model || userState.preferences.defaultModel
 		});
 
 		// Update chat updated_at
-		const chat = await this.getChat(chatId);
 		if (chat) {
 			await chat.patch({
 				updated_at: Date.now()
@@ -154,6 +164,16 @@ export class ChatService {
 			assistantMsgId = await this.addMessage(chatId, 'assistant', '', 'streaming');
 		}
 
+		// Story 4.4: Check if server is available before attempting generation
+		if (!connectionState.isConnected) {
+			const offlineMsg =
+				t('chat.server_unavailable') ||
+				'Server is currently unavailable. Your message was saved locally and will be sent when connection is restored.';
+			toast.warning(offlineMsg);
+			await this.updateMessage(assistantMsgId, offlineMsg, 'error');
+			throw new Error('Server unavailable - working in offline mode');
+		}
+
 		// Fetch chat to get system prompt
 		const chat = await this.getChat(chatId);
 		let systemPrompt = '';
@@ -163,32 +183,23 @@ export class ChatService {
 			// Inject Mood if companion exists
 			if (chat.companion_id) {
 				const db = await getDatabase();
-				const companion = await db.companions.findOne(chat.companion_id).exec();
-				if (companion && companion.mood && companion.mood !== 'neutral') {
-					systemPrompt += `\n\nIMPORTANT: You are currently in a '${companion.mood}' mood. Your responses must reflect this emotion strongly.`;
+				let companion = await db.user_companions.findOne(chat.companion_id).exec();
+				if (!companion) {
+					companion = await db.companions.findOne(chat.companion_id).exec();
 				}
-			}
-		}
 
-		// Inject Active User Prompts
-		try {
-			const db = await getDatabase();
-			const activePrompts = await db.user_prompts
-				.find({
-					selector: {
-						is_active: true
+				if (companion) {
+					// Use the companion's current system prompt to ensure we have the latest version
+					// and to fix issues where the chat might have been created with the wrong prompt.
+					if (companion.system_prompt) {
+						systemPrompt = companion.system_prompt;
 					}
-				})
-				.exec();
 
-			if (activePrompts && activePrompts.length > 0) {
-				const userContext = activePrompts.map((p: any) => p.content).join('\n');
-				if (userContext.trim()) {
-					systemPrompt += `\n\nUser Context:\n${userContext}`;
+					/* if (companion.mood && companion.mood !== 'neutral') {
+						systemPrompt += `\n\nIMPORTANT: You are currently in a '${companion.mood}' mood. Your responses must reflect this emotion strongly.`;
+					} */
 				}
 			}
-		} catch (e) {
-			console.warn('Failed to fetch user prompts:', e);
 		}
 
 		// Prepare messages for Ollama: strip base64 prefix from images
@@ -208,90 +219,119 @@ export class ChatService {
 			ollamaMessages.unshift({ role: 'system', content: systemPrompt });
 		}
 
-		try {
-			const response = await fetch(`${serverUrl}/api/chat/generate`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					model: userState.preferences.defaultModel,
-					messages: ollamaMessages,
-					stream: true,
-					context: contextState.getPayload()
-				})
-			});
+		// Retry logic with exponential backoff
+		const maxRetries = 3;
+		let lastError: Error | null = null;
 
-			if (!response.ok) {
-				let errorMessage = 'Generation failed';
-				try {
-					const errorData = await response.json();
-					if (errorData?.error?.message) {
-						errorMessage = errorData.error.message;
-					}
-				} catch {
-					// Ignore JSON parse error
-				}
-				throw new Error(errorMessage);
-			}
+		for (let attempt = 0; attempt < maxRetries; attempt++) {
+			try {
+				const response = await fetch(`${serverUrl}/api/chat/generate`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						model: chat?.model || userState.preferences.defaultModel,
+						messages: ollamaMessages,
+						stream: true,
+						context: contextState.getPayload()
+					})
+				});
 
-			if (!response.body) throw new Error('No response body');
-
-			const reader = response.body.getReader();
-			const decoder = new TextDecoder();
-			let fullContent = '';
-
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-
-				const chunk = decoder.decode(value, { stream: true });
-				// Parse NDJSON (Newline Delimited JSON)
-				const lines = chunk.split('\n').filter((line) => line.trim() !== '');
-
-				for (const line of lines) {
+				if (!response.ok) {
+					let errorMessage = 'Generation failed';
 					try {
-						const json = JSON.parse(line);
-
-						// Handle error in stream
-						if (json.error) {
-							throw new Error(json.error);
+						const errorData = await response.json();
+						if (errorData?.error?.message) {
+							errorMessage = errorData.error.message;
 						}
+					} catch {
+						// Ignore JSON parse error
+					}
 
-						if (json.message?.content) {
-							fullContent += json.message.content;
-							// Update UI/DB progressively
-							// Optimization: Maybe don't write to DB on every chunk if it's too fast,
-							// but for now let's try direct updates.
-							await this.updateMessage(assistantMsgId, fullContent, 'streaming');
-						}
-						if (json.done) {
-							await this.updateMessage(assistantMsgId, fullContent, 'done');
-							if (!toast.isFocused) {
-								toast.info(t('chat.response_received') || 'Response received');
+					// Story 4.4: Distinguish between server errors and network errors
+					if (response.status >= 500) {
+						throw new Error(`Server error: ${errorMessage}`);
+					} else if (response.status >= 400) {
+						throw new Error(`Client error: ${errorMessage}`);
+					}
+
+					throw new Error(errorMessage);
+				}
+
+				if (!response.body) throw new Error('No response body');
+
+				const reader = response.body.getReader();
+				const decoder = new TextDecoder();
+				let fullContent = '';
+
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
+
+					const chunk = decoder.decode(value, { stream: true });
+					// Parse NDJSON (Newline Delimited JSON)
+					const lines = chunk.split('\n').filter((line) => line.trim() !== '');
+
+					for (const line of lines) {
+						try {
+							const json = JSON.parse(line);
+
+							// Handle error in stream
+							if (json.error) {
+								throw new Error(json.error);
 							}
-							// Trigger metadata update in background
-							MetadataService.updateChatMetadata(chatId).catch((err) =>
-								console.error('Metadata update failed', err)
-							);
+
+							if (json.message?.content) {
+								fullContent += json.message.content;
+								// Update UI/DB progressively
+								// Optimization: Maybe don't write to DB on every chunk if it's too fast,
+								// but for now let's try direct updates.
+								await this.updateMessage(assistantMsgId, fullContent, 'streaming');
+							}
+							if (json.done) {
+								await this.updateMessage(assistantMsgId, fullContent, 'done');
+								if (!toast.isFocused) {
+									toast.info(t('chat.response_received') || 'Response received');
+								}
+								// Trigger metadata update in background
+								MetadataService.updateChatMetadata(chatId).catch((err) =>
+									console.error('Metadata update failed', err)
+								);
+							}
+						} catch (e) {
+							if (e instanceof Error && e.message !== 'JSON.parse') {
+								throw e;
+							}
+							console.error('Error parsing chunk', e);
 						}
-					} catch (e) {
-						if (e instanceof Error && e.message !== 'JSON.parse') {
-							throw e;
-						}
-						console.error('Error parsing chunk', e);
 					}
 				}
-			}
 
-			return fullContent;
-		} catch (error) {
-			console.error('Generation error:', error);
-			const errorMessage = error instanceof Error ? error.message : 'Error generating response.';
+				return fullContent;
+			} catch (err) {
+				lastError = err as Error;
+				const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff: 1s, 2s, 4s
+
+				if (attempt < maxRetries - 1) {
+					console.warn(`Generation attempt ${attempt + 1} failed, retrying in ${waitTime}ms:`, err);
+					await new Promise((resolve) => setTimeout(resolve, waitTime));
+				} else {
+					console.error('Max retries reached for generation');
+				}
+			}
+		}
+
+		// All retries failed
+		if (lastError) {
+			console.error('Generation failed after retries:', lastError);
+			const errorMessage = lastError instanceof Error ? lastError.message : 'Error generating response after retries.';
 			toast.error(errorMessage);
 			await this.updateMessage(assistantMsgId, errorMessage, 'error');
-			throw error;
+			throw lastError;
 		}
+
+		throw new Error('Generation failed');
 	}
 
 	async search(
@@ -346,7 +386,19 @@ export class ChatService {
 				})
 				.exec();
 
-			const companionIds = companions.map((c: any) => c.companion_id);
+			const userCompanions = await db.user_companions
+				.find({
+					selector: {
+						name: { $regex: regex },
+						user_id: userId
+					}
+				})
+				.exec();
+
+			const companionIds = [
+				...companions.map((c: any) => c.companion_id),
+				...userCompanions.map((c: any) => c.user_companion_id)
+			];
 			if (companionIds.length > 0) {
 				const chats = await db.chats
 					.find({
