@@ -28,6 +28,33 @@
 	let isMonitoringMic = $state(false);
 	let stopMonitoring: (() => void) | null = null;
 	let isCreatingPrompt = $state(false);
+	let hooks = $state<any[]>([]);
+	let isLoadingHooks = $state(false);
+
+	async function loadHooks() {
+		isLoadingHooks = true;
+		try {
+			const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
+			const res = await fetch(`${serverUrl}/api/hooks`);
+			if (res.ok) hooks = await res.json();
+		} catch (e) {
+			console.error('Failed to load hooks', e);
+		} finally {
+			isLoadingHooks = false;
+		}
+	}
+
+	async function toggleHook(id: string, is_enabled: boolean) {
+		const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
+		const res = await fetch(`${serverUrl}/api/hooks/${id}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ is_enabled })
+		});
+		if (res.ok) {
+			hooks = hooks.map((h) => (h._id === id ? { ...h, is_enabled } : h));
+		}
+	}
 	let isEditingCompanion = $state(false);
 	let editingCompanionId = $state<string | undefined>(undefined);
 
@@ -218,6 +245,7 @@
 		loadModels();
 		loadCompanions();
 		loadAudioDevices();
+		loadHooks();
 	});
 </script>
 
@@ -754,7 +782,69 @@
 				</div>
 			</div>
 
-			<!-- Section: Danger Zone -->
+			<!-- Section: Hooks -->
+		<div class="collapse-arrow join-item border-base-300 collapse border">
+			<input
+				type="checkbox"
+				checked={activeSection === 'hooks'}
+				onchange={() => (activeSection = activeSection === 'hooks' ? null : 'hooks')}
+				aria-label="Toggle Hooks"
+			/>
+			<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+				<Icon icon="lucide:webhook" class="h-5 w-5" />
+				Hooks
+			</div>
+			<div class="collapse-content">
+				<div class="pt-4">
+					{#if isLoadingHooks}
+						<div class="flex justify-center py-8">
+							<span class="loading loading-spinner loading-lg"></span>
+						</div>
+					{:else if hooks.length === 0}
+						<div class="alert alert-info">
+							<Icon icon="lucide:info" class="h-5 w-5" />
+							<span>No hooks registered.</span>
+						</div>
+					{:else}
+						<div class="border-base-300 overflow-x-auto rounded-lg border">
+							<table class="table-xs table w-full">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Event</th>
+										<th>Type</th>
+										<th>Priority</th>
+										<th>Scope</th>
+										<th class="text-center">Enabled</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each hooks as hook}
+										<tr class="hover">
+											<td class="font-medium">{hook.name}</td>
+											<td><span class="badge badge-ghost badge-sm">{hook.event}</span></td>
+											<td class="text-xs opacity-70">{hook.handler_type ?? '-'}</td>
+											<td class="text-xs opacity-70">{hook.priority ?? '-'}</td>
+											<td class="text-xs opacity-70">{hook.scope ?? '-'}</td>
+											<td class="text-center">
+												<input
+													type="checkbox"
+													class="toggle toggle-primary toggle-sm"
+													checked={hook.is_enabled}
+													onchange={(e) => toggleHook(hook._id, (e.target as HTMLInputElement).checked)}
+												/>
+											</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					{/if}
+				</div>
+			</div>
+		</div>
+
+		<!-- Section: Danger Zone -->
 			<div class="collapse-arrow join-item border-base-300 border-error/20 collapse border">
 				<input
 					type="checkbox"

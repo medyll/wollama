@@ -2,11 +2,11 @@
 project: wollama
 phase: development
 progress: 88
-next_action: 'Fix tsconfig.json bundler error — adjust paths and moduleResolution to resolve bundler failures'
+next_action: 'Sprint 5 complete — start Sprint 6: Polish, tests, cross-platform validation'
 next_command: 'bmad continue'
-next_role: dev
+next_role: scrum
 active_role: dev
-progress: 96
+progress: 98
 notes: 'Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
 
 phases:
@@ -44,7 +44,7 @@ sprints:
       stories: ['S4-01','S4-02','S4-03','S4-04']
     - id: 5
       name: 'Frontend UX — ToolCallMessage, HookInspector, Settings'
-      status: active
+      status: done
       stories: ['S5-01','S5-02','S5-03','S5-04']
     - id: 6
       name: 'Polish, tests, cross-platform validation'

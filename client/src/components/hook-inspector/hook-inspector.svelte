@@ -1,14 +1,7 @@
-{#snippet}
-
-{#snippet name="hook-inspector"}
-<script>
+<script lang="ts">
   import { hooks, selectedHook, filter, select, toggleEnabled } from '$lib/stores/hooks';
-  let $hooks, $selected, $filter;
-  hooks.subscribe(v => $hooks = v);
-  selectedHook.subscribe(v => $selected = v);
-  filter.subscribe(v => $filter = v);
-  const selectHook = id => select(id);
-  const toggle = id => toggleEnabled(id);
+  const selectHook = (id: string) => select(id);
+  const toggle = (id: string) => toggleEnabled(id);
 </script>
 
 <div class="p-4 bg-base-200 rounded shadow">
@@ -25,20 +18,20 @@
             </div>
             <div class="flex items-center gap-2">
               <label class="flex items-center gap-1">
-                <input type="checkbox" checked={hook.enabled} on:change={() => toggle(hook.id)} />
+                <input type="checkbox" checked={hook.enabled} onchange={() => toggle(hook.id)} />
                 <span class="text-sm">Enabled</span>
               </label>
-              <button class="btn btn-ghost btn-sm" on:click={() => selectHook(hook.id)}>Inspect</button>
+              <button class="btn btn-ghost btn-sm" onclick={() => selectHook(hook.id)}>Inspect</button>
             </div>
           </li>
         {/each}
       </ul>
     </div>
     <div class="w-2/3">
-      {#if $selected}
+      {#if $selectedHook}
         <div class="p-3 bg-base-100 rounded">
-          <h4 class="text-md font-semibold">{$selected.name}</h4>
-          <pre class="text-sm mt-2">{JSON.stringify($selected, null, 2)}</pre>
+          <h4 class="text-md font-semibold">{$selectedHook.name}</h4>
+          <pre class="text-sm mt-2">{JSON.stringify($selectedHook, null, 2)}</pre>
         </div>
       {:else}
         <div class="p-6 text-center text-sm text-muted">Select a hook to inspect details</div>
@@ -46,4 +39,3 @@
     </div>
   </div>
 </div>
-{/snippet}

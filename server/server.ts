@@ -14,6 +14,7 @@ import { hookRegistry } from './services/hook-registry.service.js';
 import { hookPipeline } from './services/hook-pipeline.service.js';
 import { logger } from './utils/logger.js';
 import skillsRouter from './routes/skills.js';
+import hooksRouter from './routes/hooks.js';
 
 import cors from 'cors';
 
@@ -68,6 +69,9 @@ app.get('/api/health', (req, res) => {
 
 // Skills routes (Sprint 3)
 app.use('/api/skills', skillsRouter);
+
+// Hooks routes (Sprint 5)
+app.use('/api/hooks', hooksRouter);
 
 // Audio Routes
 app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
