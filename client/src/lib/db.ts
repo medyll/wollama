@@ -56,10 +56,14 @@ const convertSchema = (tableName: string, tableDef: any) => {
 				properties[fieldName].multipleOf = 1;
 			}
 
-			// Add maxLength for primary keys and indexed fields (required by RxDB)
+			// Add constraints for primary keys and indexed fields (required by RxDB)
 			if (fieldName === tableDef.primaryKey || (tableDef.indexes && tableDef.indexes.includes(fieldName))) {
 				if (properties[fieldName].type === 'string') {
-					properties[fieldName].maxLength = 100; // Reasonable default for UUIDs and short strings
+					properties[fieldName].maxLength = 100;
+				} else if (properties[fieldName].type === 'number' || properties[fieldName].type === 'integer') {
+					if (properties[fieldName].multipleOf === undefined) properties[fieldName].multipleOf = 1;
+					if (properties[fieldName].minimum === undefined) properties[fieldName].minimum = 0;
+					if (properties[fieldName].maximum === undefined) properties[fieldName].maximum = 1000000;
 				}
 			}
 		}
@@ -101,7 +105,7 @@ let dbPromise: Promise<any> | null = globalAny.__wollama_db_promise || null;
 
 const _createDatabase = async () => {
 	const db = await createRxDatabase({
-		name: 'wollama_client_db_v15',
+		name: 'wollama_client_db_v17',
 		storage: wrappedValidateAjvStorage({
 			storage: getRxStorageDexie()
 		}),

@@ -32,8 +32,8 @@
 		connectionState.setConnected(isUp);
 
 		// Navigation logic
-		if (!userState.isConfigured) {
-			goto('/setup');
+		if (!userState.preferences.onboarding_completed) {
+			goto('/onboarding');
 		} else if (userState.isSecured && !userState.isAuthenticated) {
 			goto('/login');
 		} else if ($page.url.pathname === '/') {

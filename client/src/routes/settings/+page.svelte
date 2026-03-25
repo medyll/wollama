@@ -639,9 +639,7 @@
 								>
 							</label>
 							<div class="w-full">
-								id="temp" min="0" max="1" step="0.1" class="range range-primary" bind:value={userState.preferences
-									.defaultTemperature}
-								/>
+								<input id="temp" type="range" min="0" max="1" step="0.1" class="range range-primary" bind:value={userState.preferences.defaultTemperature} />
 								<div class="flex w-full justify-between px-2 text-xs">
 									<span>{t('settings.precise')}</span>
 									<span>{t('settings.creative')}</span>

@@ -62,7 +62,7 @@ describe.skip('Onboarding Page (Story 1.1)', () => {
 		const nextButton = screen.getByRole('button', { name: /start setup/i });
 		await userEvent.click(nextButton);
 
-		expect(gotoMock).toHaveBeenCalledWith('/setup');
+		expect(gotoMock).toHaveBeenCalledWith('/chat');
 	});
 
 	it('should redirect to setup when Skip button is clicked', async () => {
@@ -74,7 +74,7 @@ describe.skip('Onboarding Page (Story 1.1)', () => {
 		const skipButton = screen.getByRole('button', { name: /skip/i });
 		await userEvent.click(skipButton);
 
-		expect(gotoMock).toHaveBeenCalledWith('/setup');
+		expect(gotoMock).toHaveBeenCalledWith('/chat');
 	});
 
 	it('should display step indicator', () => {
