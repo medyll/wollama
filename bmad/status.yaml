@@ -1,11 +1,12 @@
 # BMAD Status
 project: wollama
 phase: development
-progress: 87
-next_action: 'Implement S5-01: Wire ToolCallMessage into chat message list'
-next_command: 'bmad continue'
+progress: 88
+next_action: 'Integrate Hook Inspector into UI and add tests'
+next_command: 'npm run test:client -- --run'
 next_role: dev
-active_role: scrum
+active_role: dev
+progress: 90
 notes: 'Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
 
 phases:
