@@ -2,6 +2,7 @@ import express from 'express';
 import SkillResolver from '../services/skill-resolver.service.js';
 import { dbManager } from '../db/database.js';
 import { getBuiltinHandler } from '../services/skills/index.js';
+import { AgentRunnerService } from '../services/agent-runner.service.js';
 
 const router = express.Router();
 
@@ -73,10 +74,16 @@ router.post('/:slug/invoke', async (req, res) => {
             return;
         }
 
-        // Agent handler stub
+        // Agent handler
         if (skill.handler_type === 'agent') {
-            // TODO: enqueue or spawn agent invocation
-            res.status(501).json({ error: 'Agent handler not implemented' });
+            const slug = skill.handler_ref || skill.name;
+            const input = { ...(req.body.input ?? {}), args: req.body.args ?? [] };
+            const result = await AgentRunnerService.run({ slug, input, agent_id: slug });
+            if (result.status === 'error' && !result.tool_call_id) {
+                res.status(404).json({ error: result.error });
+                return;
+            }
+            res.json({ skill_id: skill.skill_id, ...result });
             return;
         }
 

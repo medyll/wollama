@@ -1,12 +1,12 @@
 # BMAD Status
 project: wollama
 phase: development
-progress: 62
-next_action: 'CODE-QL-001 closed — next: commit audit branch and merge to main, then continue Sprint 3 UX/e2e'
+progress: 87
+next_action: 'Implement S5-01: Wire ToolCallMessage into chat message list'
 next_command: 'bmad continue'
 next_role: dev
-active_role: dev
-notes: 'S3-01 & S3-02 done. CODE-QL-001: auth.service.ts created with 22 passing tests (token gen, validation, expiry, refresh, tamper, concurrency).'
+active_role: scrum
+notes: 'Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
 
 phases:
     - name: planning
@@ -35,16 +35,16 @@ sprints:
       stories: []
     - id: 3
       name: 'Skills + Slash commands + Autocomplete'
-      status: in_progress
+      status: done
       stories: ['S3-01','S3-02']
     - id: 4
       name: 'Agents built-in — WebSearch, PageFetch'
-      status: planned
-      stories: []
+      status: done
+      stories: ['S4-01','S4-02','S4-03','S4-04']
     - id: 5
       name: 'Frontend UX — ToolCallMessage, HookInspector, Settings'
-      status: planned
-      stories: []
+      status: active
+      stories: ['S5-01','S5-02','S5-03','S5-04']
     - id: 6
       name: 'Polish, tests, cross-platform validation'
       status: planned
