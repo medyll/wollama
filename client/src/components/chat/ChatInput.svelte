@@ -176,7 +176,7 @@
 								toast.error(body?.error?.message || body?.error || 'Skill invocation failed');
 							} else {
 								value = body.output || body.result || '';
-								$nextTick(() => textareaRef?.focus());
+								setTimeout(() => textareaRef?.focus(), 0);
 							}
 						} catch (e) {
 							toast.error('Skill invocation failed');
@@ -236,3 +236,4 @@
 		</div>
 	</div>
 </div>
+

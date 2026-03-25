@@ -2,12 +2,11 @@
 project: wollama
 phase: development
 progress: 88
-next_action: 'Fix tsconfig.json bundler error'
-progress: 96
+next_action: 'Fix tsconfig.json bundler error — adjust paths and moduleResolution to resolve bundler failures'
 next_command: 'bmad continue'
 next_role: dev
-active_role: reviewer
-progress: 95
+active_role: dev
+progress: 96
 notes: 'Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
 
 phases:

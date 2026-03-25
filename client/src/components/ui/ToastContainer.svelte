@@ -48,25 +48,23 @@
 <div class="toast {positionClasses} z-50 p-4">
 	{#each toast.toasts as item (item.id)}
 		<!-- Section: Toast Item -->
-		<div
-			animate:flip={{ duration: 300 }}
+		<div animate:flip={{ duration: 300 }}
 			in:fly={{ y: 20, duration: 300 }}
 			out:fade={{ duration: 200 }}
-			class="alert {getTypeClass(item.type)} flex min-w-[300px] cursor-pointer justify-between shadow-lg"
-			onclick={() => toast.remove(item.id)}
-			role="alert"
-			onkeydown={(e) => e.key === 'Enter' && toast.remove(item.id)}
-			tabindex="0"
+			class="alert {getTypeClass(item.type)} flex min-w-[300px] justify-between shadow-lg"
+			role="status"
 		>
 			<div class="flex items-center gap-2">
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24"
-					><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getIcon(item.type)} /></svg
-				>
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getIcon(item.type)} />
+				</svg>
 				<span>{item.message}</span>
 			</div>
 			{#if !item.timeout}
-				<button class="btn btn-xs btn-ghost btn-circle" aria-label="Close">✕</button>
+				<button class="btn btn-xs btn-ghost btn-circle" aria-label="Close" onclick={(e) => { e.stopPropagation(); toast.remove(item.id); }}>✕</button>
 			{/if}
 		</div>
 	{/each}
 </div>
+\n\n\n
+

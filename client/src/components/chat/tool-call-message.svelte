@@ -1,7 +1,5 @@
-{#snippet}
 
-{#snippet name="tool-call-message"}
-<script>
+<script lang="ts">
   import type { ToolCallMessage } from '$lib/types/messages';
   export let message: ToolCallMessage;
 </script>
@@ -25,4 +23,4 @@
     </details>
   </div>
 </div>
-{/snippet}
+

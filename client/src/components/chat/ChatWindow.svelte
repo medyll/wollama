@@ -342,73 +342,64 @@
 			bind:this={chatContainer}
 			onscroll={handleScroll}
 		>
-			{#each messages as message, i}\n\t\t\t\t{#if message.type === "ToolCallMessage"}\n\t\t\t\t\t<div class="chat chat-start">\n\t\t\t\t\t\t<div class="chat-image avatar placeholder self-start">\n\t\t\t\t\t\t\t<div class="w-10 rounded-full">\n\t\t\t\t\t\t\t\t<img src="/assets/tool.png" alt="tool" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class="chat-bubble">\n\t\t\t\t\t\t\t<ToolCallMessage message={message} />\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t{:else}\n
-				<div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
-					<div class="chat-image avatar placeholder self-start">
-						{#if message.role === 'user'}
-							<div class="bg-neutral text-neutral-content w-10 rounded-full">
-								<span>U</span>
-							</div>
-						{:else if currentCompagnon.avatar}
-							<div class="w-10 rounded-full">
-								<img src={currentCompagnon.avatar} alt={currentCompagnon.name} />
-							</div>
-						{:else}
-							<div class="bg-primary text-primary-content w-10 rounded-full">
-								<span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span>
-							</div>
-						{/if}
-					</div>
-					{#if message.role !== 'user'}
-						<div class="chat-header mb-1 text-xs opacity-50">
-							{currentCompagnon.name}
-						</div>
-					{/if}
-					<div
-						class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user'
-							? 'chat-bubble-primary'
-							: 'text-base-content bg-transparent p-0'}"
-					>
-						{#if message.images && message.images.length > 0}
-							<div class="mb-2 space-y-2">
-								{#each message.images as img}
-									{#if img.startsWith('data:image')}
-										<img src={img} alt="attachment" class="h-auto max-h-64 max-w-full rounded-lg" />
-									{:else}
-										<div class="bg-base-100/20 flex items-center gap-2 rounded-lg p-2">
-											<Icon icon="lucide:file" class="h-6 w-6" />
-											<span class="text-xs opacity-70">File attached</span>
-										</div>
-									{/if}
-								\n\t\t\t\t{/if}{/each}
-							</div>
-						{/if}
-						{#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
-							<div class="bg-base-200/50 flex w-fit items-center rounded-2xl px-4 py-2">
-								<span class="loading loading-dots loading-sm opacity-50"></span>
-							</div>
-						{:else}
-							{#if message.role === 'assistant'}
-								<ThinkingMessage content={message.content || ''} />
-							{:else}
-								<div class="prose prose-sm dark:prose-invert max-w-none wrap-break-word">
-									{@html parseMarkdown(message.content)}
-								</div>
-							{/if}
+			{#each messages as message, i}
+{#if message.type === "ToolCallMessage"}
+<div class="chat chat-start">
+<div class="chat-image avatar placeholder self-start">
+<div class="w-10 rounded-full">
+<img src="/assets/tool.png" alt="tool" />
+</div>
+</div>
+<div class="chat-bubble">
+<ToolCallMessage message={message} />
+</div>
+</div>
+{:else}
+<div class={'chat ' + (message.role === 'user' ? 'chat-end' : 'chat-start')}>
+<div class="chat-image avatar placeholder self-start">
+{#if message.role === 'user'}
+<div class="bg-neutral text-neutral-content w-10 rounded-full"><span>U</span></div>
+{:else if currentCompagnon.avatar}
+<div class="w-10 rounded-full"><img src={currentCompagnon.avatar} alt={currentCompagnon.name} /></div>
+{:else}
+<div class="bg-primary text-primary-content w-10 rounded-full"><span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span></div>
+{/if}
+</div>
+{#if message.role !== 'user'}
+<div class="chat-header mb-1 text-xs opacity-50">{currentCompagnon.name}</div>
+{/if}
+<div class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user' ? 'chat-bubble-primary' : 'text-base-content bg-transparent p-0'}">
+{#if message.images && message.images.length > 0}
+<div class="mb-2 space-y-2">
+{#each message.images as img}
+{#if img.startsWith('data:image')}
+<img src={img} alt="attachment" class="h-auto max-h-64 max-w-full rounded-lg" />
+{:else}
+<div class="bg-base-100/20 flex items-center gap-2 rounded-lg p-2"><Icon icon="lucide:file" class="h-6 w-6" /><span class="text-xs opacity-70">File attached</span></div>
+{/if}
+{/each}
+</div>
+{/if}
+{#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
+<div class="bg-base-200/50 flex w-fit items-center rounded-2xl px-4 py-2"><span class="loading loading-dots loading-sm opacity-50"></span></div>
+{:else}
+{#if message.role === 'assistant'}
+<ThinkingMessage content={message.content || ''} />
+{:else}
+<div class="prose prose-sm dark:prose-invert max-w-none wrap-break-word">{@html parseMarkdown(message.content)}</div>
+{/if}
+{/if}
+{#if message.role === 'assistant' && message.status !== 'streaming'}
+<MessageActions {message} onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined} />
+{/if}
+</div>
+</div>
+{/if}
+{/each}
+</div>
 
-							{#if message.role === 'assistant' && message.status !== 'streaming'}
-								<MessageActions
-									{message}
-									onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined}
-								/>
-							{/if}
-						{/if}
-					</div>
-				</div>
-			{/each}
-		</div>
-
-		<!-- Section: Input Area (Bottom) -->
+<!-- Section: Input Area (Bottom) -->
+<!-- Section: Input Area (Bottom) -->
 		<div class="bg-base-100 z-20 w-full p-0 shadow-lg md:p-4">
 			<ChatInput
 				bind:value={messageInput}
@@ -424,4 +415,7 @@
 		</div>
 	{/if}
 </div>
+
+
+
 
