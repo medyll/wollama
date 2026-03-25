@@ -2,11 +2,11 @@
 project: wollama
 phase: development
 progress: 62
-next_action: 'Sprint 3: S3-01 & S3-02 complete — expand skills registry, add e2e tests and UX polish'
+next_action: 'CODE-QL-001 closed — next: commit audit branch and merge to main, then continue Sprint 3 UX/e2e'
 next_command: 'bmad continue'
 next_role: dev
 active_role: dev
-notes: 'S3-01 implemented; S3-02 implemented and tests passing. Committed.'
+notes: 'S3-01 & S3-02 done. CODE-QL-001: auth.service.ts created with 22 passing tests (token gen, validation, expiry, refresh, tamper, concurrency).'
 
 phases:
     - name: planning
