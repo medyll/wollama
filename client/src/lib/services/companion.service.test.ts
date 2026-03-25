@@ -4,9 +4,30 @@ import type { Companion, UserCompanion } from '$types/data';
 import { DataGenericService } from './data-generic.service';
 
 // Mock DataGenericService
-vi.mock('./data-generic.service', () => ({
-	DataGenericService: vi.fn()
-}));
+vi.mock('./data-generic.service', () => {
+	function DataGenericService(this: any, collectionName?: string) {
+		// When used with `new`, if a factory is set, return its result
+		if ((DataGenericService as any)._factory) {
+			return (DataGenericService as any)._factory(collectionName);
+		}
+		// otherwise create an empty instance
+		return this;
+	}
+	// Allow setting a factory like vi.fn().mockImplementation
+	(DataGenericService as any).mockImplementation = (fn: (...args: any[]) => any) => {
+		(DataGenericService as any)._factory = fn;
+	};
+	// Provide default prototype methods so instance has expected shape
+	DataGenericService.prototype.get = function(){};
+	DataGenericService.prototype.getAll = function(){};
+	DataGenericService.prototype.create = function(){};
+	DataGenericService.prototype.update = function(){};
+	DataGenericService.prototype.delete = function(){};
+	DataGenericService.prototype.find = function(){};
+
+	// Also make it recognizable by vi.mocked() by returning the function
+	return { DataGenericService };
+});
 
 describe('CompanionService - Companion Ownership Model (Story 5.1)', () => {
 	let companionService: CompanionService;

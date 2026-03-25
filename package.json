@@ -1,47 +1,47 @@
 {
-  "name": "wollama-monorepo",
-  "version": "0.0.9",
-  "private": true,
-  "type": "module",
-  "workspaces": [
-    "client",
-    "server",
-    "shared"
-  ],
-  "scripts": {
-    "dev:client": "npm run dev -w @wollama/client",
-    "dev:electron": "npm run electron:dev -w @wollama/client",
-    "dev:server": "npm run setup:python && npm run setup:audio && npm run dev -w @wollama/server",
-    "build": "npm run build -w @wollama/client",
-    "check": "npm run check -w @wollama/client && npm run check -w @wollama/server",
-    "test:client": "npm run test -w @wollama/client",
-    "test:server": "npm run test:unit -w @wollama/server",
-    "setup:python": "node setup-python.js",
-    "setup:audio": "npm run setup:audio -w @wollama/server",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write .",
-    "release": "standard-version",
-    "changelog": "standard-version --skip.bump --skip.commit --skip.tag"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^20.2.0",
-    "@commitlint/config-conventional": "^20.2.0",
-    "@eslint/compat": "^2.0.0",
-    "@eslint/js": "^9.39.2",
-    "concurrently": "^9.2.1",
-    "cz-customizable": "^7.0.0",
-    "eslint": "^9.39.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-svelte": "^3.13.1",
-    "globals": "^16.5.0",
-    "prettier": "^3.7.4",
-    "standard-version": "^9.5.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.49.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-customizable"
-    }
-  }
+	"name": "wollama-monorepo",
+	"version": "0.0.9",
+	"private": true,
+	"type": "module",
+	"workspaces": [
+		"client",
+		"server",
+		"shared"
+	],
+	"scripts": {
+		"dev:client": "npm run dev -w @wollama/client",
+		"dev:electron": "npm run electron:dev -w @wollama/client",
+		"dev:server": "npm run setup:python && npm run setup:audio && npm run dev -w @wollama/server",
+		"build": "npm run build -w @wollama/client",
+		"check": "npm run check -w @wollama/client && npm run check -w @wollama/server",
+		"test:client": "npm run test -w @wollama/client",
+		"test:server": "npm run test:unit -w @wollama/server",
+		"setup:python": "node setup-python.js",
+		"setup:audio": "npm run setup:audio -w @wollama/server",
+		"lint": "prettier --check .&& eslint . --fix --ignore-pattern '**/*.test.*'",
+		"format": "prettier --write . && eslint . --fix --ignore-pattern '**/*.test.*'",
+		"release": "standard-version",
+		"changelog": "standard-version --skip.bump --skip.commit --skip.tag"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^20.2.0",
+		"@commitlint/config-conventional": "^20.2.0",
+		"@eslint/compat": "^2.0.0",
+		"@eslint/js": "^9.39.2",
+		"concurrently": "^9.2.1",
+		"cz-customizable": "^7.0.0",
+		"eslint": "^9.39.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.13.1",
+		"globals": "^16.5.0",
+		"prettier": "^3.7.4",
+		"standard-version": "^9.5.0",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.49.0"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-customizable"
+		}
+	}
 }

@@ -2,11 +2,12 @@
 project: wollama
 phase: development
 progress: 88
-next_action: 'Integrate Hook Inspector into UI and add tests'
-next_command: 'npm run test:client -- --run'
+next_action: 'Fix tsconfig.json bundler error'
+progress: 96
+next_command: 'bmad continue'
 next_role: dev
-active_role: dev
-progress: 90
+active_role: reviewer
+progress: 95
 notes: 'Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
 
 phases:
