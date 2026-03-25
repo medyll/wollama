@@ -11,6 +11,7 @@
 	import MessageActions from '$components/chat/MessageActions.svelte';
 	import ThinkingMessage from '$components/chat/ThinkingMessage.svelte';
 	import ChatInput from '$components/chat/ChatInput.svelte';
+	import ToolCallMessage from '$components/chat/tool-call-message.svelte';
 	import Icon from '@iconify/svelte';
 	import type { UserCompanion } from '$types/data';
 	import { goto } from '$app/navigation';
@@ -341,7 +342,7 @@
 			bind:this={chatContainer}
 			onscroll={handleScroll}
 		>
-			{#each messages as message, i}
+			{#each messages as message, i}\n\t\t\t\t{#if message.type === "ToolCallMessage"}\n\t\t\t\t\t<div class="chat chat-start">\n\t\t\t\t\t\t<div class="chat-image avatar placeholder self-start">\n\t\t\t\t\t\t\t<div class="w-10 rounded-full">\n\t\t\t\t\t\t\t\t<img src="/assets/tool.png" alt="tool" />\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class="chat-bubble">\n\t\t\t\t\t\t\t<ToolCallMessage message={message} />\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t{:else}\n
 				<div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
 					<div class="chat-image avatar placeholder self-start">
 						{#if message.role === 'user'}
@@ -379,7 +380,7 @@
 											<span class="text-xs opacity-70">File attached</span>
 										</div>
 									{/if}
-								{/each}
+								\n\t\t\t\t{/if}{/each}
 							</div>
 						{/if}
 						{#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
@@ -423,3 +424,4 @@
 		</div>
 	{/if}
 </div>
+
