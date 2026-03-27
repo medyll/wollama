@@ -1,12 +1,11 @@
 # BMAD Status
 project: wollama
 phase: development
-progress: 88
-next_action: 'Sprint 5 complete — start Sprint 6: Polish, tests, cross-platform validation'
-next_command: 'bmad continue'
-next_role: scrum
-active_role: dev
 progress: 98
+next_action: 'S6-01: Unit tests backend services (ollama, stt, tts)'
+next_command: 'bmad continue'
+next_role: tester
+active_role: scrum
 notes: 'Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
 
 phases:
@@ -28,7 +27,7 @@ artifacts:
 sprints:
     - id: 1
       name: 'Foundation DB — 4 nouvelles tables + interfaces TS'
-      status: active
+      status: done
       stories: ['S1-01']
     - id: 2
       name: 'Hook Pipeline — middleware pre/post-send'
@@ -48,5 +47,5 @@ sprints:
       stories: ['S5-01','S5-02','S5-03','S5-04']
     - id: 6
       name: 'Polish, tests, cross-platform validation'
-      status: planned
-      stories: []
+      status: active
+      stories: ['S6-01','S6-02','S6-03','S6-04','S6-05','S6-06']
