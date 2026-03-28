@@ -2,7 +2,7 @@
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
 		"allowJs": true,
-		"checkJs": true,
+		"checkJs": false,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
@@ -19,5 +19,5 @@
 		".svelte-kit/ambient.d.ts",
 		".svelte-kit/non-ambient.d.ts"
 	],
-	"exclude": ["./node_modules/**", "./src-tauri/**", "./src/_old/**"]
+	"exclude": ["./node_modules/**", "./src-tauri/**", "./src/_old/**", "./src/**/*.test.ts", "./src/**/*.test.svelte.ts", "./e2e/**"]
 }

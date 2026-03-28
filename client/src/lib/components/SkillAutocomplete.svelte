@@ -1,98 +1,106 @@
-<script lang="ts" context="module">
-  export const tag = 'SkillAutocomplete';
-</script>
-
 <script lang="ts">
-  import { $state } from 'svelte-runes';
-  import type { Skill } from '$lib/index';
+  import { createEventDispatcher } from 'svelte';
 
-  export let minChars: number = 3;
-  export let debounceMs: number = 200;
-
-  const state = $state({
-    query: '',
-    suggestions: [] as Skill[],
-    selectedIndex: -1,
-    loading: false
-  });
-
-  let debounceTimer: number | null = null;
-
-  function fetchSuggestions(q: string) {
-    if (q.length < minChars) {
-      state.suggestions = [];
-      state.selectedIndex = -1;
-      return;
-    }
-    state.loading = true;
-    fetch(`/api/skills?q=${encodeURIComponent(q)}`)
-      .then((r) => r.json())
-      .then((data: Skill[]) => {
-        state.suggestions = data;
-        state.selectedIndex = data.length ? 0 : -1;
-      })
-      .catch(() => {
-        state.suggestions = [];
-        state.selectedIndex = -1;
-      })
-      .finally(() => (state.loading = false));
+  interface Skill {
+    name: string;
+    display_name: string;
+    description: string;
+    command: string;
   }
 
-  function onInput(e: InputEvent) {
-    const v = (e.target as HTMLInputElement).value;
-    state.query = v;
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = window.setTimeout(() => fetchSuggestions(v), debounceMs);
+  const { minChars = 3, debounceMs = 200, onSelect = () => {} } = $props();
+
+  const dispatch = createEventDispatcher<{
+    select: Skill;
+    input: string;
+  }>();
+
+  let query = $state('');
+  let suggestions = $state<Skill[]>([]);
+  let selectedIndex = $state(-1);
+  let loading = $state(false);
+  let showAutocomplete = $state(false);
+
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function onInput(e: Event) {
+    const value = (e.target as HTMLInputElement).value;
+    query = value;
+
+    if (value.length >= minChars) {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        loading = true;
+        dispatch('input', value);
+        loading = false;
+        showAutocomplete = true;
+      }, debounceMs);
+    } else {
+      suggestions = [];
+      showAutocomplete = false;
+    }
   }
 
   function onKeydown(e: KeyboardEvent) {
-    if (!state.suggestions.length) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      state.selectedIndex = Math.min(state.selectedIndex + 1, state.suggestions.length - 1);
+      selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      state.selectedIndex = Math.max(state.selectedIndex - 1, 0);
-    } else if (e.key === 'Enter') {
+      selectedIndex = Math.max(selectedIndex - 1, 0);
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
       e.preventDefault();
-      select(state.suggestions[state.selectedIndex]);
+      selectItem(suggestions[selectedIndex]);
+    } else if (e.key === 'Escape') {
+      showAutocomplete = false;
     }
   }
 
-  function select(skill: Skill) {
-    const ev = new CustomEvent('select', { detail: skill });
-    dispatchEvent(ev as unknown as Event);
-    // reset
-    state.query = '';
-    state.suggestions = [];
-    state.selectedIndex = -1;
+  function selectItem(item: Skill) {
+    query = item.display_name || item.name;
+    showAutocomplete = false;
+    dispatch('select', item);
+    onSelect(item);
+  }
+
+  function updateSuggestions(items: Skill[]) {
+    suggestions = items;
+    selectedIndex = -1;
   }
 </script>
 
-<input
-  type="text"
-  placeholder="Type a command or skill..."
-  value={state.query}
-  on:input={onInput}
-  on:keydown={onKeydown}
-  aria-autocomplete="list"
-  aria-controls="skill-list"
-  aria-expanded={state.suggestions.length > 0}
-  class="w-full p-2 border rounded"
-/>
+<div class="relative">
+  <input
+    type="text"
+    bind:value={query}
+    oninput={onInput}
+    onkeydown={onKeydown}
+    class="input input-bordered w-full"
+    placeholder="Type a skill (e.g., /translate)"
+    role="combobox"
+    aria-expanded={showAutocomplete}
+    aria-controls="skill-autocomplete-list"
+    aria-autocomplete="list"
+  />
 
-{#if state.suggestions.length}
-  <ul id="skill-list" role="listbox" class="border rounded mt-1 bg-white">
-    {#each state.suggestions as s, i}
-      <li
-        role="option"
-        aria-selected={i === state.selectedIndex}
-        class="p-2 hover:bg-gray-100 cursor-pointer {i === state.selectedIndex ? 'bg-gray-100' : ''}"
-        on:click={() => select(s)}
-      >
-        <div class="font-medium">{s.display_name || s.name} <span class="text-xs text-gray-500">{s.command}</span></div>
-        <div class="text-sm text-gray-600">{s.description}</div>
-      </li>
-    {/each}
-  </ul>
-{/if}
+  {#if showAutocomplete && suggestions.length > 0}
+    <ul
+      id="skill-autocomplete-list"
+      class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-base-300 bg-base-100 shadow-lg"
+      role="listbox"
+    >
+      {#each suggestions as item, index}
+        <li
+          role="option"
+          aria-selected={index === selectedIndex}
+          class="cursor-pointer px-4 py-2 hover:bg-base-200 {index === selectedIndex ? 'bg-base-200' : ''}"
+          onclick={() => selectItem(item)}
+          onmouseenter={() => (selectedIndex = index)}
+        >
+          <span class="font-medium">{item.command}</span>
+          <span class="text-base-content/70 text-sm"> — {item.description}</span>
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</div>

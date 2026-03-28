@@ -1,7 +1,13 @@
-
 <script lang="ts">
-  import type { ToolCallMessage } from '$lib/types/messages';
-  export let message: ToolCallMessage;
+  interface ToolCallMessage {
+    toolName: string;
+    toolId: string;
+    timestamp: number;
+    inputs: Record<string, unknown>;
+    outputs?: Record<string, unknown>;
+  }
+
+  const { message } = $props();
 </script>
 
 <div class="p-3 rounded bg-base-100 border">
@@ -17,10 +23,11 @@
       <summary class="cursor-pointer">Inputs</summary>
       <pre class="text-xs mt-2">{JSON.stringify(message.inputs, null, 2)}</pre>
     </details>
+    {#if message.outputs}
     <details class="mt-2">
       <summary class="cursor-pointer">Outputs</summary>
       <pre class="text-xs mt-2">{JSON.stringify(message.outputs, null, 2)}</pre>
     </details>
+    {/if}
   </div>
 </div>
-

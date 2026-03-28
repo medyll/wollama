@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import '@testing-library/jest-dom';
 
 // Ensure browser-like environment for component tests
 if (typeof window !== 'undefined') {

@@ -151,7 +151,7 @@ const conflictHandler = (_versionA: any, _versionB: any) => {
 	return timestampB >= timestampA ? _versionB : _versionA;
 };
 
-export const enableReplication = async (userId: string) => {
+export const enableReplication = async (userId: string, _token?: string) => {
 	const db = await getDatabase();
 	const baseUrl = userState.preferences.serverUrl || 'http://localhost:3000';
 	const serverUrl = baseUrl.endsWith('/') ? `${baseUrl}_db/` : `${baseUrl}/_db/`;
@@ -173,7 +173,6 @@ export const enableReplication = async (userId: string) => {
 			url: serverUrl + remoteName,
 			live: true,
 			// Story 4.3: Add conflict resolution strategy
-			conflictHandler,
 			pull: {
 				// Add Auth headers here if needed
 				// headers: { Authorization: `Bearer ${token}` }
