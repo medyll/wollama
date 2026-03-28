@@ -12,6 +12,17 @@
 - **Rich Chat UI**: Markdown support, code highlighting, image attachments.
 - **Customizable**: Theming (DaisyUI), multiple languages (i18n), and configurable AI personalities (Companions).
 - **Sync**: Offline-first architecture using RxDB (Client) and PouchDB (Server).
+- **Skills & Hooks**: Extensible system with slash commands (/translate, /summarize) and pre/post message processing.
+- **Agents**: Built-in WebSearch and PageFetch agents for external data retrieval.
+- **Testing**: 237+ unit and E2E tests for reliability.
+
+## 🎯 New in v0.0.9
+
+- **Skills System**: Add custom slash commands for quick actions
+- **Hooks System**: Intercept and modify messages before/after sending
+- **Agents**: Web search and page fetching capabilities
+- **Enhanced UX**: Loading skeletons, error boundaries, improved chat input
+- **Better Testing**: Comprehensive test coverage for backend and frontend
 
 ## 🛠️ Technical Stack
 
@@ -112,6 +123,40 @@ npx cap sync
 # Run on device/emulator
 npx cap run android
 ```
+
+## 🧪 Testing
+
+### Unit Tests
+
+```bash
+# Client tests (Vitest + jsdom)
+npm run test:client -- --run
+
+# Server tests (Vitest + Node.js)
+npm run test:server -- --run
+```
+
+### E2E Tests (Playwright)
+
+```bash
+# Install Playwright browsers
+npx playwright install
+
+# Run E2E tests
+cd client && npx playwright test
+
+# Run with UI
+cd client && npx playwright test --ui
+
+# Run specific test file
+cd client && npx playwright test e2e/tests/smoke.spec.ts
+```
+
+### Test Coverage
+
+- **Client**: 166 tests (components, services, utils)
+- **Server**: 71 tests (services, agents, routes)
+- **E2E**: 4 smoke tests (critical user flows)
 
 ## ⚠️ Technical Considerations & Troubleshooting
 

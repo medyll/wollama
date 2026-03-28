@@ -1,11 +1,12 @@
 # BMAD Status
 project: wollama
-phase: development
-progress: 98
-next_action: 'S6-01: Unit tests backend services (ollama, stt, tts)'
-next_command: 'bmad continue'
-next_role: tester
-active_role: scrum
+phase: testing
+progress: 100
+next_action: 'Release v0.0.9 ready — Run verify script and manual testing'
+next_command: 'bmad status'
+next_role: scrum
+active_role: dev
+notes: 'Sprint 6 COMPLETE. All stories done: S6-01 (backend tests ✓), S6-02 (frontend tests ✓), S6-03 (E2E smoke ✓), S6-04 (polish ✓), S6-05 (build scripts ✓), S6-06 (docs ✓). Ready for release.'
 notes: 'Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
 
 phases:
@@ -47,5 +48,5 @@ sprints:
       stories: ['S5-01','S5-02','S5-03','S5-04']
     - id: 6
       name: 'Polish, tests, cross-platform validation'
-      status: active
+      status: done
       stories: ['S6-01','S6-02','S6-03','S6-04','S6-05','S6-06']
