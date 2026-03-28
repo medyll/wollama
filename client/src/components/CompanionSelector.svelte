@@ -61,12 +61,14 @@
 </script>
 
 <div class="companion-selector" role="region" aria-label="Companion Selection">
-	<div class="selector-header">
+	{#if !onSelect}
+	<div class="selector-header mb-4">
 		<h2 class="text-2xl font-bold">Choose Your Companion</h2>
 		<p class="mt-2 text-gray-600">
 			Select a pre-configured companion to start chatting. You can customize or create new ones later.
 		</p>
 	</div>
+	{/if}
 
 	{#if isLoading}
 		<div class="loading-state flex h-64 items-center justify-center">
@@ -79,21 +81,22 @@
 			<p>{error}</p>
 		</div>
 	{:else if companions.length === 0}
-		<div class="empty-state alert alert-info">
+		<div class="empty-state alert alert-info" role="alert">
 			<p>No companions available. Please refresh or contact support.</p>
 		</div>
 	{:else}
-		<div class="companions-scroll-container">
+		<div class="companions-scroll-container max-h-[40vh] overflow-y-auto">
 			<div class="companions-grid grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
 				{#each companions as companion, index (companion.user_companion_id)}
-					<button
-						type="button"
+					<div
 						data-companion-id={companion.user_companion_id}
 						class="companion-card card bg-base-100 cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md"
 						class:ring-2={selectedId === companion.user_companion_id}
 						class:ring-primary={selectedId === companion.user_companion_id}
 						aria-pressed={selectedId === companion.user_companion_id}
 						aria-label={`Select ${companion.name} companion`}
+						tabindex="0"
+						role="button"
 						onclick={() => handleSelect(companion)}
 						onkeydown={(e) => handleKeyDown(e, index)}
 						onfocus={() => handleCardFocus(index)}
@@ -124,7 +127,7 @@
 
 							<!-- Badge -->
 							{#if companion.companion_id}
-								<div class="badge badge-primary badge-outline badge-xs mx-auto">From Default</div>
+								<div class="badge badge-primary badge-outline badge-xs mx-auto">Default</div>
 							{:else}
 								<div class="badge badge-secondary badge-outline badge-xs mx-auto">Personal</div>
 							{/if}
@@ -161,6 +164,7 @@
 										class="btn btn-secondary btn-xs w-full"
 										onclick={(e) => {
 											e.stopPropagation();
+											e.preventDefault();
 											onCustomize(companion);
 										}}
 										aria-label={`Customize ${companion.name}`}
@@ -170,7 +174,7 @@
 								</div>
 							{/if}
 						</div>
-					</button>
+					</div>
 				{/each}
 			</div>
 		</div>

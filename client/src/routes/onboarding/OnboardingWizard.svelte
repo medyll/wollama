@@ -235,23 +235,23 @@
 	<title>Welcome - Wollama</title>
 </svelte:head>
 
-<div class="from-base-100 to-base-200 flex min-h-screen items-center justify-center bg-linear-to-br p-4">
-	<div class="w-full" class:max-w-md={currentStep !== 3} class:max-w-4xl={currentStep === 3}>
+<div class="from-base-100 to-base-200 flex min-h-screen items-center justify-center bg-linear-to-br p-4 overflow-auto">
+	<div class="w-full flex flex-col items-center" class:max-w-md={currentStep !== 3} class:max-w-4xl={currentStep === 3}>
 		<!-- Main Card -->
-		<div class="card bg-base-100 shadow-xl">
-			<div class="card-body">
+		<div class="card bg-base-100 shadow-xl w-full max-h-[90vh] overflow-y-auto">
+			<div class="card-body py-6">
 				<!-- Icon/Logo -->
-				<div class="mb-6 flex justify-center">
-					<Icon icon={steps[currentStep].icon} width="64" height="64" class="text-primary" />
+				<div class="mb-4 flex justify-center flex-shrink-0">
+					<Icon icon={steps[currentStep].icon} width="48" height="48" class="text-primary" />
 				</div>
 
 				<!-- Title -->
-				<h1 class="card-title mb-4 justify-center text-center text-2xl">
+				<h1 class="card-title mb-2 justify-center text-center text-xl flex-shrink-0">
 					{steps[currentStep].title}
 				</h1>
 
 				<!-- Description -->
-				<p class="text-base-content/70 mb-8 text-center">
+				<p class="text-base-content/70 mb-4 text-center text-sm flex-shrink-0">
 					{steps[currentStep].description}
 				</p>
 
