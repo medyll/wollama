@@ -6,3 +6,7 @@ team:
     - Backend
     - Ops
 description: BMAD scaffold initialized from init directive.
+
+# ACP Configuration — required to avoid mobile timeouts
+acp_available: true
+acp_default_mode: "always"

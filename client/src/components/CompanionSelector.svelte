@@ -85,11 +85,12 @@
 			<p>No companions available. Please refresh or contact support.</p>
 		</div>
 	{:else}
-		<div class="companions-scroll-container max-h-[40vh] overflow-y-auto">
+		<div class="companions-scroll-container max-h-[40vh] overflow-y-auto" data-testid="companion-selector">
 			<div class="companions-grid grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
 				{#each companions as companion, index (companion.user_companion_id)}
 					<div
 						data-companion-id={companion.user_companion_id}
+						data-testid="companion-card"
 						class="companion-card card bg-base-100 cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md"
 						class:ring-2={selectedId === companion.user_companion_id}
 						class:ring-primary={selectedId === companion.user_companion_id}

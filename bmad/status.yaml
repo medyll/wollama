@@ -6,8 +6,7 @@ next_action: 'DEVELOPMENT COMPLETE — Ready for production deployment'
 next_command: 'bmad status'
 next_role: scrum
 active_role: dev
-notes: 'DEVELOPMENT COMPLETE. v0.0.9 released: Build passes, tests pass (237), tagged and pushed to GitHub. App is production-ready.'
-notes: 'Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
+notes: 'DEVELOPMENT COMPLETE. v0.0.9 released: Build passes, tests pass (237), tagged and pushed to GitHub. App is production-ready. Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
 
 phases:
     - name: planning

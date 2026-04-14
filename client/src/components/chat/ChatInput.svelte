@@ -155,6 +155,7 @@
 					onsend();
 				}
 			}}
+			data-testid="message-input"
 		></textarea>
 
 		{#if showAutocomplete}
@@ -228,6 +229,7 @@
 						onclick={onsend}
 						aria-label={t('ui.send_message') || 'Send message'}
 						title={t('ui.send_message') || 'Send message'}
+						data-testid="send-button"
 					>
 						<Icon icon="lucide:send-horizontal" class="h-5 w-5" />
 					</button>

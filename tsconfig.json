@@ -1,16 +1,1 @@
-{
-	"compilerOptions": {
-		"allowJs": true,
-		"checkJs": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"moduleResolution": "node",
-		"baseUrl": "."
-	},
-	"include": ["client/src/**/*.d.ts", "client/src/**/*.ts", "client/src/**/*.js", "client/src/**/*.svelte"],
-	"exclude": ["./node_modules/**", "./client/src-tauri/**", "./client/src/components/_old/**", "./client/src/lib/_old/**"]
-}
+﻿

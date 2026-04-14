@@ -33,24 +33,16 @@ export default defineConfig({
 	],
 
 	// Web server configuration
-	webServer: [
-		{
-			command: 'npm run dev',
-			port: 5173,
-			timeout: 120 * 1000,
-			reuseExistingServer: !process.env['CI']
-		},
-		{
-			command: 'npx pouchdb-server --port 5984',
-			port: 5984,
-			timeout: 90 * 1000,
-			reuseExistingServer: false
-		}
-	],
+	webServer: {
+		command: 'npm run dev',
+		port: 5176,
+		timeout: 120 * 1000,
+		reuseExistingServer: true // Don't kill existing server
+	},
 
 	use: {
 		// Base URL for all requests
-		baseURL: 'http://localhost:5173',
+		baseURL: 'http://localhost:5176',
 
 		// Screenshot and video configuration
 		screenshot: 'only-on-failure',

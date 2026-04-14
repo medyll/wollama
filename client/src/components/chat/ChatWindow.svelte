@@ -341,10 +341,11 @@
 			aria-label="Chat messages"
 			bind:this={chatContainer}
 			onscroll={handleScroll}
+			data-testid="chat-container"
 		>
 			{#each messages as message, i}
 {#if message.type === "ToolCallMessage"}
-<div class="chat chat-start">
+<div class="chat chat-start" data-testid="chat-message" data-role={message.role}>
 <div class="chat-image avatar placeholder self-start">
 <div class="w-10 rounded-full">
 <img src="/assets/tool.png" alt="tool" />
@@ -355,7 +356,7 @@
 </div>
 </div>
 {:else}
-<div class={'chat ' + (message.role === 'user' ? 'chat-end' : 'chat-start')}>
+<div class={'chat ' + (message.role === 'user' ? 'chat-end' : 'chat-start')} data-testid="chat-message" data-role={message.role}>
 <div class="chat-image avatar placeholder self-start">
 {#if message.role === 'user'}
 <div class="bg-neutral text-neutral-content w-10 rounded-full"><span>U</span></div>
@@ -381,7 +382,7 @@
 </div>
 {/if}
 {#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
-<div class="bg-base-200/50 flex w-fit items-center rounded-2xl px-4 py-2"><span class="loading loading-dots loading-sm opacity-50"></span></div>
+<div class="bg-base-200/50 flex w-fit items-center rounded-2xl px-4 py-2" data-testid="loading-indicator"><span class="loading loading-dots loading-sm opacity-50"></span></div>
 {:else}
 {#if message.role === 'assistant'}
 <ThinkingMessage content={message.content || ''} />

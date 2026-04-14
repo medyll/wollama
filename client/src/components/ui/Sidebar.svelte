@@ -77,7 +77,7 @@
 		</button>
 	</div>
 
-	<nav id="sidebar-nav" class="flex-1 space-y-2 overflow-y-auto p-2" aria-label={t('ui.myChats')}>
+	<nav id="sidebar-nav" class="flex-1 space-y-2 overflow-y-auto p-2" aria-label={t('ui.myChats')} data-testid="chat-list">
 		{#if !uiState.sidebarCollapsed}
 			{#each chats as chat}
 				<a
@@ -88,6 +88,7 @@
 						? 'btn-active'
 						: ''}"
 					title={chat.title}
+					data-testid="chat-list-item"
 				>
 					<Icon icon="fluent:chat-24-regular" class="mr-2 h-5 w-5 opacity-70" />
 					<span class="truncate">{chat.title}</span>
