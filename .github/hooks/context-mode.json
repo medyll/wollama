@@ -1,1 +1,22 @@
-﻿
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "if ($env:VSCODE_IPC_HOOK_CLI) { context-mode hook vscode-copilot pretooluse }"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "if ($env:VSCODE_IPC_HOOK_CLI) { context-mode hook vscode-copilot posttooluse }"
+      }
+    ],
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "if ($env:VSCODE_IPC_HOOK_CLI) { context-mode hook vscode-copilot sessionstart }"
+      }
+    ]
+  }
+}
