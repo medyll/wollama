@@ -13,6 +13,9 @@ export default defineConfig({
 			}
 		})
 	],
+	resolve: {
+		conditions: ['browser']
+	},
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
 		globals: true,
@@ -26,12 +29,19 @@ export default defineConfig({
 		},
 		coverage: {
 			provider: 'v8',
-			include: ['src/lib/auth.ts', 'src/lib/state/user.svelte.ts'],
+			include: [
+				'src/lib/**/*.{ts,svelte}',
+				'src/components/**/*.{ts,svelte}'
+			],
+			exclude: [
+				'src/lib/**/*.test.ts',
+				'src/lib/index.ts'
+			],
 			thresholds: {
-				lines: 85,
-				functions: 85,
-				branches: 85,
-				statements: 85
+				lines: 60,
+				functions: 60,
+				branches: 60,
+				statements: 60
 			}
 		}
 	}

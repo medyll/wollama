@@ -8,10 +8,14 @@
 
 	const { width, height, borderRadius = 'rounded', animated = true } = $props();
 
-	const widthClass = width ? (width.includes('%') ? `w-[${width}]` : `w-[${width}px]`) : 'w-full';
-	const heightClass = height ? (height.includes('%') ? `h-[${height}]` : `h-[${height}px]`) : 'h-4';
-	const radiusClass =
-		borderRadius === 'full' ? 'rounded-full' : borderRadius === 'none' ? '' : ` ${borderRadius}`;
+	// Use $derived for reactive computation (Svelte 5)
+	const widthClass = $derived(width ? (width.includes('%') ? `w-[${width}]` : `w-full`) : 'w-full');
+	const heightClass = $derived(height ? (height.includes('rem') || height.includes('px') ? '' : 'h-4') : 'h-4');
+	const radiusClass = $derived(
+		borderRadius === 'full' ? 'rounded-full' : borderRadius === 'none' ? '' : ` ${borderRadius}`
+	);
+	
+	const customStyle = $derived(height && (height.includes('rem') || height.includes('px')) ? `height: ${height}` : '');
 </script>
 
-<div class="skeleton {widthClass} {heightClass}{radiusClass} {animated ? 'animate-pulse' : ''}"></div>
+<div class="skeleton {widthClass} {heightClass}{radiusClass} {animated ? 'animate-pulse' : ''}" style={customStyle}></div>

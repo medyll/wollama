@@ -45,7 +45,7 @@
 	}
 </script>
 
-<div class="toast {positionClasses} z-50 p-4">
+<div class="toast {positionClasses} p-4" style="z-index: var(--z-toast)">
 	{#each toast.toasts as item (item.id)}
 		<!-- Section: Toast Item -->
 		<div

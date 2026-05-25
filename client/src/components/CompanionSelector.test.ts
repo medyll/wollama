@@ -1,78 +1,87 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import CompanionSelector from './CompanionSelector.svelte';
-import type { Companion } from '$types/data';
 
-// Mock companion data
-const mockSystemCompanions: Companion[] = [
+const mockSubscribeFn = vi.fn();
+
+// Mock $lib/db — DataGenericService imports getDatabase from '../db' (resolves to same file)
+vi.mock('$lib/db', () => ({
+	getDatabase: vi.fn().mockResolvedValue({
+		user_companions: {
+			find: vi.fn().mockReturnValue({
+				$: { subscribe: mockSubscribeFn }
+			})
+		}
+	})
+}));
+
+vi.mock('$lib/state/user.svelte', () => ({
+	userState: { uid: 'user-1' }
+}));
+
+const mockUserCompanions = [
 	{
+		user_companion_id: 'uc-1',
+		user_id: 'user-1',
 		companion_id: '1',
 		name: 'General Assistant',
 		description: 'A helpful general purpose assistant',
 		system_prompt: 'You are a helpful assistant...',
 		model: 'mistral:latest',
-		voice_id: 'alloy',
-		voice_tone: 'neutral',
-		mood: 'friendly',
-		specialization: 'general',
 		is_locked: true,
-		created_at: Date.now(),
-		avatar: undefined
+		created_at: Date.now()
 	},
 	{
+		user_companion_id: 'uc-2',
+		user_id: 'user-1',
 		companion_id: '2',
 		name: 'Expert Coder',
 		description: 'Specialized in programming',
 		system_prompt: 'You are a coding expert...',
 		model: 'codellama:latest',
-		voice_id: 'onyx',
-		voice_tone: 'fast',
-		mood: 'professional',
-		specialization: 'coding',
 		is_locked: true,
-		created_at: Date.now(),
-		avatar: undefined
+		created_at: Date.now()
 	}
 ];
 
-// TODO: Re-enable after SvelteKit SSR vs DOM test environment is resolved
-describe.skip('CompanionSelector - Story 2.1', () => {
+const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 50));
+
+describe('CompanionSelector - Story 2.1', () => {
+	beforeEach(() => {
+		mockSubscribeFn.mockImplementation((cb: (docs: any[]) => void) => {
+			cb(mockUserCompanions.map((d) => ({ toJSON: () => d })));
+			return { unsubscribe: vi.fn() };
+		});
+	});
+
 	describe('Rendering', () => {
 		it('AC1: Should display companion selector component', () => {
-			const onSelect = vi.fn();
-			render(CompanionSelector, { props: { onSelect } });
-
-			const region = screen.getByRole('region', { name: /companion selection/i });
-			expect(region).toBeTruthy();
+			render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			expect(screen.getByRole('region', { name: /companion selection/i })).toBeTruthy();
 		});
 
-		it('AC2 & AC3: Should display system companions with name, description, and model', () => {
-			const onSelect = vi.fn();
-			// Note: In a real test, you'd mock the companion service
-			// For now, we're testing the component structure
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+		it('AC2 & AC3: Should display system companions with name, description, and model', async () => {
+			render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
 
-			// Check that the header exists
-			const header = screen.getByText(/choose your companion/i);
-			expect(header).toBeTruthy();
+			expect(screen.getByText('General Assistant')).toBeTruthy();
+			expect(screen.getByText('Expert Coder')).toBeTruthy();
 		});
 
-		it('AC4: Should display "Default" badge on each companion', () => {
-			const onSelect = vi.fn();
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+		it('AC4: Should display "Default" badge on system companions (have companion_id)', async () => {
+			render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
 
-			// Badge text should be "Default"
-			const badges = screen.queryAllByText(/default/i);
-			// Badges may or may not show depending on whether companions load
-			expect(badges).toBeDefined();
+			expect(screen.queryAllByText(/default/i).length).toBeGreaterThan(0);
 		});
 
-		it('AC5: Should not display "Edit" button on system companions', () => {
-			const onSelect = vi.fn();
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+		it('AC5: Should not display "Edit" button on locked companions', async () => {
+			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
 
-			// Ensure no edit buttons are present
-			const editButtons = container.querySelectorAll('button:has-text("Edit")');
+			const editButtons = Array.from(container.querySelectorAll('button')).filter((b) =>
+				b.textContent?.toLowerCase().includes('edit')
+			);
 			expect(editButtons.length).toBe(0);
 		});
 	});
@@ -81,111 +90,100 @@ describe.skip('CompanionSelector - Story 2.1', () => {
 		it('AC6: Should call onSelect callback when companion is clicked', async () => {
 			const onSelect = vi.fn();
 			const { container } = render(CompanionSelector, { props: { onSelect } });
+			await flush();
 
-			// Get the first companion card
 			const cards = container.querySelectorAll('.companion-card');
-			if (cards.length > 0) {
-				await fireEvent.click(cards[0]);
-				expect(onSelect).toHaveBeenCalled();
-			}
+			expect(cards.length).toBeGreaterThan(0);
+			await fireEvent.click(cards[0]);
+			expect(onSelect).toHaveBeenCalled();
 		});
 
 		it('Should highlight selected companion with ring class', async () => {
-			const onSelect = vi.fn();
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
 
-			const cards = container.querySelectorAll('.companion-card');
-			if (cards.length > 0) {
-				await fireEvent.click(cards[0]);
-				// Check if ring-primary class is applied
-				const ringClass = cards[0].className.includes('ring-primary');
-				expect(ringClass).toBeTruthy();
-			}
+			const card = container.querySelectorAll('.companion-card')[0];
+			await fireEvent.click(card);
+			await flush();
+			expect(card.className).toMatch(/ring-primary/);
 		});
 	});
 
 	describe('Accessibility (AC7)', () => {
 		it('Should have proper ARIA label for region', () => {
-			const onSelect = vi.fn();
-			render(CompanionSelector, { props: { onSelect } });
-
-			const region = screen.getByRole('region', { name: /companion selection/i });
-			expect(region.getAttribute('aria-label')).toBe('Companion Selection');
+			render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			expect(screen.getByRole('region', { name: /companion selection/i }).getAttribute('aria-label')).toBe(
+				'Companion Selection'
+			);
 		});
 
 		it('Should support keyboard navigation with arrow keys', async () => {
-			const onSelect = vi.fn();
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
 
 			const cards = container.querySelectorAll('.companion-card');
 			if (cards.length > 1) {
-				// Focus first card
 				const firstCard = cards[0] as HTMLElement;
 				await fireEvent.focus(firstCard);
-
-				// Simulate arrow right
 				await fireEvent.keyDown(firstCard, { key: 'ArrowRight' });
-
-				// Second card should be focused
-				const secondCard = cards[1] as HTMLElement;
-				expect(document.activeElement === secondCard).toBeDefined();
+				expect(document.activeElement).toBeDefined();
 			}
 		});
 
 		it('Should support Enter key to select companion', async () => {
 			const onSelect = vi.fn();
 			const { container } = render(CompanionSelector, { props: { onSelect } });
+			await flush();
 
 			const cards = container.querySelectorAll('.companion-card');
 			if (cards.length > 0) {
-				const card = cards[0] as HTMLElement;
-				await fireEvent.keyDown(card, { key: 'Enter' });
+				await fireEvent.keyDown(cards[0] as HTMLElement, { key: 'Enter' });
 				expect(onSelect).toHaveBeenCalled();
 			}
 		});
 
-		it('Should have aria-label on each companion card', () => {
-			const onSelect = vi.fn();
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+		it('Should have aria-label on each companion card', async () => {
+			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
 
-			const cards = container.querySelectorAll('.companion-card');
-			cards.forEach((card) => {
-				const ariaLabel = card.getAttribute('aria-label');
-				expect(ariaLabel).toBeTruthy();
-				expect(ariaLabel).toMatch(/select .* companion/i);
+			container.querySelectorAll('.companion-card').forEach((card) => {
+				expect(card.getAttribute('aria-label')).toMatch(/select .* companion/i);
 			});
 		});
 	});
 
 	describe('Error Handling', () => {
-		it('Should display error message if companions fail to load', () => {
-			const onSelect = vi.fn();
-			// Mock a failed load scenario
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+		it('Should display error message if companions fail to load', async () => {
+			const { getDatabase } = await import('$lib/db');
+			(getDatabase as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('DB error'));
 
-			// The component should gracefully handle load failures
-			expect(container).toBeTruthy();
+			render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
+
+			expect(screen.getByRole('alert')).toBeTruthy();
 		});
 
-		it('Should show empty state if no companions available', () => {
-			const onSelect = vi.fn();
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+		it('Should show empty state if no companions available', async () => {
+			mockSubscribeFn.mockImplementationOnce((cb: (docs: any[]) => void) => {
+				cb([]);
+				return { unsubscribe: vi.fn() };
+			});
 
-			// Component should handle empty state
-			expect(container).toBeTruthy();
+			render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
+
+			expect(screen.getByRole('alert')).toBeTruthy();
 		});
 	});
 
 	describe('Responsive Design', () => {
-		it('Should use responsive grid layout', () => {
-			const onSelect = vi.fn();
-			const { container } = render(CompanionSelector, { props: { onSelect } });
+		it('Should use responsive grid layout', async () => {
+			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
+			await flush();
 
 			const grid = container.querySelector('.companions-grid');
-			const classList = grid?.className || '';
-
-			// Check for responsive classes
-			expect(classList).toMatch(/grid-cols-1|md:grid-cols-2|lg:grid-cols-3/);
+			expect(grid).toBeTruthy();
+			expect(grid?.className).toMatch(/grid-cols-2|sm:grid-cols-3|lg:grid-cols-4/);
 		});
 	});
 });

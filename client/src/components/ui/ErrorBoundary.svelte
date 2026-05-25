@@ -32,8 +32,8 @@
 	{#if fallback}
 		{@render fallback({ error: errorMessage, onRetry: retry })}
 	{:else}
-		<div class="flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-lg border border-error bg-base-200 p-6 text-center">
-			<div class="text-error text-4xl">
+		<div class="flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-lg border-critical bg-base-200 p-6 text-center" style="border-width: var(--border-width)">
+			<div class="text-4xl" style="color: var(--color-critical)">
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path
 						stroke-linecap="round"

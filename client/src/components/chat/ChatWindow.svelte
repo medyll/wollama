@@ -299,7 +299,8 @@
 <div class="absolute inset-0 flex flex-col overflow-y-auto" bind:this={chatContainer} onscroll={handleScroll}>
 	{#if uiState.isAudioPlaying}
 		<button
-			class="btn btn-circle btn-error fixed top-20 right-4 z-50 shadow-lg"
+			class="btn btn-circle fixed shadow-lg"
+			style="top: var(--spacing-20); right: var(--spacing-4); z-index: var(--z-overlay); background: var(--color-critical)"
 			onclick={() => audioService.stopAudio()}
 			aria-label="Stop Audio"
 			title="Stop Audio"

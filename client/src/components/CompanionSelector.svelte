@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import type { UserCompanion } from '$types/data';
 	import { DataGenericService } from '$lib/services/data-generic.service';
 	import { userState } from '$lib/state/user.svelte';
@@ -16,19 +16,27 @@
 	let error: string | null = $state(null);
 	let selectedId: string | null = $state(null);
 	let focusedIndex: number = $state(-1);
+	let subscription: { unsubscribe: () => void } | null = null;
 
 	onMount(async () => {
 		try {
-			isLoading = true;
 			error = null;
 			const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
-			companions = await userCompanionService.find({ user_id: userState.uid || '' });
+			const query = await userCompanionService.getQuery({ user_id: userState.uid || '' });
+			// Reactive subscription: auto-updates when importDefaultCompanions() writes to DB
+			subscription = query.$.subscribe((docs: any[]) => {
+				companions = docs.map((doc) => doc.toJSON() as UserCompanion);
+				isLoading = false;
+			});
 		} catch (err) {
 			error = `Failed to load companions: ${err instanceof Error ? err.message : String(err)}`;
 			console.error('Error loading companions:', err);
-		} finally {
 			isLoading = false;
 		}
+	});
+
+	onDestroy(() => {
+		subscription?.unsubscribe();
 	});
 
 	function handleSelect(companion: UserCompanion) {

@@ -17,6 +17,9 @@ importers:
       '@capacitor/core':
         specifier: ^8.0.0
         version: 8.3.1
+      '@medyll/css-base':
+        specifier: ^0.6.7
+        version: 0.6.7
       '@tailwindcss/typography':
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.2.4)
@@ -887,6 +890,9 @@ packages:
   '@malept/flatpak-bundler@0.4.0':
     resolution: {integrity: sha512-9QOtNffcOF/c1seMCDnjckb3R9WHcG34tky+FHpNKKCW0wc/scYLwMtO+ptyGUfMW0/b/n4qRiALlaFHc9Oj7Q==}
     engines: {node: '>= 10.0.0'}
+
+  '@medyll/css-base@0.6.7':
+    resolution: {integrity: sha512-Ue+rqr9SE1kf7OwhhyU3NAJgzrq+GFltrZ2AGZtxhnEKlrBj9V7xhO8ncTj5ppQm1cauDZtscPFBeKmsam25nA==}
 
   '@mongodb-js/saslprep@1.4.10':
     resolution: {integrity: sha512-DDb3OAw8ezai9p2i1F7R5wMVmyrMIuT8ixjV56R4Hl4cazCo2tOMTDyPR5rrCUcHiMbWHzCXOdife5OD6H1C8w==}
@@ -5265,6 +5271,8 @@ snapshots:
       tmp-promise: 3.0.3
     transitivePeerDependencies:
       - supports-color
+
+  '@medyll/css-base@0.6.7': {}
 
   '@mongodb-js/saslprep@1.4.10':
     dependencies:

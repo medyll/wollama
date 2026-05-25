@@ -31,7 +31,7 @@
 
 	let fileInput: HTMLInputElement;
 	let textareaRef: HTMLTextAreaElement;
-	let showAutocomplete = false;
+	let showAutocomplete = $state(false);
 
 	function autoResize(e: Event) {
 		const target = e.target as HTMLTextAreaElement;

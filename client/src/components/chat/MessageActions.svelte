@@ -41,7 +41,8 @@
 			<Icon icon={rating === 'good' ? 'lucide:thumbs-up' : 'lucide:thumbs-up'} class="h-4 w-4" />
 		</button>
 		<button
-			class="btn btn-ghost btn-xs btn-square join-item {rating === 'bad' ? 'text-error' : ''}"
+			class="btn btn-ghost btn-xs btn-square join-item"
+			style="color: {rating === 'bad' ? 'var(--color-critical)' : 'inherit'}"
 			onclick={() => handleRate('bad')}
 			title="Bad response"
 			aria-label="Rate bad"
