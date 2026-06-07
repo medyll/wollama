@@ -381,24 +381,26 @@ classDiagram
 ## 9. References
 
 ### Key Files
-- **Client**: `client/package.json` (Svelte 5.45.6, Vite 7.2.7)
-- **Server**: `server/package.json` (Express 5.2.1, PouchDB 9.0.0)
-- **Schema**: `shared/db/database-scheme.ts` (13 collections)
-- **Types**: `shared/db/schema-definition.ts` (Field definitions)
-- **Electron**: `client/electron/main.js` (Main process)
-- **Capacitor**: `client/capacitor.config.ts` (Mobile config)
-- **Ollama**: `server/services/ollama.service.ts` (LLM integration)
+- **Orchestration**: `server/services/ollama.service.ts`
+- **Database**: `shared/db/database-scheme.ts`
+- **Electron**: `client/electron/main.js`
+- **Capacitor**: `client/capacitor.config.ts`
+- **Sidecar**: `packages/chatterbox/main.py`
 
-### Documentation
-- **QWEN.md**: Development guide with build commands
-- **PROJECT.md**: Project specifications and architecture
-- **AGENTS.md**: Development workflow and conventions
-- **ARCH.md**: This technical audit document
+### Related Documents
+- [ARCH.md](ARCH.md) - Overall architecture
+- [HARNESS.md](HARNESS.md) - Agent harness technical analysis
+- [PROJECT.md](PROJECT.md) - Project specifications
+- [QWEN.md](QWEN.md) - Development guide
+- [AGENTS.md](AGENTS.md) - Development workflow
 
-### Dependencies
-- **Client**: @capacitor/android (v8.0.0), rxdb (v16.21.1)
-- **Server**: ollama (v0.6.3), fluent-ffmpeg (v2.1.3)
-- **Shared**: TypeScript (v5.9.3), Vitest (v4.0.15)
+### External References
+- Claude Code Documentation
+- Ollama API Reference
+- RxDB Documentation
+- PouchDB Documentation
+- Capacitor Plugin Guide
+- Electron API Reference
 
 ### Build Commands
 ```bash
