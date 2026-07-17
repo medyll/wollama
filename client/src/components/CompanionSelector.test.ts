@@ -2,7 +2,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import CompanionSelector from './CompanionSelector.svelte';
 
-const mockSubscribeFn = vi.fn();
+const { mockSubscribeFn } = vi.hoisted(() => ({
+	mockSubscribeFn: vi.fn()
+}));
 
 // Mock $lib/db — DataGenericService imports getDatabase from '../db' (resolves to same file)
 vi.mock('$lib/db', () => ({

@@ -1,6 +1,14 @@
 import crypto from 'crypto';
 
-const SECRET = process.env.AUTH_SECRET || 'wollama-dev-secret-change-in-production';
+function resolveSecret(): string {
+	if (process.env.AUTH_SECRET) return process.env.AUTH_SECRET;
+	if (process.env.NODE_ENV === 'production') {
+		throw new Error('AUTH_SECRET is required in production');
+	}
+	return 'wollama-dev-secret-change-in-production';
+}
+
+const SECRET = resolveSecret();
 const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -39,7 +47,7 @@ function verify(token: string): TokenPayload {
 	const expected = crypto.createHmac('sha256', SECRET).update(encoded).digest('base64url');
 	const sigBuf = Buffer.from(sig, 'base64url');
 	const expBuf = Buffer.from(expected, 'base64url');
-	if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+	if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(new Uint8Array(sigBuf), new Uint8Array(expBuf))) {
 		throw new AuthError('Invalid token signature', 'INVALID_TOKEN');
 	}
 	let payload: TokenPayload;

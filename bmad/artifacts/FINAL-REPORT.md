@@ -1,4 +1,6 @@
-# 🎉 Wollama — Application COMPLETE
+# Wollama — Historical v0.0.9 completion report
+
+> Historical artifact from 2026-03-27. It is superseded for current readiness decisions by `bmad/status.yaml` and `ARCH.md`.
 
 **Date:** 2026-03-27  
 **Status:** ✅ PRODUCTION READY — ALL ISSUES FIXED
@@ -14,22 +16,26 @@ L'application Wollama est **100% terminée et utilisable**. Tous les problèmes 
 ## ✅ Fixed Issues
 
 ### Onboarding (Critical UX Fix)
+
 **Problem:** Onboarding wizard not fully visible when window is maximized
 
 **Solution:**
+
 - Added `overflow-auto` to main container
 - Added `max-h-[90vh] overflow-y-auto` to card container
 - Reduced icon size: 64px → 48px
-- Reduced title: text-2xl → text-xl  
+- Reduced title: text-2xl → text-xl
 - Reduced description: text-base → text-sm
 - Added `flex-shrink-0` to header elements
 
 **Result:** Onboarding is now fully scrollable and visible on all screen sizes.
 
 ### CompanionSelector (Critical UX Fix)
+
 **Problem:** Nested buttons causing HTML validation issues and click problems
 
 **Solution:**
+
 - Changed outer `<button>` to `<div role="button">`
 - Added `tabindex="0"` for keyboard accessibility
 - Added `e.preventDefault()` to customize button
@@ -69,6 +75,7 @@ L'application Wollama est **100% terminée et utilisable**. Tous les problèmes 
 - ✅ All changes committed
 
 **Commits since last status:**
+
 1. `fix(ux): Onboarding visible in maximized window + CompanionSelector fixes`
 2. `fix(tests): Add @testing-library/jest-dom dependency`
 
@@ -77,28 +84,30 @@ L'application Wollama est **100% terminée et utilisable**. Tous les problèmes 
 ## Files Modified (Final Session)
 
 ### UX Fixes
+
 - `client/src/routes/onboarding/OnboardingWizard.svelte`
-  - Added overflow scrolling
-  - Reduced element sizes
-  - Made fully responsive
+    - Added overflow scrolling
+    - Reduced element sizes
+    - Made fully responsive
 
 - `client/src/components/CompanionSelector.svelte`
-  - Fixed nested button issue
-  - Added proper ARIA attributes
-  - Added scroll container
+    - Fixed nested button issue
+    - Added proper ARIA attributes
+    - Added scroll container
 
 ### Test Fixes
+
 - `client/vitest.setup.ts`
-  - Removed unused import
-  
+    - Removed unused import
 - `client/package.json`
-  - Added @testing-library/jest-dom
+    - Added @testing-library/jest-dom
 
 ---
 
 ## Application Features (Complete)
 
 ### Core Features ✅
+
 - [x] AI Chat with Ollama integration
 - [x] Voice input (STT) with Whisper
 - [x] Voice output (TTS) with Piper
@@ -109,6 +118,7 @@ L'application Wollama est **100% terminée et utilisable**. Tous les problèmes 
 - [x] Settings page for Skills/Hooks management
 
 ### UX Features ✅
+
 - [x] Responsive design (mobile-first)
 - [x] Dark/Light themes (DaisyUI)
 - [x] Loading skeletons
@@ -120,6 +130,7 @@ L'application Wollama est **100% terminée et utilisable**. Tous les problèmes 
 - [x] **Onboarding wizard (FULLY VISIBLE)**
 
 ### Technical ✅
+
 - [x] Svelte 5 Runes syntax
 - [x] TypeScript strict mode
 - [x] Offline-first with RxDB/PouchDB sync
@@ -132,6 +143,7 @@ L'application Wollama est **100% terminée et utilisable**. Tous les problèmes 
 ## Known Warnings (Non-Blocking)
 
 ### Svelte Warnings
+
 - `showAutocomplete` not declared with $state (ChatInput.svelte)
 - State reference warnings in DataButton.svelte
 - Accessibility warnings for click handlers (li elements)
@@ -143,6 +155,7 @@ L'application Wollama est **100% terminée et utilisable**. Tous les problèmes 
 ## Installation & Usage
 
 ### Quick Start
+
 ```bash
 # Clone
 git clone https://github.com/medyll/wollama.git
@@ -160,6 +173,7 @@ npm run build        # Output: client/build/
 ```
 
 ### Prerequisites
+
 - Node.js v20+
 - Ollama running on http://127.0.0.1:11434
 - Android Studio (for mobile development)
@@ -186,6 +200,7 @@ cd client && npx playwright test
 **L'application Wollama est TERMINÉE et PRÊTE POUR LA PRODUCTION.**
 
 ### What was accomplished:
+
 1. ✅ Fixed onboarding visibility (scrollable, responsive)
 2. ✅ Fixed CompanionSelector (no nested buttons)
 3. ✅ Build passes successfully
@@ -193,6 +208,7 @@ cd client && npx playwright test
 5. ✅ All changes pushed to GitHub
 
 ### The app is now:
+
 - ✅ Fully usable on all screen sizes
 - ✅ Accessible (ARIA attributes, keyboard navigation)
 - ✅ Responsive (mobile-first design)

@@ -5,7 +5,7 @@
 	import AudioToggle from '$components/chat/AudioToggle.svelte';
 	import DataButton from '$components/ui_data/DataButton.svelte';
 	import SkillAutocomplete from '$components/SkillAutocomplete.svelte';
-	import type { Companion } from '$types/data';
+	import type { Companion, UserCompanion } from '$types/data';
 
 	let {
 		value = $bindable(''),
@@ -22,7 +22,7 @@
 		files: string[];
 		isRecording: boolean;
 		isTranscribing: boolean;
-		currentCompagnon: Companion;
+		currentCompagnon: Companion | UserCompanion;
 		chatId?: string;
 		onsend: () => void;
 		onrecord: () => void;
@@ -167,6 +167,10 @@
 						// Auto-invoke the selected builtin skill and populate the input with the result
 						try {
 							const slug = skill.slug || skill.name || skill.skill_id;
+							if (!slug) {
+								toast.error('Skill invocation failed');
+								return;
+							}
 							const res = await fetch(`/api/skills/${encodeURIComponent(slug)}/invoke`, {
 								method: 'POST',
 								headers: { 'Content-Type': 'application/json' },
@@ -238,4 +242,3 @@
 		</div>
 	</div>
 </div>
-
