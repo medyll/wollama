@@ -14,7 +14,7 @@
 - **Sync**: Offline-first architecture using RxDB (Client) and PouchDB (Server).
 - **Skills & Hooks**: Extensible system with slash commands (/translate, /summarize) and pre/post message processing.
 - **Agents**: Built-in WebSearch and PageFetch agents for external data retrieval.
-- **Testing**: 237+ unit and E2E tests for reliability.
+- **Testing**: 290 active unit/integration tests currently pass; legacy and E2E coverage is tracked separately.
 
 ## 🎯 New in v0.0.9
 
@@ -92,10 +92,10 @@ Runs the Node.js server and the Vite frontend in parallel.
 
 ```bash
 # Terminal 1: Start the Backend Server
-npm run server:dev
+npm run dev:server
 
 # Terminal 2: Start the Frontend
-npm run dev
+npm run dev:client
 ```
 
 - Frontend: `http://localhost:5173`
@@ -154,9 +154,9 @@ cd client && npx playwright test e2e/tests/smoke.spec.ts
 
 ### Test Coverage
 
-- **Client**: 166 tests (components, services, utils)
-- **Server**: 71 tests (services, agents, routes)
-- **E2E**: 4 smoke tests (critical user flows)
+- **Client**: 216 passing tests; 55 legacy assertions remain explicitly skipped
+- **Server**: 74 passing tests (services, agents, routes)
+- **E2E**: 6 Playwright specifications present; run them as a separate release gate
 
 ## ⚠️ Technical Considerations & Troubleshooting
 

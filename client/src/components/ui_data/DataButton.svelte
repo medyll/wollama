@@ -10,7 +10,7 @@
 	let isLoading = $state(false);
 
 	const dispatch = createEventDispatcher();
-	const service = new DataGenericService(table);
+	const service = $derived(new DataGenericService(table));
 
 	async function handleClick() {
 		if (confirm && !isConfirming) {
@@ -48,8 +48,8 @@
 		isConfirming = false;
 	}
 
-	const defaultIcon = mode === 'delete' ? 'lucide:trash-2' : 'lucide:plus';
-	const displayIcon = icon || defaultIcon;
+	const defaultIcon = $derived(mode === 'delete' ? 'lucide:trash-2' : 'lucide:plus');
+	const displayIcon = $derived(icon || defaultIcon);
 </script>
 
 <div class="relative inline-block">

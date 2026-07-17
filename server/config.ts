@@ -30,7 +30,7 @@ export const config = {
 	},
 	stt: {
 		url: process.env.STT_URL || 'http://127.0.0.1:9000/v1/audio/transcriptions',
-		enabled: process.env.STT_ENABLED === 'true' || true, // Default to true to try local
+		enabled: process.env.STT_ENABLED !== 'false',
 		provider: process.env.STT_PROVIDER || 'local', // 'openai' | 'local'
 		binaryPath:
 			process.env.STT_BINARY_PATH ||

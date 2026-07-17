@@ -4,7 +4,9 @@ import path from 'path';
 import os from 'os';
 import { spawn } from 'child_process';
 import ffmpeg from 'fluent-ffmpeg';
-import ffmpegPath from 'ffmpeg-static';
+import ffmpegPathImport from 'ffmpeg-static';
+
+const ffmpegPath = ffmpegPathImport as unknown as string | null;
 
 if (ffmpegPath) {
 	ffmpeg.setFfmpegPath(ffmpegPath);
@@ -24,7 +26,7 @@ export const SttService = {
 
 		try {
 			const formData = new FormData();
-			const blob = new Blob([audioBuffer], { type: 'audio/wav' });
+			const blob = new Blob([new Uint8Array(audioBuffer)], { type: 'audio/wav' });
 			formData.append('file', blob, filename);
 			formData.append('model', 'whisper-1'); // Default model name for OpenAI API
 			if (language && language !== 'auto') {
@@ -71,7 +73,7 @@ export const SttService = {
 		console.log(`[STT] Input (Temp): ${tempInputFile}`);
 
 		try {
-			await fs.promises.writeFile(tempInputFile, audioBuffer);
+			await fs.promises.writeFile(tempInputFile, new Uint8Array(audioBuffer));
 			console.log(`[STT] Input file written. Size: ${audioBuffer.length} bytes`);
 
 			// Convert to 16kHz WAV using ffmpeg
@@ -85,7 +87,7 @@ export const SttService = {
 						console.log('[STT] Conversion complete.');
 						resolve();
 					})
-					.on('error', (err) => {
+					.on('error', (err: Error) => {
 						console.error('[STT] FFmpeg error:', err);
 						reject(err);
 					})
