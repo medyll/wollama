@@ -47,11 +47,19 @@
 		}
 	];
 
-	// Auto-test connection when entering step 1
+	// Auto-test connection when entering step 1; auto-advance if the default
+	// Ollama URL is already reachable so dev/local users aren't forced to
+	// manually click through a step that already just works.
 	$effect(() => {
 		if (currentStep === 1 && !hasAttemptedConnection) {
 			hasAttemptedConnection = true;
-			testConnection();
+			testConnection().then(() => {
+				if (connectionSuccess) {
+					setTimeout(() => {
+						if (currentStep === 1) currentStep++;
+					}, 600);
+				}
+			});
 		}
 	});
 
@@ -167,14 +175,12 @@
 	}
 
 	function handleSkip() {
-		// On companion selection step (final step), skip by going to chat without selection
-		if (currentStep === 2) {
-			completeOnboarding();
-		} else if (currentStep < totalSteps - 1) {
-			currentStep++;
-		} else {
-			completeOnboarding();
+		// Skip means skip the whole wizard — straight to chat with defaults.
+		if (currentStep === 0 && nickname.trim()) {
+			userState.nickname = nickname.trim();
+			userState.save();
 		}
+		completeOnboarding();
 	}
 
 	async function importDefaultCompanions() {
