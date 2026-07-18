@@ -37,6 +37,15 @@ export const config = {
 			path.resolve(__dirname, 'bin', 'whisper', process.platform === 'win32' ? 'main.exe' : 'main'),
 		modelPath: process.env.STT_MODEL_PATH || path.resolve(__dirname, 'bin', 'whisper', 'ggml-base.bin')
 	},
+	rag: {
+		embedModel: process.env.RAG_EMBED_MODEL || 'nomic-embed-text',
+		chunkSize: Number(process.env.RAG_CHUNK_SIZE) || 500,
+		chunkOverlap: Number(process.env.RAG_CHUNK_OVERLAP) || 50,
+		topK: Number(process.env.RAG_TOP_K) || 5,
+		minScore: Number(process.env.RAG_MIN_SCORE) || 0.5,
+		// Directory where per-user flat vector index files are persisted
+		vectorDir: process.env.RAG_VECTOR_DIR ? path.resolve(process.env.RAG_VECTOR_DIR) : path.resolve(__dirname, 'db_data', 'vectors')
+	},
 	tts: {
 		url: process.env.TTS_URL || 'http://127.0.0.1:9000/v1/audio/speech',
 		enabled: process.env.TTS_ENABLED !== 'false',

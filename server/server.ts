@@ -16,6 +16,7 @@ import { logger } from './utils/logger.js';
 import skillsRouter from './routes/skills.js';
 import hooksRouter from './routes/hooks.js';
 import agentsRouter from './routes/agents.js';
+import ragRouter from './routes/rag.js';
 
 import cors from 'cors';
 
@@ -76,6 +77,9 @@ app.use('/api/hooks', hooksRouter);
 
 // Agents routes (Sprint 4)
 app.use('/api/agents', agentsRouter);
+
+// RAG routes
+app.use('/api/rag', ragRouter);
 
 // Audio Routes
 app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
@@ -597,6 +601,7 @@ app.listen(port, async () => {
 	logger.info('DB', `PouchDB mounted at /_db`);
 
 	await dbManager.seedCompanions();
+	await dbManager.seedHooks();
 	await hookRegistry.load();
 
 	// Allow tests to skip heavy external initializations (Ollama, audio, sidecar)

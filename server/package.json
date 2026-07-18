@@ -23,6 +23,7 @@
 		"multer": "^2.0.2",
 		"ollama": "^0.6.3",
 		"ollama-node": "^0.1.28",
+		"pdf-parse": "^1.1.1",
 		"pouchdb": "^9.0.0",
 		"pouchdb-adapter-http": "^9.0.0",
 		"pouchdb-adapter-idb": "^9.0.0",
@@ -31,6 +32,7 @@
 	},
 	"devDependencies": {
 		"@types/cors": "^2.8.19",
+		"@types/pdf-parse": "^1.1.5",
 		"@types/pouchdb": "^6.4.2",
 		"@types/pouchdb-find": "^7.3.3",
 		"adm-zip": "^0.5.16",
