@@ -41,9 +41,12 @@ export async function completeOnboarding(
 	await page.getByTestId('wizard-next-button').click();
 	await page.waitForTimeout(500);
 
-	// Step 3: Complete
-	await page.waitForSelector('[data-testid="wizard-finish-button"]', { timeout: 5000 });
-	await page.getByTestId('wizard-finish-button').click();
+	// Step 3: choose the first imported companion and complete the wizard
+	const firstCompanion = page.getByTestId('companion-card').first();
+	await expect(firstCompanion).toBeVisible({ timeout: 10_000 });
+	await firstCompanion.click();
+	await page.getByTestId('wizard-next-button').click();
+	await expect(page).toHaveURL(/\/chat\/new$/, { timeout: 10_000 });
 	await page.waitForLoadState('networkidle');
 }
 

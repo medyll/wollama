@@ -34,7 +34,7 @@ export default defineConfig({
 
 	// Web server configuration
 	webServer: {
-		command: 'node ../node_modules/vite/bin/vite.js --host 127.0.0.1',
+		command: 'node ./node_modules/vite/bin/vite.js --host 127.0.0.1',
 		port: 5176,
 		timeout: 120 * 1000,
 		reuseExistingServer: true // Don't kill existing server

@@ -27,9 +27,9 @@ describe('Story 2.1 Integration Test - Display System-Provided Default Companion
 		it('Should have 3 steps total: Intro + Server Config + Companion Selection', async () => {
 			const { container } = render(OnboardingWizard);
 
-			// Check step indicator shows 3 dots
-			const stepIndicators = container.querySelectorAll('[role="progressbar"]');
-			expect(stepIndicators.length).toBe(3);
+			const stepIndicator = container.querySelector('[role="progressbar"]');
+			expect(stepIndicator?.getAttribute('aria-valuemax')).toBe('3');
+			expect(stepIndicator?.querySelectorAll('span')).toHaveLength(3);
 		});
 
 		it('Should display "Choose Your Companion" title on step 2', async () => {
@@ -130,8 +130,7 @@ describe('Story 2.1 Integration Test - Display System-Provided Default Companion
 		it('Should adapt layout for step 2 with wider max-width', async () => {
 			const { container } = render(OnboardingWizard);
 
-			// The wrapper should have responsive width classes
-			const wrapper = container.querySelector('.w-full');
+			const wrapper = container.querySelector('onboarding-panel');
 			expect(wrapper).toBeTruthy();
 		});
 

@@ -17,7 +17,7 @@
 		if (userState.isSecured && !userState.isAuthenticated) {
 			goto('/login');
 		} else {
-			goto('/chat');
+			goto('/chat/new');
 		}
 	});
 </script>

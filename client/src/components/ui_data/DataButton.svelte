@@ -52,19 +52,17 @@
 	const displayIcon = $derived(icon || defaultIcon);
 </script>
 
-<div class="relative inline-block">
+<div class="data-action">
 	<!-- Section: Confirmation Overlay -->
 	{#if isConfirming}
-		<div
-			class="bg-error/10 text-error animate-in slide-in-from-right-4 fade-in absolute top-0 right-0 z-10 flex h-full items-center gap-2 overflow-hidden rounded-lg p-1 pr-2 whitespace-nowrap duration-200"
-		>
-			<button class="btn btn-xs btn-ghost btn-circle" onclick={cancel} aria-label="Cancel">
+		<div class="data-action-confirmation">
+			<button class="btn-icon btn-sm" onclick={cancel} aria-label="Cancel">
 				<Icon icon="fluent:dismiss-24-regular" class="h-4 w-4" />
 			</button>
 			<span class="text-xs font-bold">Confirm?</span>
-			<button class="btn btn-xs btn-error" onclick={handleClick} disabled={isLoading} aria-label="Confirm">
+			<button class="btn-danger btn-sm" onclick={handleClick} disabled={isLoading} aria-label="Confirm">
 				{#if isLoading}
-					<span class="loading loading-spinner loading-xs"></span>
+					<span aria-hidden="true">…</span>
 				{:else}
 					<Icon icon="fluent:checkmark-24-regular" class="h-4 w-4" />
 				{/if}
@@ -74,10 +72,34 @@
 
 	<!-- Section: Main Button -->
 	<button
-		class="btn btn-ghost btn-sm btn-circle {isConfirming ? 'pointer-events-none opacity-0' : ''} transition-opacity"
+		class="btn-icon btn-sm"
+		class:opacity-0={isConfirming}
 		onclick={handleClick}
 		aria-label={mode}
 	>
 		<Icon icon={displayIcon} class="h-5 w-5" />
 	</button>
 </div>
+
+<style>
+	.data-action {
+		position: relative;
+		display: inline-block;
+	}
+
+	.data-action-confirmation {
+		position: absolute;
+		top: 0;
+		right: 0;
+		display: flex;
+		height: 100%;
+		align-items: center;
+		gap: var(--gap-xs);
+		padding: var(--pad-xs);
+		border-radius: var(--radius-sm);
+		background: color-mix(in oklch, var(--color-critical) 12%, var(--color-surface-overlay));
+		color: var(--color-critical);
+		white-space: nowrap;
+		z-index: var(--z-dropdown);
+	}
+</style>

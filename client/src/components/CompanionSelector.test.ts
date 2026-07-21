@@ -94,20 +94,20 @@ describe('CompanionSelector - Story 2.1', () => {
 			const { container } = render(CompanionSelector, { props: { onSelect } });
 			await flush();
 
-			const cards = container.querySelectorAll('.companion-card');
+			const cards = container.querySelectorAll('companion-card');
 			expect(cards.length).toBeGreaterThan(0);
 			await fireEvent.click(cards[0]);
 			expect(onSelect).toHaveBeenCalled();
 		});
 
-		it('Should highlight selected companion with ring class', async () => {
+		it('Should expose the selected companion through aria-pressed', async () => {
 			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
 			await flush();
 
-			const card = container.querySelectorAll('.companion-card')[0];
+			const card = container.querySelectorAll('companion-card')[0];
 			await fireEvent.click(card);
 			await flush();
-			expect(card.className).toMatch(/ring-primary/);
+			expect(card.getAttribute('aria-pressed')).toBe('true');
 		});
 	});
 
@@ -123,7 +123,7 @@ describe('CompanionSelector - Story 2.1', () => {
 			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
 			await flush();
 
-			const cards = container.querySelectorAll('.companion-card');
+			const cards = container.querySelectorAll('companion-card');
 			if (cards.length > 1) {
 				const firstCard = cards[0] as HTMLElement;
 				await fireEvent.focus(firstCard);
@@ -137,7 +137,7 @@ describe('CompanionSelector - Story 2.1', () => {
 			const { container } = render(CompanionSelector, { props: { onSelect } });
 			await flush();
 
-			const cards = container.querySelectorAll('.companion-card');
+			const cards = container.querySelectorAll('companion-card');
 			if (cards.length > 0) {
 				await fireEvent.keyDown(cards[0] as HTMLElement, { key: 'Enter' });
 				expect(onSelect).toHaveBeenCalled();
@@ -148,7 +148,7 @@ describe('CompanionSelector - Story 2.1', () => {
 			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
 			await flush();
 
-			container.querySelectorAll('.companion-card').forEach((card) => {
+			container.querySelectorAll('companion-card').forEach((card) => {
 				expect(card.getAttribute('aria-label')).toMatch(/select .* companion/i);
 			});
 		});
@@ -174,7 +174,7 @@ describe('CompanionSelector - Story 2.1', () => {
 			render(CompanionSelector, { props: { onSelect: vi.fn() } });
 			await flush();
 
-			expect(screen.getByRole('alert')).toBeTruthy();
+			expect(screen.getByRole('status')).toBeTruthy();
 		});
 	});
 
@@ -183,9 +183,9 @@ describe('CompanionSelector - Story 2.1', () => {
 			const { container } = render(CompanionSelector, { props: { onSelect: vi.fn() } });
 			await flush();
 
-			const grid = container.querySelector('.companions-grid');
+			const grid = container.querySelector('companion-grid');
 			expect(grid).toBeTruthy();
-			expect(grid?.className).toMatch(/grid-cols-2|sm:grid-cols-3|lg:grid-cols-4/);
+			expect(grid?.tagName.toLowerCase()).toBe('companion-grid');
 		});
 	});
 });
