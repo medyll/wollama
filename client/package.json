@@ -83,7 +83,6 @@
 		"@types/pouchdb": "^6.4.2",
 		"@vitest/coverage-v8": "^4.0.15",
 		"concurrently": "^9.2.1",
-		"daisyui": "^5.5.8",
 		"electron": "^39.8.9",
 		"electron-builder": "^24.13.3",
 		"electron-serve": "^3.0.0",

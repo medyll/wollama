@@ -160,9 +160,6 @@ importers:
       concurrently:
         specifier: ^9.2.1
         version: 9.2.4
-      daisyui:
-        specifier: ^5.5.8
-        version: 5.6.18
       electron:
         specifier: ^39.8.9
         version: 39.8.10
@@ -2757,9 +2754,6 @@ packages:
     resolution: {integrity: sha512-vkNc7kLrWYBkr8VQKSZdDfy8athDZ2huIAWJwVxCrymBXRhB7q8hamkKd6JwAoLPwReS8fKi/kAjRpmy7VvL2w==}
     hasBin: true
 
-  daisyui@5.6.18:
-    resolution: {integrity: sha512-6y9rboRQl8fosnusy/5pg11yp+H0LtK3YdtfS4Vf2QVnaYOKasNdYm6hDxeiT6bwZPdl4WRPzVIlIApdo2ssBg==}
-
   dargs@7.0.0:
     resolution: {integrity: sha512-2iy1EkLdlBzQGvbweYRFxmFath8+K7+AKB0TlhHWkNuH+TmovaMH/Wp7V7R4u7f4SnX3OgLsU9t1NI9ioDnUpg==}
     engines: {node: '>=8'}
@@ -4480,6 +4474,7 @@ packages:
   nats@2.29.3:
     resolution: {integrity: sha512-tOQCRCwC74DgBTk4pWZ9V45sk4d7peoE2njVprMRCBXrhJ5q5cYM7i6W+Uvw2qUrcfOSnuisrX7bEx3b3Wx4QA==}
     engines: {node: '>= 14.0.0'}
+    deprecated: Package moved. Use @nats-io/transport-node from https://github.com/nats-io/nats.js
 
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
@@ -9107,8 +9102,6 @@ snapshots:
       lodash: 4.18.1
       temp: 0.9.4
       word-wrap: 1.2.5
-
-  daisyui@5.6.18: {}
 
   dargs@7.0.0: {}
 
