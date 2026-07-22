@@ -210,35 +210,34 @@
 </script>
 
 {#snippet fieldInput(fieldName: string, fieldDef: any)}
-	<div class="form-control w-full">
-		<label class="label pb-1" for={`field-${fieldName}`}>
-			<span class="label-text w-32 shrink-0 text-sm font-medium capitalize">{fieldName.replace(/_/g, ' ')}</span>
+	<div class="field-stack">
+		<label for={`field-${fieldName}`}>
+			<span class="field-label">{fieldName.replace(/_/g, ' ')}</span>
 		</label>
-		<div class="flex-1">
+		<div class="field-control">
 			{#if fieldDef.type === 'boolean' || (fieldDef.ui && fieldDef.ui.type === 'toggle')}
 				<input
 					type="checkbox"
 					id={`field-${fieldName}`}
-					class="toggle toggle-primary"
 					bind:checked={formData[fieldName]}
 				/>
 			{:else if fieldDef.type === 'text-long' || (fieldDef.ui && fieldDef.ui.type === 'textarea')}
-				<div class="relative">
+				<div class="field-with-action">
 					<textarea
 						id={`field-${fieldName}`}
-						class="textarea textarea-bordered h-24 w-full resize-none text-sm"
+						class="field-textarea"
 						bind:value={formData[fieldName]}
 						placeholder={`Enter ${fieldName.replace(/_/g, ' ')}...`}
 					></textarea>
 					{#if fieldDef.ai && fieldDef.ai.trigger === 'manual'}
 						<button
-							class="btn btn-circle btn-ghost btn-sm absolute right-2 bottom-2"
+							class="btn-icon btn-sm field-action"
 							onclick={() => handleAiAction(fieldName, fieldDef.ai)}
 							disabled={isOptimizing}
 							title="Optimize with AI"
 						>
 							{#if isOptimizing}
-								<span class="loading loading-spinner loading-xs"></span>
+								<span class="loading-ellipsis" aria-label="Optimizing">Loading</span>
 							{:else}
 								<Icon icon="lucide:sparkles" class="text-primary" />
 							{/if}
@@ -249,14 +248,14 @@
 				<input
 					type="number"
 					id={`field-${fieldName}`}
-					class="input input-bordered input-sm w-full text-sm"
+					class="w-full"
 					bind:value={formData[fieldName]}
 					placeholder="0"
 				/>
 			{:else if fieldDef.enum}
 				<select
 					id={`field-${fieldName}`}
-					class="select select-bordered select-sm w-full text-sm"
+					class="w-full"
 					bind:value={formData[fieldName]}
 				>
 					<option disabled selected value="">Select...</option>
@@ -268,7 +267,7 @@
 				<input
 					type="text"
 					id={`field-${fieldName}`}
-					class="input input-bordered input-sm w-full text-sm"
+					class="w-full"
 					bind:value={formData[fieldName]}
 					placeholder={`Enter ${fieldName.replace(/_/g, ' ')}...`}
 				/>
@@ -279,15 +278,15 @@
 
 <dialog
 	bind:this={dialogRef}
-	class="modal"
+	class="data-dialog"
 	oncancel={(e) => {
 		e.preventDefault();
 		isOpen = false;
 	}}
 >
-	<div class="modal-box relative w-11/12 max-w-4xl">
+	<data-dialog-panel>
 		<button
-			class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
+			class="btn-icon btn-sm dialog-close"
 			onclick={() => {
 				isOpen = false;
 			}}
@@ -301,21 +300,19 @@
 		</h3>
 
 		{#if loading}
-			<div class="flex justify-center p-8">
-				<span class="loading loading-spinner loading-lg"></span>
-			</div>
+			<data-dialog-state aria-busy="true"><span class="loading-ellipsis">Loading</span></data-dialog-state>
 		{:else}
 			{#if error}
-				<div class="alert alert-error mb-4 shadow-lg">
+				<div class="status-message" data-status="critical" role="alert">
 					<Icon icon="mdi:alert-circle" />
 					<span>{error}</span>
 				</div>
 			{/if}
 
-			<div class="max-h-[65vh] space-y-3 overflow-y-auto pr-2">
+			<data-form-sections>
 				<!-- Regular Fields Section -->
 				{#if regularFields.length > 0}
-					<div class="bg-base-200/30 space-y-3 rounded-lg p-4">
+					<section class="data-form-section">
 						<h4 class="mb-3 flex items-center gap-2 text-sm font-semibold tracking-wide uppercase opacity-70">
 							<Icon icon="mdi:format-list-bulleted" class="h-4 w-4" />
 							General Information
@@ -323,12 +320,12 @@
 						{#each regularFields as [fieldName, fieldDef]}
 							{@render fieldInput(fieldName, fieldDef)}
 						{/each}
-					</div>
+					</section>
 				{/if}
 
 				<!-- FK Fields Section -->
 				{#if fkFields.length > 0}
-					<div class="bg-base-200/30 space-y-3 rounded-lg p-4">
+					<section class="data-form-section">
 						<h4 class="mb-3 flex items-center gap-2 text-sm font-semibold tracking-wide uppercase opacity-70">
 							<Icon icon="mdi:link-variant" class="h-4 w-4" />
 							Relations
@@ -336,14 +333,14 @@
 						{#each fkFields as [fieldName, fieldDef]}
 							{@render fieldInput(fieldName, fieldDef)}
 						{/each}
-					</div>
+					</section>
 				{/if}
-			</div>
+			</data-form-sections>
 		{/if}
 
-		<div class="modal-action mt-6 gap-3">
+		<data-dialog-actions>
 			<button
-				class="btn btn-ghost"
+				class="btn-ghost"
 				onclick={() => {
 					isOpen = false;
 				}}
@@ -351,17 +348,17 @@
 			>
 				Cancel
 			</button>
-			<button class="btn btn-primary" onclick={handleSave} disabled={loading}>
+			<button class="btn-primary" onclick={handleSave} disabled={loading}>
 				{#if loading}
-					<span class="loading loading-spinner loading-sm"></span>
+					<span class="loading-ellipsis" aria-label="Saving">Loading</span>
 				{/if}
 				Save Changes
 			</button>
-		</div>
-	</div>
+		</data-dialog-actions>
+	</data-dialog-panel>
 	<!-- Backdrop: Clicking outside closes the modal -->
 	<!-- svelte-ignore a11y_consider_explicit_label -->
-	<form method="dialog" class="modal-backdrop">
+	<form method="dialog" class="dialog-dismiss">
 		<button
 			type="submit"
 			onclick={(e) => {
@@ -369,7 +366,140 @@
 				isOpen = false;
 			}}
 			tabindex="-1"
-			style="width: 100%; height: 100%; cursor: default; border: none; background: transparent; padding: 0;"
+			class="dialog-dismiss-button"
 		></button>
 	</form>
 </dialog>
+
+<style>
+	@layer components {
+		.data-dialog {
+			width: min(94vw, 64rem);
+			max-height: 90dvh;
+			margin: auto;
+			padding: 0;
+			border: 0;
+			background: transparent;
+			color: var(--color-text);
+			overflow: visible;
+		}
+
+		.data-dialog::backdrop {
+			background: color-mix(in srgb, var(--color-text) 45%, transparent);
+			backdrop-filter: blur(2px);
+		}
+
+		data-dialog-panel,
+		data-dialog-state,
+		data-form-sections,
+		data-dialog-actions {
+			display: flex;
+		}
+
+		data-dialog-panel {
+			position: relative;
+			z-index: 1;
+			flex-direction: column;
+			max-height: 90dvh;
+			padding: var(--pad-xl);
+			background: var(--color-surface);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-xl);
+		}
+
+		.dialog-close {
+			position: absolute;
+			top: var(--pad-md);
+			right: var(--pad-md);
+		}
+
+		data-dialog-state {
+			min-block-size: 10rem;
+			align-items: center;
+			justify-content: center;
+		}
+
+		data-form-sections {
+			flex-direction: column;
+			gap: var(--gap-md);
+			max-height: 65dvh;
+			overflow-y: auto;
+			padding-inline-end: var(--pad-xs);
+		}
+
+		.data-form-section {
+			display: flex;
+			flex-direction: column;
+			gap: var(--gap-md);
+			padding: var(--pad-lg);
+			background: var(--color-surface-raised);
+			border-radius: var(--radius-md);
+		}
+
+		.field-stack,
+		.field-control {
+			display: flex;
+			width: 100%;
+			flex-direction: column;
+			gap: var(--gap-xs);
+		}
+
+		.field-label {
+			font-size: var(--text-sm);
+			font-weight: var(--font-medium);
+			text-transform: capitalize;
+		}
+
+		.field-with-action {
+			position: relative;
+		}
+
+		.field-textarea {
+			width: 100%;
+			min-height: 7rem;
+			padding-inline-end: calc(var(--pad-xl) + var(--pad-lg));
+			resize: vertical;
+		}
+
+		.field-action {
+			position: absolute;
+			right: var(--pad-sm);
+			bottom: var(--pad-sm);
+		}
+
+		data-dialog-actions {
+			justify-content: flex-end;
+			gap: var(--gap-md);
+			padding-block-start: var(--pad-lg);
+		}
+
+		.dialog-dismiss {
+			position: fixed;
+			inset: 0;
+		}
+
+		.dialog-dismiss-button {
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			border: 0;
+			background: transparent;
+			cursor: default;
+		}
+
+		@media (max-width: 40rem) {
+			data-dialog-panel {
+				padding: var(--pad-lg);
+			}
+
+			data-dialog-actions {
+				flex-direction: column-reverse;
+			}
+
+			data-dialog-actions button {
+				width: 100%;
+			}
+		}
+	}
+</style>
