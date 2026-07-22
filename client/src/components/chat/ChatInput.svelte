@@ -116,17 +116,15 @@
 			{#each files as file, i}
 				<div class="group relative shrink-0">
 					{#if file.startsWith('data:image')}
-						<img src={file} alt="preview" class="border-base-content/10 h-20 w-20 rounded-lg border object-cover" />
+						<img src={file} alt="preview" class="file-preview" />
 					{:else}
-						<div
-							class="bg-base-200 border-base-content/10 flex h-20 w-20 flex-col items-center justify-center rounded-lg border"
-						>
+						<div class="file-preview file-placeholder">
 							<Icon icon="lucide:file" class="h-8 w-8 opacity-50" />
 							<span class="text-[10px] opacity-50">File</span>
 						</div>
 					{/if}
 					<button
-						class="btn btn-circle btn-xs btn-error absolute -top-2 -right-2 opacity-0 shadow-md transition-opacity group-hover:opacity-100"
+						class="file-remove"
 						onclick={() => removeFile(i)}
 						title={t('ui.remove_file') || 'Remove file'}
 						aria-label={t('ui.remove_file') || 'Remove file'}>✕</button
@@ -288,6 +286,42 @@
 		background: var(--color-surface-sunken);
 		overflow: visible;
 		transition: border-color var(--transition-fast);
+	}
+
+	.file-preview {
+		display: flex;
+		width: 5rem;
+		height: 5rem;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-raised);
+		object-fit: cover;
+	}
+
+	.file-remove {
+		position: absolute;
+		top: calc(var(--pad-sm) * -1);
+		right: calc(var(--pad-sm) * -1);
+		display: grid;
+		width: 1.5rem;
+		height: 1.5rem;
+		place-items: center;
+		padding: 0;
+		border: 0;
+		border-radius: var(--radius-full);
+		background: var(--color-critical);
+		color: var(--color-on-primary);
+		box-shadow: var(--shadow-sm);
+		opacity: 0;
+		transition: opacity var(--transition-fast);
+	}
+
+	.group:hover .file-remove,
+	.file-remove:focus-visible {
+		opacity: 1;
 	}
 
 	.composer-surface:focus-within {

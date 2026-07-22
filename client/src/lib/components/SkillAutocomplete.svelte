@@ -69,13 +69,13 @@
 	}
 </script>
 
-<div class="relative">
+<skill-autocomplete>
 	<input
 		type="text"
 		bind:value={query}
 		oninput={onInput}
 		onkeydown={onKeydown}
-		class="input input-bordered w-full"
+		class="w-full"
 		placeholder="Type a skill (e.g., /translate)"
 		role="combobox"
 		aria-expanded={showAutocomplete}
@@ -86,23 +86,68 @@
 	{#if showAutocomplete && suggestions.length > 0}
 		<ul
 			id="skill-autocomplete-list"
-			class="border-base-300 bg-base-100 absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border shadow-lg"
+			class="skill-suggestions"
 			role="listbox"
 		>
 			{#each suggestions as item, index}
 				<li role="option" aria-selected={index === selectedIndex} onmouseenter={() => (selectedIndex = index)}>
 					<button
 						type="button"
-						class="hover:bg-base-200 w-full cursor-pointer px-4 py-2 text-left {index === selectedIndex
-							? 'bg-base-200'
-							: ''}"
+						class="skill-option"
+						data-selected={index === selectedIndex ? 'true' : undefined}
 						onclick={() => selectItem(item)}
 					>
 						<span class="font-medium">{item.command}</span>
-						<span class="text-base-content/70 text-sm"> — {item.description}</span>
+						<span class="skill-description"> — {item.description}</span>
 					</button>
 				</li>
 			{/each}
 		</ul>
 	{/if}
-</div>
+</skill-autocomplete>
+
+<style>
+	@layer components {
+		skill-autocomplete {
+			position: relative;
+			display: block;
+		}
+
+		.skill-suggestions {
+			position: absolute;
+			z-index: var(--z-dropdown);
+			inset-inline: 0;
+			top: 100%;
+			max-height: 15rem;
+			margin: var(--gap-xs) 0 0;
+			padding: var(--pad-xs);
+			overflow-y: auto;
+			list-style: none;
+			background: var(--color-surface);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-md);
+			box-shadow: var(--shadow-lg);
+		}
+
+		.skill-option {
+			width: 100%;
+			padding: var(--pad-sm) var(--pad-md);
+			border: 0;
+			background: transparent;
+			color: var(--color-text);
+			border-radius: var(--radius-sm);
+			cursor: pointer;
+			text-align: start;
+		}
+
+		.skill-option:hover,
+		.skill-option[data-selected='true'] {
+			background: var(--color-surface-raised);
+		}
+
+		.skill-description {
+			color: var(--color-text-muted);
+			font-size: var(--text-sm);
+		}
+	}
+</style>

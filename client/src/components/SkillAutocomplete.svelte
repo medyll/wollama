@@ -33,7 +33,7 @@
 
 <div class="skill-autocomplete">
 	{#if items.length > 0}
-		<ul class="menu bg-base-100 rounded-box shadow" aria-label="Skill suggestions">
+		<ul class="skill-suggestions" aria-label="Skill suggestions">
 			{#each items as item}
 				<li>
 					<button type="button" onclick={() => onSelect(item)}>
@@ -44,3 +44,33 @@
 		</ul>
 	{/if}
 </div>
+
+<style>
+	@layer components {
+		.skill-suggestions {
+			display: flex;
+			flex-direction: column;
+			gap: var(--gap-xs);
+			margin: 0;
+			padding: var(--pad-xs);
+			list-style: none;
+			background: var(--color-surface);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-md);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.skill-suggestions button {
+			width: 100%;
+			padding: var(--pad-sm) var(--pad-md);
+			border: 0;
+			background: transparent;
+			color: var(--color-text);
+			text-align: start;
+		}
+
+		.skill-suggestions button:hover {
+			background: var(--color-surface-raised);
+		}
+	}
+</style>

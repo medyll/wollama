@@ -119,7 +119,7 @@
 						<h3 class="text-lg font-bold">{result.data.title}</h3>
 					{:else if result.type === 'message'}
 						<div class="mb-1 text-sm font-semibold">In: {result.chat.title}</div>
-						<p class="text-base-content/80 line-clamp-2">{result.data.content}</p>
+						<p class="result-preview line-clamp-2">{result.data.content}</p>
 					{:else if result.type === 'chat_assistant'}
 						<h3 class="text-lg font-bold">{result.data.title}</h3>
 						<div class="mt-1 flex items-center gap-1 text-sm opacity-70">
@@ -239,6 +239,10 @@
 
 		.result-kind[data-kind='assistant'] {
 			color: var(--color-complementary);
+		}
+
+		.result-preview {
+			color: var(--color-text-muted);
 		}
 
 		@media (max-width: 36rem) {
