@@ -29,6 +29,7 @@
 	let connectionSuccess = $state(false);
 	let hasAttemptedConnection = $state(false);
 	let isImportingCompanions = $state(false);
+	let hasAttemptedCompanionImport = $state(false);
 
 	const steps = [
 		{
@@ -66,7 +67,8 @@
 
 	// Auto-import companions when entering step 2 (companion selection)
 	$effect(() => {
-		if (currentStep === 2 && !isImportingCompanions) {
+		if (currentStep === 2 && !hasAttemptedCompanionImport) {
+			hasAttemptedCompanionImport = true;
 			importDefaultCompanions();
 		}
 	});
