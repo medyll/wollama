@@ -310,11 +310,11 @@
 	});
 </script>
 
-<div class="bg-base-200 absolute inset-0 overflow-y-auto p-4 md:p-8">
+<div class="settings-page">
 	<div class="mx-auto max-w-3xl">
 		<!-- Section: Header -->
 		<div class="mb-8 flex items-center justify-between">
-			<button class="btn btn-ghost btn-circle" onclick={() => window.history.back()} aria-label="Back">
+			<button class="btn-icon" onclick={() => window.history.back()} aria-label="Back">
 				<Icon icon="lucide:arrow-left" class="h-6 w-6" />
 			</button>
 			<div class="flex-1 text-center">
@@ -700,7 +700,15 @@
 								>
 							</label>
 							<div class="w-full">
-								<input id="temp" type="range" min="0" max="1" step="0.1" class="range range-primary" bind:value={userState.preferences.defaultTemperature} />
+								<input
+									id="temp"
+									type="range"
+									min="0"
+									max="1"
+									step="0.1"
+									class="range range-primary"
+									bind:value={userState.preferences.defaultTemperature}
+								/>
 								<div class="flex w-full justify-between px-2 text-xs">
 									<span>{t('settings.precise')}</span>
 									<span>{t('settings.creative')}</span>
@@ -960,68 +968,69 @@
 			</div>
 
 			<!-- Section: Hooks -->
-		<div class="collapse-arrow join-item border-base-300 collapse border">
-			<input
-				type="checkbox"
-				checked={activeSection === 'hooks'}
-				onchange={() => (activeSection = activeSection === 'hooks' ? null : 'hooks')}
-				aria-label="Toggle Hooks"
-			/>
-			<div class="collapse-title flex items-center gap-2 text-lg font-medium">
-				<Icon icon="lucide:webhook" class="h-5 w-5" />
-				Hooks
-			</div>
-			<div class="collapse-content">
-				<div class="pt-4">
-					{#if isLoadingHooks}
-						<div class="flex justify-center py-8">
-							<span class="loading loading-spinner loading-lg"></span>
-						</div>
-					{:else if hooks.length === 0}
-						<div class="alert alert-info">
-							<Icon icon="lucide:info" class="h-5 w-5" />
-							<span>No hooks registered.</span>
-						</div>
-					{:else}
-						<div class="border-base-300 overflow-x-auto rounded-lg border">
-							<table class="table-xs table w-full">
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Event</th>
-										<th>Type</th>
-										<th>Priority</th>
-										<th>Scope</th>
-										<th class="text-center">Enabled</th>
-									</tr>
-								</thead>
-								<tbody>
-									{#each hooks as hook}
-										<tr class="hover">
-											<td class="font-medium">{hook.name}</td>
-											<td><span class="badge badge-ghost badge-sm">{hook.event}</span></td>
-											<td class="text-xs opacity-70">{hook.handler_type ?? '-'}</td>
-											<td class="text-xs opacity-70">{hook.priority ?? '-'}</td>
-											<td class="text-xs opacity-70">{hook.scope ?? '-'}</td>
-											<td class="text-center">
-												<input
-													type="checkbox"
-													class="toggle toggle-primary toggle-sm"
-													checked={hook.is_enabled}
-													onchange={(e) => toggleHook(hook._id, (e.target as HTMLInputElement).checked)}
-												/>
-											</td>
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'hooks'}
+					onchange={() => (activeSection = activeSection === 'hooks' ? null : 'hooks')}
+					aria-label="Toggle Hooks"
+				/>
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:webhook" class="h-5 w-5" />
+					Hooks
+				</div>
+				<div class="collapse-content">
+					<div class="pt-4">
+						{#if isLoadingHooks}
+							<div class="flex justify-center py-8">
+								<span class="loading loading-spinner loading-lg"></span>
+							</div>
+						{:else if hooks.length === 0}
+							<div class="alert alert-info">
+								<Icon icon="lucide:info" class="h-5 w-5" />
+								<span>No hooks registered.</span>
+							</div>
+						{:else}
+							<div class="border-base-300 overflow-x-auto rounded-lg border">
+								<table class="table-xs table w-full">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Event</th>
+											<th>Type</th>
+											<th>Priority</th>
+											<th>Scope</th>
+											<th class="text-center">Enabled</th>
 										</tr>
-									{/each}
-								</tbody>
-							</table>
-						</div>
-					{/if}
+									</thead>
+									<tbody>
+										{#each hooks as hook}
+											<tr class="hover">
+												<td class="font-medium">{hook.name}</td>
+												<td><span class="badge badge-ghost badge-sm">{hook.event}</span></td>
+												<td class="text-xs opacity-70">{hook.handler_type ?? '-'}</td>
+												<td class="text-xs opacity-70">{hook.priority ?? '-'}</td>
+												<td class="text-xs opacity-70">{hook.scope ?? '-'}</td>
+												<td class="text-center">
+													<input
+														type="checkbox"
+														class="toggle toggle-primary toggle-sm"
+														checked={hook.is_enabled}
+														onchange={(e) =>
+															toggleHook(hook._id, (e.target as HTMLInputElement).checked)}
+													/>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						{/if}
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<!-- Section: Danger Zone -->
+			<!-- Section: Danger Zone -->
 			<div class="collapse-arrow join-item border-base-300 border-error/20 collapse border">
 				<input
 					type="checkbox"
@@ -1056,3 +1065,170 @@
 	<DataUpdate tableName="user_prompts" bind:isOpen={isCreatingPrompt} />
 	<DataUpdate tableName="user_companions" bind:isOpen={isEditingCompanion} id={editingCompanionId} />
 </div>
+
+<style>
+	@layer components {
+		.settings-page {
+			position: absolute;
+			inset: 0;
+			padding: var(--pad-xl);
+			overflow-y: auto;
+			background: var(--color-surface-raised);
+		}
+
+		.join-vertical {
+			display: flex;
+			width: 100%;
+			flex-direction: column;
+			background: var(--color-surface);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-md);
+			overflow: hidden;
+		}
+
+		.collapse {
+			position: relative;
+			border: var(--border-width) solid var(--color-border);
+			border-block-end: 0;
+			background: var(--color-surface);
+		}
+
+		.collapse:last-child {
+			border-block-end: var(--border-width) solid var(--color-border);
+		}
+
+		.collapse > input:first-child {
+			position: absolute;
+			z-index: 1;
+			inset: 0 0 auto;
+			width: 100%;
+			height: 3.5rem;
+			margin: 0;
+			opacity: 0;
+			cursor: pointer;
+		}
+
+		.collapse-title {
+			display: flex;
+			min-height: 3.5rem;
+			align-items: center;
+			gap: var(--gap-sm);
+			padding: var(--pad-md) calc(var(--pad-xl) + var(--pad-md)) var(--pad-md) var(--pad-lg);
+			font-size: var(--text-lg);
+			font-weight: var(--font-medium);
+		}
+
+		.collapse-title::after {
+			position: absolute;
+			right: var(--pad-lg);
+			content: '›';
+			transform: rotate(90deg);
+			transition: transform var(--transition-fast);
+		}
+
+		.collapse > input:first-child:checked ~ .collapse-title::after {
+			transform: rotate(-90deg);
+		}
+
+		.collapse-content {
+			display: none;
+			padding: 0 var(--pad-lg) var(--pad-lg);
+		}
+
+		.collapse > input:first-child:checked ~ .collapse-content {
+			display: block;
+		}
+
+		.form-control {
+			display: flex;
+			min-width: 0;
+			flex-direction: column;
+			gap: var(--gap-xs);
+		}
+
+		.label {
+			display: flex;
+			align-items: center;
+			gap: var(--gap-sm);
+			font-size: var(--text-sm);
+		}
+
+		.alert {
+			display: flex;
+			align-items: center;
+			gap: var(--gap-sm);
+			padding: var(--pad-md);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-md);
+		}
+
+		.alert-error {
+			border-color: var(--color-critical);
+			background: color-mix(in srgb, var(--color-critical) 8%, var(--color-surface));
+			color: var(--color-critical);
+		}
+
+		.alert-info {
+			border-color: var(--color-info);
+			background: color-mix(in srgb, var(--color-info) 8%, var(--color-surface));
+		}
+
+		.badge {
+			display: inline-flex;
+			align-items: center;
+			padding: var(--pad-xs) var(--pad-sm);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-full);
+			font-size: var(--text-xs);
+		}
+
+		.badge-primary {
+			border-color: var(--color-primary);
+			background: var(--color-primary);
+			color: var(--color-on-primary);
+		}
+
+		.loading-spinner {
+			display: inline-block;
+			width: 1.5rem;
+			height: 1.5rem;
+			border: calc(var(--border-width) * 2) solid var(--color-border);
+			border-top-color: var(--color-primary);
+			border-radius: var(--radius-full);
+			animation: settings-spin var(--duration-spin) linear infinite;
+		}
+
+		.bg-base-100 {
+			background: var(--color-surface);
+		}
+
+		.bg-base-300 {
+			background: var(--color-surface-raised);
+		}
+
+		.border-base-300 {
+			border-color: var(--color-border);
+		}
+
+		.text-error {
+			color: var(--color-critical);
+		}
+
+		.btn-error {
+			border-color: var(--color-critical);
+			color: var(--color-critical);
+		}
+
+		@keyframes settings-spin {
+			to {
+				transform: rotate(1turn);
+			}
+		}
+
+		@media (max-width: 48rem) {
+			.settings-page {
+				padding: var(--pad-md);
+			}
+		}
+	}
+</style>
