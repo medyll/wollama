@@ -1,6 +1,6 @@
 /**
  * E2E Test Setup Utilities
- * 
+ *
  * Provides helpers for:
  * - Mocking Ollama API responses
  * - Resetting database state between tests
@@ -15,16 +15,15 @@ const API_URL = process.env.API_URL || 'http://localhost:3000';
 /**
  * Complete onboarding flow programmatically
  */
-export async function completeOnboarding(page: Page, options?: {
-	nickname?: string;
-	model?: string;
-	skipOllamaTest?: boolean;
-}) {
-	const {
-		nickname = 'Test User',
-		model = 'mistral',
-		skipOllamaTest = true
-	} = options || {};
+export async function completeOnboarding(
+	page: Page,
+	options?: {
+		nickname?: string;
+		model?: string;
+		skipOllamaTest?: boolean;
+	}
+) {
+	const { nickname = 'Test User', model = 'mistral', skipOllamaTest = true } = options || {};
 
 	await page.goto(`${BASE_URL}/onboarding`);
 	await page.waitForLoadState('networkidle');
@@ -42,9 +41,12 @@ export async function completeOnboarding(page: Page, options?: {
 	await page.getByTestId('wizard-next-button').click();
 	await page.waitForTimeout(500);
 
-	// Step 3: Complete
-	await page.waitForSelector('[data-testid="wizard-finish-button"]', { timeout: 5000 });
-	await page.getByTestId('wizard-finish-button').click();
+	// Step 3: choose the first imported companion and complete the wizard
+	const firstCompanion = page.getByTestId('companion-card').first();
+	await expect(firstCompanion).toBeVisible({ timeout: 10_000 });
+	await firstCompanion.click();
+	await page.getByTestId('wizard-next-button').click();
+	await expect(page).toHaveURL(/\/chat\/new$/, { timeout: 10_000 });
 	await page.waitForLoadState('networkidle');
 }
 
@@ -60,12 +62,13 @@ export async function resetDatabaseState(page: Page) {
 		// Clear IndexedDB
 		const dbs = (window as any).indexedDB.databases();
 		Promise.all(
-			dbs.map((db: any) =>
-				new Promise<void>((res) => {
-					const req = (window as any).indexedDB.deleteDatabase(db.name);
-					req.onsuccess = () => res();
-					req.onerror = () => res();
-				})
+			dbs.map(
+				(db: any) =>
+					new Promise<void>((res) => {
+						const req = (window as any).indexedDB.deleteDatabase(db.name);
+						req.onsuccess = () => res();
+						req.onerror = () => res();
+					})
 			)
 		);
 	});
@@ -77,31 +80,44 @@ export async function resetDatabaseState(page: Page) {
 /**
  * Set up test state with onboarding completed
  */
-export async function setupTestState(page: Page, options?: {
-	nickname?: string;
-	model?: string;
-}) {
+export async function setupTestState(
+	page: Page,
+	options?: {
+		nickname?: string;
+		model?: string;
+	}
+) {
 	const { nickname = 'Test User', model = 'mistral' } = options || {};
 
 	// Set localStorage directly to skip onboarding
-	await page.addInitScript((data) => {
-		localStorage.setItem('wollama_onboarding_completed', 'true');
-		localStorage.setItem('wollama_user_preferences', JSON.stringify({
-			onboarding_completed: true,
-			defaultModel: data.model,
-			nickname: data.nickname
-		}));
-	}, { nickname, model });
+	await page.addInitScript(
+		(data) => {
+			localStorage.setItem(
+				'wollama_user',
+				JSON.stringify({
+					nickname: data.nickname,
+					preferences: {
+						onboarding_completed: true,
+						defaultModel: data.model
+					}
+				})
+			);
+		},
+		{ nickname, model }
+	);
 }
 
 /**
  * Mock Ollama API responses
  */
-export async function mockOllamaResponses(page: Page, options?: {
-	models?: string[];
-	response?: string;
-	delay?: number;
-}) {
+export async function mockOllamaResponses(
+	page: Page,
+	options?: {
+		models?: string[];
+		response?: string;
+		delay?: number;
+	}
+) {
 	const {
 		models = ['mistral', 'llama2', 'gemma'],
 		response = 'This is a mocked AI response for testing.',
@@ -117,7 +133,7 @@ export async function mockOllamaResponses(page: Page, options?: {
 			await route.fulfill({
 				status: 200,
 				contentType: 'application/json',
-				body: JSON.stringify({ models: models.map(name => ({ name, model: name })) })
+				body: JSON.stringify({ models: models.map((name) => ({ name, model: name })) })
 			});
 		} else if (url.includes('/api/generate') || url.includes('/api/chat')) {
 			// Return mocked response with delay
@@ -143,10 +159,14 @@ export async function waitForChatReady(page: Page, timeout = 10000) {
 /**
  * Send a message and wait for response
  */
-export async function sendMessage(page: Page, text: string, options?: {
-	waitForResponse?: boolean;
-	responseTimeout?: number;
-}) {
+export async function sendMessage(
+	page: Page,
+	text: string,
+	options?: {
+		waitForResponse?: boolean;
+		responseTimeout?: number;
+	}
+) {
 	const { waitForResponse = true, responseTimeout = 15000 } = options || {};
 
 	const input = page.getByTestId('message-input');
@@ -195,7 +215,7 @@ export async function getChatList(page: Page): Promise<Array<{ id: string; name:
  */
 export async function getCompanionList(page: Page): Promise<string[]> {
 	const companions = await page.getByTestId('companion-card').allTextContents();
-	return companions.map(c => c.trim());
+	return companions.map((c) => c.trim());
 }
 
 /**

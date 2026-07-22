@@ -7,7 +7,7 @@
 
 {#if visible}
 	<button
-		class="btn btn-square btn-ghost {className}"
+		class="btn-icon {className}"
 		onclick={() => uiState.toggleSidebarVisibility()}
 		aria-label={title}
 		{title}

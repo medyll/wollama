@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/svelte';
 import ToolCallMessage from './tool-call-message.svelte';
 
-// TODO: Re-enable after SvelteKit SSR vs DOM test environment is resolved
+// TODO: Rewrite assertions for the current tool-call component contract before re-enabling.
 describe.skip('ToolCallMessage', () => {
 	const baseToolCall = {
 		tool_call_id: 'tc-123',

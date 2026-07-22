@@ -50,9 +50,9 @@
 </script>
 
 {#if loading}
-	<span class="loading loading-spinner loading-sm"></span>
+	<span class="loading-ellipsis" aria-label="Loading">Loading</span>
 {:else if mode === 'dropdown'}
-	<select class="select select-bordered w-full {className}" bind:value={selectedId} aria-label={label || placeholder}>
+	<select class="w-full {className}" bind:value={selectedId} aria-label={label || placeholder}>
 		<option value="" disabled selected>{placeholder}</option>
 		{#each items as item}
 			<option value={item[valueKey]}>
@@ -61,10 +61,11 @@
 		{/each}
 	</select>
 {:else if mode === 'grid'}
-	<div class="grid grid-cols-2 gap-2 {className}">
+	<selector-grid class={className}>
 		{#each items as item}
 			<button
-				class="btn btn-outline flex h-auto flex-col gap-1 py-2 {selectedId === item[valueKey] ? 'btn-active' : ''}"
+				class="selector-option"
+				aria-pressed={selectedId === item[valueKey]}
 				onclick={() => handleSelect(item)}
 			>
 				{#if item.flag}
@@ -73,13 +74,13 @@
 				<span class="text-xs">{item[presentation]}</span>
 			</button>
 		{/each}
-	</div>
+	</selector-grid>
 {:else}
 	<!-- List Mode -->
-	<ul class="menu bg-base-200 rounded-box w-full {className}">
+	<ul class="selector-list {className}">
 		{#each items as item}
 			<li>
-				<button class:active={selectedId === item[valueKey]} onclick={() => handleSelect(item)}>
+				<button aria-pressed={selectedId === item[valueKey]} onclick={() => handleSelect(item)}>
 					{#if item.flag}
 						<span class="mr-2 text-xl">{item.flag}</span>
 					{/if}
@@ -89,3 +90,59 @@
 		{/each}
 	</ul>
 {/if}
+
+<style>
+	@layer components {
+		selector-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: var(--gap-sm);
+		}
+
+		.selector-option,
+		.selector-list button {
+			border: var(--border-width) solid var(--color-border);
+			background: var(--color-surface);
+			color: var(--color-text);
+		}
+
+		.selector-option {
+			display: flex;
+			min-block-size: calc(var(--pad-lg) * 2 + var(--text-sm));
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			gap: var(--gap-xs);
+			padding: var(--pad-sm);
+			border-radius: var(--radius-md);
+		}
+
+		.selector-option[aria-pressed='true'],
+		.selector-list button[aria-pressed='true'] {
+			border-color: var(--color-primary);
+			background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+			color: var(--color-primary);
+		}
+
+		.selector-list {
+			display: flex;
+			flex-direction: column;
+			gap: var(--gap-xs);
+			width: 100%;
+			margin: 0;
+			padding: var(--pad-sm);
+			list-style: none;
+			background: var(--color-surface-raised);
+			border-radius: var(--radius-md);
+		}
+
+		.selector-list button {
+			display: flex;
+			width: 100%;
+			align-items: center;
+			padding: var(--pad-sm) var(--pad-md);
+			border-radius: var(--radius-sm);
+			text-align: start;
+		}
+	}
+</style>

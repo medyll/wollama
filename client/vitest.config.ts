@@ -5,13 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
-		sveltekit({
-			// Force DOM compilation under Vitest so lifecycle hooks are available
-			compilerOptions: {
-				generate: 'dom',
-				hydratable: true
-			}
-		})
+		sveltekit()
 	],
 	resolve: {
 		conditions: ['browser']

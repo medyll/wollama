@@ -15,6 +15,8 @@ import { hookPipeline } from './services/hook-pipeline.service.js';
 import { logger } from './utils/logger.js';
 import skillsRouter from './routes/skills.js';
 import hooksRouter from './routes/hooks.js';
+import agentsRouter from './routes/agents.js';
+import ragRouter from './routes/rag.js';
 
 import cors from 'cors';
 
@@ -72,6 +74,12 @@ app.use('/api/skills', skillsRouter);
 
 // Hooks routes (Sprint 5)
 app.use('/api/hooks', hooksRouter);
+
+// Agents routes (Sprint 4)
+app.use('/api/agents', agentsRouter);
+
+// RAG routes
+app.use('/api/rag', ragRouter);
 
 // Audio Routes
 app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
@@ -189,7 +197,10 @@ app.post('/api/chat/generate', async (req, res) => {
 		// ── Hook Pipeline: pre-send ──────────────────────────────────────────
 		let lastUserIdx = -1;
 		for (let i = messages.length - 1; i >= 0; i--) {
-			if (messages[i].role === 'user') { lastUserIdx = i; break; }
+			if (messages[i].role === 'user') {
+				lastUserIdx = i;
+				break;
+			}
 		}
 		if (lastUserIdx !== -1 && (chat_id || user_id)) {
 			const preSendCtx = hookPipeline.createContext({
@@ -417,7 +428,7 @@ const startLocalOllama = async () => {
 				detached: true,
 				stdio: 'ignore'
 			});
-			child.f();
+			child.unref();
 			logger.success('OLLAMA', 'Started local Ollama instance (Linux)');
 			return true;
 		}
@@ -590,6 +601,7 @@ app.listen(port, async () => {
 	logger.info('DB', `PouchDB mounted at /_db`);
 
 	await dbManager.seedCompanions();
+	await dbManager.seedHooks();
 	await hookRegistry.load();
 
 	// Allow tests to skip heavy external initializations (Ollama, audio, sidecar)

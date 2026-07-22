@@ -10,7 +10,7 @@
   const { message } = $props();
 </script>
 
-<div class="p-3 rounded bg-base-100 border">
+<tool-call-message>
   <div class="flex justify-between items-start">
     <div>
       <div class="font-semibold">Tool: {message.toolName}</div>
@@ -30,4 +30,16 @@
     </details>
     {/if}
   </div>
-</div>
+</tool-call-message>
+
+<style>
+	@layer components {
+		tool-call-message {
+			display: block;
+			padding: var(--pad-md);
+			background: var(--color-surface);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-md);
+		}
+	}
+</style>

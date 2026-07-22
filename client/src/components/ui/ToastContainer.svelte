@@ -3,34 +3,6 @@
 	import { fade, fly } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 
-	// Mapping position to DaisyUI classes
-	const positionClasses = $derived(
-		{
-			'top-left': 'toast-top toast-start',
-			'top-right': 'toast-top toast-end',
-			'top-center': 'toast-top toast-center',
-			'bottom-left': 'toast-bottom toast-start',
-			'bottom-right': 'toast-bottom toast-end',
-			'bottom-center': 'toast-bottom toast-center'
-		}[toast.position]
-	);
-
-	// Mapping type to DaisyUI alert classes
-	function getTypeClass(type: string) {
-		switch (type) {
-			case 'success':
-				return 'alert-success';
-			case 'error':
-				return 'alert-error';
-			case 'warning':
-				return 'alert-warning';
-			case 'info':
-				return 'alert-info';
-			default:
-				return 'alert-info';
-		}
-	}
-
 	function getIcon(type: string) {
 		switch (type) {
 			case 'success':
@@ -45,14 +17,15 @@
 	}
 </script>
 
-<div class="toast {positionClasses} p-4" style="z-index: var(--z-toast)">
+<aside class="toast-component" data-position={toast.position} aria-label="Notifications">
 	{#each toast.toasts as item (item.id)}
 		<!-- Section: Toast Item -->
 		<div
 			animate:flip={{ duration: 300 }}
 			in:fly={{ y: 20, duration: 300 }}
 			out:fade={{ duration: 200 }}
-			class="alert {getTypeClass(item.type)} flex min-w-[300px] justify-between shadow-lg"
+			class="toast-item"
+			data-type={item.type}
 			role="status"
 		>
 			<div class="flex items-center gap-2">
@@ -63,7 +36,7 @@
 			</div>
 			{#if !item.timeout}
 				<button
-					class="btn btn-xs btn-ghost btn-circle"
+					class="btn-icon btn-sm"
 					aria-label="Close"
 					onclick={(e) => {
 						e.stopPropagation();
@@ -73,4 +46,42 @@
 			{/if}
 		</div>
 	{/each}
-</div>
+</aside>
+
+<style>
+	.toast-component {
+		position: fixed;
+		display: flex;
+		max-width: min(24rem, calc(100vw - (2 * var(--pad-md))));
+		flex-direction: column;
+		gap: var(--gap-sm);
+		padding: var(--pad-md);
+		z-index: var(--z-toast);
+		pointer-events: none;
+	}
+
+	.toast-component[data-position^='top'] { top: 0; }
+	.toast-component[data-position^='bottom'] { bottom: 0; }
+	.toast-component[data-position$='left'] { left: 0; }
+	.toast-component[data-position$='right'] { right: 0; }
+	.toast-component[data-position$='center'] { left: 50%; transform: translateX(-50%); }
+
+	.toast-item {
+		display: flex;
+		min-width: min(18rem, calc(100vw - (2 * var(--pad-md))));
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--gap-md);
+		padding: var(--pad-md);
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-overlay);
+		box-shadow: var(--shadow-lg);
+		pointer-events: auto;
+
+		&[data-type='success'] { border-color: var(--color-success); }
+		&[data-type='error'] { border-color: var(--color-critical); }
+		&[data-type='warning'] { border-color: var(--color-warning); }
+		&[data-type='info'] { border-color: var(--color-info); }
+	}
+</style>

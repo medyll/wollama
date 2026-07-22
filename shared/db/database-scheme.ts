@@ -334,6 +334,59 @@ IMPORTANT:
 		}
 	},
 
+	// ── RAG ───────────────────────────────────────────────────────────────────
+
+	documents: {
+		primaryKey: 'document_id',
+		indexes: ['owner_id', 'source', 'created_at'],
+		template: {
+			presentation: 'title',
+			card_lines: ['source', 'source_ref', 'chunk_count']
+		},
+		fk: {
+			owner_id: { table: 'users', required: true, multiple: true }
+		},
+		fields: {
+			document_id: { type: 'uuid', required: true },
+			owner_id: { type: 'uuid', required: true },
+			source: { type: 'string', required: true, enum: ['file', 'chat', 'web'] },
+			title: { type: 'string', required: true },
+			source_ref: { type: 'string' }, // filename, chat_id, or URL
+			mime_type: { type: 'string' },
+			chunk_count: { type: 'number', default: 0 },
+			status: {
+				type: 'string',
+				enum: ['pending', 'indexed', 'error'],
+				default: 'pending'
+			},
+			error: { type: 'string' },
+			created_at: { type: 'timestamp', required: true, auto: true },
+			updated_at: { type: 'timestamp', auto: true }
+		}
+	},
+
+	document_chunks: {
+		primaryKey: 'chunk_id',
+		indexes: ['document_id', 'owner_id', 'position'],
+		fk: {
+			document_id: { table: 'documents', required: true, multiple: true },
+			owner_id: { table: 'users', required: true, multiple: true }
+		},
+		template: {
+			presentation: 'text',
+			card_lines: ['text', 'position']
+		},
+		fields: {
+			chunk_id: { type: 'uuid', required: true },
+			document_id: { type: 'uuid', required: true },
+			owner_id: { type: 'uuid', required: true },
+			text: { type: 'text-long', required: true },
+			position: { type: 'number', required: true },
+			embedding_model: { type: 'string', required: true },
+			created_at: { type: 'timestamp', required: true, auto: true }
+		}
+	},
+
 	tool_calls: {
 		primaryKey: 'tool_call_id',
 		indexes: ['message_id', 'agent_id', 'status', 'started_at'],

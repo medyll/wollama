@@ -20,14 +20,14 @@
 
 {#if !userState.isAuthenticated}
 	<button
-		class="btn btn-primary btn-sm"
+		class="btn-primary btn-sm"
 		onclick={handleSignIn}
 		disabled={isSigningIn}
 		title={t('ui.signIn')}
 		aria-label={t('ui.signIn')}
 	>
 		{#if isSigningIn}
-			<span class="loading loading-spinner loading-xs"></span>
+			<span aria-hidden="true">…</span>
 		{:else}
 			<Icon icon="fluent:person-arrow-right-24-regular" class="mr-2 h-4 w-4" />
 			{t('ui.signIn')}
@@ -35,11 +35,11 @@
 	</button>
 {:else}
 	<!-- Section: User Profile -->
-	<div class="bg-base-200 flex items-center gap-2 rounded-lg px-2 py-1">
+	<div class="user-profile">
 		{#if userState.photoURL}
-			<img src={userState.photoURL} alt="Avatar" class="h-8 w-8 rounded-full" />
+			<img src={userState.photoURL} alt="Avatar" class="user-avatar" />
 		{:else}
-			<div class="bg-primary text-primary-content flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bold">
+			<div class="user-avatar user-avatar-placeholder">
 				{userState.nickname ? userState.nickname[0].toUpperCase() : 'U'}
 			</div>
 		{/if}
@@ -49,3 +49,31 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	.user-profile {
+		display: flex;
+		align-items: center;
+		gap: var(--gap-sm);
+		padding: var(--pad-xs) var(--pad-sm);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface-alt);
+	}
+
+	.user-avatar {
+		display: flex;
+		width: var(--icon-size-md);
+		height: var(--icon-size-md);
+		flex: none;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-full);
+		object-fit: cover;
+	}
+
+	.user-avatar-placeholder {
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+		font-weight: var(--font-bold);
+	}
+</style>

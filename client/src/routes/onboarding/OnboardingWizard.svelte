@@ -7,6 +7,7 @@
 	import type { UserCompanion } from '$types/data';
 	import { DEFAULT_COMPANIONS } from '../../../../shared/configuration/data-default';
 	import { DataGenericService } from '$lib/services/data-generic.service';
+	import { uiState } from '$lib/state/ui.svelte';
 
 	let currentStep = $state(0);
 	const totalSteps = 3; // Profile/Auth + Server URL config + Companion selection
@@ -47,11 +48,19 @@
 		}
 	];
 
-	// Auto-test connection when entering step 1
+	// Auto-test connection when entering step 1; auto-advance if the default
+	// Ollama URL is already reachable so dev/local users aren't forced to
+	// manually click through a step that already just works.
 	$effect(() => {
 		if (currentStep === 1 && !hasAttemptedConnection) {
 			hasAttemptedConnection = true;
-			testConnection();
+			testConnection().then(() => {
+				if (connectionSuccess) {
+					setTimeout(() => {
+						if (currentStep === 1) currentStep++;
+					}, 600);
+				}
+			});
 		}
 	});
 
@@ -159,22 +168,20 @@
 			// Store onboarding completion in preferences
 			Object.assign(userState.preferences, { onboarding_completed: true });
 			userState.save();
-			// Navigate to chat (server is now configured)
-			goto('/chat');
+			uiState.setActiveCompanionId(selectedCompanion?.user_companion_id);
+			goto('/chat/new');
 		} catch (error) {
 			console.error('Failed to complete onboarding:', error);
 		}
 	}
 
 	function handleSkip() {
-		// On companion selection step (final step), skip by going to chat without selection
-		if (currentStep === 2) {
-			completeOnboarding();
-		} else if (currentStep < totalSteps - 1) {
-			currentStep++;
-		} else {
-			completeOnboarding();
+		// Skip means skip the whole wizard — straight to chat with defaults.
+		if (currentStep === 0 && nickname.trim()) {
+			userState.nickname = nickname.trim();
+			userState.save();
 		}
+		completeOnboarding();
 	}
 
 	async function importDefaultCompanions() {
@@ -227,124 +234,93 @@
 	<title>Welcome - Wollama</title>
 </svelte:head>
 
-<div class="from-base-100 to-base-200 flex min-h-screen items-center justify-center bg-linear-to-br p-4 overflow-auto">
-	<div class="w-full flex flex-col items-center" class:max-w-md={currentStep !== 3} class:max-w-4xl={currentStep === 3}>
-		<!-- Main Card -->
-		<div class="card bg-base-100 shadow-xl w-full max-h-[90vh] overflow-y-auto" data-testid="onboarding-wizard">
-			<div class="card-body py-6">
-				<!-- Icon/Logo -->
-				<div class="mb-4 flex justify-center flex-shrink-0">
-					<Icon icon={steps[currentStep].icon} width="48" height="48" class="text-primary" />
-				</div>
+<onboarding-component>
+	<onboarding-panel data-step={currentStep === 2 ? 'companions' : 'form'} data-testid="onboarding-wizard">
+		<onboarding-header>
+			<Icon icon={steps[currentStep].icon} width="48" height="48" class="text-primary" />
+			<h1 data-testid="wizard-title">{steps[currentStep].title}</h1>
+			<p>{steps[currentStep].description}</p>
+		</onboarding-header>
 
-				<!-- Title -->
-				<h1 class="card-title mb-2 justify-center text-center text-xl flex-shrink-0" data-testid="wizard-title">
-					{steps[currentStep].title}
-				</h1>
-
-				<!-- Description -->
-				<p class="text-base-content/70 mb-4 text-center text-sm flex-shrink-0">
-					{steps[currentStep].description}
-				</p>
-
-				<!-- Step 0: Profile & Auth -->
+		<onboarding-body>
 				{#if currentStep === 0}
-					<div class="space-y-4">
-						<div class="form-control">
-							<label class="label" for="nickname">
-								<span class="label-text">Nickname</span>
-							</label>
+					<form class="form-stack" onsubmit={(event) => { event.preventDefault(); handleNext(); }}>
+						<div class="field-stack">
+							<label for="nickname">Nickname</label>
 							<input
 								type="text"
 								id="nickname"
 								placeholder="How should we call you?"
-								class="input input-bordered w-full"
 								bind:value={nickname}
 							/>
 						</div>
 
-						<div class="form-control">
-							<label class="label cursor-pointer justify-start gap-4">
-								<input type="checkbox" class="checkbox checkbox-primary" bind:checked={isSharedMachine} />
-								<span class="label-text">This is a shared machine (Secure my profile)</span>
+						<div>
+							<label class="checkbox-row">
+								<input type="checkbox" bind:checked={isSharedMachine} />
+								<span>This is a shared machine (Secure my profile)</span>
 							</label>
 						</div>
 
 						{#if isSharedMachine}
-							<div class="form-control">
-								<label class="label" for="password">
-									<span class="label-text">Password / PIN</span>
-								</label>
+							<div class="field-stack">
+								<label for="password">Password / PIN</label>
 								<input
 									type="password"
 									id="password"
 									placeholder="Enter a secure password"
-									class="input input-bordered w-full"
 									bind:value={password}
 								/>
 							</div>
-							<div class="form-control">
-								<label class="label" for="email">
-									<span class="label-text">Email (Optional)</span>
-								</label>
+							<div class="field-stack">
+								<label for="email">Email (Optional)</label>
 								<input
 									type="email"
 									id="email"
 									placeholder="For recovery"
-									class="input input-bordered w-full"
 									bind:value={email}
 								/>
 							</div>
 						{/if}
 
 						{#if profileError}
-							<div class="alert alert-error py-2 text-sm">
+							<div class="status-message" data-status="critical" role="alert">
 								<Icon icon="lucide:alert-circle" class="h-4 w-4" />
 								<span>{profileError}</span>
 							</div>
 						{/if}
-					</div>
+					</form>
 				{/if}
 
-				<!-- Step 1: Server URL Configuration Form -->
 				{#if currentStep === 1}
-					<div class="form-control mb-6">
-						<label class="label" for="server-url">
-							<span class="label-text">Ollama Server URL</span>
-						</label>
+					<div class="field-stack">
+						<label for="server-url">Ollama Server URL</label>
 						<input
 							id="server-url"
 							type="text"
 							placeholder="http://localhost:11434"
-							class="input input-bordered"
 							bind:value={serverUrl}
 							disabled={isTestingConnection}
 							aria-label="Server URL input"
 							data-testid="server-url-input"
 						/>
-						<label class="label" for="server-url">
-							<span class="label-text-alt text-xs opacity-70">Example: http://localhost:11434</span>
-						</label>
+						<small>Example: http://localhost:11434</small>
 
 						{#if isTestingConnection}
-							<div class="mt-3 rounded-lg p-3 bg-info/20" role="alert" aria-live="polite">
-								<p class="text-sm font-medium text-info flex items-center gap-2">
-									<span class="loading loading-spinner loading-sm"></span>
+							<div class="status-message" role="status" aria-live="polite">
+								<p>
 									Testing connection...
 								</p>
 							</div>
 						{:else if connectionMessage}
 							<div
-								class={`mt-3 rounded-lg p-3 transition-all ${connectionSuccess ? 'bg-success/20' : 'bg-warning/20'}`.trim()}
+								class="status-message"
+								data-status={connectionSuccess ? 'success' : 'critical'}
 								role="alert"
 								aria-live="polite"
 								data-testid={connectionSuccess ? 'connection-success' : 'connection-error'}
 							>
-								<p
-									class="text-sm font-medium"
-									class:text-success={connectionSuccess}
-									class:text-warning={!connectionSuccess && connectionMessage}
-								>
+								<p>
 									{connectionSuccess ? '✓ ' : '⚠ '}{connectionMessage}
 								</p>
 								{#if connectionSuggestion && !connectionSuccess}
@@ -362,7 +338,6 @@
 					</div>
 				{/if}
 
-				<!-- Step 2: Companion Selection -->
 				{#if currentStep === 2}
 					<CompanionSelector
 						onSelect={(companion) => {
@@ -370,27 +345,26 @@
 						}}
 					/>
 				{/if}
+		</onboarding-body>
 
-				<!-- Step Indicator -->
-				<div class="mb-8 flex justify-center gap-2 pt-6">
-					{#each Array(totalSteps) as _, i}
-						<div
-							class="h-2 w-2 rounded-full transition-all"
-							class:bg-primary={i === currentStep}
-							class:bg-base-300={i !== currentStep}
-							role="progressbar"
-							aria-valuenow={currentStep + 1}
-							aria-valuemin={1}
-							aria-valuemax={totalSteps}
-						></div>
-					{/each}
-				</div>
-
-				<!-- Actions -->
-				<div class="card-actions mt-6 justify-center gap-3">
-					<button class="btn btn-ghost btn-sm" onclick={handleSkip} aria-label="Skip onboarding" data-testid="wizard-skip-button"> Skip </button>
+		<onboarding-footer>
+			<div
+				class="onboarding-progress"
+				role="progressbar"
+				aria-label={`Step ${currentStep + 1} of ${totalSteps}`}
+				aria-valuenow={currentStep + 1}
+				aria-valuemin={1}
+				aria-valuemax={totalSteps}
+			>
+				{#each Array(totalSteps) as _, i}
+					<span aria-current={i === currentStep ? 'step' : undefined}></span>
+				{/each}
+				<small>Step {currentStep + 1} of {totalSteps}</small>
+			</div>
+			<div class="toolbar">
+					<button class="btn-ghost btn-sm" onclick={handleSkip} aria-label="Skip onboarding" data-testid="wizard-skip-button">Skip</button>
 					<button
-						class="btn btn-primary btn-sm"
+						class="btn-primary btn-sm"
 						onclick={handleNext}
 						disabled={isTestingConnection ||
 							(currentStep === 0 && (!nickname.trim() || (isSharedMachine && !password.trim()))) ||
@@ -399,7 +373,6 @@
 						data-testid="wizard-next-button"
 					>
 						{#if isTestingConnection}
-							<span class="loading loading-spinner loading-sm"></span>
 							Testing...
 						{:else if currentStep === totalSteps - 1}
 							Complete Setup
@@ -407,13 +380,7 @@
 							Next
 						{/if}
 					</button>
-				</div>
 			</div>
-		</div>
-
-		<!-- Footer text -->
-		<p class="text-base-content/50 mt-8 text-center text-xs">
-			Step {currentStep + 1} of {totalSteps}
-		</p>
-	</div>
-</div>
+		</onboarding-footer>
+	</onboarding-panel>
+</onboarding-component>

@@ -5,7 +5,7 @@
 </script>
 
 <button
-	class="btn btn-ghost btn-square btn-sm {uiState.sidebarCollapsed ? 'mx-auto' : ''} "
+	class="btn-icon btn-sm {uiState.sidebarCollapsed ? 'mx-auto' : ''}"
 	onclick={() => uiState.toggleSidebar()}
 	aria-label={uiState.sidebarCollapsed ? t('ui.expand') : t('ui.collapse')}
 	title={uiState.sidebarCollapsed ? t('ui.expand') : t('ui.collapse')}

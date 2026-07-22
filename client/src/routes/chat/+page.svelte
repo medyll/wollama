@@ -1,20 +1,22 @@
 <script lang="ts">
 	import { t } from '$lib/state/i18n.svelte';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	function createNewChat() {
 		goto('/chat/new');
 	}
+
+	onMount(() => {
+		goto('/chat/new', { replaceState: true });
+	});
 </script>
 
-<div class="hero bg-base-200 h-full">
-	<!-- Section: Hero Content -->
-	<div class="hero-content text-center">
-		<div class="flex max-w-md flex-col items-center">
-			<img src="/assets/lama.png" alt="Wollama" class="mb-6 h-32 w-32 object-contain opacity-90" />
-			<h1 class="text-3xl font-bold">{t('ui.ready_to_chat')}</h1>
-			<p class="py-6">{t('ui.select_chat_help')}</p>
-			<button class="btn btn-primary" onclick={createNewChat}>{t('ui.newChat')}</button>
-		</div>
-	</div>
-</div>
+<chat-landing-component>
+	<section>
+		<img src="/assets/lama.png" alt="Wollama" />
+		<h1>{t('ui.ready_to_chat')}</h1>
+		<p>{t('ui.select_chat_help')}</p>
+		<button class="btn-primary" onclick={createNewChat}>{t('ui.newChat')}</button>
+	</section>
+</chat-landing-component>

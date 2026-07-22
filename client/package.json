@@ -50,7 +50,7 @@
 		"@capacitor/android": "^8.0.0",
 		"@capacitor/app": "^8.0.0",
 		"@capacitor/core": "^8.0.0",
-		"@medyll/css-base": "^0.6.7",
+		"@medyll/css-base": "^0.7.10",
 		"@tailwindcss/typography": "^0.5.19",
 		"date-fns": "^4.1.0",
 		"highlight.js": "^11.11.1",

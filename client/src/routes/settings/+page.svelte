@@ -12,6 +12,7 @@
 	import type { Companion } from '$types/data';
 	import DataGenericList from '$components/ui_data/DataGenericList.svelte';
 	import DataUpdate from '$components/ui_data/DataUpdate.svelte';
+	import { ragService, type RagDocument } from '$lib/services/rag.service';
 
 	import { onDestroy } from 'svelte';
 
@@ -30,6 +31,65 @@
 	let isCreatingPrompt = $state(false);
 	let hooks = $state<any[]>([]);
 	let isLoadingHooks = $state(false);
+
+	let ragDocuments = $state<RagDocument[]>([]);
+	let isLoadingRag = $state(false);
+	let isUploadingRag = $state(false);
+	let ragUrlInput = $state('');
+	let ragFileInput = $state<HTMLInputElement | null>(null);
+
+	async function loadRagDocuments() {
+		isLoadingRag = true;
+		try {
+			ragDocuments = await ragService.listDocuments();
+		} catch (e) {
+			console.error('Failed to load RAG documents', e);
+		} finally {
+			isLoadingRag = false;
+		}
+	}
+
+	async function uploadRagFile(e: Event) {
+		const input = e.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (!file) return;
+		isUploadingRag = true;
+		try {
+			await ragService.uploadFile(file);
+			toast.success(`Ingested "${file.name}"`);
+			await loadRagDocuments();
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Upload failed');
+		} finally {
+			isUploadingRag = false;
+			input.value = '';
+		}
+	}
+
+	async function ingestRagUrl() {
+		if (!ragUrlInput.trim()) return;
+		isUploadingRag = true;
+		try {
+			await ragService.ingestUrl(ragUrlInput.trim());
+			toast.success('Page ingested');
+			ragUrlInput = '';
+			await loadRagDocuments();
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Ingestion failed');
+		} finally {
+			isUploadingRag = false;
+		}
+	}
+
+	async function deleteRagDocument(documentId: string) {
+		if (!confirm('Remove this document from your knowledge base?')) return;
+		try {
+			await ragService.deleteDocument(documentId);
+			ragDocuments = ragDocuments.filter((d) => d.document_id !== documentId);
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Delete failed');
+		}
+	}
 
 	async function loadHooks() {
 		isLoadingHooks = true;
@@ -246,6 +306,7 @@
 		loadCompanions();
 		loadAudioDevices();
 		loadHooks();
+		loadRagDocuments();
 	});
 </script>
 
@@ -776,6 +837,124 @@
 						<div class="label">
 							<span class="label-text-alt">{t('settings.server_help')}</span>
 						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Section: Knowledge Base (RAG) -->
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'rag'}
+					onchange={() => (activeSection = activeSection === 'rag' ? null : 'rag')}
+					aria-label="Toggle Knowledge Base"
+				/>
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:database" class="h-5 w-5" />
+					Knowledge Base
+				</div>
+				<div class="collapse-content">
+					<div class="flex flex-col gap-4 pt-4">
+						<p class="text-sm opacity-70">
+							Documents ingested here are embedded and automatically retrieved as context during chat.
+						</p>
+
+						<div class="flex flex-col gap-3 md:flex-row">
+							<button
+								class="btn btn-primary btn-sm"
+								onclick={() => ragFileInput?.click()}
+								disabled={isUploadingRag}
+								aria-label="Upload document"
+							>
+								{#if isUploadingRag}
+									<span class="loading loading-spinner loading-sm"></span>
+								{:else}
+									<Icon icon="lucide:upload" class="h-4 w-4" />
+								{/if}
+								Upload File (PDF / TXT / MD)
+							</button>
+							<input
+								bind:this={ragFileInput}
+								type="file"
+								accept=".pdf,.txt,.md"
+								class="hidden"
+								onchange={uploadRagFile}
+							/>
+
+							<div class="join flex-1">
+								<input
+									type="url"
+									placeholder="https://example.com/article"
+									class="input input-bordered join-item w-full"
+									bind:value={ragUrlInput}
+									disabled={isUploadingRag}
+								/>
+								<button
+									class="btn btn-secondary join-item"
+									onclick={ingestRagUrl}
+									disabled={isUploadingRag || !ragUrlInput.trim()}
+									aria-label="Ingest URL"
+								>
+									<Icon icon="lucide:link" class="h-4 w-4" />
+									Ingest
+								</button>
+							</div>
+						</div>
+
+						{#if isLoadingRag}
+							<div class="flex justify-center py-8">
+								<span class="loading loading-spinner loading-lg"></span>
+							</div>
+						{:else if ragDocuments.length === 0}
+							<div class="alert alert-info">
+								<Icon icon="lucide:info" class="h-5 w-5" />
+								<span>No documents ingested yet.</span>
+							</div>
+						{:else}
+							<div class="border-base-300 overflow-x-auto rounded-lg border">
+								<table class="table-xs table w-full">
+									<thead>
+										<tr>
+											<th>Title</th>
+											<th>Source</th>
+											<th>Chunks</th>
+											<th>Status</th>
+											<th class="text-right">Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										{#each ragDocuments as doc}
+											<tr class="hover">
+												<td class="max-w-xs truncate font-medium" title={doc.title}>{doc.title}</td>
+												<td><span class="badge badge-ghost badge-sm">{doc.source}</span></td>
+												<td class="text-xs opacity-70">{doc.chunk_count}</td>
+												<td>
+													<span
+														class="badge badge-sm {doc.status === 'indexed'
+															? 'badge-success'
+															: doc.status === 'error'
+																? 'badge-error'
+																: 'badge-warning'}"
+														title={doc.error}
+													>
+														{doc.status}
+													</span>
+												</td>
+												<td class="text-right">
+													<button
+														class="btn btn-ghost btn-xs text-error"
+														onclick={() => deleteRagDocument(doc.document_id)}
+														aria-label="Delete document"
+													>
+														<Icon icon="lucide:trash-2" class="h-4 w-4" />
+													</button>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						{/if}
 					</div>
 				</div>
 			</div>

@@ -89,22 +89,20 @@
 	}
 </script>
 
-<div class="h-full w-full">
+<data-list>
 	{#if loading && items.length === 0}
-		<div class="flex h-40 items-center justify-center">
-			<span class="loading loading-spinner loading-lg"></span>
-		</div>
+		<data-list-state aria-busy="true"><span class="loading-ellipsis">Loading</span></data-list-state>
 	{:else if error}
-		<div class="alert alert-error">
+		<div class="status-message" data-status="critical" role="alert">
 			<Icon icon="fluent:error-circle-24-regular" />
 			<span>{error}</span>
 		</div>
 	{:else if items.length === 0}
-		<div class="py-10 text-center opacity-50">
+		<data-list-state>
 			No items found in {tableName}
-		</div>
+		</data-list-state>
 	{:else if displayType === 'card'}
-		<div class="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
+		<data-card-grid>
 			{#each items as item}
 				<DataCard
 					{tableName}
@@ -116,10 +114,10 @@
 					{onRowClick}
 				/>
 			{/each}
-		</div>
+		</data-card-grid>
 	{:else}
 		<!-- List View Fallback -->
-		<div class="overflow-x-auto">
+		<div class="table-scroll">
 			<table class="table">
 				<thead>
 					<tr>
@@ -133,7 +131,7 @@
 				</thead>
 				<tbody>
 					{#each items as item}
-						<tr class="hover {onRowClick ? 'cursor-pointer' : ''}" onclick={() => onRowClick && onRowClick(item)}>
+						<tr data-interactive={onRowClick ? 'true' : undefined} onclick={() => onRowClick && onRowClick(item)}>
 							{#each tableColumns as col}
 								<td>
 									{#if col === presentationField}
@@ -144,10 +142,10 @@
 								</td>
 							{/each}
 							{#if editable || deletable}
-								<td class="flex gap-2">
+								<td class="table-actions">
 									{#if editable}
 										<button
-											class="btn btn-sm btn-ghost btn-circle"
+											class="btn-icon btn-sm"
 											onclick={(e) => {
 												e.stopPropagation();
 												onEdit && onEdit(item);
@@ -159,7 +157,7 @@
 									{/if}
 									{#if deletable}
 										<button
-											class="btn btn-sm btn-ghost btn-circle text-error"
+											class="btn-icon btn-sm action-critical"
 											onclick={(e) => {
 												e.stopPropagation();
 												handleDelete(item);
@@ -175,6 +173,58 @@
 					{/each}
 				</tbody>
 			</table>
-		</div>
+	</div>
 	{/if}
-</div>
+</data-list>
+
+<style>
+	@layer components {
+		data-list,
+		data-list-state,
+		data-card-grid {
+			display: block;
+		}
+
+		data-list {
+			width: 100%;
+			height: 100%;
+		}
+
+		data-list-state {
+			display: flex;
+			min-block-size: 10rem;
+			align-items: center;
+			justify-content: center;
+			color: var(--color-text-muted);
+			text-align: center;
+		}
+
+		data-card-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+			gap: var(--gap-lg);
+			padding: var(--pad-lg);
+		}
+
+		.table-scroll {
+			overflow-x: auto;
+		}
+
+		tr[data-interactive='true'] {
+			cursor: pointer;
+		}
+
+		tr[data-interactive='true']:hover {
+			background: var(--color-surface-raised);
+		}
+
+		.table-actions {
+			display: flex;
+			gap: var(--gap-sm);
+		}
+
+		.action-critical {
+			color: var(--color-critical);
+		}
+	}
+</style>

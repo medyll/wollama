@@ -59,11 +59,11 @@
 	<title>{isNew ? 'Customize Companion' : 'Edit Companion'} - Wollama</title>
 </svelte:head>
 
-<div class="bg-base-200 min-h-screen p-4">
-	<div class="mx-auto max-w-4xl">
+<companion-customize-page>
+	<companion-customize-content>
 		<!-- Header -->
 		<div class="mb-8">
-			<button class="btn btn-ghost btn-sm mb-4" onclick={() => goto('/compagnons')} aria-label="Back to companions">
+			<button class="btn-ghost btn-sm" onclick={() => goto('/compagnons')} aria-label="Back to companions">
 				← Back
 			</button>
 			<h1 class="text-3xl font-bold">
@@ -76,22 +76,54 @@
 
 		<!-- Content -->
 		{#if isLoading}
-			<div class="flex h-64 items-center justify-center">
-				<div class="spinner">
-					<div class="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
-				</div>
-			</div>
+			<customize-state aria-busy="true"><span class="loading-ellipsis">Loading companion</span></customize-state>
 		{:else if error}
-			<div class="alert alert-error">
+			<div class="status-message" data-status="critical" role="alert">
 				<p>{error}</p>
-				<button class="btn btn-sm" onclick={() => goto('/compagnons')}> Go to Companions </button>
+				<button class="btn-outline btn-sm" onclick={() => goto('/compagnons')}>Go to Companions</button>
 			</div>
 		{:else if companion}
 			<CompanionEditor {companion} {isNew} onSave={handleSave} onCancel={handleCancel} />
 		{:else}
-			<div class="alert alert-warning">
+			<div class="status-message" data-status="warning">
 				<p>No companion data available</p>
 			</div>
 		{/if}
-	</div>
-</div>
+	</companion-customize-content>
+</companion-customize-page>
+
+<style>
+	@layer components {
+		companion-customize-page,
+		companion-customize-content,
+		customize-state {
+			display: flex;
+		}
+
+		companion-customize-page {
+			min-height: 100%;
+			padding: var(--pad-lg);
+			background: var(--color-surface-raised);
+		}
+
+		companion-customize-content {
+			width: min(100%, 64rem);
+			margin-inline: auto;
+			flex-direction: column;
+		}
+
+		companion-customize-content > div:first-child {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: var(--gap-sm);
+			margin-block-end: var(--pad-xl);
+		}
+
+		customize-state {
+			min-height: 16rem;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+</style>
