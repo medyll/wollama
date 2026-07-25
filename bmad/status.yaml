@@ -10,84 +10,22 @@ last_updated: "2026-07-17"
 notes: "Chromium E2E baseline is reliable: 6 active checks pass and 22 incompatible legacy checks are explicitly skipped. TypeScript checks, 216 client tests, and 74 server tests pass; 55 legacy client unit assertions remain skipped."
 
 phases:
-  - name: planning
-    status: done
-  - name: development
-    status: done
-  - name: testing
-    status: in_progress
-  - name: release
-    status: upcoming
-
-marketing:
-  - "Version 0.0.9 has a passing Chromium smoke baseline; broader browser and native validation remains"
-  - "Web, Electron, Android, voice, skills, hooks, and agents are implemented"
-
-product:
-  - "TypeScript checks pass for client and server"
-  - "216 client tests and 74 server tests pass"
-  - "55 legacy client assertions require rewriting for current UI contracts"
-  - "6 active Chromium E2E checks pass; 22 obsolete E2E contracts are explicitly skipped"
-
-far_vision:
-  - "Consolidate the two offline synchronization mechanisms"
-  - "Remove or archive the client legacy tree after migration verification"
-  - "Complete iOS support and cross-platform audio validation"
-
-artifacts:
-  prd: done
-  architecture: in_progress
-  tech-spec: done
-  audit-report: in_progress
-
-backlog:
-  - id: BACK-01
-    title: "Rewrite legacy client test contracts"
-    priority: high
-    description: "Replace 55 skipped assertions tied to obsolete UI flows and mocks."
-  - id: BACK-02
-    title: "Rewrite chat and companion E2E contracts"
-    priority: high
-    description: "Replace 16 skipped checks that target obsolete chat and companion controls."
-  - id: BACK-03
-    title: "Restore service-backed E2E coverage"
-    priority: high
-    description: "Replace six skipped smoke, skills, and multi-device checks with deterministic backend and sync fixtures."
-  - id: BL-01
-    title: "Consolidate offline synchronization"
-    priority: medium
-    description: "Clarify ownership between CouchDB replication and the custom sync queue."
-  - id: BL-02
-    title: "Retire the client legacy tree"
-    priority: medium
-    description: "Verify references, then archive or remove client/src/_old."
-
-sprints:
-  - id: 1
-    name: "Foundation DB — 4 nouvelles tables + interfaces TS"
-    status: completed
-    stories: ["S1-01"]
-  - id: 2
-    name: "Hook Pipeline — middleware pre/post-send"
-    status: completed
-    stories: []
-  - id: 3
-    name: "Skills + Slash commands + Autocomplete"
-    status: completed
-    stories: ["S3-01", "S3-02"]
-  - id: 4
-    name: "Agents built-in — WebSearch, PageFetch"
-    status: completed
-    stories: ["S4-01", "S4-02", "S4-03", "S4-04"]
-  - id: 5
-    name: "Frontend UX — ToolCallMessage, HookInspector, Settings"
-    status: completed
-    stories: ["S5-01", "S5-02", "S5-03", "S5-04"]
-  - id: 6
-    name: "Polish, tests, cross-platform validation"
-    status: completed
-    stories: ["S6-01", "S6-02", "S6-03", "S6-04", "S6-05", "S6-06"]
-  - id: 7
-    name: "Release preparation and stabilization"
-    status: active
-    stories: ["S7-01", "S7-02", "S7-03", "S7-04", "S7-05", "S7-06", "S7-07"]
+    - init
+    - analysis
+    - planning
+    - execution
+audit:
+  last_run: "2026-03-11"
+  type: "full"
+  baseline: false
+  score: null
+  project_type: "single-package"
+  packages_scanned: []
+  critical: 2
+  major: 3
+  minor: 1
+  info: 0
+  artifact: "bmad/artifacts/audit-report.md"
+  auto_stories_created:
+    - CODE-QL-001
+    - SEC-001
