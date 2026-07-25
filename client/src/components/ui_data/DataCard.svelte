@@ -57,40 +57,36 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 {#if loading}
-	<div class="card bg-base-100 border-base-200 flex h-40 items-center justify-center border shadow-xl">
-		<span class="loading loading-spinner"></span>
-	</div>
+	<data-card data-loading="true" aria-busy="true"><span class="loading-ellipsis">Loading</span></data-card>
 {:else if item}
-	<div
-		class="card bg-base-100 border-base-200 border shadow-xl transition-all hover:shadow-2xl {onRowClick
-			? 'hover:bg-base-200 cursor-pointer'
-			: ''}"
+	<data-card
+		data-interactive={onRowClick ? 'true' : undefined}
 		onclick={() => onRowClick && onRowClick(item)}
 	>
-		<div class="card-body p-5">
+		<data-card-body>
 			<!-- Header / Title -->
-			<h2 class="card-title mb-2 text-lg">
+			<h2>
 				{item[presentationField] || 'Untitled'}
 			</h2>
 
 			<!-- Card Lines -->
-			<div class="space-y-1">
+			<data-card-details>
 				{#each cardLines as line}
 					{#if line !== presentationField}
-						<div class="flex items-start gap-2 text-sm">
-							<span class="min-w-20 capitalize opacity-60">{line.split('.').pop()}:</span>
-							<span class="truncate font-medium">
+						<div class="data-line">
+							<span class="data-label">{line.split('.').pop()}:</span>
+							<span class="data-value">
 								{String(getDisplayValue(item, line))}
 							</span>
 						</div>
 					{/if}
 				{/each}
-			</div>
+			</data-card-details>
 			<!-- Actions (Slot) -->
-			<div class="card-actions mt-4 justify-end">
+			<data-card-actions>
 				{#if editable}
 					<button
-						class="btn btn-sm btn-ghost btn-circle"
+						class="btn-icon btn-sm"
 						onclick={(e) => {
 							e.stopPropagation();
 							if (onEdit) {
@@ -108,7 +104,7 @@
 				{/if}
 				{#if deletable}
 					<button
-						class="btn btn-sm btn-ghost btn-circle text-error"
+						class="btn-icon btn-sm action-critical"
 						onclick={(e) => {
 							e.stopPropagation();
 							onDelete && onDelete(item);
@@ -119,9 +115,9 @@
 					</button>
 				{/if}
 				<!-- We can add a slot here later -->
-			</div>
-		</div>
-	</div>
+			</data-card-actions>
+		</data-card-body>
+	</data-card>
 
 	<!-- Internal modal: only used if no onEdit callback is provided -->
 	{#if isEditing && !onEdit}
@@ -135,3 +131,85 @@
 		/>
 	{/if}
 {/if}
+
+<style>
+	@layer components {
+		data-card {
+			display: flex;
+			min-block-size: 10rem;
+			background: var(--color-surface);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-sm);
+			overflow: hidden;
+			transition: background-color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast);
+		}
+
+		data-card[data-loading='true'] {
+			align-items: center;
+			justify-content: center;
+		}
+
+		data-card[data-interactive='true'] {
+			cursor: pointer;
+		}
+
+		data-card[data-interactive='true']:hover {
+			background: var(--color-surface-raised);
+			box-shadow: var(--shadow-md);
+			transform: translateY(-1px);
+		}
+
+		data-card-body {
+			display: flex;
+			flex: 1;
+			flex-direction: column;
+			padding: var(--pad-lg);
+		}
+
+		data-card-body h2 {
+			margin: 0 0 var(--gap-sm);
+			font-size: var(--text-lg);
+		}
+
+		data-card-details,
+		data-card-actions {
+			display: flex;
+		}
+
+		data-card-details {
+			flex-direction: column;
+			gap: var(--gap-xs);
+		}
+
+		.data-line {
+			display: grid;
+			grid-template-columns: minmax(5rem, auto) minmax(0, 1fr);
+			gap: var(--gap-sm);
+			font-size: var(--text-sm);
+		}
+
+		.data-label {
+			color: var(--color-text-muted);
+			text-transform: capitalize;
+		}
+
+		.data-value {
+			overflow: hidden;
+			font-weight: var(--font-medium);
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		data-card-actions {
+			justify-content: flex-end;
+			gap: var(--gap-xs);
+			margin-block-start: auto;
+			padding-block-start: var(--pad-md);
+		}
+
+		.action-critical {
+			color: var(--color-critical);
+		}
+	}
+</style>

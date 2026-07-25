@@ -4,9 +4,10 @@ import type { Companion, UserCompanion } from '$types/data';
 import { DataGenericService } from './data-generic.service';
 
 // Mock DataGenericService
-vi.mock('./data-generic.service', () => ({
-	DataGenericService: vi.fn()
-}));
+vi.mock('./data-generic.service', () => {
+	const DataGenericService = vi.fn();
+	return { DataGenericService };
+});
 
 describe('CompanionService - Companion Ownership Model (Story 5.1)', () => {
 	let companionService: CompanionService;
@@ -58,7 +59,7 @@ describe('CompanionService - Companion Ownership Model (Story 5.1)', () => {
 
 		// Mock the DataGenericService constructor
 		const DataGenericServiceMock = vi.mocked(DataGenericService);
-		DataGenericServiceMock.mockImplementation((collectionName: string) => {
+		DataGenericServiceMock.mockImplementation(function(this: unknown, collectionName: string) {
 			if (collectionName === 'companions') {
 				return mockSystemService;
 			}

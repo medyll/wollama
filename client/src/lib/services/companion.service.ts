@@ -99,6 +99,7 @@ export class CompanionService {
 			user_companion_id: crypto.randomUUID(),
 			user_id: userId,
 			companion_id: systemComp.companion_id,
+			is_locked: false,
 			created_at: Date.now(),
 			updated_at: Date.now()
 		};

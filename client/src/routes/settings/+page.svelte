@@ -12,6 +12,7 @@
 	import type { Companion } from '$types/data';
 	import DataGenericList from '$components/ui_data/DataGenericList.svelte';
 	import DataUpdate from '$components/ui_data/DataUpdate.svelte';
+	import { ragService, type RagDocument } from '$lib/services/rag.service';
 
 	import { onDestroy } from 'svelte';
 
@@ -28,6 +29,92 @@
 	let isMonitoringMic = $state(false);
 	let stopMonitoring: (() => void) | null = null;
 	let isCreatingPrompt = $state(false);
+	let hooks = $state<any[]>([]);
+	let isLoadingHooks = $state(false);
+
+	let ragDocuments = $state<RagDocument[]>([]);
+	let isLoadingRag = $state(false);
+	let isUploadingRag = $state(false);
+	let ragUrlInput = $state('');
+	let ragFileInput = $state<HTMLInputElement | null>(null);
+
+	async function loadRagDocuments() {
+		isLoadingRag = true;
+		try {
+			ragDocuments = await ragService.listDocuments();
+		} catch (e) {
+			console.error('Failed to load RAG documents', e);
+		} finally {
+			isLoadingRag = false;
+		}
+	}
+
+	async function uploadRagFile(e: Event) {
+		const input = e.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (!file) return;
+		isUploadingRag = true;
+		try {
+			await ragService.uploadFile(file);
+			toast.success(`Ingested "${file.name}"`);
+			await loadRagDocuments();
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Upload failed');
+		} finally {
+			isUploadingRag = false;
+			input.value = '';
+		}
+	}
+
+	async function ingestRagUrl() {
+		if (!ragUrlInput.trim()) return;
+		isUploadingRag = true;
+		try {
+			await ragService.ingestUrl(ragUrlInput.trim());
+			toast.success('Page ingested');
+			ragUrlInput = '';
+			await loadRagDocuments();
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Ingestion failed');
+		} finally {
+			isUploadingRag = false;
+		}
+	}
+
+	async function deleteRagDocument(documentId: string) {
+		if (!confirm('Remove this document from your knowledge base?')) return;
+		try {
+			await ragService.deleteDocument(documentId);
+			ragDocuments = ragDocuments.filter((d) => d.document_id !== documentId);
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Delete failed');
+		}
+	}
+
+	async function loadHooks() {
+		isLoadingHooks = true;
+		try {
+			const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
+			const res = await fetch(`${serverUrl}/api/hooks`);
+			if (res.ok) hooks = await res.json();
+		} catch (e) {
+			console.error('Failed to load hooks', e);
+		} finally {
+			isLoadingHooks = false;
+		}
+	}
+
+	async function toggleHook(id: string, is_enabled: boolean) {
+		const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
+		const res = await fetch(`${serverUrl}/api/hooks/${id}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ is_enabled })
+		});
+		if (res.ok) {
+			hooks = hooks.map((h) => (h._id === id ? { ...h, is_enabled } : h));
+		}
+	}
 	let isEditingCompanion = $state(false);
 	let editingCompanionId = $state<string | undefined>(undefined);
 
@@ -218,14 +305,16 @@
 		loadModels();
 		loadCompanions();
 		loadAudioDevices();
+		loadHooks();
+		loadRagDocuments();
 	});
 </script>
 
-<div class="bg-base-200 absolute inset-0 overflow-y-auto p-4 md:p-8">
+<div class="settings-page">
 	<div class="mx-auto max-w-3xl">
 		<!-- Section: Header -->
 		<div class="mb-8 flex items-center justify-between">
-			<button class="btn btn-ghost btn-circle" onclick={() => window.history.back()} aria-label="Back">
+			<button class="btn-icon" onclick={() => window.history.back()} aria-label="Back">
 				<Icon icon="lucide:arrow-left" class="h-6 w-6" />
 			</button>
 			<div class="flex-1 text-center">
@@ -611,8 +700,14 @@
 								>
 							</label>
 							<div class="w-full">
-								id="temp" min="0" max="1" step="0.1" class="range range-primary" bind:value={userState.preferences
-									.defaultTemperature}
+								<input
+									id="temp"
+									type="range"
+									min="0"
+									max="1"
+									step="0.1"
+									class="range range-primary"
+									bind:value={userState.preferences.defaultTemperature}
 								/>
 								<div class="flex w-full justify-between px-2 text-xs">
 									<span>{t('settings.precise')}</span>
@@ -754,6 +849,187 @@
 				</div>
 			</div>
 
+			<!-- Section: Knowledge Base (RAG) -->
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'rag'}
+					onchange={() => (activeSection = activeSection === 'rag' ? null : 'rag')}
+					aria-label="Toggle Knowledge Base"
+				/>
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:database" class="h-5 w-5" />
+					Knowledge Base
+				</div>
+				<div class="collapse-content">
+					<div class="flex flex-col gap-4 pt-4">
+						<p class="text-sm opacity-70">
+							Documents ingested here are embedded and automatically retrieved as context during chat.
+						</p>
+
+						<div class="flex flex-col gap-3 md:flex-row">
+							<button
+								class="btn btn-primary btn-sm"
+								onclick={() => ragFileInput?.click()}
+								disabled={isUploadingRag}
+								aria-label="Upload document"
+							>
+								{#if isUploadingRag}
+									<span class="loading loading-spinner loading-sm"></span>
+								{:else}
+									<Icon icon="lucide:upload" class="h-4 w-4" />
+								{/if}
+								Upload File (PDF / TXT / MD)
+							</button>
+							<input
+								bind:this={ragFileInput}
+								type="file"
+								accept=".pdf,.txt,.md"
+								class="hidden"
+								onchange={uploadRagFile}
+							/>
+
+							<div class="join flex-1">
+								<input
+									type="url"
+									placeholder="https://example.com/article"
+									class="input input-bordered join-item w-full"
+									bind:value={ragUrlInput}
+									disabled={isUploadingRag}
+								/>
+								<button
+									class="btn btn-secondary join-item"
+									onclick={ingestRagUrl}
+									disabled={isUploadingRag || !ragUrlInput.trim()}
+									aria-label="Ingest URL"
+								>
+									<Icon icon="lucide:link" class="h-4 w-4" />
+									Ingest
+								</button>
+							</div>
+						</div>
+
+						{#if isLoadingRag}
+							<div class="flex justify-center py-8">
+								<span class="loading loading-spinner loading-lg"></span>
+							</div>
+						{:else if ragDocuments.length === 0}
+							<div class="alert alert-info">
+								<Icon icon="lucide:info" class="h-5 w-5" />
+								<span>No documents ingested yet.</span>
+							</div>
+						{:else}
+							<div class="border-base-300 overflow-x-auto rounded-lg border">
+								<table class="table-xs table w-full">
+									<thead>
+										<tr>
+											<th>Title</th>
+											<th>Source</th>
+											<th>Chunks</th>
+											<th>Status</th>
+											<th class="text-right">Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										{#each ragDocuments as doc}
+											<tr class="hover">
+												<td class="max-w-xs truncate font-medium" title={doc.title}>{doc.title}</td>
+												<td><span class="badge badge-ghost badge-sm">{doc.source}</span></td>
+												<td class="text-xs opacity-70">{doc.chunk_count}</td>
+												<td>
+													<span
+														class="badge badge-sm {doc.status === 'indexed'
+															? 'badge-success'
+															: doc.status === 'error'
+																? 'badge-error'
+																: 'badge-warning'}"
+														title={doc.error}
+													>
+														{doc.status}
+													</span>
+												</td>
+												<td class="text-right">
+													<button
+														class="btn btn-ghost btn-xs text-error"
+														onclick={() => deleteRagDocument(doc.document_id)}
+														aria-label="Delete document"
+													>
+														<Icon icon="lucide:trash-2" class="h-4 w-4" />
+													</button>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+
+			<!-- Section: Hooks -->
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'hooks'}
+					onchange={() => (activeSection = activeSection === 'hooks' ? null : 'hooks')}
+					aria-label="Toggle Hooks"
+				/>
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:webhook" class="h-5 w-5" />
+					Hooks
+				</div>
+				<div class="collapse-content">
+					<div class="pt-4">
+						{#if isLoadingHooks}
+							<div class="flex justify-center py-8">
+								<span class="loading loading-spinner loading-lg"></span>
+							</div>
+						{:else if hooks.length === 0}
+							<div class="alert alert-info">
+								<Icon icon="lucide:info" class="h-5 w-5" />
+								<span>No hooks registered.</span>
+							</div>
+						{:else}
+							<div class="border-base-300 overflow-x-auto rounded-lg border">
+								<table class="table-xs table w-full">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Event</th>
+											<th>Type</th>
+											<th>Priority</th>
+											<th>Scope</th>
+											<th class="text-center">Enabled</th>
+										</tr>
+									</thead>
+									<tbody>
+										{#each hooks as hook}
+											<tr class="hover">
+												<td class="font-medium">{hook.name}</td>
+												<td><span class="badge badge-ghost badge-sm">{hook.event}</span></td>
+												<td class="text-xs opacity-70">{hook.handler_type ?? '-'}</td>
+												<td class="text-xs opacity-70">{hook.priority ?? '-'}</td>
+												<td class="text-xs opacity-70">{hook.scope ?? '-'}</td>
+												<td class="text-center">
+													<input
+														type="checkbox"
+														class="toggle toggle-primary toggle-sm"
+														checked={hook.is_enabled}
+														onchange={(e) =>
+															toggleHook(hook._id, (e.target as HTMLInputElement).checked)}
+													/>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+
 			<!-- Section: Danger Zone -->
 			<div class="collapse-arrow join-item border-base-300 border-error/20 collapse border">
 				<input
@@ -789,3 +1065,170 @@
 	<DataUpdate tableName="user_prompts" bind:isOpen={isCreatingPrompt} />
 	<DataUpdate tableName="user_companions" bind:isOpen={isEditingCompanion} id={editingCompanionId} />
 </div>
+
+<style>
+	@layer components {
+		.settings-page {
+			position: absolute;
+			inset: 0;
+			padding: var(--pad-xl);
+			overflow-y: auto;
+			background: var(--color-surface-raised);
+		}
+
+		.join-vertical {
+			display: flex;
+			width: 100%;
+			flex-direction: column;
+			background: var(--color-surface);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-md);
+			overflow: hidden;
+		}
+
+		.collapse {
+			position: relative;
+			border: var(--border-width) solid var(--color-border);
+			border-block-end: 0;
+			background: var(--color-surface);
+		}
+
+		.collapse:last-child {
+			border-block-end: var(--border-width) solid var(--color-border);
+		}
+
+		.collapse > input:first-child {
+			position: absolute;
+			z-index: 1;
+			inset: 0 0 auto;
+			width: 100%;
+			height: 3.5rem;
+			margin: 0;
+			opacity: 0;
+			cursor: pointer;
+		}
+
+		.collapse-title {
+			display: flex;
+			min-height: 3.5rem;
+			align-items: center;
+			gap: var(--gap-sm);
+			padding: var(--pad-md) calc(var(--pad-xl) + var(--pad-md)) var(--pad-md) var(--pad-lg);
+			font-size: var(--text-lg);
+			font-weight: var(--font-medium);
+		}
+
+		.collapse-title::after {
+			position: absolute;
+			right: var(--pad-lg);
+			content: '›';
+			transform: rotate(90deg);
+			transition: transform var(--transition-fast);
+		}
+
+		.collapse > input:first-child:checked ~ .collapse-title::after {
+			transform: rotate(-90deg);
+		}
+
+		.collapse-content {
+			display: none;
+			padding: 0 var(--pad-lg) var(--pad-lg);
+		}
+
+		.collapse > input:first-child:checked ~ .collapse-content {
+			display: block;
+		}
+
+		.form-control {
+			display: flex;
+			min-width: 0;
+			flex-direction: column;
+			gap: var(--gap-xs);
+		}
+
+		.label {
+			display: flex;
+			align-items: center;
+			gap: var(--gap-sm);
+			font-size: var(--text-sm);
+		}
+
+		.alert {
+			display: flex;
+			align-items: center;
+			gap: var(--gap-sm);
+			padding: var(--pad-md);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-md);
+		}
+
+		.alert-error {
+			border-color: var(--color-critical);
+			background: color-mix(in srgb, var(--color-critical) 8%, var(--color-surface));
+			color: var(--color-critical);
+		}
+
+		.alert-info {
+			border-color: var(--color-info);
+			background: color-mix(in srgb, var(--color-info) 8%, var(--color-surface));
+		}
+
+		.badge {
+			display: inline-flex;
+			align-items: center;
+			padding: var(--pad-xs) var(--pad-sm);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-full);
+			font-size: var(--text-xs);
+		}
+
+		.badge-primary {
+			border-color: var(--color-primary);
+			background: var(--color-primary);
+			color: var(--color-on-primary);
+		}
+
+		.loading-spinner {
+			display: inline-block;
+			width: 1.5rem;
+			height: 1.5rem;
+			border: calc(var(--border-width) * 2) solid var(--color-border);
+			border-top-color: var(--color-primary);
+			border-radius: var(--radius-full);
+			animation: settings-spin var(--duration-spin) linear infinite;
+		}
+
+		.bg-base-100 {
+			background: var(--color-surface);
+		}
+
+		.bg-base-300 {
+			background: var(--color-surface-raised);
+		}
+
+		.border-base-300 {
+			border-color: var(--color-border);
+		}
+
+		.text-error {
+			color: var(--color-critical);
+		}
+
+		.btn-error {
+			border-color: var(--color-critical);
+			color: var(--color-critical);
+		}
+
+		@keyframes settings-spin {
+			to {
+				transform: rotate(1turn);
+			}
+		}
+
+		@media (max-width: 48rem) {
+			.settings-page {
+				padding: var(--pad-md);
+			}
+		}
+	}
+</style>

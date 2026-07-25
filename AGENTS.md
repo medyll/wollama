@@ -1,186 +1,183 @@
-# AGENTS.md - Wollama Development Guide
+# Wollama - AI Chat Application Context
 
-This file contains essential development guidelines and commands for agentic coding agents working in the Wollama repository.
+## Project Overview
 
-## 1. Build, Lint, and Test Commands
+**Wollama** is a cross-platform AI chat application (Web, Desktop, Mobile) that runs locally with **Ollama**. It supports text streaming and voice interactions (STT/TTS) with an offline-first architecture.
 
-### Root Commands (Monorepo)
+### Core Technologies
+
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Svelte 5 (Runes), Vite, Tailwind CSS v4, DaisyUI |
+| **Backend** | Node.js v20+, Express.js, PouchDB (LevelDB) |
+| **Desktop** | Electron |
+| **Mobile** | Capacitor (Android/iOS) |
+| **Database** | RxDB (Client/IndexedDB) ↔ PouchDB (Server) sync |
+| **AI** | Ollama API (streaming), Whisper (STT), Piper (TTS) |
+
+## Monorepo Structure
+
+```
+wollama/
+├── client/              # Svelte 5 frontend (@wollama/client)
+│   ├── src/
+│   │   ├── lib/         # DB, services, state (Svelte 5 Runes)
+│   │   ├── routes/      # SvelteKit pages
+│   │   └── components/  # UI components (kebab-case naming)
+│   ├── electron/        # Electron main process
+│   └── android/         # Capacitor Android project
+├── server/              # Node.js backend (@wollama/server)
+│   ├── services/        # Business logic (ollama, stt, tts)
+│   ├── db/              # PouchDB setup
+│   └── routes/          # Express routes
+├── shared/              # Shared code (@wollama/shared)
+│   └── db/              # Database schema (single source of truth)
+└── packages/            # Internal packages (e.g., chatterbox TTS)
+```
+
+## Build & Development Commands
+
+### Root Commands (run from project root)
 
 ```bash
 # Development
-npm run dev:client          # Start Svelte 5 frontend (Vite)
-npm run dev:server          # Start Node.js backend with audio setup
-npm run dev:electron        # Start Electron desktop app
+npm run dev:client       # Start Svelte 5 frontend (Vite) - http://localhost:5173
+npm run dev:server       # Start Node.js backend with audio setup - http://localhost:3000
+npm run dev:electron     # Start Electron desktop app
 
-# Build & Check
-npm run build              # Build client for production
-npm run check              # Type check all projects
+# Build & Type Check
+npm run build            # Build client for production
+npm run check            # Type check all projects
 
 # Testing
-npm run test:client        # Run all client tests (Vitest)
-npm run test:server        # Run all server tests (Vitest)
-npm run test:client -- --run  # Run client tests once (no watch)
-npm run test:server -- --run  # Run server tests once (no watch)
-
-# Single test file (replace with actual path)
-npm run test:client -- src/components/button.test.ts
-npm run test:server -- src/services/ollama.test.ts
+npm run test:client      # Run client tests (Vitest, watch mode)
+npm run test:server      # Run server tests (Vitest)
+npm run test:client -- --run   # Client tests once (no watch)
+npm run test:server -- --run   # Server tests once (no watch)
 
 # Quality Assurance
-npm run lint               # Run Prettier + ESLint
-npm run format             # Format all files with Prettier
-npm run setup:audio        # Download audio models for TTS
+npm run lint             # Prettier check + ESLint
+npm run format           # Auto-fix formatting with Prettier
+npm run setup:audio      # Download ONNX models for TTS/STT
 ```
 
-### Nx Commands (if available)
+### Workspace Commands
 
 ```bash
-# Use Nx for workspace management
-nx run client:build        # Build client project
-nx run server:test         # Run server tests
-nx affected:test           # Test affected projects only
+npm run <command> -w @wollama/client   # Client-specific commands
+npm run <command> -w @wollama/server   # Server-specific commands
 ```
 
-## 2. Code Style Guidelines
+## Development Conventions
 
-### TypeScript & JavaScript
+### TypeScript
+- **Strict mode** enabled throughout
+- **No `any` type** - use proper typing
+- **Type-only imports**: `import type` for interfaces
 
-- **Strict Mode**: TypeScript strict mode enabled throughout
-- **No Explicit Any**: Use proper typing, avoid `any` type
-- **Unused Variables**: ESLint will warn about unused variables
-- **Import Organization**: Group imports by type (external, internal, type-only)
-
-### Frontend (Svelte 5)
-
-- **Runes Syntax Only**: Use `$state`, `$derived`, `$effect` - no old Svelte patterns
-- **Component Structure**: Follow Svelte 5 conventions with `{#snippet}` syntax
+### Svelte 5 (Frontend)
+- **Runes syntax only**: `$state`, `$derived`, `$effect` (no old Svelte patterns)
+- **Component naming**: kebab-case (e.g., `chat-window.svelte`)
 - **Styling**: Tailwind utility classes + DaisyUI components only
-- **File Naming**: kebab-case for components (e.g., `chat-window.svelte`)
+- **New syntax**: Use `{#snippet}` for component slots
 
 ### Backend (Node.js)
+- **Relative imports** for server modules
+- **Async/await** over Promise chains
+- **Try/catch** with proper error propagation
 
-- **Relative Imports**: Use relative paths for server modules
-- **Async/Await**: Prefer async/await over Promise chains
-- **Error Handling**: Use try/catch blocks with proper error propagation
-- **Type Safety**: Strong typing for all interfaces and schemas
+### Code Style
+- **Tabs** for indentation (see `.prettierrc`)
+- **Single quotes** for strings
+- **No trailing commas**
+- **Print width**: 130 characters
 
-### Shared Code
+## Database Architecture
 
-- **Type-Only Imports**: Use `import type` for shared interfaces
-- **Schema Updates**: Update `shared/db/database-scheme.ts` first before any DB changes
-- **Cross-Platform**: Consider platform differences (Web/Electron/Mobile)
+### Schema Management
+1. **Always update first**: `shared/db/database-scheme.ts`
+2. Then implement client-side RxDB changes
+3. Then update server-side PouchDB configuration
 
-## 3. Development Workflow
+### Key Collections
+- `users`, `user_preferences`
+- `companions`, `user_companions` (AI personalities)
+- `chats`, `messages`
+- `user_prompts` (custom instructions)
+- `skills`, `agents`, `hooks` (extensibility)
+- `tool_calls`
 
-### Monorepo First
+### Offline-First Sync
+- **Client**: RxDB with IndexedDB
+- **Server**: PouchDB with LevelDB adapter
+- **Sync**: CouchDB replication protocol
 
-- Always run commands from the root directory
-- Use workspace flags (`-w @wollama/*`) when needed
-- Follow the monorepo structure: client/, server/, shared/
+## Platform-Specific Audio Strategy
 
-### Platform Considerations
+| Platform | STT/TTS Execution |
+|----------|-------------------|
+| **Web** | Server-side (Node.js child processes) |
+| **Desktop (Electron)** | Native Node.js child processes (whisper.cpp, piper binaries) |
+| **Mobile (Capacitor)** | Custom Capacitor Plugin (native bridge to JNI/Swift) |
 
-- **Web**: Server-side audio processing
-- **Desktop**: Native Node.js child processes
-- **Mobile**: Capacitor Plugin with native bridge
+## Key Configuration Files
 
-### Offline-First Architecture
+| File | Purpose |
+|------|---------|
+| `PROJECT.md` | Complete project specifications |
+| `AGENTS.md` | Development guide for coding agents |
+| `shared/db/database-scheme.ts` | Database schema (update first) |
+| `client/src/lib/db.ts` | Client RxDB setup |
+| `server/server.ts` | Backend entry point |
+| `server/db/database.ts` | PouchDB configuration |
+| `.prettierrc` | Code formatting rules |
+| `tsconfig.json` | TypeScript configuration |
 
-- Client uses RxDB for local-first data
-- Server uses PouchDB with CouchDB replication
-- Always consider offline scenarios in data flow
+## Testing Guidelines
 
-## 4. Key Files and Their Purposes
+- **Framework**: Vitest for all projects
+- **Client tests**: jsdom environment with SvelteKit integration
+- **Server tests**: Node.js environment
+- **Naming pattern**: `functionName_shouldDoSomething`
+- **Run single file**: `npm run test:client -- path/to/test.test.ts`
 
-- `PROJECT.md`: Complete project specifications and requirements
-- `shared/db/database-scheme.ts`: Database schema - update this first
-- `client/src/lib/db.ts`: Client database logic and RxDB setup
-- `server/server.ts`: Backend entry point and Express setup
-- `server/db/database.ts`: PouchDB server database configuration
+## Important Considerations
 
-## 5. Testing Guidelines
+### Prerequisites
+- Node.js v20+ and npm
+- Ollama running on `http://127.0.0.1:11434`
+- Android Studio (for mobile development)
 
-### Test Structure
+### Environment Variables
+- Set `OLLAMA_ORIGINS="*"` for CORS if needed
+- Use environment variables for sensitive configuration (never commit secrets)
 
-- Use Vitest for all testing
-- Client tests use jsdom environment with SvelteKit integration
-- Server tests use Node.js environment with TypeScript support
-- Write descriptive test names following the pattern: `functionName_shouldDoSomething`
+### Deep Linking (Mobile)
+- Custom URL schemes handled in `client/src/routes/+layout.svelte`
+- Intercept `appUrlOpen` event from Capacitor App plugin
 
-### Test Commands
+### Accessibility
+- Application must be RGAA 2.0 compatible
+- Use semantic HTML and ARIA attributes
 
-- Run all tests: `npm run test:client` or `npm run test:server`
-- Run single test: `npm run test:client -- path/to/test.test.ts`
-- Watch mode: `npm run test:client -- --watch`
-- Single run: `npm run test:client -- --run`
+### Internationalization (i18n)
+- Supported languages: English, French, German, Spanish, Italian
+- Locale stored in `user_preferences.locale`
 
-## 6. Quality Assurance
-
-### Pre-commit Hooks
-
-- Husky + lint-staged configured for automatic checks
-- Prettier runs on all JS/TS/Svelte/JSON/MD files
-- ESLint fixes on JS/TS/Svelte files automatically
-
-### Linting Rules
-
-- TypeScript strict mode enforced
-- Svelte-specific rules (no-at-html-tags, require-each-key)
-- Custom ESLint overrides for Svelte syntax
-
-## 7. Architecture Principles
-
-### Data Flow
-
-1. Update shared schema first
-2. Implement client-side RxDB changes
-3. Update server-side PouchDB configuration
-4. Test data sync across platforms
-
-### Audio Strategy
-
-- Web: Server-side Whisper/Piper processing
-- Desktop: Native Node.js child processes
-- Mobile: Capacitor Plugin native bridge
-
-### TTS Sidecar (Chatterbox Turbo)
-
-- Server spawns Python FastAPI sidecar
-- REST/WebSocket communication on localhost
-- Lazy-loaded models for performance
-
-## 8. Common Issues and Solutions
+## Common Issues
 
 ### Build Failures
+- Run `npm install` at root to install all workspace dependencies
+- Check TypeScript config in each project
 
-- Check package.json for correct workspace scripts
-- Verify TypeScript configuration in each project
-- Ensure all dependencies are installed with `npm install`
+### Ollama Connection
+- Ensure Ollama is running: `ollama serve`
+- Pull a model: `ollama pull mistral`
 
-### Test Failures
+### Database Sync
+- Clear browser data triggers re-sync from server
+- Server data stored in `db_data/` directory
 
-- Run tests with `--run` flag for non-watch mode
-- Check test environment configuration (jsdom vs Node.js)
-- Verify test file paths and naming conventions
-
-### Linting Issues
-
-- Run `npm run format` to auto-fix formatting
-- Check ESLint configuration for specific rule violations
-- Use `npm run lint` to identify all issues before committing
-
-## 9. Security Considerations
-
-- Never commit secrets or API keys
-- Use environment variables for sensitive configuration
-- Validate all user inputs and API responses
-- Follow OWASP guidelines for web application security
-
-## 10. Performance Guidelines
-
-- Use lazy loading for heavy components and models
-- Optimize bundle size with proper code splitting
-- Consider offline-first performance implications
-- Monitor memory usage for audio processing tasks
-
-Remember: This is a production-ready AI chat application with strict coding standards and cross-platform requirements. Always follow the established patterns and conventions.
+### Audio Permissions
+- Web/Electron: Browser `navigator.mediaDevices`
+- Mobile: `RECORD_AUDIO` permission (handled by Capacitor)

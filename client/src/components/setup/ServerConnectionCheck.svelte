@@ -8,6 +8,13 @@
 	let pollingTimer: any;
 	let tempUrl = $state(userState.preferences.serverUrl);
 	let currentErrorToastId: string | null = null;
+	let dialog = $state<HTMLDialogElement>();
+
+	$effect(() => {
+		if (!dialog) return;
+		if (connectionState.showModal && !dialog.open) dialog.showModal();
+		if (!connectionState.showModal && dialog.open) dialog.close();
+	});
 
 	async function checkConnection(isAuto = false) {
 		connectionState.setChecking(true);
@@ -94,9 +101,8 @@
 </script>
 
 {#if connectionState.showModal}
-	<!-- Section: Connection Modal -->
-	<div class="modal modal-open z-50 bg-black/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-		<div class="modal-box shadow-2xl">
+	<dialog bind:this={dialog} class="connection-dialog" aria-labelledby="modal-title" oncancel={goOffline}>
+		<section>
 			<h3
 				id="modal-title"
 				class={`flex items-center gap-2 text-lg font-bold ${!connectionState.isConnected ? 'text-error' : 'text-warning'}`}
@@ -124,30 +130,59 @@
 				{/if}
 			</p>
 
-			<div class="form-control w-full">
-				<label class="label" for="server-url-input">
-					<span class="label-text">{t('settings.server_url')}</span>
-				</label>
+			<div class="field-stack">
+				<label for="server-url-input">{t('settings.server_url')}</label>
 				<input
 					id="server-url-input"
 					type="text"
 					bind:value={tempUrl}
-					class="input input-bordered w-full font-mono"
+					class="font-mono"
 					placeholder="http://localhost:3000"
 				/>
 			</div>
 
-			<div class="modal-action">
-				<button class="btn btn-ghost" onclick={goOffline}>{t('status.continue_offline')}</button>
-				<button class="btn btn-primary" onclick={updateUrl} disabled={connectionState.isChecking}>
+			<div class="toolbar">
+				<button class="btn-ghost" onclick={goOffline}>{t('status.continue_offline')}</button>
+				<button class="btn-primary" onclick={updateUrl} disabled={connectionState.isChecking}>
 					{#if connectionState.isChecking}
-						<span class="loading loading-spinner loading-xs"></span>
 						{t('status.connecting')}...
 					{:else}
 						{t('status.retry')}
 					{/if}
 				</button>
 			</div>
-		</div>
-	</div>
+		</section>
+	</dialog>
 {/if}
+
+<style>
+	.connection-dialog {
+		width: min(32rem, calc(100vw - (2 * var(--pad-md))));
+		max-width: none;
+		padding: 0;
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface-raised);
+		color: var(--color-text);
+	}
+
+	.connection-dialog::backdrop {
+		background: color-mix(in oklch, var(--color-text) 40%, transparent);
+		backdrop-filter: blur(0.25rem);
+	}
+
+	.connection-dialog section {
+		display: grid;
+		gap: var(--gap-md);
+		padding: var(--pad-lg);
+	}
+
+	.connection-dialog h3,
+	.connection-dialog p {
+		margin: 0;
+	}
+
+	.connection-dialog .toolbar {
+		justify-content: flex-end;
+	}
+</style>

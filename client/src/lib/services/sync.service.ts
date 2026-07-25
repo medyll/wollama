@@ -158,7 +158,7 @@ export class SyncService {
 	private startPeriodicSync() {
 		if (typeof window === 'undefined') return;
 
-		this.syncInterval = window.setInterval(() => {
+		this.syncInterval = setInterval(() => {
 			if (connectionState.isConnected && !this.isSyncing && this.syncQueue.size > 0) {
 				this.syncPending().catch(console.error);
 			}

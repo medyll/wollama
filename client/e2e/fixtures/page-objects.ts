@@ -217,7 +217,7 @@ export class ChatPage {
 export class AppPage {
 	constructor(private page: Page) {}
 
-	async goto(url: string = 'http://localhost:5173') {
+	async goto(url: string = 'http://localhost:5176') {
 		await this.page.goto(url);
 	}
 
@@ -230,46 +230,34 @@ export class AppPage {
 	}
 
 	async clearLocalStorage() {
-		await this.page.evaluate(() => localStorage.clear());
+		try {
+			await this.page.evaluate(() => localStorage.clear());
+		} catch (e) {
+			// Ignore localStorage errors (can happen in some browser contexts)
+			console.warn('Could not clear localStorage:', e);
+		}
 	}
 
 	async clearIndexedDB() {
-		await this.page.evaluate(() => {
-			return new Promise<void>((resolve, reject) => {
-				const dbs = indexedDB.databases
-					? indexedDB.databases()
-					: Promise.resolve([]).then(() => {
-							// Fallback for older browsers
-							return [];
-						});
-
-				if (dbs instanceof Promise) {
-					dbs.then((databases: any[]) => {
-						let completed = 0;
-						if (databases.length === 0) {
-							resolve();
-							return;
-						}
-
+		try {
+			await this.page.evaluate(() => {
+				// Manually delete known databases
+				if (indexedDB.databases) {
+					indexedDB.databases().then((databases: any[]) => {
 						databases.forEach((db: any) => {
-							const request = indexedDB.deleteDatabase(db.name);
-							request.onsuccess = () => {
-								completed++;
-								if (completed === databases.length) {
-									resolve();
-								}
-							};
-							request.onerror = reject;
+							indexedDB.deleteDatabase(db.name);
 						});
-					}).catch(reject);
+					}).catch(() => {});
 				} else {
-					// Manually delete known databases
-					indexedDB.deleteDatabase('wollama_db');
-					indexedDB.deleteDatabase('rxdb_wollama');
-					resolve();
+					// Fallback: delete known databases
+					try { indexedDB.deleteDatabase('wollama_db'); } catch {}
+					try { indexedDB.deleteDatabase('rxdb_wollama'); } catch {}
 				}
 			});
-		});
+		} catch (e) {
+			// Ignore IndexedDB errors
+			console.warn('Could not clear IndexedDB:', e);
+		}
 	}
 
 	async freshAppState() {

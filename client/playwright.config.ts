@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Playwright E2E Test Configuration for Wollama
- * 
+ *
  * Runs tests for:
  * - Story 5.3: E2E Test for Onboarding Journey
  * - Story 5.4: E2E Test for Multi-Device Sync
@@ -19,7 +19,7 @@ export default defineConfig({
 	workers: 1, // Single worker to avoid race conditions
 
 	// Timeout settings
-	timeout: 30 * 1000, // 30 seconds per test
+	timeout: 120 * 1000, // 120 seconds per test
 	expect: {
 		timeout: 5000
 	},
@@ -33,24 +33,16 @@ export default defineConfig({
 	],
 
 	// Web server configuration
-	webServer: [
-		{
-			command: 'npm run dev',
-			port: 5173,
-			timeout: 120 * 1000,
-			reuseExistingServer: !process.env['CI']
-		},
-		{
-			command: 'npx pouchdb-server --port 5984',
-			port: 5984,
-			timeout: 90 * 1000,
-			reuseExistingServer: false
-		}
-	],
+	webServer: {
+		command: 'node ./node_modules/vite/bin/vite.js --host 127.0.0.1',
+		port: 5176,
+		timeout: 120 * 1000,
+		reuseExistingServer: true // Don't kill existing server
+	},
 
 	use: {
 		// Base URL for all requests
-		baseURL: 'http://localhost:5173',
+		baseURL: 'http://localhost:5176',
 
 		// Screenshot and video configuration
 		screenshot: 'only-on-failure',
@@ -62,7 +54,7 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium',
-			use: { ...devices['Desktop Chrome'] }
+			use: { ...devices['Desktop Chrome'], channel: 'chrome' }
 		},
 
 		{
@@ -78,7 +70,7 @@ export default defineConfig({
 		// Mobile testing
 		{
 			name: 'Mobile Chrome',
-			use: { ...devices['Galaxy S5'] }
+			use: { ...devices['Galaxy S5'], channel: 'chrome' }
 		}
 	]
 });

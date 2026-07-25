@@ -2,6 +2,7 @@
 /.idea
 node_modules
 **/node_modules
+.pnpm-store/
 /build
 **/build
 .svelte-kit

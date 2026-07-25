@@ -66,7 +66,7 @@ function createWindow() {
 		});
 
 		if (isDev) {
-			mainWindow.loadURL('http://localhost:5173');
+			mainWindow.loadURL('http://localhost:5176');
 			mainWindow.webContents.openDevTools();
 		} else {
 			loadURL(mainWindow);

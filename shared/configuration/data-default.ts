@@ -1,6 +1,29 @@
-import type { Companion } from '../../client/src/types/data';
+interface DefaultCompanion {
+	companion_id: string;
+	name: string;
+	description: string;
+	system_prompt: string;
+	model: string;
+	voice_id: string;
+	voice_tone: 'neutral' | 'fast' | 'slow' | 'deep' | 'high';
+	mood: 'neutral' | 'happy' | 'sad' | 'angry' | 'sarcastic' | 'professional' | 'friendly' | 'sexy';
+	avatar?: string;
+	created_at?: number;
+	updated_at?: number;
+	specialization:
+		| 'character development'
+		| 'plot outline'
+		| 'world building'
+		| 'dialogue'
+		| 'general'
+		| 'coding'
+		| 'prompt-engineering'
+		| 'roleplay'
+		| 'storytelling';
+	is_locked: boolean;
+}
 
-export const DEFAULT_COMPANIONS: Partial<Companion>[] = [
+export const DEFAULT_COMPANIONS: DefaultCompanion[] = [
 	{
 		companion_id: '1',
 		name: 'General Assistant',

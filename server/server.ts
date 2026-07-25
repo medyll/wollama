@@ -10,7 +10,13 @@ import { TtsService } from './services/tts.service.js';
 import { OllamaService } from './services/ollama.service.js';
 import { PromptService } from './services/prompt.service.js';
 import { sidecarService } from './services/sidecar.service.js';
+import { hookRegistry } from './services/hook-registry.service.js';
+import { hookPipeline } from './services/hook-pipeline.service.js';
 import { logger } from './utils/logger.js';
+import skillsRouter from './routes/skills.js';
+import hooksRouter from './routes/hooks.js';
+import agentsRouter from './routes/agents.js';
+import ragRouter from './routes/rag.js';
 
 import cors from 'cors';
 import helmet from 'helmet';
@@ -99,6 +105,18 @@ app.get('/api/health', (req, res) => {
 	});
 });
 
+// Skills routes (Sprint 3)
+app.use('/api/skills', skillsRouter);
+
+// Hooks routes (Sprint 5)
+app.use('/api/hooks', hooksRouter);
+
+// Agents routes (Sprint 4)
+app.use('/api/agents', agentsRouter);
+
+// RAG routes
+app.use('/api/rag', ragRouter);
+
 // Audio Routes
 app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
 	try {
@@ -169,7 +187,7 @@ app.post('/api/audio/speak', async (req, res) => {
 
 app.post('/api/chat/generate', async (req, res) => {
 	try {
-		const { model, messages, stream, context } = req.body;
+		const { model, messages, stream, context, chat_id, user_id, companion_id } = req.body;
 
 		// Process Context if available
 		if (context) {
@@ -211,6 +229,29 @@ app.post('/api/chat/generate', async (req, res) => {
 				);
 			}
 		}
+
+		// ── Hook Pipeline: pre-send ──────────────────────────────────────────
+		let lastUserIdx = -1;
+		for (let i = messages.length - 1; i >= 0; i--) {
+			if (messages[i].role === 'user') {
+				lastUserIdx = i;
+				break;
+			}
+		}
+		if (lastUserIdx !== -1 && (chat_id || user_id)) {
+			const preSendCtx = hookPipeline.createContext({
+				event: 'pre-send',
+				chat_id: chat_id ?? '',
+				user_id: user_id ?? '',
+				companion_id,
+				content: messages[lastUserIdx].content,
+				role: 'user',
+				skill_invoked: req.body.skill_invoked
+			});
+			const mutated = await hookPipeline.run('pre-send', preSendCtx);
+			messages[lastUserIdx].content = mutated.message.content;
+		}
+		// ────────────────────────────────────────────────────────────────────
 
 		if (stream) {
 			// Don't set headers immediately, wait until we have the stream or at least know the request is valid
@@ -423,7 +464,7 @@ const startLocalOllama = async () => {
 				detached: true,
 				stdio: 'ignore'
 			});
-			child.f();
+			child.unref();
 			logger.success('OLLAMA', 'Started local Ollama instance (Linux)');
 			return true;
 		}
@@ -596,10 +637,17 @@ app.listen(port, async () => {
 	logger.info('DB', `PouchDB mounted at /_db`);
 
 	await dbManager.seedCompanions();
+	await dbManager.seedHooks();
+	await hookRegistry.load();
 
-	await ensureAudioSetup();
-	await initializeOllama();
-	await initializeTTS();
+	// Allow tests to skip heavy external initializations (Ollama, audio, sidecar)
+	if (process.env.SKIP_HEAVY_SETUP !== 'true') {
+		await ensureAudioSetup();
+		await initializeOllama();
+		await initializeTTS();
+	} else {
+		logger.info('SERVER', 'Skipping heavy setup (SKIP_HEAVY_SETUP=true)');
+	}
 });
 
 // Graceful Shutdown

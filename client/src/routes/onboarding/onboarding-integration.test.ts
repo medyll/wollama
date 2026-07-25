@@ -43,7 +43,7 @@ describe('Integration: Onboarding Flow (Story 1.1 AC)', () => {
 		// Step 5: Verify flag is set
 		expect(userState.preferences.onboarding_completed).toBe(true);
 
-		// Step 6: User is redirected to /setup
+		// Step 6: User is redirected to /chat
 		// (Would redirect based on flag in +layout)
 	});
 
@@ -71,7 +71,7 @@ describe('Integration: Onboarding Flow (Story 1.1 AC)', () => {
 	it('should provide Next button for proceeding', () => {
 		// The component includes a Next button that either:
 		// 1. Advances to next step (if steps available)
-		// 2. Completes onboarding and redirects to /setup (if on final step)
+		// 2. Completes onboarding and redirects to /chat (if on final step)
 		// Verified by component test checking button existence and onclick handler
 		expect(true).toBe(true); // Placeholder - actual test in component test
 	});

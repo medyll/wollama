@@ -54,7 +54,10 @@ export const appSchema: DatabaseSchema = {
 			created_at: { type: 'timestamp', required: true, auto: true },
 			updated_at: { type: 'timestamp', auto: true },
 			specialization: { type: 'string' },
-			is_locked: { type: 'boolean' }
+			is_locked: { type: 'boolean' },
+			// Skills / Hooks bindings
+			hooks: { type: 'array', items: { type: 'string' } },
+			skills: { type: 'array', items: { type: 'string' } }
 		}
 	},
 	user_companions: {
@@ -156,6 +159,22 @@ export const appSchema: DatabaseSchema = {
 						title: { type: 'string' }
 					}
 				}
+			},
+			// Skills / Hooks extensions
+			tool_call_id: { type: 'uuid' },
+			skill_invoked: { type: 'string' }, // e.g. "/translate fr"
+			hook_log: {
+				type: 'array',
+				items: {
+					type: 'object',
+					properties: {
+						hook_id: { type: 'string' },
+						event: { type: 'string' },
+						duration_ms: { type: 'number' },
+						mutated: { type: 'boolean' },
+						error: { type: 'string' }
+					}
+				}
 			}
 		}
 	},
@@ -215,6 +234,186 @@ IMPORTANT:
 			name: { type: 'string', required: true },
 			created_at: { type: 'timestamp', required: true, auto: true },
 			updated_at: { type: 'timestamp', auto: true }
+		}
+	},
+
+	// ── Agents / Skills / Hooks ──────────────────────────────────────────────
+
+	skills: {
+		primaryKey: 'skill_id',
+		indexes: ['name', 'scope', 'is_enabled'],
+		template: {
+			presentation: 'display_name',
+			card_lines: ['description', 'command', 'handler_type']
+		},
+		fields: {
+			skill_id: { type: 'uuid', required: true },
+			name: { type: 'string', required: true }, // slug: "translate"
+			display_name: { type: 'string', required: true },
+			description: { type: 'string', ui: { type: 'textarea' } },
+			command: { type: 'string', required: true }, // "/translate"
+			icon: { type: 'string' },
+			input_schema: {
+				type: 'object',
+				properties: {}
+			},
+			handler_type: {
+				type: 'string',
+				required: true,
+				enum: ['builtin', 'llm', 'agent']
+			},
+			handler_ref: { type: 'string', required: true }, // fn name or agent_id
+			scope: {
+				type: 'string',
+				required: true,
+				enum: ['global', 'user', 'companion'],
+				default: 'global'
+			},
+			is_enabled: { type: 'boolean', default: true },
+			created_at: { type: 'timestamp', required: true, auto: true },
+			updated_at: { type: 'timestamp', auto: true }
+		}
+	},
+
+	agents: {
+		primaryKey: 'agent_id',
+		indexes: ['name', 'type', 'is_enabled'],
+		template: {
+			presentation: 'name',
+			card_lines: ['description', 'type']
+		},
+		fields: {
+			agent_id: { type: 'uuid', required: true },
+			name: { type: 'string', required: true },
+			description: { type: 'string', ui: { type: 'textarea' } },
+			type: {
+				type: 'string',
+				required: true,
+				enum: ['web_search', 'page_fetch', 'file_reader', 'custom']
+			},
+			config: { type: 'object', properties: {} }, // type-specific config
+			is_enabled: { type: 'boolean', default: true },
+			created_at: { type: 'timestamp', required: true, auto: true },
+			updated_at: { type: 'timestamp', auto: true }
+		}
+	},
+
+	hooks: {
+		primaryKey: 'hook_id',
+		indexes: ['event', 'scope', 'is_enabled', 'priority'],
+		template: {
+			presentation: 'name',
+			card_lines: ['event', 'handler_type', 'priority']
+		},
+		fields: {
+			hook_id: { type: 'uuid', required: true },
+			name: { type: 'string', required: true },
+			event: {
+				type: 'string',
+				required: true,
+				enum: ['pre-send', 'post-receive', 'on-session-start', 'on-session-end', 'on-tool-result']
+			},
+			handler_type: {
+				type: 'string',
+				required: true,
+				enum: ['builtin', 'llm', 'skill']
+			},
+			handler_ref: { type: 'string', required: true },
+			priority: { type: 'number', default: 100 }, // lower = runs first
+			scope: {
+				type: 'string',
+				required: true,
+				enum: ['global', 'user', 'companion'],
+				default: 'global'
+			},
+			scope_id: { type: 'uuid' }, // user_id or companion_id if scoped
+			is_enabled: { type: 'boolean', default: true },
+			config: { type: 'object', properties: {} },
+			created_at: { type: 'timestamp', required: true, auto: true },
+			updated_at: { type: 'timestamp', auto: true }
+		}
+	},
+
+	// ── RAG ───────────────────────────────────────────────────────────────────
+
+	documents: {
+		primaryKey: 'document_id',
+		indexes: ['owner_id', 'source', 'created_at'],
+		template: {
+			presentation: 'title',
+			card_lines: ['source', 'source_ref', 'chunk_count']
+		},
+		fk: {
+			owner_id: { table: 'users', required: true, multiple: true }
+		},
+		fields: {
+			document_id: { type: 'uuid', required: true },
+			owner_id: { type: 'uuid', required: true },
+			source: { type: 'string', required: true, enum: ['file', 'chat', 'web'] },
+			title: { type: 'string', required: true },
+			source_ref: { type: 'string' }, // filename, chat_id, or URL
+			mime_type: { type: 'string' },
+			chunk_count: { type: 'number', default: 0 },
+			status: {
+				type: 'string',
+				enum: ['pending', 'indexed', 'error'],
+				default: 'pending'
+			},
+			error: { type: 'string' },
+			created_at: { type: 'timestamp', required: true, auto: true },
+			updated_at: { type: 'timestamp', auto: true }
+		}
+	},
+
+	document_chunks: {
+		primaryKey: 'chunk_id',
+		indexes: ['document_id', 'owner_id', 'position'],
+		fk: {
+			document_id: { table: 'documents', required: true, multiple: true },
+			owner_id: { table: 'users', required: true, multiple: true }
+		},
+		template: {
+			presentation: 'text',
+			card_lines: ['text', 'position']
+		},
+		fields: {
+			chunk_id: { type: 'uuid', required: true },
+			document_id: { type: 'uuid', required: true },
+			owner_id: { type: 'uuid', required: true },
+			text: { type: 'text-long', required: true },
+			position: { type: 'number', required: true },
+			embedding_model: { type: 'string', required: true },
+			created_at: { type: 'timestamp', required: true, auto: true }
+		}
+	},
+
+	tool_calls: {
+		primaryKey: 'tool_call_id',
+		indexes: ['message_id', 'agent_id', 'status', 'started_at'],
+		fk: {
+			message_id: { table: 'messages', required: true, multiple: false },
+			agent_id: { table: 'agents', required: true, multiple: false }
+		},
+		template: {
+			presentation: 'tool_call_id',
+			card_lines: ['status', 'started_at', 'finished_at']
+		},
+		fields: {
+			tool_call_id: { type: 'uuid', required: true },
+			message_id: { type: 'uuid', required: true },
+			agent_id: { type: 'uuid', required: true },
+			skill_id: { type: 'uuid' }, // nullable — set when triggered by a skill
+			status: {
+				type: 'string',
+				required: true,
+				enum: ['pending', 'running', 'done', 'error'],
+				default: 'pending'
+			},
+			input: { type: 'object', properties: {} },
+			output: { type: 'object', properties: {} },
+			error: { type: 'string' },
+			started_at: { type: 'timestamp', required: true, auto: true },
+			finished_at: { type: 'timestamp' }
 		}
 	}
 };

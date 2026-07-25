@@ -3,24 +3,24 @@
 	"version": "0.0.9",
 	"private": true,
 	"type": "module",
+	"packageManager": "pnpm@11.9.0",
 	"workspaces": [
 		"client",
 		"server",
 		"shared"
 	],
 	"scripts": {
-		"dev:client": "npm run dev -w @wollama/client",
-		"dev:electron": "npm run electron:dev -w @wollama/client",
-		"dev:server": "npm run setup:python && npm run setup:audio && npm run dev -w @wollama/server",
-		"build": "npm run build -w @wollama/client",
-		"check": "npm run check -w @wollama/client && npm run check -w @wollama/server",
-		"test:client": "npm run test -w @wollama/client",
-		"test:server": "npm run test:unit -w @wollama/server",
+		"dev:client": "pnpm --filter @wollama/client dev",
+		"dev:electron": "pnpm --filter @wollama/client electron:dev",
+		"dev:server": "pnpm setup:python && pnpm setup:audio && pnpm --filter @wollama/server dev",
+		"build": "pnpm --filter @wollama/client build",
+		"check": "pnpm --filter @wollama/client check && pnpm --filter @wollama/server check",
+		"test:client": "pnpm --filter @wollama/client test",
+		"test:server": "pnpm --filter @wollama/server test:unit",
 		"setup:python": "node setup-python.js",
-		"setup:audio": "npm run setup:audio -w @wollama/server",
-		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write .",
-		"prepare": "husky",
+		"setup:audio": "pnpm --filter @wollama/server setup:audio",
+		"lint": "prettier --check .&& eslint . --fix --ignore-pattern '**/*.test.*'",
+		"format": "prettier --write . && eslint . --fix --ignore-pattern '**/*.test.*'",
 		"release": "standard-version",
 		"changelog": "standard-version --skip.bump --skip.commit --skip.tag"
 	},
@@ -35,8 +35,6 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.1",
 		"globals": "^16.5.0",
-		"husky": "^9.1.7",
-		"lint-staged": "^16.2.7",
 		"prettier": "^3.7.4",
 		"standard-version": "^9.5.0",
 		"typescript": "^5.9.3",
@@ -46,13 +44,5 @@
 		"commitizen": {
 			"path": "./node_modules/cz-customizable"
 		}
-	},
-	"lint-staged": {
-		"*.{js,ts,svelte,json,md}": [
-			"prettier --write"
-		],
-		"*.{js,ts,svelte}": [
-			"eslint --fix"
-		]
 	}
 }

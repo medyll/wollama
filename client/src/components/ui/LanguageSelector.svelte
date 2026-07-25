@@ -18,7 +18,7 @@
 		tableName="languages"
 		bind:selectedId={userState.preferences.locale}
 		mode="dropdown"
-		class="select-sm select-ghost w-full max-w-xs"
+		class="w-full"
 		placeholder="Select Language"
 	/>
 </div>

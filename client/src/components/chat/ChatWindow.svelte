@@ -11,6 +11,7 @@
 	import MessageActions from '$components/chat/MessageActions.svelte';
 	import ThinkingMessage from '$components/chat/ThinkingMessage.svelte';
 	import ChatInput from '$components/chat/ChatInput.svelte';
+	import ToolCallMessage from '$components/chat/tool-call-message.svelte';
 	import Icon from '@iconify/svelte';
 	import type { UserCompanion } from '$types/data';
 	import { goto } from '$app/navigation';
@@ -295,29 +296,21 @@
 
 <CompanionSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
 
-<div class="absolute inset-0 flex flex-col overflow-y-auto" bind:this={chatContainer} onscroll={handleScroll}>
+<chat-window>
 	{#if uiState.isAudioPlaying}
-		<button
-			class="btn btn-circle btn-error fixed top-20 right-4 z-50 shadow-lg"
-			onclick={() => audioService.stopAudio()}
-			aria-label="Stop Audio"
-			title="Stop Audio"
-		>
+		<button class="btn-icon stop-audio" onclick={() => audioService.stopAudio()} aria-label="Stop Audio" title="Stop Audio">
 			<Icon icon="fluent:stop-24-filled" class="h-6 w-6 fill-current" />
 		</button>
 	{/if}
 
-	<!-- Section: Header Removed (Moved to Input Area) -->
-
 	{#if messages.length === 0}
-		<!-- Section: Empty State -->
-		<div class="flex flex-1 flex-col items-center justify-center p-4">
-			<div class="flex w-full max-w-md flex-col items-center">
-				<img src="/assets/lama.png" alt="Wollama" class="mb-6 h-32 w-32 object-contain opacity-90" />
-				<h1 class="mb-2 text-3xl font-bold">{t('ui.ready_to_chat')}</h1>
-				<p class="mb-8 opacity-70">{t('ui.select_chat_help')}</p>
+		<chat-empty-state>
+			<empty-state-content>
+				<img src="/assets/lama.png" alt="Wollama" />
+				<h1>{t('ui.ready_to_chat')}</h1>
+				<p>{t('ui.select_chat_help')}</p>
 
-				<div class="w-full">
+				<div class="empty-composer">
 					<ChatInput
 						bind:value={messageInput}
 						bind:files={selectedFiles}
@@ -330,85 +323,76 @@
 						oncompanionclick={() => (isCompagnonModalOpen = true)}
 					/>
 				</div>
-			</div>
-		</div>
+			</empty-state-content>
+		</chat-empty-state>
 	{:else}
-		<!-- Section: Messages Area -->
-		<div
-			class="flex-1 space-y-4 overflow-y-auto p-4"
+		<chat-message-list
 			role="log"
 			aria-label="Chat messages"
 			bind:this={chatContainer}
 			onscroll={handleScroll}
+			data-testid="chat-container"
 		>
 			{#each messages as message, i}
-				<div class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}">
-					<div class="chat-image avatar placeholder self-start">
-						{#if message.role === 'user'}
-							<div class="bg-neutral text-neutral-content w-10 rounded-full">
+				{#if message.type === 'ToolCallMessage'}
+					<chat-message data-testid="chat-message" data-role={message.role}>
+						<message-avatar><img src="/assets/tool.png" alt="Tool" /></message-avatar>
+						<message-content><ToolCallMessage {message} /></message-content>
+					</chat-message>
+				{:else}
+					<chat-message data-testid="chat-message" data-role={message.role}>
+						<message-avatar>
+							{#if message.role === 'user'}
 								<span>U</span>
-							</div>
-						{:else if currentCompagnon.avatar}
-							<div class="w-10 rounded-full">
+							{:else if currentCompagnon.avatar}
 								<img src={currentCompagnon.avatar} alt={currentCompagnon.name} />
-							</div>
-						{:else}
-							<div class="bg-primary text-primary-content w-10 rounded-full">
-								<span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span>
-							</div>
-						{/if}
-					</div>
-					{#if message.role !== 'user'}
-						<div class="chat-header mb-1 text-xs opacity-50">
-							{currentCompagnon.name}
-						</div>
-					{/if}
-					<div
-						class="chat-bubble rounded-2xl rounded-tl-none rounded-tr-none before:hidden {message.role === 'user'
-							? 'chat-bubble-primary'
-							: 'text-base-content bg-transparent p-0'}"
-					>
-						{#if message.images && message.images.length > 0}
-							<div class="mb-2 space-y-2">
-								{#each message.images as img}
-									{#if img.startsWith('data:image')}
-										<img src={img} alt="attachment" class="h-auto max-h-64 max-w-full rounded-lg" />
-									{:else}
-										<div class="bg-base-100/20 flex items-center gap-2 rounded-lg p-2">
-											<Icon icon="lucide:file" class="h-6 w-6" />
-											<span class="text-xs opacity-70">File attached</span>
-										</div>
-									{/if}
-								{/each}
-							</div>
-						{/if}
-						{#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
-							<div class="bg-base-200/50 flex w-fit items-center rounded-2xl px-4 py-2">
-								<span class="loading loading-dots loading-sm opacity-50"></span>
-							</div>
-						{:else}
-							{#if message.role === 'assistant'}
-								<ThinkingMessage content={message.content || ''} />
 							{:else}
-								<div class="prose prose-sm dark:prose-invert max-w-none wrap-break-word">
-									{@html parseMarkdown(message.content)}
-								</div>
+								<span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span>
 							{/if}
-
-							{#if message.role === 'assistant' && message.status !== 'streaming'}
-								<MessageActions
-									{message}
-									onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined}
-								/>
+						</message-avatar>
+						<message-stack>
+							{#if message.role !== 'user'}
+								<small>{currentCompagnon.name}</small>
 							{/if}
-						{/if}
-					</div>
-				</div>
+							<message-content>
+								{#if message.images && message.images.length > 0}
+									<message-attachments>
+										{#each message.images as img}
+											{#if img.startsWith('data:image')}
+												<img src={img} alt="attachment" />
+											{:else}
+												<div class="file-attachment">
+													<Icon icon="lucide:file" class="h-6 w-6" /><span>File attached</span>
+												</div>
+											{/if}
+										{/each}
+									</message-attachments>
+								{/if}
+								{#if message.role === 'assistant' && message.status === 'streaming' && !message.content}
+									<div class="message-loading" data-testid="loading-indicator">
+										<span class="loading-ellipsis">Thinking</span>
+									</div>
+								{:else if message.role === 'assistant'}
+									<ThinkingMessage content={message.content || ''} />
+								{:else}
+									<div class="prose prose-sm dark:prose-invert max-w-none wrap-break-word">
+										{@html parseMarkdown(message.content)}
+									</div>
+								{/if}
+								{#if message.role === 'assistant' && message.status !== 'streaming'}
+									<MessageActions
+										{message}
+										onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined}
+									/>
+								{/if}
+							</message-content>
+						</message-stack>
+					</chat-message>
+				{/if}
 			{/each}
-		</div>
+		</chat-message-list>
 
-		<!-- Section: Input Area (Bottom) -->
-		<div class="bg-base-100 z-20 w-full p-0 shadow-lg md:p-4">
+		<chat-composer-dock>
 			<ChatInput
 				bind:value={messageInput}
 				bind:files={selectedFiles}
@@ -420,6 +404,187 @@
 				onrecord={toggleRecording}
 				oncompanionclick={() => (isCompagnonModalOpen = true)}
 			/>
-		</div>
+		</chat-composer-dock>
 	{/if}
-</div>
+</chat-window>
+
+<style>
+	@layer components {
+		chat-window,
+		chat-empty-state,
+		empty-state-content,
+		chat-message-list,
+		chat-message,
+		message-avatar,
+		message-stack,
+		message-content,
+		message-attachments,
+		chat-composer-dock {
+			display: flex;
+		}
+
+		chat-window {
+			position: absolute;
+			inset: 0;
+			min-height: 0;
+			flex-direction: column;
+			overflow: hidden;
+		}
+
+		.stop-audio {
+			position: fixed;
+			top: var(--spacing-20);
+			right: var(--spacing-4);
+			z-index: var(--z-overlay);
+			background: var(--color-critical);
+			color: var(--color-on-primary);
+			box-shadow: var(--shadow-md);
+		}
+
+		chat-empty-state {
+			min-height: 0;
+			flex: 1;
+			align-items: center;
+			justify-content: center;
+			padding: var(--pad-lg);
+			overflow-y: auto;
+		}
+
+		empty-state-content {
+			width: min(100%, 34rem);
+			align-items: center;
+			flex-direction: column;
+			text-align: center;
+		}
+
+		empty-state-content > img {
+			width: 8rem;
+			height: 8rem;
+			margin-block-end: var(--pad-lg);
+			object-fit: contain;
+		}
+
+		empty-state-content h1 {
+			margin: 0 0 var(--gap-sm);
+		}
+
+		empty-state-content p {
+			margin: 0 0 var(--pad-xl);
+			color: var(--color-text-muted);
+		}
+
+		.empty-composer {
+			width: 100%;
+		}
+
+		chat-message-list {
+			min-height: 0;
+			flex: 1;
+			flex-direction: column;
+			gap: var(--gap-lg);
+			padding: var(--pad-lg);
+			overflow-y: auto;
+		}
+
+		chat-message {
+			width: min(100%, 54rem);
+			align-items: flex-start;
+			gap: var(--gap-sm);
+		}
+
+		chat-message[data-role='user'] {
+			align-self: flex-end;
+			flex-direction: row-reverse;
+		}
+
+		message-avatar {
+			width: 2.5rem;
+			height: 2.5rem;
+			align-items: center;
+			justify-content: center;
+			flex: 0 0 auto;
+			border-radius: var(--radius-full);
+			background: var(--color-primary);
+			color: var(--color-on-primary);
+			overflow: hidden;
+		}
+
+		message-avatar img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		message-stack {
+			min-width: 0;
+			align-items: flex-start;
+			flex-direction: column;
+			gap: var(--gap-xs);
+		}
+
+		message-stack > small {
+			color: var(--color-text-muted);
+		}
+
+		message-content {
+			min-width: 0;
+			max-width: 100%;
+			flex-direction: column;
+			padding: var(--pad-md);
+			background: var(--color-surface-raised);
+			border-radius: var(--radius-lg);
+		}
+
+		chat-message[data-role='user'] message-content {
+			background: var(--color-primary);
+			color: var(--color-on-primary);
+		}
+
+		message-attachments {
+			flex-direction: column;
+			gap: var(--gap-sm);
+			margin-block-end: var(--gap-sm);
+		}
+
+		message-attachments > img {
+			width: auto;
+			max-width: 100%;
+			max-height: 16rem;
+			border-radius: var(--radius-md);
+		}
+
+		.file-attachment,
+		.message-loading {
+			display: flex;
+			align-items: center;
+			gap: var(--gap-sm);
+			padding: var(--pad-sm);
+			background: color-mix(in srgb, var(--color-surface) 25%, transparent);
+			border-radius: var(--radius-md);
+		}
+
+		chat-composer-dock {
+			z-index: var(--z-sticky);
+			width: 100%;
+			padding: var(--pad-lg);
+			background: var(--color-surface);
+			border-top: var(--border-width) solid var(--color-border);
+			box-shadow: var(--shadow-sm);
+		}
+
+		chat-composer-dock :global(.chat-composer) {
+			width: 100%;
+		}
+
+		@media (max-width: 48rem) {
+			chat-message-list,
+			chat-composer-dock {
+				padding: var(--pad-sm);
+			}
+
+			chat-message {
+				width: 100%;
+			}
+		}
+	}
+</style>

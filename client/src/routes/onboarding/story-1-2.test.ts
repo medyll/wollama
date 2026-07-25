@@ -35,7 +35,7 @@ vi.mock('$app/navigation', () => ({
 // Mock Ollama service
 vi.mock('$lib/services/ollama.service');
 
-// TODO: Re-enable after SvelteKit SSR vs DOM test environment is resolved
+// TODO: Rewrite for the current profile-first onboarding sequence before re-enabling.
 describe.skip('Onboarding Page - Story 1.2 (Server URL Configuration)', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();

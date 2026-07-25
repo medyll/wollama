@@ -32,12 +32,12 @@
 		connectionState.setConnected(isUp);
 
 		// Navigation logic
-		if (!userState.isConfigured) {
-			goto('/setup');
+		if (!userState.preferences.onboarding_completed) {
+			goto('/onboarding');
 		} else if (userState.isSecured && !userState.isAuthenticated) {
 			goto('/login');
 		} else if ($page.url.pathname === '/') {
-			goto('/chat');
+			goto('/chat/new');
 		}
 
 		// Hide splash screen
@@ -48,26 +48,57 @@
 
 {#if isVisible}
 	<dialog
-		class="modal backdrop:bg-base-300/50 backdrop:backdrop-blur-sm"
+		class="splash-dialog"
 		bind:this={dialog}
 		oncancel={(e) => e.preventDefault()}
 		aria-labelledby="splash-title"
 	>
-		<div class="modal-box bg-base-100 relative w-full max-w-md overflow-hidden p-0 shadow-2xl">
-			<!-- Section: Background Image Container -->
-			<div
-				class="absolute inset-0 z-0"
-				style="background-image: url('/assets/lama.png'); background-size: cover; background-position: center;"
-			>
-				<div class="bg-base-100/90 absolute inset-0"></div>
-			</div>
-
-			<!-- Section: Content -->
-			<div class="relative z-10 flex flex-col items-center p-10 text-center">
-				<h1 id="splash-title" class="text-primary mb-2 text-4xl font-bold">Wollama</h1>
-				<p class="py-6 text-lg font-medium opacity-70">{t('ui.loading_assistant')}</p>
-				<span class="loading loading-dots loading-lg text-primary"></span>
-			</div>
-		</div>
+		<section>
+			<img src="/assets/lama.png" alt="" />
+			<h1 id="splash-title">Wollama</h1>
+			<p>{t('ui.loading_assistant')}</p>
+			<progress aria-label={t('ui.loading_assistant')}></progress>
+		</section>
 	</dialog>
 {/if}
+
+<style>
+	.splash-dialog {
+		width: min(28rem, calc(100vw - (2 * var(--pad-md))));
+		max-width: none;
+		padding: 0;
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface-raised);
+		color: var(--color-text);
+	}
+
+	.splash-dialog::backdrop {
+		background: color-mix(in oklch, var(--color-surface-alt) 70%, transparent);
+		backdrop-filter: blur(0.25rem);
+	}
+
+	.splash-dialog section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--gap-md);
+		padding: var(--pad-xl);
+		text-align: center;
+	}
+
+	.splash-dialog img {
+		width: 6rem;
+		height: 6rem;
+		object-fit: contain;
+	}
+
+	.splash-dialog h1,
+	.splash-dialog p {
+		margin: 0;
+	}
+
+	.splash-dialog h1 {
+		color: var(--color-primary);
+	}
+</style>
