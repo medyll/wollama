@@ -1,11 +1,9 @@
 @import '@medyll/css-base';
+@import './styles/wollama-theme.css';
 
 @layer components {
 	:root {
-		--color-primary: oklch(0.61 0.18 255);
-		--app-sidebar-width: 16rem;
-		--app-sidebar-collapsed-width: 4.5rem;
-		--app-header-height: 4rem;
+		font-family: var(--font-sans);
 	}
 
 	html,
@@ -19,6 +17,9 @@
 	body {
 		margin: 0;
 		overflow: hidden;
+		font-size: var(--text-base);
+		line-height: var(--leading-normal);
+		background: var(--wollama-shell-bg);
 	}
 
 	app-shell-component,
@@ -55,8 +56,9 @@
 		align-items: center;
 		gap: var(--gap-sm);
 		padding-inline: var(--pad-md);
-		border-bottom: var(--border-width) solid var(--color-border);
-		background: var(--color-surface-raised);
+		border-bottom: var(--border-width) solid var(--wollama-border-subtle);
+		background: color-mix(in oklch, var(--color-surface) 92%, transparent);
+		backdrop-filter: blur(1rem);
 		z-index: var(--z-dropdown);
 	}
 
@@ -70,8 +72,9 @@
 
 	.app-brand {
 		color: var(--color-text);
-		font-size: var(--text-xl);
-		font-weight: var(--font-semibold);
+		font-size: var(--text-base);
+		font-weight: var(--font-medium);
+		letter-spacing: var(--tracking-tight);
 		text-decoration: none;
 	}
 
@@ -212,7 +215,10 @@
 		color: var(--color-text);
 		text-align: center;
 		cursor: pointer;
-		transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+		transition:
+			border-color var(--transition-fast),
+			background var(--transition-fast),
+			transform var(--transition-fast);
 	}
 
 	companion-card:hover {

@@ -1,8 +1,10 @@
 {
 	"name": "@wollama/server",
 	"version": "0.0.9",
+	"main": "dist/server/server.js",
 	"type": "module",
 	"scripts": {
+		"build": "tsc",
 		"dev": "pnpm exec tsx watch server.ts",
 		"check": "tsc --noEmit",
 		"test": "concurrently \"pnpm dev\" \"pnpm exec tsx test-server.ts\" --kill-others --success first",

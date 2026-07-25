@@ -1,0 +1,47 @@
+@layer theme, components {
+	@layer theme {
+		:root {
+			color-scheme: light dark;
+			--color-primary: oklch(0.56 0.12 250);
+			--default-font-size: 0.875rem;
+			--default-leading: 1.5;
+			--default-color-text-light: oklch(0.24 0.012 70);
+			--default-color-text-dark: oklch(0.93 0.008 80);
+			--default-color-surface-light: oklch(0.985 0.006 80);
+			--default-color-surface-dark: oklch(0.18 0.008 250);
+
+			--app-sidebar-width: 15rem;
+			--app-sidebar-collapsed-width: 3.5rem;
+			--app-header-height: 3.25rem;
+			--app-reading-width: 52rem;
+
+			--wollama-shell-bg: var(--color-surface);
+			--wollama-sidebar-bg: color-mix(in oklch, var(--color-surface-alt) 86%, var(--color-surface));
+			--wollama-panel-bg: color-mix(in oklch, var(--color-surface-raised) 94%, var(--color-primary) 6%);
+			--wollama-border-subtle: color-mix(in oklch, var(--color-border) 72%, transparent);
+			--wollama-active-bg: color-mix(in oklch, var(--color-primary) 10%, transparent);
+			--wollama-focus-ring: color-mix(in oklch, var(--color-primary) 42%, transparent);
+		}
+	}
+
+	@layer components {
+		::selection {
+			background: color-mix(in oklch, var(--color-primary) 24%, transparent);
+		}
+
+		:focus-visible {
+			outline-color: var(--color-primary);
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*,
+			*::before,
+			*::after {
+				scroll-behavior: auto !important;
+				transition-duration: 0.01ms !important;
+				animation-duration: 0.01ms !important;
+				animation-iteration-count: 1 !important;
+			}
+		}
+	}
+}

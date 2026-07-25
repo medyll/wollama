@@ -111,7 +111,6 @@ const _createDatabase = async () => {
 		}),
 		multiInstance: true,
 		eventReduce: true,
-		ignoreDuplicate: true
 	});
 
 	// Create collections based on shared schema

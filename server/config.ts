@@ -53,7 +53,7 @@ export const config = {
 		binaryPath:
 			process.env.TTS_BINARY_PATH ||
 			path.resolve(__dirname, 'bin', 'piper', process.platform === 'win32' ? 'piper.exe' : 'piper'),
-		modelDir: path.resolve(__dirname, 'bin', 'piper'),
+		modelDir: process.env.TTS_MODEL_DIR || path.resolve(__dirname, 'bin', 'piper'),
 		defaultVoice: 'en_US-lessac-medium.onnx'
 	}
 };

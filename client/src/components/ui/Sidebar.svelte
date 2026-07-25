@@ -36,12 +36,7 @@
 	}
 </script>
 
-<aside
-	class="app-sidebar"
-	data-open={uiState.sidebarOpen}
-	data-collapsed={uiState.sidebarCollapsed}
-	aria-label="Sidebar"
->
+<aside class="app-sidebar" data-open={uiState.sidebarOpen} data-collapsed={uiState.sidebarCollapsed} aria-label="Sidebar">
 	<div class="sidebar-header">
 		<!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
 		<div
@@ -65,11 +60,7 @@
 			</button>
 		{/if}
 
-		<button
-			class="sidebar-action"
-			onclick={createNewChat}
-			title={t('ui.newChat')}
-		>
+		<button class="sidebar-action" onclick={createNewChat} title={t('ui.newChat')}>
 			<Icon icon="fluent:compose-24-regular" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.newChat')}
@@ -98,11 +89,7 @@
 		<div class="flex justify-end px-2">
 			<SidebarCollapse />
 		</div>
-		<button
-			class="sidebar-action"
-			onclick={() => goto('/settings')}
-			title={t('ui.settings')}
-		>
+		<button class="sidebar-action" onclick={() => goto('/settings')} title={t('ui.settings')}>
 			<Icon icon="fluent:settings-24-regular" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.settings')}
@@ -112,79 +99,102 @@
 </aside>
 
 <style>
-	.app-sidebar {
-		display: flex;
-		width: var(--app-sidebar-width);
-		min-width: var(--app-sidebar-width);
-		height: calc(100dvh - (2 * var(--pad-sm)));
-		margin: var(--marg-sm);
-		flex-direction: column;
-		border: var(--border-width) solid var(--color-border);
-		border-radius: var(--radius-lg);
-		background: var(--color-surface-alt);
-		overflow: hidden;
-		transition: width var(--transition-normal), min-width var(--transition-normal), transform var(--transition-normal);
-		z-index: var(--z-modal);
-	}
-
-	.app-sidebar[data-collapsed='true'] {
-		width: var(--app-sidebar-collapsed-width);
-		min-width: var(--app-sidebar-collapsed-width);
-	}
-
-	.sidebar-header,
-	.sidebar-footer {
-		display: flex;
-		flex-direction: column;
-		gap: var(--gap-sm);
-		padding: var(--pad-sm);
-	}
-
-	.sidebar-footer {
-		border-top: var(--border-width) solid var(--color-border);
-	}
-
-	.sidebar-nav {
-		min-height: 0;
-		flex: 1;
-		padding: var(--pad-sm);
-		overflow-y: auto;
-	}
-
-	.sidebar-action,
-	.sidebar-chat-link {
-		display: flex;
-		width: 100%;
-		min-width: 0;
-		align-items: center;
-		gap: var(--gap-sm);
-		padding: var(--pad-sm);
-		border: 0;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		color: var(--color-text);
-		text-align: left;
-		text-decoration: none;
-		cursor: pointer;
-	}
-
-	.sidebar-action:hover,
-	.sidebar-chat-link:hover,
-	.sidebar-chat-link[aria-current='page'] {
-		background: var(--color-surface-hover);
-	}
-
-	@media (width < 48rem) {
+	@layer components {
 		.app-sidebar {
-			position: fixed;
-			top: 0;
-			left: 0;
-			height: calc(100dvh - (2 * var(--pad-sm)));
-			transform: translateX(calc(-100% - var(--marg-sm)));
+			display: flex;
+			width: var(--app-sidebar-width);
+			min-width: var(--app-sidebar-width);
+			height: 100dvh;
+			flex-direction: column;
+			border-right: var(--border-width) solid var(--wollama-border-subtle);
+			background: var(--wollama-sidebar-bg);
+			overflow: hidden;
+			transition:
+				width var(--transition-normal),
+				min-width var(--transition-normal),
+				transform var(--transition-normal);
+			z-index: var(--z-dropdown);
 		}
 
-		.app-sidebar[data-open='true'] {
-			transform: translateX(0);
+		.app-sidebar[data-collapsed='true'] {
+			width: var(--app-sidebar-collapsed-width);
+			min-width: var(--app-sidebar-collapsed-width);
+		}
+
+		.sidebar-header,
+		.sidebar-footer {
+			display: flex;
+			flex-direction: column;
+			gap: var(--gap-xs);
+			padding: var(--pad-sm);
+		}
+
+		.sidebar-footer {
+			border-top: var(--border-width) solid var(--wollama-border-subtle);
+		}
+
+		.sidebar-nav {
+			min-height: 0;
+			flex: 1;
+			padding: var(--pad-xs) var(--pad-sm);
+			overflow-y: auto;
+		}
+
+		.sidebar-action,
+		.sidebar-chat-link {
+			display: flex;
+			width: 100%;
+			min-width: 0;
+			align-items: center;
+			gap: var(--gap-sm);
+			min-height: var(--icon-size-xl);
+			padding: var(--pad-xs) var(--pad-sm);
+			border: 0;
+			border-radius: var(--radius-md);
+			background: transparent;
+			color: var(--color-text);
+			font-size: var(--text-sm);
+			font-weight: var(--font-normal);
+			text-align: left;
+			text-decoration: none;
+			cursor: pointer;
+			transition:
+				background var(--transition-fast),
+				color var(--transition-fast);
+		}
+
+		.sidebar-action:hover,
+		.sidebar-chat-link:hover {
+			background: var(--color-surface-hover);
+		}
+
+		.sidebar-chat-link[aria-current='page'] {
+			background: var(--wollama-active-bg);
+			color: var(--color-primary);
+			font-weight: var(--font-medium);
+		}
+
+		.sidebar-action:focus-visible,
+		.sidebar-chat-link:focus-visible {
+			outline: var(--focus-ring-width) solid var(--wollama-focus-ring);
+			outline-offset: calc(var(--focus-ring-gap) * -1);
+		}
+
+		@media (width < 48rem) {
+			.app-sidebar {
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: 100dvh;
+				border-right: var(--border-width) solid var(--wollama-border-subtle);
+				box-shadow: var(--shadow-lg);
+				transform: translateX(-100%);
+				z-index: var(--z-modal);
+			}
+
+			.app-sidebar[data-open='true'] {
+				transform: translateX(0);
+			}
 		}
 	}
 </style>

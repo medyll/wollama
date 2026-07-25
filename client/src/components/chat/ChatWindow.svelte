@@ -2,6 +2,7 @@
 	import { t } from '$lib/state/i18n.svelte';
 	import { userState } from '$lib/state/user.svelte';
 	import { uiState } from '$lib/state/ui.svelte';
+	import { connectionState } from '$lib/state/connection.svelte';
 	import { toast } from '$lib/state/notifications.svelte';
 	import { audioService } from '$lib/services/audio.service';
 	import { chatService } from '$lib/services/chat.service';
@@ -13,8 +14,10 @@
 	import ChatInput from '$components/chat/ChatInput.svelte';
 	import ToolCallMessage from '$components/chat/tool-call-message.svelte';
 	import Icon from '@iconify/svelte';
-	import type { UserCompanion } from '$types/data';
+	import type { Companion, UserCompanion } from '$types/data';
 	import { goto } from '$app/navigation';
+
+	type ActiveCompanion = Companion | UserCompanion;
 
 	let { chatId = $bindable(undefined), initialCompanionId = undefined } = $props();
 
@@ -24,7 +27,7 @@
 	let isRecording = $state(false);
 	let selectedFiles = $state<string[]>([]);
 
-	let currentCompagnon: UserCompanion = $state({
+	let currentCompagnon: ActiveCompanion = $state({
 		user_companion_id: '1',
 		user_id: userState.uid || '',
 		name: t('ui.general_assistant'),
@@ -34,8 +37,42 @@
 	});
 
 	let messages = $state<any[]>([]);
+	let visibleMessages = $derived(messages.filter((message) => message.role !== 'system'));
 	let chatContainer = $state<HTMLDivElement>();
 	let userHasScrolledUp = $state(false);
+	let availableModels = $state<string[]>([]);
+
+	function getCompanionId(companion: ActiveCompanion): string {
+		return 'user_companion_id' in companion ? companion.user_companion_id : companion.companion_id;
+	}
+
+	async function getCompanionById(companionId: string): Promise<ActiveCompanion | null> {
+		const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
+		const userCompanion = await userCompanionService.get(companionId);
+		if (userCompanion) return userCompanion;
+
+		const companionService = new DataGenericService<Companion>('companions');
+		return companionService.get(companionId);
+	}
+
+	async function loadAvailableModels() {
+		try {
+			const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
+			const response = await fetch(`${serverUrl}/api/models`);
+			if (!response.ok) return;
+
+			const data = (await response.json()) as { models?: Array<string | { name?: string }> };
+			availableModels = (data.models || [])
+				.map((model) => (typeof model === 'string' ? model : model.name || ''))
+				.filter(Boolean);
+		} catch (error) {
+			console.warn('Could not load Ollama models:', error);
+		}
+	}
+
+	$effect(() => {
+		if (connectionState.isConnected) void loadAvailableModels();
+	});
 
 	function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
 		if (chatContainer) {
@@ -63,8 +100,7 @@
 
 			if (initialCompanionId) {
 				(async () => {
-					const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
-					const comp = await userCompanionService.get(initialCompanionId);
+					const comp = await getCompanionById(initialCompanionId);
 					if (comp) {
 						currentCompagnon = comp;
 						// Clear the global state so it doesn't persist
@@ -83,10 +119,9 @@
 			if (chat) {
 				uiState.setTitle(chat.title);
 				if (chat.companion_id) {
-					const userCompanionService = new DataGenericService<UserCompanion>('user_companions');
-					const comp = await userCompanionService.get(chat.companion_id);
+					const comp = await getCompanionById(chat.companion_id);
 					if (comp) {
-						currentCompagnon = comp;
+						currentCompagnon = { ...comp, model: chat.model || comp.model };
 					}
 				}
 			}
@@ -128,10 +163,9 @@
 			if (!targetChatId) {
 				// Create chat first
 				// Use initialCompanionId if set and user hasn't selected a different one (assuming default is '1')
+				const currentCompanionId = getCompanionId(currentCompagnon);
 				const companionIdToUse =
-					currentCompagnon.user_companion_id === '1' && initialCompanionId
-						? initialCompanionId
-						: currentCompagnon.user_companion_id;
+					currentCompanionId === '1' && initialCompanionId ? initialCompanionId : currentCompanionId;
 
 				try {
 					targetChatId = await chatService.createChat(undefined, currentCompagnon.model, companionIdToUse);
@@ -158,11 +192,13 @@
 			let history;
 			try {
 				const messagesDocs = await chatService.getChatHistory(targetChatId);
-				history = messagesDocs.map((m: any) => ({
-					role: m.role,
-					content: m.content,
-					images: m.images
-				}));
+				history = messagesDocs
+					.filter((message: any) => message.role === 'user' || message.role === 'assistant')
+					.map((message: any) => ({
+						role: message.role,
+						content: message.content,
+						images: message.images
+					}));
 			} catch (e) {
 				console.error('Error fetching chat history:', e);
 				// Continue anyway, maybe we can generate without full history or it will fail next
@@ -231,15 +267,26 @@
 		}
 	}
 
-	function onCompagnonSelected(compagnon: UserCompanion) {
+	async function onCompagnonSelected(compagnon: ActiveCompanion) {
 		currentCompagnon = compagnon;
-		// Logic to update chat context with new compagnon
-		if (messages.length > 0) {
-			messages.push({
-				id: messages.length + 1,
-				role: 'system',
-				content: `${t('ui.interlocutor_changed')} ${compagnon.name}`
+
+		if (chatId) {
+			await chatService.updateChatRuntime(chatId, {
+				model: compagnon.model,
+				companionId: getCompanionId(compagnon),
+				systemPrompt: compagnon.system_prompt
 			});
+		}
+
+		toast.info(`${t('ui.interlocutor_changed')} ${compagnon.name}`);
+	}
+
+	async function onModelSelected(model: string) {
+		if (!model || model === currentCompagnon.model) return;
+
+		currentCompagnon = { ...currentCompagnon, model };
+		if (chatId) {
+			await chatService.updateChatRuntime(chatId, { model });
 		}
 	}
 
@@ -255,19 +302,24 @@
 
 		if (lastMsg.role === 'assistant') {
 			// Exclude the last assistant message to regenerate it
-			history = messages.slice(0, -1).map((m: any) => ({
-				role: m.role,
-				content: m.content,
-				images: m.images
-			}));
+			history = messages
+				.slice(0, -1)
+				.filter((message: any) => message.role === 'user' || message.role === 'assistant')
+				.map((message: any) => ({
+					role: message.role,
+					content: message.content,
+					images: message.images
+				}));
 			messageIdToUpdate = lastMsg.message_id;
 		} else {
 			// Last message is user, just generate
-			history = messages.map((m: any) => ({
-				role: m.role,
-				content: m.content,
-				images: m.images
-			}));
+			history = messages
+				.filter((message: any) => message.role === 'user' || message.role === 'assistant')
+				.map((message: any) => ({
+					role: message.role,
+					content: message.content,
+					images: message.images
+				}));
 		}
 
 		try {
@@ -317,10 +369,12 @@
 						{isRecording}
 						{isTranscribing}
 						{currentCompagnon}
+						models={availableModels}
 						{chatId}
 						onsend={sendMessage}
 						onrecord={toggleRecording}
 						oncompanionclick={() => (isCompagnonModalOpen = true)}
+						onmodelchange={onModelSelected}
 					/>
 				</div>
 			</empty-state-content>
@@ -333,7 +387,7 @@
 			onscroll={handleScroll}
 			data-testid="chat-container"
 		>
-			{#each messages as message, i}
+			{#each visibleMessages as message, i}
 				{#if message.type === 'ToolCallMessage'}
 					<chat-message data-testid="chat-message" data-role={message.role}>
 						<message-avatar><img src="/assets/tool.png" alt="Tool" /></message-avatar>
@@ -382,7 +436,7 @@
 								{#if message.role === 'assistant' && message.status !== 'streaming'}
 									<MessageActions
 										{message}
-										onRegenerate={i === messages.length - 1 ? regenerateResponse : undefined}
+										onRegenerate={i === visibleMessages.length - 1 ? regenerateResponse : undefined}
 									/>
 								{/if}
 							</message-content>
@@ -399,10 +453,12 @@
 				{isRecording}
 				{isTranscribing}
 				{currentCompagnon}
+				models={availableModels}
 				{chatId}
 				onsend={sendMessage}
 				onrecord={toggleRecording}
 				oncompanionclick={() => (isCompagnonModalOpen = true)}
+				onmodelchange={onModelSelected}
 			/>
 		</chat-composer-dock>
 	{/if}
@@ -458,19 +514,25 @@
 		}
 
 		empty-state-content > img {
-			width: 8rem;
-			height: 8rem;
-			margin-block-end: var(--pad-lg);
+			width: 5rem;
+			height: 5rem;
+			margin-block-end: var(--pad-md);
 			object-fit: contain;
 		}
 
 		empty-state-content h1 {
 			margin: 0 0 var(--gap-sm);
+			font-size: var(--text-xl);
+			font-weight: var(--font-semibold);
+			letter-spacing: var(--tracking-tight);
+			line-height: var(--leading-tight);
 		}
 
 		empty-state-content p {
-			margin: 0 0 var(--pad-xl);
+			max-width: 28rem;
+			margin: 0 0 var(--pad-lg);
 			color: var(--color-text-muted);
+			font-size: var(--text-sm);
 		}
 
 		.empty-composer {
@@ -481,13 +543,15 @@
 			min-height: 0;
 			flex: 1;
 			flex-direction: column;
-			gap: var(--gap-lg);
-			padding: var(--pad-lg);
+			gap: var(--gap-xl);
+			padding: var(--pad-xl) var(--pad-lg);
 			overflow-y: auto;
+			scrollbar-gutter: stable;
 		}
 
 		chat-message {
-			width: min(100%, 54rem);
+			width: 100%;
+			max-width: var(--app-reading-width);
 			align-items: flex-start;
 			gap: var(--gap-sm);
 		}
@@ -498,14 +562,16 @@
 		}
 
 		message-avatar {
-			width: 2.5rem;
-			height: 2.5rem;
+			width: var(--icon-size-lg);
+			height: var(--icon-size-lg);
 			align-items: center;
 			justify-content: center;
 			flex: 0 0 auto;
 			border-radius: var(--radius-full);
-			background: var(--color-primary);
-			color: var(--color-on-primary);
+			background: var(--color-surface-alt);
+			color: var(--color-text-muted);
+			font-size: var(--text-xs);
+			font-weight: var(--font-medium);
 			overflow: hidden;
 		}
 
@@ -517,27 +583,35 @@
 
 		message-stack {
 			min-width: 0;
+			max-width: min(80%, 42rem);
 			align-items: flex-start;
 			flex-direction: column;
 			gap: var(--gap-xs);
 		}
 
+		chat-message[data-role='user'] message-stack {
+			align-items: flex-end;
+		}
+
 		message-stack > small {
 			color: var(--color-text-muted);
+			font-size: var(--text-xs);
 		}
 
 		message-content {
 			min-width: 0;
 			max-width: 100%;
 			flex-direction: column;
-			padding: var(--pad-md);
-			background: var(--color-surface-raised);
+			padding: var(--pad-sm) var(--pad-md);
+			border: var(--border-width) solid var(--color-border);
 			border-radius: var(--radius-lg);
+			background: var(--color-surface-raised);
+			box-shadow: var(--shadow-sm);
+			line-height: var(--leading-relaxed);
 		}
 
 		chat-message[data-role='user'] message-content {
-			background: var(--color-primary);
-			color: var(--color-on-primary);
+			background: var(--wollama-active-bg);
 		}
 
 		message-attachments {
@@ -566,10 +640,8 @@
 		chat-composer-dock {
 			z-index: var(--z-sticky);
 			width: 100%;
-			padding: var(--pad-lg);
-			background: var(--color-surface);
-			border-top: var(--border-width) solid var(--color-border);
-			box-shadow: var(--shadow-sm);
+			padding: var(--pad-sm) var(--pad-lg) var(--pad-lg);
+			background: linear-gradient(to bottom, transparent, var(--color-surface) var(--pad-lg));
 		}
 
 		chat-composer-dock :global(.chat-composer) {
@@ -579,11 +651,19 @@
 		@media (max-width: 48rem) {
 			chat-message-list,
 			chat-composer-dock {
-				padding: var(--pad-sm);
+				padding: var(--pad-md) var(--pad-sm);
 			}
 
 			chat-message {
 				width: 100%;
+			}
+
+			message-stack {
+				max-width: 90%;
+			}
+
+			message-avatar {
+				display: none;
 			}
 		}
 	}

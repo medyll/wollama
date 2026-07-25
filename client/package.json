@@ -14,7 +14,7 @@
 		"format": "prettier --write .",
 		"electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
 		"build:sidecar": "pyinstaller --clean --onefile --name chatterbox --distpath ./resources/extraResources ../packages/chatterbox/main.py",
-		"package": "npm run build && npm run build:sidecar && electron-builder"
+		"package": "node electron/prepare-server.mjs && pnpm build && electron-builder"
 	},
 	"build": {
 		"appId": "com.wollama.app",
@@ -31,6 +31,13 @@
 			{
 				"from": "resources/extraResources",
 				"to": "extraResources",
+				"filter": [
+					"**/*"
+				]
+			},
+			{
+				"from": "resources/wollama-server",
+				"to": "wollama-server",
 				"filter": [
 					"**/*"
 				]
@@ -53,6 +60,7 @@
 		"@medyll/css-base": "^0.7.10",
 		"@tailwindcss/typography": "^0.5.19",
 		"date-fns": "^4.1.0",
+		"electron-serve": "^3.0.0",
 		"highlight.js": "^11.11.1",
 		"hljs": "^6.2.3",
 		"idb": "^8.0.3",
@@ -85,7 +93,6 @@
 		"concurrently": "^9.2.1",
 		"electron": "^39.8.9",
 		"electron-builder": "^24.13.3",
-		"electron-serve": "^3.0.0",
 		"eslint": "^9.39.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.1",

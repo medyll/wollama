@@ -82,10 +82,10 @@
 <ToastContainer />
 <ServerConnectionCheck />
 <SplashScreen />
-<SyncStatus />
-<OfflineIndicator />
 
 {#if userState.preferences.onboarding_completed}
+	<SyncStatus />
+	<OfflineIndicator />
 	<app-shell-component>
 		<Sidebar />
 		<button
@@ -105,11 +105,11 @@
 					<SidebarTrigger visible={!uiState.sidebarOpen} />
 				</div>
 				<a href="/chat" class="app-brand">Wollama</a>
-					{#if uiState.pageTitle}
-						<span class="hidden max-w-[200px] truncate text-lg font-normal opacity-70 sm:inline-block md:max-w-md">
-							{uiState.pageTitle}
-						</span>
-					{/if}
+				{#if uiState.pageTitle}
+					<span class="hidden max-w-[200px] truncate text-sm font-normal opacity-70 sm:inline-block md:max-w-md">
+						{uiState.pageTitle}
+					</span>
+				{/if}
 				<span class="app-header-spacer"></span>
 				<div class="flex flex-none items-center gap-2">
 					{#if downloadState.isPulling}

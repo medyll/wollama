@@ -29,3 +29,13 @@ export function parseThinking(content: string | null | undefined): ThinkingResul
 	const restContent = content.substring(thinkEnd + 8);
 	return { pre, thinking: thinkContent, response: restContent, isThinking: false };
 }
+
+export function stripPrivateReasoning(content: string | null | undefined): string {
+	if (!content || typeof content !== 'string') return '';
+
+	let visible = content.replace(/<(think|analysis|reasoning)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, '');
+	const unclosedPrivateBlock = visible.search(/<(think|analysis|reasoning)\b[^>]*>/i);
+	if (unclosedPrivateBlock !== -1) visible = visible.slice(0, unclosedPrivateBlock);
+
+	return visible;
+}

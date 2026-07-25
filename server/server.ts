@@ -8,6 +8,7 @@ import { config } from './config.js';
 import { SttService } from './services/stt.service.js';
 import { TtsService } from './services/tts.service.js';
 import { OllamaService } from './services/ollama.service.js';
+import { sanitizeOllamaResponse } from './services/ollama-response.js';
 import { PromptService } from './services/prompt.service.js';
 import { sidecarService } from './services/sidecar.service.js';
 import { hookRegistry } from './services/hook-registry.service.js';
@@ -234,7 +235,7 @@ app.post('/api/chat/generate', async (req, res) => {
 				res.setHeader('Transfer-Encoding', 'chunked');
 
 				for await (const part of response) {
-					res.write(JSON.stringify(part) + '\n');
+					res.write(JSON.stringify(sanitizeOllamaResponse(part)) + '\n');
 				}
 				res.end();
 			} catch (error: any) {
@@ -262,7 +263,7 @@ app.post('/api/chat/generate', async (req, res) => {
 				messages,
 				stream: false
 			});
-			res.json(response);
+			res.json(sanitizeOllamaResponse(response));
 		}
 	} catch (error: any) {
 		console.error('Chat generation error:', error);
@@ -449,6 +450,7 @@ const initializeOllama = async () => {
 		try {
 			// 1. Check connection by listing models
 			const list = await OllamaService.list();
+			serverState.ollamaReady = true;
 			logger.success('OLLAMA', 'Connection established');
 
 			// 2. Check if default model exists
@@ -484,6 +486,7 @@ const initializeOllama = async () => {
 
 			return; // Success, exit function
 		} catch (error: any) {
+			serverState.ollamaReady = false;
 			const isLastAttempt = i === maxRetries - 1;
 
 			// If first attempt fails and it looks like the service is down (and local), try to start it
@@ -606,8 +609,8 @@ app.listen(port, async () => {
 
 	// Allow tests to skip heavy external initializations (Ollama, audio, sidecar)
 	if (process.env.SKIP_HEAVY_SETUP !== 'true') {
-		await ensureAudioSetup();
 		await initializeOllama();
+		await ensureAudioSetup();
 		await initializeTTS();
 	} else {
 		logger.info('SERVER', 'Skipping heavy setup (SKIP_HEAVY_SETUP=true)');
