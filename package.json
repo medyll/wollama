@@ -19,7 +19,7 @@
 		"test:server": "pnpm --filter @wollama/server test:unit",
 		"setup:python": "node setup-python.js",
 		"setup:audio": "pnpm --filter @wollama/server setup:audio",
-		"lint": "prettier --check .&& eslint . --fix --ignore-pattern '**/*.test.*'",
+		"lint": "prettier --check . && eslint . --ignore-pattern '**/*.test.*'",
 		"format": "prettier --write . && eslint . --fix --ignore-pattern '**/*.test.*'",
 		"release": "standard-version",
 		"changelog": "standard-version --skip.bump --skip.commit --skip.tag"
@@ -36,6 +36,8 @@
 		"eslint-plugin-svelte": "^3.13.1",
 		"globals": "^16.5.0",
 		"prettier": "^3.7.4",
+		"prettier-plugin-svelte": "^3.4.0",
+		"prettier-plugin-tailwindcss": "^0.7.2",
 		"standard-version": "^9.5.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.49.0"
