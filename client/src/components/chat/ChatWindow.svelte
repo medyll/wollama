@@ -383,6 +383,8 @@
 		<chat-message-list
 			role="log"
 			aria-label="Chat messages"
+			aria-live="polite"
+			aria-relevant="additions text"
 			bind:this={chatContainer}
 			onscroll={handleScroll}
 			data-testid="chat-container"
@@ -390,25 +392,28 @@
 			{#each visibleMessages as message, i}
 				{#if message.type === 'ToolCallMessage'}
 					<chat-message data-testid="chat-message" data-role={message.role}>
-						<message-avatar><img src="/assets/tool.png" alt="Tool" /></message-avatar>
+						<message-avatar><img src="/assets/tool.png" alt="" /></message-avatar>
 						<message-content><ToolCallMessage {message} /></message-content>
 					</chat-message>
 				{:else}
 					<chat-message data-testid="chat-message" data-role={message.role}>
-						<message-avatar>
-							{#if message.role === 'user'}
-								<span>U</span>
-							{:else if currentCompagnon.avatar}
-								<img src={currentCompagnon.avatar} alt={currentCompagnon.name} />
-							{:else}
-								<span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span>
-							{/if}
-						</message-avatar>
+						{#if message.role !== 'user'}
+							<message-avatar>
+								{#if currentCompagnon.avatar}
+									<img src={currentCompagnon.avatar} alt={currentCompagnon.name} />
+								{:else}
+									<span>{currentCompagnon.name.substring(0, 2).toUpperCase()}</span>
+								{/if}
+							</message-avatar>
+						{/if}
 						<message-stack>
 							{#if message.role !== 'user'}
-								<small>{currentCompagnon.name}</small>
+								<small class="message-author">{currentCompagnon.name}</small>
 							{/if}
 							<message-content>
+								<span class="sr-only"
+									>{message.role === 'user' ? 'You said:' : `${currentCompagnon.name} said:`}</span
+								>
 								{#if message.images && message.images.length > 0}
 									<message-attachments>
 										{#each message.images as img}
@@ -485,12 +490,13 @@
 			min-height: 0;
 			flex-direction: column;
 			overflow: hidden;
+			background: var(--wollama-shell-bg);
 		}
 
 		.stop-audio {
 			position: fixed;
-			top: var(--spacing-20);
-			right: var(--spacing-4);
+			top: var(--pad-lg);
+			right: var(--pad-md);
 			z-index: var(--z-overlay);
 			background: var(--color-critical);
 			color: var(--color-on-primary);
@@ -543,8 +549,8 @@
 			min-height: 0;
 			flex: 1;
 			flex-direction: column;
-			gap: var(--gap-xl);
-			padding: var(--pad-xl) var(--pad-lg);
+			gap: var(--gap-lg);
+			padding: var(--pad-2xl) var(--pad-lg) var(--pad-xl);
 			overflow-y: auto;
 			scrollbar-gutter: stable;
 		}
@@ -552,24 +558,25 @@
 		chat-message {
 			width: 100%;
 			max-width: var(--app-reading-width);
+			margin-inline: auto;
 			align-items: flex-start;
-			gap: var(--gap-sm);
+			gap: var(--gap-md);
 		}
 
 		chat-message[data-role='user'] {
-			align-self: flex-end;
-			flex-direction: row-reverse;
+			justify-content: flex-end;
 		}
 
 		message-avatar {
-			width: var(--icon-size-lg);
-			height: var(--icon-size-lg);
+			width: var(--icon-size-md);
+			height: var(--icon-size-md);
 			align-items: center;
 			justify-content: center;
 			flex: 0 0 auto;
-			border-radius: var(--radius-full);
-			background: var(--color-surface-alt);
-			color: var(--color-text-muted);
+			border: var(--border-width) solid var(--wollama-border-subtle);
+			border-radius: var(--radius-lg);
+			background: var(--color-surface-raised);
+			color: var(--color-primary);
 			font-size: var(--text-xs);
 			font-weight: var(--font-medium);
 			overflow: hidden;
@@ -583,35 +590,54 @@
 
 		message-stack {
 			min-width: 0;
-			max-width: min(80%, 42rem);
+			max-width: calc(100% - var(--icon-size-md) - var(--gap-md));
+			flex: 1;
 			align-items: flex-start;
 			flex-direction: column;
 			gap: var(--gap-xs);
 		}
 
 		chat-message[data-role='user'] message-stack {
+			max-width: min(78%, 38rem);
+			flex: 0 1 auto;
 			align-items: flex-end;
 		}
 
-		message-stack > small {
+		.message-author {
 			color: var(--color-text-muted);
 			font-size: var(--text-xs);
+			font-weight: var(--font-medium);
 		}
 
 		message-content {
 			min-width: 0;
+			width: 100%;
 			max-width: 100%;
 			flex-direction: column;
-			padding: var(--pad-sm) var(--pad-md);
-			border: var(--border-width) solid var(--color-border);
-			border-radius: var(--radius-lg);
-			background: var(--color-surface-raised);
-			box-shadow: var(--shadow-sm);
+			padding-block: var(--pad-xs);
 			line-height: var(--leading-relaxed);
+			overflow-wrap: anywhere;
 		}
 
 		chat-message[data-role='user'] message-content {
+			width: auto;
+			padding: var(--pad-sm) var(--pad-md);
+			border: var(--border-width) solid color-mix(in oklch, var(--color-primary) 24%, var(--wollama-border-subtle));
+			border-radius: var(--radius-xl) var(--radius-xl) var(--radius-sm) var(--radius-xl);
 			background: var(--wollama-active-bg);
+		}
+
+		message-content :global(.prose) {
+			max-width: none;
+			color: var(--color-text);
+		}
+
+		message-content :global(.prose > :first-child) {
+			margin-block-start: 0;
+		}
+
+		message-content :global(.prose > :last-child) {
+			margin-block-end: 0;
 		}
 
 		message-attachments {
@@ -638,13 +664,13 @@
 		}
 
 		chat-composer-dock {
-			z-index: var(--z-sticky);
+			z-index: var(--z-dropdown);
 			width: 100%;
-			padding: var(--pad-sm) var(--pad-lg) var(--pad-lg);
-			background: linear-gradient(to bottom, transparent, var(--color-surface) var(--pad-lg));
+			padding: var(--pad-sm) var(--pad-lg) var(--pad-md);
+			background: linear-gradient(to bottom, transparent, var(--wollama-shell-bg) var(--pad-xl));
 		}
 
-		chat-composer-dock :global(.chat-composer) {
+		chat-composer-dock :global(chat-composer-component) {
 			width: 100%;
 		}
 
@@ -658,8 +684,9 @@
 				width: 100%;
 			}
 
-			message-stack {
-				max-width: 90%;
+			message-stack,
+			chat-message[data-role='user'] message-stack {
+				max-width: 92%;
 			}
 
 			message-avatar {

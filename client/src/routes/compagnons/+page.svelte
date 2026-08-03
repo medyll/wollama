@@ -50,7 +50,12 @@
 
 <companions-page>
 	<!-- Section: Header -->
-	<h1 class="mb-6 text-center text-3xl font-bold">Choisir un Compagnon</h1>
+	<header class="page-header">
+		<div class="page-header-copy">
+			<h1>Choisir un compagnon</h1>
+			<p class="page-description">Sélectionnez la personnalité et le modèle les mieux adaptés à votre conversation.</p>
+		</div>
+	</header>
 
 	<!-- Section: Companion Grid -->
 	{#if isLoading}
@@ -71,14 +76,11 @@
 						<h2>{companion.name}</h2>
 
 						<!-- Badge: System or Personal -->
-						<div
-							class="companion-kind"
-							data-kind={isSystemCompanion(companion) ? 'default' : 'personal'}
-						>
+						<div class="companion-kind" data-kind={isSystemCompanion(companion) ? 'default' : 'personal'}>
 							{isSystemCompanion(companion) ? 'Default' : 'Personal'}
 						</div>
 
-						<p class="text-sm text-gray-600">{companion.description}</p>
+						<p class="text-muted text-sm">{companion.description}</p>
 
 						<!-- Model and Specialization -->
 						<div class="flex gap-2 text-xs">
@@ -143,9 +145,11 @@
 
 		companions-page {
 			width: min(100%, 76rem);
+			height: 100%;
 			margin-inline: auto;
-			padding: var(--pad-lg);
+			padding: var(--pad-xl);
 			flex-direction: column;
+			overflow-y: auto;
 		}
 
 		companions-state {
@@ -161,11 +165,13 @@
 		}
 
 		companion-card {
-			background: var(--color-surface);
-			border: var(--border-width) solid var(--color-border);
-			border-radius: var(--radius-lg);
+			background: var(--color-surface-raised);
+			border: var(--border-width) solid var(--wollama-border-subtle);
+			border-radius: var(--radius-xl);
 			box-shadow: var(--shadow-sm);
-			transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+			transition:
+				box-shadow var(--transition-fast),
+				transform var(--transition-fast);
 		}
 
 		companion-card:hover {
@@ -214,6 +220,12 @@
 			gap: var(--gap-sm);
 			margin-block-start: auto;
 			padding-block-start: var(--pad-sm);
+		}
+
+		@media (width < 48rem) {
+			companions-page {
+				padding: var(--pad-md);
+			}
 		}
 	}
 </style>

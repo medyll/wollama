@@ -1,47 +1,57 @@
-@layer theme, components {
-	@layer theme {
-		:root {
-			color-scheme: light dark;
-			--color-primary: oklch(0.56 0.12 250);
-			--default-font-size: 0.875rem;
-			--default-leading: 1.5;
-			--default-color-text-light: oklch(0.24 0.012 70);
-			--default-color-text-dark: oklch(0.93 0.008 80);
-			--default-color-surface-light: oklch(0.985 0.006 80);
-			--default-color-surface-dark: oklch(0.18 0.008 250);
+@layer theme, components;
 
-			--app-sidebar-width: 15rem;
-			--app-sidebar-collapsed-width: 3.5rem;
-			--app-header-height: 3.25rem;
-			--app-reading-width: 52rem;
+@layer theme {
+	:root {
+		color-scheme: light dark;
+		--color-primary: oklch(0.56 0.19 274);
+		--default-font-size: 0.9375rem;
+		--default-leading: 1.6;
+		--default-color-text-light: oklch(0.22 0.018 270);
+		--default-color-text-dark: oklch(0.94 0.012 270);
+		--default-color-surface-light: oklch(0.982 0.007 270);
+		--default-color-surface-dark: oklch(0.145 0.014 270);
 
-			--wollama-shell-bg: var(--color-surface);
-			--wollama-sidebar-bg: color-mix(in oklch, var(--color-surface-alt) 86%, var(--color-surface));
-			--wollama-panel-bg: color-mix(in oklch, var(--color-surface-raised) 94%, var(--color-primary) 6%);
-			--wollama-border-subtle: color-mix(in oklch, var(--color-border) 72%, transparent);
-			--wollama-active-bg: color-mix(in oklch, var(--color-primary) 10%, transparent);
-			--wollama-focus-ring: color-mix(in oklch, var(--color-primary) 42%, transparent);
-		}
+		--app-sidebar-width: 17rem;
+		--app-sidebar-collapsed-width: 3.5rem;
+		--app-header-height: 3.75rem;
+		--app-reading-width: 48rem;
+
+		--wollama-shell-bg: color-mix(in oklch, var(--color-surface) 96%, var(--color-primary) 4%);
+		--wollama-sidebar-bg: color-mix(in oklch, var(--color-surface-alt) 92%, var(--color-primary) 8%);
+		--wollama-panel-bg: color-mix(in oklch, var(--color-surface-raised) 97%, var(--color-primary) 3%);
+		--wollama-border-subtle: color-mix(in oklch, var(--color-border) 82%, transparent);
+		--wollama-active-bg: color-mix(in oklch, var(--color-primary) 14%, transparent);
+		--wollama-focus-ring: color-mix(in oklch, var(--color-primary) 48%, transparent);
+	}
+}
+
+@layer components {
+	::selection {
+		background: color-mix(in oklch, var(--color-primary) 24%, transparent);
 	}
 
-	@layer components {
-		::selection {
-			background: color-mix(in oklch, var(--color-primary) 24%, transparent);
-		}
+	:focus-visible {
+		outline-color: var(--color-primary);
+	}
 
-		:focus-visible {
-			outline-color: var(--color-primary);
-		}
+	h1,
+	h2,
+	h3 {
+		text-wrap: balance;
+	}
 
-		@media (prefers-reduced-motion: reduce) {
-			*,
-			*::before,
-			*::after {
-				scroll-behavior: auto !important;
-				transition-duration: 0.01ms !important;
-				animation-duration: 0.01ms !important;
-				animation-iteration-count: 1 !important;
-			}
+	p {
+		text-wrap: pretty;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			scroll-behavior: auto !important;
+			transition-duration: 0.01ms !important;
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
 		}
 	}
 }

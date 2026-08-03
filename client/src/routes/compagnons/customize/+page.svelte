@@ -62,17 +62,15 @@
 <companion-customize-page>
 	<companion-customize-content>
 		<!-- Header -->
-		<div class="mb-8">
-			<button class="btn-ghost btn-sm" onclick={() => goto('/compagnons')} aria-label="Back to companions">
-				← Back
-			</button>
-			<h1 class="text-3xl font-bold">
-				{isNew ? 'Customize Companion' : 'Edit Companion'}
-			</h1>
-			<p class="mt-2 text-gray-600">
-				{isNew ? 'Create your personalized version of this companion' : 'Update your companion settings'}
-			</p>
-		</div>
+		<header class="page-header">
+			<button class="btn-ghost btn-sm" onclick={() => goto('/compagnons')} aria-label="Back to companions"> ← Back </button>
+			<div class="page-header-copy">
+				<h1>{isNew ? 'Customize Companion' : 'Edit Companion'}</h1>
+				<p class="page-description">
+					{isNew ? 'Create your personalized version of this companion' : 'Update your companion settings'}
+				</p>
+			</div>
+		</header>
 
 		<!-- Content -->
 		{#if isLoading}

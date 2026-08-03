@@ -90,48 +90,7 @@
 	});
 </script>
 
-<section class="chat-composer">
-	<!-- Top Bar: Companion, Audio, Delete -->
-	<header class="chat-composer-toolbar">
-		<!-- Left: Companion -->
-		<div class="chat-runtime-controls">
-			<button
-				type="button"
-				class="companion-control"
-				onclick={oncompanionclick}
-				title={t('ui.choose_companion') || 'Choose companion'}
-				aria-label={t('ui.choose_companion') || 'Choose companion'}
-			>
-				<strong>{currentCompagnon.name}</strong>
-			</button>
-			<label class="model-control">
-				<span class="sr-only">Model</span>
-				<select
-					value={currentCompagnon.model}
-					onchange={(event) => onmodelchange(event.currentTarget.value)}
-					aria-label="Model"
-					title="Model"
-				>
-					{#each modelOptions as model}
-						<option value={model}>{model}</option>
-					{/each}
-				</select>
-			</label>
-		</div>
-
-		<!-- Center: Audio Toggle -->
-		<div class="audio-control">
-			<AudioToggle />
-		</div>
-
-		<!-- Right: Delete Chat -->
-		<div>
-			{#if chatId}
-				<DataButton table="chats" table_id={chatId} mode="delete" confirm={true} />
-			{/if}
-		</div>
-	</header>
-
+<chat-composer-component>
 	<!-- File Previews -->
 	{#if files.length > 0}
 		<div class="mb-2 flex gap-2 overflow-x-auto p-2">
@@ -157,11 +116,50 @@
 	{/if}
 
 	<div class="composer-surface">
+		<header class="chat-composer-toolbar">
+			<div class="chat-runtime-controls">
+				<button
+					type="button"
+					class="companion-control"
+					onclick={oncompanionclick}
+					title={t('ui.choose_companion') || 'Choose companion'}
+					aria-label={t('ui.choose_companion') || 'Choose companion'}
+				>
+					<span class="companion-dot" aria-hidden="true"></span>
+					<strong>{currentCompagnon.name}</strong>
+				</button>
+				<label class="model-control">
+					<span class="sr-only">Model</span>
+					<select
+						name="model"
+						value={currentCompagnon.model}
+						onchange={(event) => onmodelchange(event.currentTarget.value)}
+						aria-label="Model"
+						title="Model"
+					>
+						{#each modelOptions as model}
+							<option value={model}>{model}</option>
+						{/each}
+					</select>
+				</label>
+			</div>
+
+			<div class="composer-toolbar-actions">
+				<AudioToggle />
+				{#if chatId}
+					<DataButton table="chats" table_id={chatId} mode="delete" confirm={true} />
+				{/if}
+			</div>
+		</header>
+
 		<textarea
 			bind:this={textareaRef}
 			placeholder={t('ui.type_message')}
 			aria-label={t('ui.type_message')}
+			aria-describedby="composer-hint"
 			class="composer-input"
+			name="message"
+			autocomplete="off"
 			rows="1"
 			bind:value
 			oninput={autoResize}
@@ -209,8 +207,10 @@
 
 		<footer class="composer-actions">
 			<!-- Left: Attachments -->
-			<div>
-				<input type="file" class="hidden" multiple bind:this={fileInput} onchange={handleFileSelect} />
+			<p id="composer-hint" class="composer-hint">Enter to send · Shift + Enter for a new line</p>
+
+			<div class="composer-submit-actions">
+				<input type="file" name="attachments" class="hidden" multiple bind:this={fileInput} onchange={handleFileSelect} />
 				<button
 					class="btn-icon btn-sm"
 					aria-label={t('ui.add_attachment') || 'Add attachment'}
@@ -257,11 +257,11 @@
 			</div>
 		</footer>
 	</div>
-</section>
+</chat-composer-component>
 
 <style>
 	@layer components {
-		.chat-composer {
+		chat-composer-component {
 			display: flex;
 			width: min(100%, var(--app-reading-width));
 			margin-inline: auto;
@@ -270,10 +270,12 @@
 		}
 
 		.chat-composer-toolbar {
-			display: grid;
-			grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+			display: flex;
 			align-items: center;
+			justify-content: space-between;
 			gap: var(--gap-sm);
+			padding: var(--pad-sm) var(--pad-sm) var(--pad-xs);
+			border-bottom: var(--border-width) solid var(--wollama-border-subtle);
 		}
 
 		.companion-control {
@@ -282,13 +284,21 @@
 			align-items: center;
 			justify-self: start;
 			gap: var(--gap-xs);
-			padding: var(--pad-xs) var(--pad-sm);
+			padding: var(--pad-xs);
 			border: 0;
 			border-radius: var(--radius-sm);
 			background: transparent;
 			color: var(--color-text);
 			font-size: var(--text-xs);
 			cursor: pointer;
+		}
+
+		.companion-dot {
+			width: var(--icon-size-xs);
+			height: var(--icon-size-xs);
+			flex: none;
+			border-radius: var(--radius-full);
+			background: var(--color-primary);
 		}
 
 		.companion-control:hover {
@@ -308,11 +318,11 @@
 		}
 
 		.model-control select {
-			max-width: 12rem;
-			padding: var(--pad-xs) var(--pad-sm);
-			border: var(--border-width) solid var(--wollama-border-subtle);
-			border-radius: var(--radius-full);
-			background: var(--color-surface);
+			max-width: 14rem;
+			padding: var(--pad-xs);
+			border: 0;
+			border-radius: var(--radius-sm);
+			background: transparent;
 			color: var(--color-text-muted);
 			font-size: var(--text-xs);
 			cursor: pointer;
@@ -323,12 +333,11 @@
 			outline-offset: var(--focus-ring-gap);
 		}
 
-		.audio-control {
-			grid-column: 2;
-		}
-
-		.chat-composer-toolbar > :last-child {
-			justify-self: end;
+		.composer-toolbar-actions,
+		.composer-submit-actions {
+			display: flex;
+			align-items: center;
+			gap: var(--gap-xs);
 		}
 
 		.composer-surface {
@@ -336,7 +345,7 @@
 			border: var(--border-width) solid var(--wollama-border-subtle);
 			border-radius: var(--radius-xl);
 			background: var(--wollama-panel-bg);
-			box-shadow: var(--shadow-md);
+			box-shadow: var(--shadow-sm);
 			overflow: visible;
 			transition:
 				border-color var(--transition-fast),
@@ -391,7 +400,7 @@
 			width: 100%;
 			min-height: 3rem;
 			max-height: 11rem;
-			padding: var(--pad-md) var(--pad-md) var(--pad-sm);
+			padding: var(--pad-md);
 			border: 0;
 			background: transparent;
 			color: var(--color-text);
@@ -402,28 +411,34 @@
 		}
 
 		.composer-input:focus {
-			outline: none;
+			outline: var(--border-width) solid transparent;
 		}
 
 		.composer-actions {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			padding: var(--pad-xs) var(--pad-sm);
-			border-top: 0;
+			gap: var(--gap-sm);
+			padding: var(--pad-xs) var(--pad-sm) var(--pad-sm);
+		}
+
+		.composer-hint {
+			margin: 0 auto 0 0;
+			color: var(--color-text-muted);
+			font-size: var(--text-xs);
 		}
 
 		@media (width < 48rem) {
-			.chat-composer-toolbar {
-				grid-template-columns: minmax(0, 1fr) auto auto;
-			}
-
 			.model-control select {
 				max-width: 8rem;
 			}
 
 			.composer-surface {
 				border-radius: var(--radius-lg);
+			}
+
+			.composer-hint {
+				display: none;
 			}
 		}
 	}

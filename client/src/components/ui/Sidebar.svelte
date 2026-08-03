@@ -36,7 +36,12 @@
 	}
 </script>
 
-<aside class="app-sidebar" data-open={uiState.sidebarOpen} data-collapsed={uiState.sidebarCollapsed} aria-label="Sidebar">
+<aside
+	class="app-sidebar"
+	data-open={uiState.sidebarOpen}
+	data-collapsed={uiState.sidebarCollapsed}
+	aria-label="Primary navigation"
+>
 	<div class="sidebar-header">
 		<!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
 		<div
@@ -60,8 +65,8 @@
 			</button>
 		{/if}
 
-		<button class="sidebar-action" onclick={createNewChat} title={t('ui.newChat')}>
-			<Icon icon="fluent:compose-24-regular" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
+		<button type="button" class="sidebar-action sidebar-new-chat" onclick={createNewChat} title={t('ui.newChat')}>
+			<Icon icon="fluent:compose-24-regular" class="h-5 w-5" aria-hidden="true" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.newChat')}
 			{/if}
@@ -70,18 +75,23 @@
 
 	<nav id="sidebar-nav" class="sidebar-nav" aria-label={t('ui.myChats')} data-testid="chat-list">
 		{#if !uiState.sidebarCollapsed}
-			{#each chats as chat}
-				<a
-					href="/chat/{chat.chat_id}"
-					class="sidebar-chat-link"
-					aria-current={$page.url.pathname.includes(chat.chat_id) ? 'page' : undefined}
-					title={chat.title}
-					data-testid="chat-list-item"
-				>
-					<Icon icon="fluent:chat-24-regular" class="mr-2 h-5 w-5 opacity-70" />
-					<span class="truncate">{chat.title}</span>
-				</a>
-			{/each}
+			<p class="sidebar-section-label">{t('ui.myChats')}</p>
+			{#if chats.length === 0}
+				<p class="sidebar-empty">{t('ui.noChats')}</p>
+			{:else}
+				{#each chats as chat}
+					<a
+						href="/chat/{chat.chat_id}"
+						class="sidebar-chat-link"
+						aria-current={$page.url.pathname.includes(chat.chat_id) ? 'page' : undefined}
+						title={chat.title}
+						data-testid="chat-list-item"
+					>
+						<Icon icon="fluent:chat-24-regular" class="h-5 w-5" aria-hidden="true" />
+						<span class="truncate">{chat.title}</span>
+					</a>
+				{/each}
+			{/if}
 		{/if}
 	</nav>
 
@@ -89,8 +99,8 @@
 		<div class="flex justify-end px-2">
 			<SidebarCollapse />
 		</div>
-		<button class="sidebar-action" onclick={() => goto('/settings')} title={t('ui.settings')}>
-			<Icon icon="fluent:settings-24-regular" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
+		<button type="button" class="sidebar-action" onclick={() => goto('/settings')} title={t('ui.settings')}>
+			<Icon icon="fluent:settings-24-regular" class="h-5 w-5" aria-hidden="true" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.settings')}
 			{/if}
@@ -136,8 +146,27 @@
 		.sidebar-nav {
 			min-height: 0;
 			flex: 1;
-			padding: var(--pad-xs) var(--pad-sm);
+			padding: var(--pad-md) var(--pad-sm);
 			overflow-y: auto;
+			scrollbar-gutter: stable;
+		}
+
+		.sidebar-section-label {
+			margin: 0 0 var(--gap-sm);
+			padding-inline: var(--pad-sm);
+			color: var(--color-text-muted);
+			font-size: var(--text-xs);
+			font-weight: var(--font-semibold);
+			letter-spacing: var(--tracking-wide);
+			text-transform: uppercase;
+		}
+
+		.sidebar-empty {
+			margin: 0;
+			padding: var(--pad-md) var(--pad-sm);
+			color: var(--color-text-muted);
+			font-size: var(--text-sm);
+			line-height: var(--leading-relaxed);
 		}
 
 		.sidebar-action,
@@ -147,8 +176,8 @@
 			min-width: 0;
 			align-items: center;
 			gap: var(--gap-sm);
-			min-height: var(--icon-size-xl);
-			padding: var(--pad-xs) var(--pad-sm);
+			min-height: var(--icon-size-lg);
+			padding: var(--pad-sm);
 			border: 0;
 			border-radius: var(--radius-md);
 			background: transparent;
@@ -163,9 +192,30 @@
 				color var(--transition-fast);
 		}
 
+		.sidebar-action :global(svg),
+		.sidebar-chat-link :global(svg) {
+			flex: none;
+			color: var(--color-text-muted);
+		}
+
+		.sidebar-new-chat {
+			background: var(--color-primary);
+			color: var(--color-on-primary);
+			font-weight: var(--font-semibold);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.sidebar-new-chat :global(svg) {
+			color: currentColor;
+		}
+
 		.sidebar-action:hover,
 		.sidebar-chat-link:hover {
 			background: var(--color-surface-hover);
+		}
+
+		.sidebar-new-chat:hover {
+			background: var(--color-primary-hover);
 		}
 
 		.sidebar-chat-link[aria-current='page'] {

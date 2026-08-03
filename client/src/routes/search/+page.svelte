@@ -49,17 +49,22 @@
 </script>
 
 <search-page>
-	<h1>
-		<Icon icon="lucide:search" />
-		Search
-	</h1>
+	<header class="page-header">
+		<div class="page-header-copy">
+			<h1>Search</h1>
+			<p class="page-description">Find a conversation, message, or assistant.</p>
+		</div>
+	</header>
 
 	<!-- Search Input -->
 	<search-bar>
 		<input
-			type="text"
+			type="search"
 			class="search-input"
-			placeholder="Search chats, messages, assistants..."
+			placeholder="Search chats, messages, assistants…"
+			name="query"
+			autocomplete="off"
+			aria-label="Search chats, messages, and assistants"
 			bind:value={query}
 			onkeydown={handleKeydown}
 		/>
@@ -77,15 +82,15 @@
 		<strong>Search in:</strong>
 		<label class="checkbox-row">
 			<span>Chat Names</span>
-			<input type="checkbox" bind:checked={filters.chatName} />
+			<input type="checkbox" name="chat-name" bind:checked={filters.chatName} />
 		</label>
 		<label class="checkbox-row">
 			<span>Messages</span>
-			<input type="checkbox" bind:checked={filters.messageContent} />
+			<input type="checkbox" name="message-content" bind:checked={filters.messageContent} />
 		</label>
 		<label class="checkbox-row">
 			<span>Assistant Names</span>
-			<input type="checkbox" bind:checked={filters.assistantName} />
+			<input type="checkbox" name="assistant-name" bind:checked={filters.assistantName} />
 		</label>
 	</search-filters>
 
@@ -97,11 +102,7 @@
 			</search-empty>
 		{:else if results.length > 0}
 			{#each results as result}
-				<button
-					class="search-result"
-					onclick={() => navigateToResult(result)}
-					transition:fade
-				>
+				<button class="search-result" onclick={() => navigateToResult(result)} transition:fade>
 					<div class="mb-1 flex items-start justify-between">
 						<div class="flex items-center gap-2">
 							{#if result.type === 'chat'}
@@ -149,13 +150,6 @@
 			margin-inline: auto;
 			padding: var(--pad-lg);
 			flex-direction: column;
-		}
-
-		search-page h1 {
-			display: flex;
-			align-items: center;
-			gap: var(--gap-sm);
-			margin-block: 0 var(--pad-xl);
 		}
 
 		search-bar {
@@ -215,7 +209,9 @@
 			border-radius: var(--radius-md);
 			box-shadow: var(--shadow-sm);
 			text-align: start;
-			transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+			transition:
+				box-shadow var(--transition-fast),
+				transform var(--transition-fast);
 		}
 
 		.search-result:hover {

@@ -76,7 +76,7 @@ export default {
 			change: 'Changer',
 			you: 'Vous',
 			assistant: 'Assistant',
-			type_message: 'Écrivez votre message...',
+			type_message: 'Écrivez votre message…',
 			general_assistant_desc: 'Un assistant polyvalent pour toutes vos tâches.',
 			expert_coder: 'Codeur Expert',
 			expert_coder_desc: 'Spécialisé en développement logiciel.',
