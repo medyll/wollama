@@ -12,6 +12,7 @@
 	import type { Companion } from '$types/data';
 	import DataGenericList from '$components/ui_data/DataGenericList.svelte';
 	import DataUpdate from '$components/ui_data/DataUpdate.svelte';
+	import { APP_THEMES } from '$lib/theme';
 
 	import { onDestroy } from 'svelte';
 
@@ -93,32 +94,6 @@
 			isMonitoringMic = false;
 		}
 	});
-
-	const themes = [
-		'fluent-light',
-		'fluent-dark',
-		'light',
-		'dark',
-		'cupcake',
-		'bumblebee',
-		'emerald',
-		'corporate',
-		'synthwave',
-		'retro',
-		'cyberpunk',
-		'valentine',
-		'halloween',
-		'garden',
-		'forest',
-		'aqua',
-		'lofi',
-		'pastel',
-		'fantasy',
-		'wireframe',
-		'black',
-		'luxury',
-		'dracula'
-	];
 
 	async function loadCompanions() {
 		try {
@@ -396,21 +371,21 @@
 						<label class="label" for="theme">
 							<span class="label-text">{t('settings.theme')}</span>
 						</label>
-						<div class="grid grid-cols-3 gap-2 md:grid-cols-5">
-							{#each themes as theme}
+						<div class="grid max-w-lg grid-cols-2 gap-3">
+							{#each APP_THEMES as theme}
 								<button
 									class="btn flex h-auto flex-col gap-1 rounded-xl border-2 p-2 {userState.preferences.theme ===
-									theme
+									theme.id
 										? 'border-primary'
 										: 'border-base-content/10'}"
-									onclick={() => (userState.preferences.theme = theme)}
-									data-theme={theme}
-									aria-label="Select theme {theme}"
+									onclick={() => (userState.preferences.theme = theme.id)}
+									data-theme={theme.id}
+									aria-label="Select {theme.label} theme"
 								>
 									<div class="bg-base-100 border-base-content/10 h-4 w-full rounded border"></div>
 									<div class="bg-primary h-4 w-full rounded"></div>
 									<div class="bg-secondary h-4 w-full rounded"></div>
-									<span class="text-[10px] font-bold capitalize">{theme}</span>
+									<span class="text-xs font-medium">{theme.label}</span>
 								</button>
 							{/each}
 						</div>
@@ -639,7 +614,15 @@
 								>
 							</label>
 							<div class="w-full">
-								<input id="temp" type="range" min="0" max="1" step="0.1" class="range range-primary" bind:value={userState.preferences.defaultTemperature} />
+								<input
+									id="temp"
+									type="range"
+									min="0"
+									max="1"
+									step="0.1"
+									class="range range-primary"
+									bind:value={userState.preferences.defaultTemperature}
+								/>
 								<div class="flex w-full justify-between px-2 text-xs">
 									<span>{t('settings.precise')}</span>
 									<span>{t('settings.creative')}</span>
@@ -781,68 +764,69 @@
 			</div>
 
 			<!-- Section: Hooks -->
-		<div class="collapse-arrow join-item border-base-300 collapse border">
-			<input
-				type="checkbox"
-				checked={activeSection === 'hooks'}
-				onchange={() => (activeSection = activeSection === 'hooks' ? null : 'hooks')}
-				aria-label="Toggle Hooks"
-			/>
-			<div class="collapse-title flex items-center gap-2 text-lg font-medium">
-				<Icon icon="lucide:webhook" class="h-5 w-5" />
-				Hooks
-			</div>
-			<div class="collapse-content">
-				<div class="pt-4">
-					{#if isLoadingHooks}
-						<div class="flex justify-center py-8">
-							<span class="loading loading-spinner loading-lg"></span>
-						</div>
-					{:else if hooks.length === 0}
-						<div class="alert alert-info">
-							<Icon icon="lucide:info" class="h-5 w-5" />
-							<span>No hooks registered.</span>
-						</div>
-					{:else}
-						<div class="border-base-300 overflow-x-auto rounded-lg border">
-							<table class="table-xs table w-full">
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Event</th>
-										<th>Type</th>
-										<th>Priority</th>
-										<th>Scope</th>
-										<th class="text-center">Enabled</th>
-									</tr>
-								</thead>
-								<tbody>
-									{#each hooks as hook}
-										<tr class="hover">
-											<td class="font-medium">{hook.name}</td>
-											<td><span class="badge badge-ghost badge-sm">{hook.event}</span></td>
-											<td class="text-xs opacity-70">{hook.handler_type ?? '-'}</td>
-											<td class="text-xs opacity-70">{hook.priority ?? '-'}</td>
-											<td class="text-xs opacity-70">{hook.scope ?? '-'}</td>
-											<td class="text-center">
-												<input
-													type="checkbox"
-													class="toggle toggle-primary toggle-sm"
-													checked={hook.is_enabled}
-													onchange={(e) => toggleHook(hook._id, (e.target as HTMLInputElement).checked)}
-												/>
-											</td>
+			<div class="collapse-arrow join-item border-base-300 collapse border">
+				<input
+					type="checkbox"
+					checked={activeSection === 'hooks'}
+					onchange={() => (activeSection = activeSection === 'hooks' ? null : 'hooks')}
+					aria-label="Toggle Hooks"
+				/>
+				<div class="collapse-title flex items-center gap-2 text-lg font-medium">
+					<Icon icon="lucide:webhook" class="h-5 w-5" />
+					Hooks
+				</div>
+				<div class="collapse-content">
+					<div class="pt-4">
+						{#if isLoadingHooks}
+							<div class="flex justify-center py-8">
+								<span class="loading loading-spinner loading-lg"></span>
+							</div>
+						{:else if hooks.length === 0}
+							<div class="alert alert-info">
+								<Icon icon="lucide:info" class="h-5 w-5" />
+								<span>No hooks registered.</span>
+							</div>
+						{:else}
+							<div class="border-base-300 overflow-x-auto rounded-lg border">
+								<table class="table-xs table w-full">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Event</th>
+											<th>Type</th>
+											<th>Priority</th>
+											<th>Scope</th>
+											<th class="text-center">Enabled</th>
 										</tr>
-									{/each}
-								</tbody>
-							</table>
-						</div>
-					{/if}
+									</thead>
+									<tbody>
+										{#each hooks as hook}
+											<tr class="hover">
+												<td class="font-medium">{hook.name}</td>
+												<td><span class="badge badge-ghost badge-sm">{hook.event}</span></td>
+												<td class="text-xs opacity-70">{hook.handler_type ?? '-'}</td>
+												<td class="text-xs opacity-70">{hook.priority ?? '-'}</td>
+												<td class="text-xs opacity-70">{hook.scope ?? '-'}</td>
+												<td class="text-center">
+													<input
+														type="checkbox"
+														class="toggle toggle-primary toggle-sm"
+														checked={hook.is_enabled}
+														onchange={(e) =>
+															toggleHook(hook._id, (e.target as HTMLInputElement).checked)}
+													/>
+												</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+						{/if}
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<!-- Section: Danger Zone -->
+			<!-- Section: Danger Zone -->
 			<div class="collapse-arrow join-item border-base-300 border-error/20 collapse border">
 				<input
 					type="checkbox"

@@ -4,6 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "npx tsx watch server.ts",
+		"build:electron": "node build-electron.mjs",
 		"check": "tsc --noEmit",
 		"test": "concurrently \"npm run dev\" \"npx tsx test-server.ts\" --kill-others --success first",
 		"test:unit": "vitest run",
@@ -36,6 +37,7 @@
 		"adm-zip": "^0.5.16",
 		"concurrently": "^9.2.1",
 		"cross-env": "^10.1.0",
+		"esbuild": "^0.27.0",
 		"ts-node": "^10.9.2",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",

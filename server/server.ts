@@ -62,6 +62,7 @@ app.use(express.json());
 // API Routes
 app.get('/api/health', (req, res) => {
 	res.json({
+		service: 'wollama',
 		status: 'ok',
 		ollama: serverState.ollamaReady
 	});
@@ -189,7 +190,10 @@ app.post('/api/chat/generate', async (req, res) => {
 		// ── Hook Pipeline: pre-send ──────────────────────────────────────────
 		let lastUserIdx = -1;
 		for (let i = messages.length - 1; i >= 0; i--) {
-			if (messages[i].role === 'user') { lastUserIdx = i; break; }
+			if (messages[i].role === 'user') {
+				lastUserIdx = i;
+				break;
+			}
 		}
 		if (lastUserIdx !== -1 && (chat_id || user_id)) {
 			const preSendCtx = hookPipeline.createContext({

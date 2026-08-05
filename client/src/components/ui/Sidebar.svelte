@@ -37,12 +37,14 @@
 </script>
 
 <aside
-	class="bg-base-300 border-base-content/10 flex flex-col transition-all duration-300 {uiState.sidebarOpen
-		? (uiState.sidebarCollapsed ? 'w-20' : 'w-64') + ' m-2 h-[calc(100%-1rem)] rounded-xl border'
+	class="app-sidebar transition-all duration-300 {uiState.sidebarOpen
+		? uiState.sidebarCollapsed
+			? 'w-20'
+			: 'w-64'
 		: 'h-full w-0 overflow-hidden'}"
 	aria-label="Sidebar"
 >
-	<div class="flex flex-col gap-2 p-2">
+	<div class="sidebar-header gap-2 p-2">
 		<!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
 		<div
 			class="hidden md:flex {uiState.sidebarCollapsed
@@ -97,7 +99,7 @@
 		{/if}
 	</nav>
 
-	<div class="  flex flex-col gap-2 p-4">
+	<div class="sidebar-footer gap-2 p-4">
 		<div class="flex justify-end px-2">
 			<SidebarCollapse />
 		</div>

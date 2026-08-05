@@ -1,5 +1,16 @@
 import { translations } from '../../locales/translations.js';
 import { browser } from '$app/environment';
+import { normalizeTheme } from '$lib/theme';
+
+const DEVELOPMENT_SERVER_URL = 'http://localhost:3000';
+
+function getDefaultServerUrl() {
+	if (browser && typeof window !== 'undefined' && window.wollamaDesktop?.serverUrl) {
+		return window.wollamaDesktop.serverUrl;
+	}
+
+	return DEVELOPMENT_SERVER_URL;
+}
 
 export class UserState {
 	nickname = $state('');
@@ -16,9 +27,9 @@ export class UserState {
 
 	preferences = $state({
 		ollamaUrl: 'http://localhost:11434', // Ollama service
-		serverUrl: 'http://localhost:3000', // Wollama application server
+		serverUrl: getDefaultServerUrl(), // Wollama application server
 		locale: 'en',
-		theme: 'fluent-light',
+		theme: 'light',
 		defaultModel: 'mistral:latest',
 		defaultCompanion: '1', // Default to General Assistant
 		defaultTemperature: 0.7,
@@ -52,6 +63,7 @@ export class UserState {
 				if (data.preferences) {
 					// Use Object.assign to update the reactive proxy instead of replacing it
 					Object.assign(this.preferences, data.preferences);
+					this.preferences.theme = normalizeTheme(data.preferences.theme);
 				}
 			} else {
 				// First start: Detect browser language
@@ -122,9 +134,9 @@ export class UserState {
 		// Reset preferences to defaults
 		this.preferences = {
 			ollamaUrl: 'http://localhost:11434',
-			serverUrl: 'http://localhost:3000',
+			serverUrl: getDefaultServerUrl(),
 			locale: 'en',
-			theme: 'fluent-light',
+			theme: 'light',
 			defaultModel: 'mistral:latest',
 			defaultCompanion: '1',
 			defaultTemperature: 0.7,

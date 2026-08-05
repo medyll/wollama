@@ -5,9 +5,10 @@
 	import { t } from '$lib/state/i18n.svelte';
 	import { onMount, onDestroy } from 'svelte';
 
-	let pollingTimer: any;
+	let pollingTimer: ReturnType<typeof setInterval> | undefined;
 	let tempUrl = $state(userState.preferences.serverUrl);
-	let currentErrorToastId: string | null = null;
+	let isRestartingBackend = $state(false);
+	let isDesktopRuntime = $state(false);
 
 	async function checkConnection(isAuto = false) {
 		connectionState.setChecking(true);
@@ -52,6 +53,7 @@
 			if (connectionState.isConnected) {
 				// Transition from Connected -> Disconnected
 				connectionState.setConnected(false);
+				connectionState.showModal = true;
 
 				// "in case of fail, the bubble must be red, autoclose off" -> CHANGED TO: "show notification with auto_close"
 				toast.error(t('status.server_inaccessible'), 5000);
@@ -78,7 +80,29 @@
 		toast.info(t('status.offline_mode'));
 	}
 
+	async function restartPackagedBackend() {
+		if (!window.wollamaDesktop) return;
+
+		isRestartingBackend = true;
+		try {
+			const status = await window.wollamaDesktop.restartBackend();
+			tempUrl = status.url;
+			userState.preferences.serverUrl = status.url;
+			userState.save();
+
+			if (status.status === 'running') {
+				await checkConnection();
+			} else {
+				toast.error(status.error || t('status.still_inaccessible'), 5000);
+			}
+		} finally {
+			isRestartingBackend = false;
+		}
+	}
+
 	onMount(() => {
+		isDesktopRuntime = !!window.wollamaDesktop;
+
 		// Initial check
 		checkConnection(true);
 
@@ -94,60 +118,66 @@
 </script>
 
 {#if connectionState.showModal}
-	<!-- Section: Connection Modal -->
-	<div class="modal modal-open z-50 bg-black/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-		<div class="modal-box shadow-2xl">
-			<h3
-				id="modal-title"
-				class={`flex items-center gap-2 text-lg font-bold ${!connectionState.isConnected ? 'text-error' : 'text-warning'}`}
+	<!-- This alert intentionally stays below the sidebar layer so navigation and Settings remain reachable. -->
+	<aside class="connection-banner" role="alert" aria-live="assertive" aria-labelledby="connection-banner-title">
+		<div class="connection-banner-header">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="text-warning h-6 w-6"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				><path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+				/></svg
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-					/></svg
-				>
+			<h3 id="connection-banner-title" class="text-lg font-semibold">
 				{#if !connectionState.isConnected}
 					{t('status.server_inaccessible')}
 				{:else}
 					Ollama Service Unavailable
 				{/if}
 			</h3>
-			<p class="py-4">
-				{#if !connectionState.isConnected}
-					{t('status.check_server')}
-				{:else}
-					The backend server is connected, but the Ollama AI engine is not responding. Please check your Ollama
-					installation.
-				{/if}
-			</p>
-
-			<div class="form-control w-full">
-				<label class="label" for="server-url-input">
-					<span class="label-text">{t('settings.server_url')}</span>
-				</label>
-				<input
-					id="server-url-input"
-					type="text"
-					bind:value={tempUrl}
-					class="input input-bordered w-full font-mono"
-					placeholder="http://localhost:3000"
-				/>
-			</div>
-
-			<div class="modal-action">
-				<button class="btn btn-ghost" onclick={goOffline}>{t('status.continue_offline')}</button>
-				<button class="btn btn-primary" onclick={updateUrl} disabled={connectionState.isChecking}>
-					{#if connectionState.isChecking}
-						<span class="loading loading-spinner loading-xs"></span>
-						{t('status.connecting')}...
-					{:else}
-						{t('status.retry')}
-					{/if}
-				</button>
-			</div>
 		</div>
-	</div>
+		<p class="text-sm opacity-80">
+			{#if !connectionState.isConnected}
+				{t('status.check_server')}
+			{:else}
+				The backend is connected, but Ollama is not responding. Check the Ollama installation or continue offline.
+			{/if}
+		</p>
+
+		<div class="form-control w-full">
+			<label class="label" for="server-url-input">
+				<span class="label-text">{t('settings.server_url')}</span>
+			</label>
+			<input
+				id="server-url-input"
+				type="url"
+				bind:value={tempUrl}
+				class="input input-bordered w-full font-mono"
+				placeholder="http://localhost:3000"
+			/>
+		</div>
+
+		<div class="connection-banner-actions">
+			<button class="btn btn-ghost btn-sm" onclick={goOffline}>{t('status.continue_offline')}</button>
+			{#if isDesktopRuntime}
+				<button class="btn btn-outline btn-sm" onclick={restartPackagedBackend} disabled={isRestartingBackend}>
+					{isRestartingBackend ? `${t('status.connecting')}...` : 'Restart local server'}
+				</button>
+			{/if}
+			<button class="btn btn-primary btn-sm" onclick={updateUrl} disabled={connectionState.isChecking}>
+				{#if connectionState.isChecking}
+					<span class="loading loading-spinner loading-xs"></span>
+					{t('status.connecting')}...
+				{:else}
+					{t('status.retry')}
+				{/if}
+			</button>
+		</div>
+	</aside>
 {/if}

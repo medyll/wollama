@@ -85,13 +85,13 @@
 <OfflineIndicator />
 
 {#if userState.preferences.onboarding_completed}
-	<div class="drawer md:drawer-open h-screen overflow-hidden">
+	<div class="drawer md:drawer-open app-shell h-screen overflow-hidden">
 		<!-- Section: Drawer Toggle -->
 		<input id="main-drawer" type="checkbox" class="drawer-toggle" bind:checked={uiState.sidebarOpen} />
 
 		<div class="drawer-content relative flex h-full flex-col">
 			<!-- Section: Navbar -->
-			<header class="navbar bg-base-100 z-10 min-h-16">
+			<header class="navbar app-navbar min-h-16">
 				<div class="flex-none md:hidden">
 					<SidebarTrigger />
 				</div>
@@ -126,13 +126,13 @@
 			</header>
 
 			<!-- Section: Main Content -->
-			<main class="relative flex-1 overflow-hidden">
+			<main class="app-main relative flex-1 overflow-hidden">
 				{@render children()}
 			</main>
 		</div>
 
 		<!-- Section: Sidebar -->
-		<div class="drawer-side z-20">
+		<div class="drawer-side app-sidebar-layer">
 			<label for="main-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
 			<Sidebar />
 		</div>
