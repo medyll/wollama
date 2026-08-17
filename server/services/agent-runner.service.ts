@@ -1,78 +1,51 @@
-import { randomUUID } from 'crypto';
+import { toolExecutor } from '../orchestration/tool-executor.js';
 import { dbManager } from '../db/database.js';
-import { getAgent } from '../agents/index.js';
 import type { ToolCall } from '../../shared/types/agents.js';
 
 export interface AgentRunRequest {
-    slug: string;
-    input: Record<string, unknown>;
-    message_id?: string;
-    agent_id?: string;
+	slug: string;
+	input: Record<string, unknown>;
+	message_id?: string;
+	agent_id?: string;
 }
 
 export interface AgentRunResponse {
-    tool_call_id: string;
-    status: 'running' | 'done' | 'error';
-    output?: Record<string, unknown>;
-    error?: string;
+	tool_call_id: string;
+	status: 'running' | 'done' | 'error';
+	output?: Record<string, unknown>;
+	error?: string;
 }
 
+/**
+ * Thin wrapper over toolExecutor — all persistence (tool_calls writes) and dispatch
+ * now live there, so builtin agents share one execution path with MCP tools instead
+ * of a parallel one. See docs/architecture/mcp-client-acp-team-investigation.md.
+ */
 export class AgentRunnerService {
-    static async run(req: AgentRunRequest): Promise<AgentRunResponse> {
-        const { slug, input, message_id = 'standalone', agent_id = slug } = req;
+	static async run(req: AgentRunRequest): Promise<AgentRunResponse> {
+		const { slug } = req;
 
-        const handler = getAgent(slug);
-        if (!handler) {
-            return { tool_call_id: '', status: 'error', error: `No agent registered for slug: ${slug}` };
-        }
+		const result = await toolExecutor.executeById(`builtin:${slug}`, req.input, {
+			origin: 'api',
+			message_id: req.message_id
+		});
 
-        const tool_call_id = randomUUID();
-        const db = dbManager.getDb('tool_calls');
+		if (!result.ok) {
+			return { tool_call_id: result.tool_call_id ?? '', status: 'error', error: result.error ?? result.content };
+		}
+		return { tool_call_id: result.tool_call_id ?? '', status: 'done', output: result.data };
+	}
 
-        const record: ToolCall & { _id: string } = {
-            _id: tool_call_id,
-            tool_call_id,
-            message_id,
-            agent_id,
-            status: 'running',
-            input,
-            started_at: new Date().toISOString()
-        };
-
-        await db.put(record);
-
-        try {
-            const output = await handler(input);
-            const existing: any = await db.get(tool_call_id);
-            await db.put({
-                ...existing,
-                status: 'done',
-                output,
-                finished_at: new Date().toISOString()
-            });
-            return { tool_call_id, status: 'done', output };
-        } catch (err: any) {
-            const existing: any = await db.get(tool_call_id);
-            await db.put({
-                ...existing,
-                status: 'error',
-                error: err?.message ?? 'Unknown error',
-                finished_at: new Date().toISOString()
-            });
-            return { tool_call_id, status: 'error', error: err?.message ?? 'Unknown error' };
-        }
-    }
-
-    static async getStatus(tool_call_id: string): Promise<ToolCall | null> {
-        const db = dbManager.getDb('tool_calls');
-        try {
-            const doc: any = await db.get(tool_call_id);
-            return doc as ToolCall;
-        } catch (e: any) {
-            if (e.status === 404) return null;
-            throw e;
-        }
-    }
+	static async getStatus(tool_call_id: string): Promise<ToolCall | null> {
+		const db = dbManager.getDb('tool_calls');
+		try {
+			const doc: any = await db.get(tool_call_id);
+			return doc as ToolCall;
+		} catch (e: any) {
+			if (e.status === 404) return null;
+			throw e;
+		}
+	}
 }
 
 export default AgentRunnerService;

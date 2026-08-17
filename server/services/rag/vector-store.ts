@@ -60,7 +60,12 @@ class VectorStore {
 		this.persist(ownerId);
 	}
 
-	search(ownerId: string, queryEmbedding: number[], topK: number, minScore: number): Array<{ chunk_id: string; document_id: string; score: number }> {
+	search(
+		ownerId: string,
+		queryEmbedding: number[],
+		topK: number,
+		minScore: number
+	): Array<{ chunk_id: string; document_id: string; score: number }> {
 		const records = this.load(ownerId);
 		const scored = records.map((r) => ({
 			chunk_id: r.chunk_id,

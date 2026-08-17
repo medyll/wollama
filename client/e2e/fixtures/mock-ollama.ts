@@ -1,10 +1,10 @@
 /**
  * Mock Ollama Server for E2E Testing
- * 
+ *
  * Provides deterministic responses for:
  * - Health checks (GET /api/tags)
  * - Chat completions (POST /api/chat)
- * 
+ *
  * Usage:
  *   const mockServer = new MockOllamaServer(port);
  *   await mockServer.start();

@@ -59,10 +59,7 @@
 {#if loading}
 	<data-card data-loading="true" aria-busy="true"><span class="loading-ellipsis">Loading</span></data-card>
 {:else if item}
-	<data-card
-		data-interactive={onRowClick ? 'true' : undefined}
-		onclick={() => onRowClick && onRowClick(item)}
-	>
+	<data-card data-interactive={onRowClick ? 'true' : undefined} onclick={() => onRowClick && onRowClick(item)}>
 		<data-card-body>
 			<!-- Header / Title -->
 			<h2>
@@ -142,7 +139,10 @@
 			border-radius: var(--radius-lg);
 			box-shadow: var(--shadow-sm);
 			overflow: hidden;
-			transition: background-color var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast);
+			transition:
+				background-color var(--duration-fast),
+				box-shadow var(--duration-fast),
+				transform var(--duration-fast);
 		}
 
 		data-card[data-loading='true'] {

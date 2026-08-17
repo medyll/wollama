@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { appSchema } from '../../../../shared/db/database-scheme';
 	import { DataGenericService } from '$lib/services/data-generic.service';
-	import Icon from '@iconify/svelte';
 
 	let {
 		tableName,
@@ -63,11 +62,7 @@
 {:else if mode === 'grid'}
 	<selector-grid class={className}>
 		{#each items as item}
-			<button
-				class="selector-option"
-				aria-pressed={selectedId === item[valueKey]}
-				onclick={() => handleSelect(item)}
-			>
+			<button class="selector-option" aria-pressed={selectedId === item[valueKey]} onclick={() => handleSelect(item)}>
 				{#if item.flag}
 					<span class="text-2xl">{item.flag}</span>
 				{/if}

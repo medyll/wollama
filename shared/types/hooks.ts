@@ -1,9 +1,4 @@
-export type HookEvent =
-	| 'pre-send'
-	| 'post-receive'
-	| 'on-session-start'
-	| 'on-session-end'
-	| 'on-tool-result';
+export type HookEvent = 'pre-send' | 'post-receive' | 'on-session-start' | 'on-session-end' | 'on-tool-result';
 
 export type HookHandlerType = 'builtin' | 'llm' | 'skill';
 export type HookScope = 'global' | 'user' | 'companion';

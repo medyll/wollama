@@ -105,13 +105,12 @@ let dbPromise: Promise<any> | null = globalAny.__wollama_db_promise || null;
 
 const _createDatabase = async () => {
 	const db = await createRxDatabase({
-		name: 'wollama_client_db_v17',
+		name: 'wollama_client_db_v19',
 		storage: wrappedValidateAjvStorage({
 			storage: getRxStorageDexie()
 		}),
 		multiInstance: true,
-		eventReduce: true,
-		ignoreDuplicate: true
+		eventReduce: true
 	});
 
 	// Create collections based on shared schema
@@ -134,22 +133,6 @@ const _createDatabase = async () => {
 
 // Store replication states to be able to cancel them
 const replicationStates: any[] = [];
-
-/**
- * Story 4.3: Implement last-write-wins conflict resolution
- * Compare timestamps and keep the document with the later updated_at
- */
-const conflictHandler = (_versionA: any, _versionB: any) => {
-	// RxDB passes the full documents with their metadata
-	// We prefer the version with the later timestamp
-	const timestampA = _versionA.updated_at || _versionA.created_at || 0;
-	const timestampB = _versionB.updated_at || _versionB.created_at || 0;
-
-	console.log(`Conflict resolution: A=${timestampA}, B=${timestampB}`);
-
-	// Return the document with the later timestamp (last-write-wins)
-	return timestampB >= timestampA ? _versionB : _versionA;
-};
 
 export const enableReplication = async (userId: string, _token?: string) => {
 	const db = await getDatabase();

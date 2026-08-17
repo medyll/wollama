@@ -1,6 +1,5 @@
 declare module 'express-pouchdb' {
 	import { Router } from 'express';
-	import PouchDB from 'pouchdb';
 
 	interface ExpressPouchDBOptions {
 		configPath?: string;

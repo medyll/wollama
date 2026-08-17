@@ -24,10 +24,16 @@
 			<p class="text-muted">Please enter your password to continue</p>
 		</login-header>
 
-		<form class="form-stack" onsubmit={(event) => { event.preventDefault(); handleLogin(); }}>
+		<form
+			class="form-stack"
+			onsubmit={(event) => {
+				event.preventDefault();
+				handleLogin();
+			}}
+		>
 			<div class="field-stack">
 				<label for="password">Password</label>
-				<input id="password" type="password" bind:value={password} autocomplete="current-password" />
+				<input id="password" name="password" type="password" bind:value={password} autocomplete="current-password" />
 			</div>
 
 			{#if error}

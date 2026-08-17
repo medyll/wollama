@@ -6,12 +6,7 @@
 </script>
 
 {#if visible}
-	<button
-		class="btn-icon {className}"
-		onclick={() => uiState.toggleSidebarVisibility()}
-		aria-label={title}
-		{title}
-	>
+	<button class="btn-icon {className}" onclick={() => uiState.toggleSidebarVisibility()} aria-label={title} {title}>
 		<Icon icon="fluent:navigation-24-regular" class="inline-block h-5 w-5" />
 	</button>
 {/if}

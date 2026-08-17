@@ -45,14 +45,14 @@ graph TD
         C --> D[RxDB/PouchDB Sync]
         A --> E[Basic Context Management]
     end
-    
+
     subgraph Defined but Unimplemented
         F[STT/TTS Services] -.->|Stubbed| A
         G[Hooks System] -.->|Schema Only| C
         H[Skills Engine] -.->|Defined| C
         I[Agents System] -.->|Framework| C
     end
-    
+
     subgraph Missing
         J[Permission System]
         K[Tool Queue]
@@ -70,19 +70,19 @@ graph TD
 #### Implemented Components:
 
 1. **Ollama Service** (`server/services/ollama.service.ts`)
-   - Primary LLM interface
-   - Streaming response handling
-   - Model management
+    - Primary LLM interface
+    - Streaming response handling
+    - Model management
 
 2. **Generic Service** (`server/services/generic.service.ts`)
-   - Business logic container
-   - Database interaction layer
-   - Request/response processing
+    - Business logic container
+    - Database interaction layer
+    - Request/response processing
 
 3. **Database Services** (`server/db/database.ts`)
-   - PouchDB configuration
-   - Schema management
-   - Sync protocol implementation
+    - PouchDB configuration
+    - Schema management
+    - Sync protocol implementation
 
 #### Architecture Diagram:
 
@@ -93,19 +93,19 @@ classDiagram
         +listModels()
         +pullModel()
     }
-    
+
     class GenericService {
         +handleRequest()
         +processResponse()
         +manageSession()
     }
-    
+
     class DatabaseService {
         +query()
         +sync()
         +manageSchema()
     }
-    
+
     OllamaService --> GenericService : Provides LLM
     GenericService --> DatabaseService : Uses Storage
 ```
@@ -121,13 +121,14 @@ classDiagram
 is_enabled: { type: 'boolean', default: true }
 scope: { type: 'string', enum: ['global', 'user', 'companion'] }
 
-// Hooks Collection  
+// Hooks Collection
 priority: { type: 'number', default: 100 }
 scope: { type: 'string', enum: ['global', 'user', 'companion'] }
 scope_id: { type: 'uuid' }
 ```
 
 **Missing Implementation**:
+
 - No ACL engine
 - No role-based access control
 - No operation sandboxing
@@ -140,19 +141,19 @@ scope_id: { type: 'uuid' }
 #### Implemented:
 
 1. **Session Persistence**
-   - RxDB client-side storage
-   - PouchDB server-side storage
-   - CouchDB sync protocol
+    - RxDB client-side storage
+    - PouchDB server-side storage
+    - CouchDB sync protocol
 
 2. **Chat History**
-   - `chats` collection with full conversation threads
-   - `messages` collection with status tracking
-   - Context embedding support
+    - `chats` collection with full conversation threads
+    - `messages` collection with status tracking
+    - Context embedding support
 
 3. **User Preferences**
-   - Theme and locale settings
-   - Default model configurations
-   - Audio preferences
+    - Theme and locale settings
+    - Default model configurations
+    - Audio preferences
 
 #### Architecture:
 
@@ -162,7 +163,7 @@ sequenceDiagram
     participant Client
     participant Server
     participant DB
-    
+
     UI->>Client: User Input
     Client->>DB: Store (RxDB)
     DB->>Server: Sync (PouchDB)
@@ -173,6 +174,7 @@ sequenceDiagram
 ```
 
 #### Missing:
+
 - No vector database for semantic memory
 - No long-term memory system
 - No context window optimization
@@ -205,12 +207,13 @@ graph TD
     B --> C[LLM Processing]
     C --> D[Post-receive Hooks]
     D --> E[Output]
-    
+
     style B fill:#f9f,stroke:#333
     style D fill:#f9f,stroke:#333
 ```
 
 **Missing Implementation**:
+
 - No hook execution engine
 - No priority-based ordering
 - No error handling for hooks
@@ -247,6 +250,7 @@ graph TD
 ```
 
 **Current Implementation**:
+
 - Skill/agent definitions in database
 - No execution engine
 - No tool call queue
@@ -260,7 +264,7 @@ sequenceDiagram
     participant Agent
     participant Skill
     participant Tool
-    
+
     User->>Agent: Request with /command
     Agent->>Skill: Lookup handler
     Skill->>Tool: Execute
@@ -276,19 +280,19 @@ sequenceDiagram
 #### Implemented Components:
 
 1. **Electron Process** (`client/electron/main.js`)
-   - Desktop application container
-   - Native API access
-   - Extended permissions
+    - Desktop application container
+    - Native API access
+    - Extended permissions
 
 2. **Capacitor Plugin** (`client/android/`)
-   - Mobile native bridge
-   - Platform-specific APIs
-   - Hardware access
+    - Mobile native bridge
+    - Platform-specific APIs
+    - Hardware access
 
 3. **Python Sidecar** (`packages/chatterbox/main.py`)
-   - Audio processing specialist
-   - PyInstaller packaged
-   - REST/WebSocket interface
+    - Audio processing specialist
+    - PyInstaller packaged
+    - REST/WebSocket interface
 
 #### Architecture:
 
@@ -297,13 +301,14 @@ graph TD
     A[Main Node Process] --> B[Electron Process]
     A --> C[Capacitor Plugin]
     A --> D[Python Sidecar]
-    
+
     B -->|Native APIs| E[Desktop OS]
     C -->|JNI/Swift| F[Mobile OS]
     D -->|Audio Models| G[ONNX Runtime]
 ```
 
 **Missing**:
+
 - No inter-process communication protocol
 - No task distribution system
 - No load balancing
@@ -313,20 +318,20 @@ graph TD
 
 ### Feature Comparison Matrix
 
-| Feature | Claude Code | Wollama | Status |
-|---------|------------|---------|--------|
-| **LLM Core** | Opus 4.7 | Ollama | ✅ Implemented |
-| **Tool Orchestration** | Built-in | Custom Services | ✅ Partial |
-| **Permission System** | Fine-grained ACLs | Basic DB flags | ❌ Missing |
-| **Context Management** | Session + Vector | RxDB Sync | ✅ Partial |
-| **Hooks System** | Pre/post processing | Schema defined | ❌ Unimplemented |
-| **Skills Engine** | Built-in skills | DB-defined | ❌ Unimplemented |
-| **Agents System** | Specialized | Framework | ❌ Unimplemented |
-| **Sub-agents** | Coordinated | Platform processes | ✅ Partial |
-| **Memory System** | Vector DB | None | ❌ Missing |
-| **Tool Queue** | Prioritized | None | ❌ Missing |
-| **Error Handling** | Comprehensive | Basic | ❌ Missing |
-| **Sandboxing** | Full | None | ❌ Missing |
+| Feature                | Claude Code         | Wollama            | Status           |
+| ---------------------- | ------------------- | ------------------ | ---------------- |
+| **LLM Core**           | Opus 4.7            | Ollama             | ✅ Implemented   |
+| **Tool Orchestration** | Built-in            | Custom Services    | ✅ Partial       |
+| **Permission System**  | Fine-grained ACLs   | Basic DB flags     | ❌ Missing       |
+| **Context Management** | Session + Vector    | RxDB Sync          | ✅ Partial       |
+| **Hooks System**       | Pre/post processing | Schema defined     | ❌ Unimplemented |
+| **Skills Engine**      | Built-in skills     | DB-defined         | ❌ Unimplemented |
+| **Agents System**      | Specialized         | Framework          | ❌ Unimplemented |
+| **Sub-agents**         | Coordinated         | Platform processes | ✅ Partial       |
+| **Memory System**      | Vector DB           | None               | ❌ Missing       |
+| **Tool Queue**         | Prioritized         | None               | ❌ Missing       |
+| **Error Handling**     | Comprehensive       | Basic              | ❌ Missing       |
+| **Sandboxing**         | Full                | None               | ❌ Missing       |
 
 ### Architecture Comparison
 
@@ -339,14 +344,14 @@ graph LR
         B --> E[Memory]
         B --> F[Agents]
     end
-    
+
     subgraph Wollama
         G[Ollama] --> H[Partial Harness]
         H --> I[Basic Services]
         H -.-> J[Defined Schema]
         H -.-> K[Platform Processes]
     end
-    
+
     style B fill:#0f0
     style H fill:#ff0
 ```
@@ -356,124 +361,125 @@ graph LR
 ### Phase 1: Core Harness Completion (Q3 2026)
 
 1. **Implement Permission System**
-   - [ ] ACL engine with role-based controls
-   - [ ] Operation sandboxing
-   - [ ] Permission validation middleware
-   - [ ] Audit logging system
+    - [ ] ACL engine with role-based controls
+    - [ ] Operation sandboxing
+    - [ ] Permission validation middleware
+    - [ ] Audit logging system
 
 2. **Complete Hooks System**
-   - [ ] Hook execution engine
-   - [ ] Priority-based ordering
-   - [ ] Error handling and isolation
-   - [ ] Built-in hooks library
+    - [ ] Hook execution engine
+    - [ ] Priority-based ordering
+    - [ ] Error handling and isolation
+    - [ ] Built-in hooks library
 
 3. **Build Skills Engine**
-   - [ ] Skill execution runtime
-   - [ ] Tool call queue with priorities
-   - [ ] Result processing pipeline
-   - [ ] Error handling and retries
+    - [ ] Skill execution runtime
+    - [ ] Tool call queue with priorities
+    - [ ] Result processing pipeline
+    - [ ] Error handling and retries
 
 ### Phase 2: Advanced Features (Q4 2026)
 
 1. **Memory System**
-   - [ ] Vector database integration
-   - [ ] Semantic search
-   - [ ] Context window management
-   - [ ] Automatic pruning
+    - [ ] Vector database integration
+    - [ ] Semantic search
+    - [ ] Context window management
+    - [ ] Automatic pruning
 
 2. **Agent Coordination**
-   - [ ] Inter-process communication
-   - [ ] Task distribution
-   - [ ] Load balancing
-   - [ ] Health monitoring
+    - [ ] Inter-process communication
+    - [ ] Task distribution
+    - [ ] Load balancing
+    - [ ] Health monitoring
 
 3. **Enhanced Security**
-   - [ ] Input validation
-   - [ ] Output sanitization
-   - [ ] Rate limiting
-   - [ ] API key management
+    - [ ] Input validation
+    - [ ] Output sanitization
+    - [ ] Rate limiting
+    - [ ] API key management
 
 ### Phase 3: Production Readiness (Q1 2027)
 
 1. **Performance Optimization**
-   - [ ] Caching layer
-   - [ ] Parallel processing
-   - [ ] Memory management
-   - [ ] Benchmarking
+    - [ ] Caching layer
+    - [ ] Parallel processing
+    - [ ] Memory management
+    - [ ] Benchmarking
 
 2. **Observability**
-   - [ ] Metrics collection
-   - [ ] Logging system
-   - [ ] Tracing
-   - [ ] Alerting
+    - [ ] Metrics collection
+    - [ ] Logging system
+    - [ ] Tracing
+    - [ ] Alerting
 
 3. **Documentation**
-   - [ ] API documentation
-   - [ ] Developer guides
-   - [ ] Examples library
-   - [ ] Best practices
+    - [ ] API documentation
+    - [ ] Developer guides
+    - [ ] Examples library
+    - [ ] Best practices
 
 ## 6. Technical Recommendations
 
 ### 6.1 Immediate Actions
 
 1. **Implement Basic Permission System**
-   - Start with database-level permissions
-   - Add middleware validation
-   - Implement audit logging
+    - Start with database-level permissions
+    - Add middleware validation
+    - Implement audit logging
 
 2. **Complete Hooks Execution Engine**
-   - Build priority-based executor
-   - Add error handling
-   - Implement isolation
+    - Build priority-based executor
+    - Add error handling
+    - Implement isolation
 
 3. **Build Skills Runtime**
-   - Create execution queue
-   - Implement result processing
-   - Add error handling
+    - Create execution queue
+    - Implement result processing
+    - Add error handling
 
 ### 6.2 Architecture Improvements
 
 1. **Modular Design**
-   - Separate concerns clearly
-   - Use dependency injection
-   - Implement interface contracts
+    - Separate concerns clearly
+    - Use dependency injection
+    - Implement interface contracts
 
 2. **Error Handling**
-   - Comprehensive try-catch blocks
-   - Meaningful error messages
-   - Graceful degradation
-   - Retry mechanisms
+    - Comprehensive try-catch blocks
+    - Meaningful error messages
+    - Graceful degradation
+    - Retry mechanisms
 
 3. **Performance**
-   - Implement caching
-   - Add parallel processing
-   - Optimize database queries
-   - Profile and benchmark
+    - Implement caching
+    - Add parallel processing
+    - Optimize database queries
+    - Profile and benchmark
 
 ### 6.3 Security Considerations
 
 1. **Input Validation**
-   - Sanitize all inputs
-   - Validate data types
-   - Check value ranges
-   - Prevent injection
+    - Sanitize all inputs
+    - Validate data types
+    - Check value ranges
+    - Prevent injection
 
 2. **Output Sanitization**
-   - Escape HTML/JS
-   - Validate responses
-   - Prevent XSS
-   - Content filtering
+    - Escape HTML/JS
+    - Validate responses
+    - Prevent XSS
+    - Content filtering
 
 3. **Access Control**
-   - Implement RBAC
-   - Add permission checks
-   - Audit all operations
-   - Monitor anomalies
+    - Implement RBAC
+    - Add permission checks
+    - Audit all operations
+    - Monitor anomalies
 
 ## 7. References
 
 ### Key Files
+
 - **Orchestration**: `server/services/ollama.service.ts`
 - **Database**: `shared/db/database-scheme.ts`
 - **Electron**: `client/electron/main.js`
@@ -481,12 +487,14 @@ graph LR
 - **Sidecar**: `packages/chatterbox/main.py`
 
 ### Related Documents
+
 - [ARCH.md](ARCH.md) - Overall architecture
 - [PROJECT.md](PROJECT.md) - Project specifications
 - [QWEN.md](QWEN.md) - Development guide
 - [AGENTS.md](AGENTS.md) - Development workflow
 
 ### External References
+
 - Claude Code Documentation
 - Ollama API Reference
 - RxDB Documentation
@@ -514,6 +522,7 @@ However, critical components remain unimplemented:
 With focused development on these missing components, Wollama can achieve feature parity with commercial agent harnesses like Claude Code. The recommended roadmap provides a clear path to completion over the next 9-12 months.
 
 **Next Steps**:
+
 1. Implement basic permission system
 2. Complete hooks execution engine
 3. Build skills runtime

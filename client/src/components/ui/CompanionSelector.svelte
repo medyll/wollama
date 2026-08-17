@@ -28,12 +28,7 @@
 	<section class="companion-dialog-panel">
 		<header class="section-header section-header-bordered">
 			<h2 id="companion-modal-title">{t('ui.choose_companion')}</h2>
-			<button
-				type="button"
-				class="btn-icon btn-sm"
-				onclick={() => (isOpen = false)}
-				aria-label="Close"
-			>✕</button>
+			<button type="button" class="btn-icon btn-sm" onclick={() => (isOpen = false)} aria-label="Close">✕</button>
 		</header>
 
 		<div class="companion-dialog-body">

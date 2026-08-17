@@ -1,8 +1,10 @@
 {
 	"name": "@wollama/server",
 	"version": "0.0.9",
+	"main": "dist/server/server.js",
 	"type": "module",
 	"scripts": {
+		"build": "tsc",
 		"dev": "pnpm exec tsx watch server.ts",
 		"check": "tsc --noEmit",
 		"test": "concurrently \"pnpm dev\" \"pnpm exec tsx test-server.ts\" --kill-others --success first",
@@ -10,6 +12,7 @@
 		"setup:audio": "node setup-audio.js"
 	},
 	"dependencies": {
+		"@modelcontextprotocol/client": "2.0.0",
 		"@types/multer": "^2.0.0",
 		"ajv": "^8.17.1",
 		"cheerio": "^1.1.2",
@@ -32,6 +35,8 @@
 		"ts-deepmerge": "^8.0.0"
 	},
 	"devDependencies": {
+		"@modelcontextprotocol/node": "2.0.0",
+		"@modelcontextprotocol/server": "2.0.0",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/pdf-parse": "^1.1.5",

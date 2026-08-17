@@ -73,7 +73,9 @@ describe('authService.validateAccessToken', () => {
 	it('throws INVALID_TOKEN for a tampered payload', () => {
 		const { accessToken } = authService.generateTokens('user-1');
 		const [, sig] = accessToken.split('.');
-		const fakepayload = Buffer.from(JSON.stringify({ userId: 'hacker', type: 'access', iat: 0, exp: 9999999999999 })).toString('base64url');
+		const fakepayload = Buffer.from(
+			JSON.stringify({ userId: 'hacker', type: 'access', iat: 0, exp: 9999999999999 })
+		).toString('base64url');
 		const tampered = `${fakepayload}.${sig}`;
 		try {
 			authService.validateAccessToken(tampered);

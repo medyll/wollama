@@ -3,6 +3,7 @@
 node_modules
 **/node_modules
 .pnpm-store/
+.venv/
 /build
 **/build
 .svelte-kit
@@ -26,3 +27,7 @@ log.txt
 client/pouch__all_dbs__
 client/_replicator
 client/_users
+client/.tmp/
+client/dist_electron/
+client/resources/wollama-server/
+server/dist/

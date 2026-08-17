@@ -2,7 +2,6 @@ import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import net from 'net';
-import { config } from '../config.js';
 
 export class SidecarService {
 	private process: ChildProcess | null = null;

@@ -18,7 +18,6 @@
 	let query = $state('');
 	let suggestions = $state<Skill[]>([]);
 	let selectedIndex = $state(-1);
-	let loading = $state(false);
 	let showAutocomplete = $state(false);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -30,9 +29,7 @@
 		if (value.length >= minChars) {
 			if (debounceTimer) clearTimeout(debounceTimer);
 			debounceTimer = setTimeout(() => {
-				loading = true;
 				dispatch('input', value);
-				loading = false;
 				showAutocomplete = true;
 			}, debounceMs);
 		} else {
@@ -62,11 +59,6 @@
 		dispatch('select', item);
 		onSelect(item);
 	}
-
-	function updateSuggestions(items: Skill[]) {
-		suggestions = items;
-		selectedIndex = -1;
-	}
 </script>
 
 <skill-autocomplete>
@@ -84,11 +76,7 @@
 	/>
 
 	{#if showAutocomplete && suggestions.length > 0}
-		<ul
-			id="skill-autocomplete-list"
-			class="skill-suggestions"
-			role="listbox"
-		>
+		<ul id="skill-autocomplete-list" class="skill-suggestions" role="listbox">
 			{#each suggestions as item, index}
 				<li role="option" aria-selected={index === selectedIndex} onmouseenter={() => (selectedIndex = index)}>
 					<button

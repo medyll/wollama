@@ -6,7 +6,10 @@ export function chunkText(text: string, chunkSize: number, overlap: number): str
 	const normalized = text.replace(/\r\n/g, '\n').trim();
 	if (!normalized) return [];
 
-	const paragraphs = normalized.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+	const paragraphs = normalized
+		.split(/\n{2,}/)
+		.map((p) => p.trim())
+		.filter(Boolean);
 	const units = paragraphs.length > 0 ? paragraphs : [normalized];
 
 	const words: string[] = [];
@@ -18,7 +21,11 @@ export function chunkText(text: string, chunkSize: number, overlap: number): str
 	let start = 0;
 	while (start < words.length) {
 		const end = Math.min(start + chunkSize, words.length);
-		const chunk = words.slice(start, end).join(' ').replace(/\s*\n\n\s*/g, '\n\n').trim();
+		const chunk = words
+			.slice(start, end)
+			.join(' ')
+			.replace(/\s*\n\n\s*/g, '\n\n')
+			.trim();
 		if (chunk) chunks.push(chunk);
 		if (end >= words.length) break;
 		start = end - overlap;

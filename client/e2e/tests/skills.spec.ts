@@ -16,7 +16,7 @@ test.setTimeout(120 * 1000);
 
 function waitForServer(request: any, serverProc: any, timeout = 120000) {
 	const start = Date.now();
-	return new Promise<void>(async (resolve, reject) => {
+	return new Promise<void>((resolve, reject) => {
 		let resolved = false;
 
 		const checkHealth = async () => {
@@ -42,15 +42,17 @@ function waitForServer(request: any, serverProc: any, timeout = 120000) {
 
 		serverProc.stdout?.on('data', onData);
 
-		while (!resolved && Date.now() - start < timeout) {
-			await checkHealth();
-			if (resolved) break;
-			await new Promise((r) => setTimeout(r, 500));
-		}
+		void (async () => {
+			while (!resolved && Date.now() - start < timeout) {
+				await checkHealth();
+				if (resolved) break;
+				await new Promise((r) => setTimeout(r, 500));
+			}
 
-		serverProc.stdout?.off('data', onData);
+			serverProc.stdout?.off('data', onData);
 
-		if (!resolved) reject(new Error('Server did not become ready in time'));
+			if (!resolved) reject(new Error('Server did not become ready in time'));
+		})().catch(reject);
 	});
 }
 
@@ -59,7 +61,7 @@ test.describe.skip('Skills E2E', () => {
 	let serverProc: ChildProcess | null = null;
 
 	test.beforeAll(
-		async ({ request }) => {
+		async () => {
 			// Start the server using the locally installed tsx binary so we run the TypeScript entrypoint
 			const tsxCmd = path.join(SERVER_DIR, 'node_modules', '.bin', process.platform === 'win32' ? 'tsx.cmd' : 'tsx');
 

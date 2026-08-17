@@ -177,7 +177,7 @@ export const TtsService = {
 		}
 
 		try {
-			const response = await fetch(config.tts.url, { method: 'GET' });
+			await fetch(config.tts.url, { method: 'GET' });
 			return true;
 		} catch (error) {
 			if (error instanceof TypeError && (error as any).cause?.code === 'ECONNREFUSED') {

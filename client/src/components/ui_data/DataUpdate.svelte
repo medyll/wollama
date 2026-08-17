@@ -216,11 +216,7 @@
 		</label>
 		<div class="field-control">
 			{#if fieldDef.type === 'boolean' || (fieldDef.ui && fieldDef.ui.type === 'toggle')}
-				<input
-					type="checkbox"
-					id={`field-${fieldName}`}
-					bind:checked={formData[fieldName]}
-				/>
+				<input type="checkbox" id={`field-${fieldName}`} bind:checked={formData[fieldName]} />
 			{:else if fieldDef.type === 'text-long' || (fieldDef.ui && fieldDef.ui.type === 'textarea')}
 				<div class="field-with-action">
 					<textarea
@@ -245,19 +241,9 @@
 					{/if}
 				</div>
 			{:else if fieldDef.type === 'number' || (fieldDef.ui && fieldDef.ui.type === 'slider')}
-				<input
-					type="number"
-					id={`field-${fieldName}`}
-					class="w-full"
-					bind:value={formData[fieldName]}
-					placeholder="0"
-				/>
+				<input type="number" id={`field-${fieldName}`} class="w-full" bind:value={formData[fieldName]} placeholder="0" />
 			{:else if fieldDef.enum}
-				<select
-					id={`field-${fieldName}`}
-					class="w-full"
-					bind:value={formData[fieldName]}
-				>
+				<select id={`field-${fieldName}`} class="w-full" bind:value={formData[fieldName]}>
 					<option disabled selected value="">Select...</option>
 					{#each fieldDef.enum as option}
 						<option value={option}>{option}</option>
@@ -398,7 +384,7 @@
 
 		data-dialog-panel {
 			position: relative;
-			z-index: 1;
+			z-index: var(--z-dropdown);
 			flex-direction: column;
 			max-height: 90dvh;
 			padding: var(--pad-xl);

@@ -3,14 +3,14 @@ import type { Chat, Message } from '$types/data';
 
 /**
  * Integration Tests for Offline/Online Sync (Story 5.2)
- * 
+ *
  * Tests the complete offline/online sync flow:
  * 1. Online message creation and sync
  * 2. Offline message queuing
  * 3. Reconnection and replay
  * 4. Multi-device sync scenarios
  * 5. Sync conflict resolution
- * 
+ *
  * Mocks:
  * - Network connectivity (online/offline state)
  * - RxDB collections (local persistence)
@@ -24,11 +24,7 @@ describe('Story 5.2: Integration Tests for Offline/Online Sync', () => {
 	const mockChatId = 'chat-456';
 	const mockCompanionId = 'companion-789';
 
-	const createMockMessage = (
-		content: string,
-		role: 'user' | 'assistant' = 'user',
-		status: string = 'sent'
-	): Message => ({
+	const createMockMessage = (content: string, role: 'user' | 'assistant' = 'user', status: string = 'sent'): Message => ({
 		message_id: `msg-${Date.now()}-${Math.random()}`,
 		chat_id: mockChatId,
 		role,
@@ -205,9 +201,7 @@ describe('Story 5.2: Integration Tests for Offline/Online Sync', () => {
 
 			// Insert with 'sent' status
 			await mockRxDbService.insertMessage(message);
-			expect(mockRxDbService.insertMessage).toHaveBeenCalledWith(
-				expect.objectContaining({ status: 'sent' })
-			);
+			expect(mockRxDbService.insertMessage).toHaveBeenCalledWith(expect.objectContaining({ status: 'sent' }));
 
 			// Simulate sync and status update
 			const syncedMessage = { ...message, status: 'synced' };
@@ -373,9 +367,7 @@ describe('Story 5.2: Integration Tests for Offline/Online Sync', () => {
 
 			const messagesOnDeviceB = await mockRxDbService.getMessages();
 
-			expect(messagesOnDeviceB).toContainEqual(
-				expect.objectContaining({ content: 'From Device A' })
-			);
+			expect(messagesOnDeviceB).toContainEqual(expect.objectContaining({ content: 'From Device A' }));
 		});
 
 		it('should sync message created on Device B to Device A (AC: 3)', async () => {
@@ -390,9 +382,7 @@ describe('Story 5.2: Integration Tests for Offline/Online Sync', () => {
 
 			const messagesOnDeviceA = await mockRxDbService.getMessages();
 
-			expect(messagesOnDeviceA).toContainEqual(
-				expect.objectContaining({ content: 'From Device B' })
-			);
+			expect(messagesOnDeviceA).toContainEqual(expect.objectContaining({ content: 'From Device B' }));
 		});
 
 		it('should handle concurrent offline changes on two devices (AC: 3)', async () => {
@@ -527,9 +517,7 @@ describe('Story 5.2: Integration Tests for Offline/Online Sync', () => {
 			// Device A receives winning version from server
 			await mockRxDbService.updateMessage(versionB);
 
-			expect(mockRxDbService.updateMessage).toHaveBeenCalledWith(
-				expect.objectContaining({ content: 'Version B (newer)' })
-			);
+			expect(mockRxDbService.updateMessage).toHaveBeenCalledWith(expect.objectContaining({ content: 'Version B (newer)' }));
 		});
 
 		it('should maintain consistency on both devices after conflict (AC: 3)', async () => {
