@@ -22,7 +22,7 @@ export async function completeOnboarding(
 		skipOllamaTest?: boolean;
 	}
 ) {
-	const { nickname = 'Test User', model: _model = 'mistral', skipOllamaTest = true } = options || {};
+	const { nickname = 'Test User', skipOllamaTest = true } = options || {};
 
 	await page.goto(`${BASE_URL}/onboarding`);
 	await page.waitForLoadState('networkidle');

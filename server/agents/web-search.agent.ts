@@ -13,6 +13,19 @@ export interface WebSearchOutput {
 export class WebSearchAgent {
 	static readonly slug = 'web-search';
 
+	static readonly descriptor = {
+		name: 'web-search',
+		description: 'Search the web via DuckDuckGo Instant Answer for a query and return up to 5 results.',
+		inputSchema: {
+			type: 'object',
+			properties: {
+				query: { type: 'string', description: 'The search query' }
+			},
+			required: ['query']
+		},
+		risk: 'external' as const
+	};
+
 	static async run(input: { query: string }): Promise<WebSearchOutput> {
 		const { query } = input;
 

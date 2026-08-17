@@ -32,6 +32,19 @@ function stripHtml(html: string): string {
 export class PageFetchAgent {
 	static readonly slug = 'page-fetch';
 
+	static readonly descriptor = {
+		name: 'page-fetch',
+		description: 'Fetch a URL and return its text content, stripped of HTML markup, truncated to 4000 characters.',
+		inputSchema: {
+			type: 'object',
+			properties: {
+				url: { type: 'string', description: 'The URL to fetch' }
+			},
+			required: ['url']
+		},
+		risk: 'external' as const
+	};
+
 	static async run(input: { url: string }): Promise<PageFetchOutput> {
 		const { url } = input;
 

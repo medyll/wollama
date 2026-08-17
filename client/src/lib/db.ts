@@ -105,13 +105,12 @@ let dbPromise: Promise<any> | null = globalAny.__wollama_db_promise || null;
 
 const _createDatabase = async () => {
 	const db = await createRxDatabase({
-		name: 'wollama_client_db_v17',
+		name: 'wollama_client_db_v19',
 		storage: wrappedValidateAjvStorage({
 			storage: getRxStorageDexie()
 		}),
 		multiInstance: true,
-		eventReduce: true,
-		ignoreDuplicate: true
+		eventReduce: true
 	});
 
 	// Create collections based on shared schema
@@ -135,10 +134,6 @@ const _createDatabase = async () => {
 // Store replication states to be able to cancel them
 const replicationStates: any[] = [];
 
-/**
- * Story 4.3: Implement last-write-wins conflict resolution
- * Compare timestamps and keep the document with the later updated_at
- */
 export const enableReplication = async (userId: string, _token?: string) => {
 	const db = await getDatabase();
 	const baseUrl = userState.preferences.serverUrl || 'http://localhost:3000';

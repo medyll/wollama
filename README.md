@@ -102,7 +102,7 @@ pnpm --filter @wollama/client exec playwright install
 pnpm --filter @wollama/client exec playwright test
 ```
 
-État actuel : 216 tests client et 74 tests serveur passent. Playwright couvre notamment l’onboarding, le shell du chat, les réglages, le responsive, les compagnons, les skills et la synchronisation entre appareils.
+État actuel : 224 tests client et 76 tests serveur passent. Playwright couvre notamment l’onboarding, le shell du chat, les réglages, le responsive, les compagnons, les skills et la synchronisation entre appareils.
 
 ## Structure
 

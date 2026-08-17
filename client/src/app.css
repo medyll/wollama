@@ -1,11 +1,9 @@
 @import '@medyll/css-base';
+@import './styles/wollama-theme.css';
 
 @layer components {
 	:root {
-		--color-primary: oklch(0.61 0.18 255);
-		--app-sidebar-width: 16rem;
-		--app-sidebar-collapsed-width: 4.5rem;
-		--app-header-height: 4rem;
+		font-family: var(--font-sans);
 	}
 
 	html,
@@ -19,12 +17,60 @@
 	body {
 		margin: 0;
 		overflow: hidden;
+		font-size: var(--text-base);
+		line-height: var(--leading-normal);
+		background: var(--wollama-shell-bg);
+	}
+
+	button,
+	input,
+	select,
+	textarea {
+		font: inherit;
+	}
+
+	button,
+	a,
+	input,
+	select,
+	textarea {
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: var(--border-width);
+		height: var(--border-width);
+		padding: 0;
+		margin: calc(var(--border-width) * -1);
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.skip-link {
+		position: fixed;
+		top: var(--pad-sm);
+		left: var(--pad-sm);
+		padding: var(--pad-sm) var(--pad-md);
+		border-radius: var(--radius-md);
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+		font-weight: var(--font-semibold);
+		transform: translateY(calc(-100% - var(--pad-lg)));
+		transition: transform var(--transition-fast);
+		z-index: var(--z-chrome);
+	}
+
+	.skip-link:focus-visible {
+		transform: translateY(0);
 	}
 
 	app-shell-component,
-	app-content,
-	app-header,
-	app-main,
+	app-shell-content,
+	app-shell-header,
+	app-shell-main,
 	onboarding-component,
 	onboarding-panel,
 	onboarding-header,
@@ -43,36 +89,66 @@
 		overflow: hidden;
 	}
 
-	app-content {
+	app-shell-content {
 		min-width: 0;
 		min-height: 0;
 		flex: 1;
 		flex-direction: column;
 	}
 
-	app-header {
+	app-shell-header {
 		min-height: var(--app-header-height);
 		align-items: center;
-		gap: var(--gap-sm);
-		padding-inline: var(--pad-md);
-		border-bottom: var(--border-width) solid var(--color-border);
-		background: var(--color-surface-raised);
+		gap: var(--gap-md);
+		padding-inline: var(--pad-lg);
+		border-bottom: var(--border-width) solid var(--wollama-border-subtle);
+		background: color-mix(in oklch, var(--color-surface) 88%, transparent);
+		backdrop-filter: blur(1rem);
 		z-index: var(--z-dropdown);
 	}
 
-	app-main {
+	app-shell-main {
 		position: relative;
 		min-width: 0;
 		min-height: 0;
 		flex: 1;
 		overflow: hidden;
+		background: var(--wollama-shell-bg);
 	}
 
 	.app-brand {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--gap-sm);
 		color: var(--color-text);
-		font-size: var(--text-xl);
+		font-size: var(--text-base);
 		font-weight: var(--font-semibold);
+		letter-spacing: var(--tracking-tight);
 		text-decoration: none;
+	}
+
+	.app-brand-mark {
+		display: grid;
+		width: var(--icon-size-md);
+		height: var(--icon-size-md);
+		place-items: center;
+		border-radius: var(--radius-lg);
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+		font-size: var(--text-sm);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.app-page-title {
+		min-width: 0;
+		max-width: 28rem;
+		padding-inline-start: var(--pad-md);
+		border-inline-start: var(--border-width) solid var(--wollama-border-subtle);
+		color: var(--color-text-muted);
+		font-size: var(--text-sm);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.app-header-spacer {
@@ -81,6 +157,38 @@
 
 	.app-progress {
 		accent-color: var(--color-primary);
+	}
+
+	.page-header {
+		display: flex;
+		min-width: 0;
+		align-items: flex-start;
+		gap: var(--gap-md);
+		margin-block-end: var(--pad-xl);
+	}
+
+	.page-header-copy {
+		min-width: 0;
+		flex: 1;
+	}
+
+	.page-header h1 {
+		margin: 0;
+		font-size: var(--text-2xl);
+		font-weight: var(--font-semibold);
+		letter-spacing: var(--tracking-tight);
+		line-height: var(--leading-tight);
+	}
+
+	.page-description {
+		max-width: 42rem;
+		margin: var(--gap-xs) 0 0;
+		color: var(--color-text-muted);
+		font-size: var(--text-sm);
+	}
+
+	.page-header-centered {
+		align-items: center;
 	}
 
 	.mobile-sidebar-backdrop {
@@ -274,9 +382,10 @@
 	}
 
 	.status-message {
-		padding: var(--pad-sm);
-		border-radius: var(--radius-md);
-		background: var(--color-surface-alt);
+		padding: var(--pad-md);
+		border: var(--border-width) solid var(--wollama-border-subtle);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface-raised);
 	}
 
 	.status-message[data-status='critical'] {
@@ -288,8 +397,13 @@
 	}
 
 	@media (width < 48rem) {
-		app-header {
+		app-shell-header {
 			padding-inline: var(--pad-sm);
+		}
+
+		.app-brand-mark,
+		.app-page-title {
+			display: none;
 		}
 
 		.mobile-sidebar-backdrop[data-open='true'] {

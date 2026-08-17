@@ -7,7 +7,12 @@
 </script>
 
 <label class="audio-toggle" aria-label={t('ui.toggle_audio')} title={t('ui.toggle_audio')}>
-	<input type="checkbox" bind:checked={userState.preferences.auto_play_audio} onchange={() => userState.save()} />
+	<input
+		type="checkbox"
+		name="auto-play-audio"
+		bind:checked={userState.preferences.auto_play_audio}
+		onchange={() => userState.save()}
+	/>
 	<Icon icon={userState.preferences.auto_play_audio ? 'lucide:volume-2' : 'lucide:volume-x'} />
 </label>
 

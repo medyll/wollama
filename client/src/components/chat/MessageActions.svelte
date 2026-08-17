@@ -29,33 +29,37 @@
 	}
 </script>
 
-<div class="mt-2 flex items-center gap-2">
+<message-actions aria-label="Message actions">
 	<!-- Section: Rating -->
 	<div class="rating-actions">
 		<button
+			type="button"
 			class="btn-icon btn-xs"
 			data-rating={rating === 'good' ? 'good' : undefined}
 			onclick={() => handleRate('good')}
 			title="Good response"
 			aria-label="Rate good"
+			aria-pressed={rating === 'good'}
 		>
 			<Icon icon={rating === 'good' ? 'lucide:thumbs-up' : 'lucide:thumbs-up'} class="h-4 w-4" />
 		</button>
 		<button
+			type="button"
 			class="btn-icon btn-xs"
 			data-rating={rating === 'bad' ? 'bad' : undefined}
 			onclick={() => handleRate('bad')}
 			title="Bad response"
 			aria-label="Rate bad"
+			aria-pressed={rating === 'bad'}
 		>
 			<Icon icon={rating === 'bad' ? 'lucide:thumbs-down' : 'lucide:thumbs-down'} class="h-4 w-4" />
 		</button>
 	</div>
 
-	<div class="divider divider-horizontal mx-0"></div>
+	<span class="message-action-separator" aria-hidden="true"></span>
 
 	<!-- Section: Copy -->
-	<button class="btn-icon btn-xs" onclick={copyToClipboard} title="Copy" aria-label="Copy to clipboard">
+	<button type="button" class="btn-icon btn-xs" onclick={copyToClipboard} title="Copy" aria-label="Copy to clipboard">
 		{#if isCopied}
 			<Icon icon="fluent:checkmark-24-regular" class="action-success h-4 w-4" />
 		{:else}
@@ -65,22 +69,36 @@
 
 	<!-- Section: Reload (only if onRegenerate is provided) -->
 	{#if onRegenerate}
-		<button class="btn-icon btn-xs" onclick={onRegenerate} title="Regenerate" aria-label="Regenerate response">
+		<button type="button" class="btn-icon btn-xs" onclick={onRegenerate} title="Regenerate" aria-label="Regenerate response">
 			<Icon icon="fluent:arrow-clockwise-24-regular" class="h-4 w-4" />
 		</button>
 	{/if}
 
-	<!-- Section: Share -->
-	<button class="btn-icon btn-xs" title="Share" aria-label="Share">
+	<button type="button" class="btn-icon btn-xs" title="Share (coming soon)" aria-label="Share" disabled>
 		<Icon icon="fluent:share-24-regular" class="h-4 w-4" />
 	</button>
-</div>
+</message-actions>
 
 <style>
 	@layer components {
+		message-actions {
+			display: flex;
+			align-items: center;
+			gap: var(--gap-xs);
+			margin-block-start: var(--gap-xs);
+			color: var(--color-text-muted);
+		}
+
 		.rating-actions {
 			display: flex;
-			gap: var(--gap-sm);
+			gap: var(--gap-xs);
+		}
+
+		.message-action-separator {
+			width: var(--border-width);
+			height: var(--icon-size-sm);
+			margin-inline: var(--gap-xs);
+			background: var(--wollama-border-subtle);
 		}
 
 		button[data-rating='good'],

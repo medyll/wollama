@@ -22,6 +22,12 @@ vi.mock('$lib/state/context.svelte', () => ({
 	}
 }));
 
+vi.mock('$lib/state/connection.svelte', () => ({
+	connectionState: {
+		isConnected: true
+	}
+}));
+
 vi.mock('$lib/state/notifications.svelte', () => ({
 	toast: {
 		info: vi.fn(),
@@ -45,10 +51,14 @@ import { getDatabase } from '$lib/db';
 describe('ChatService', () => {
 	let chatService: ChatService;
 	let mockDb: any;
+	let mockChatPatch: ReturnType<typeof vi.fn>;
+	let mockMessagePatch: ReturnType<typeof vi.fn>;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
 		chatService = new ChatService();
+		mockChatPatch = vi.fn().mockResolvedValue({});
+		mockMessagePatch = vi.fn().mockResolvedValue({});
 
 		// Setup mock DB
 		mockDb = {
@@ -61,7 +71,8 @@ describe('ChatService', () => {
 				findOne: vi.fn().mockReturnValue({
 					exec: vi.fn().mockResolvedValue({
 						system_prompt: 'System Prompt',
-						patch: vi.fn().mockResolvedValue({})
+						model: 'mistral',
+						patch: mockChatPatch
 					})
 				})
 			},
@@ -73,7 +84,7 @@ describe('ChatService', () => {
 				}),
 				findOne: vi.fn().mockReturnValue({
 					exec: vi.fn().mockResolvedValue({
-						patch: vi.fn().mockResolvedValue({})
+						patch: mockMessagePatch
 					})
 				})
 			},
@@ -118,6 +129,33 @@ describe('ChatService', () => {
 		expect(mockDb.chats.findOne).toHaveBeenCalledWith(chatId);
 	});
 
+	it('should persist a model-only change on the current chat', async () => {
+		await chatService.updateChatRuntime('chat-123', { model: 'qwen3:latest' });
+
+		expect(mockChatPatch).toHaveBeenCalledWith(
+			expect.objectContaining({
+				model: 'qwen3:latest',
+				updated_at: expect.any(Number)
+			})
+		);
+	});
+
+	it('should persist the companion model, id and prompt together', async () => {
+		await chatService.updateChatRuntime('chat-123', {
+			model: 'llama3.2:latest',
+			companionId: 'companion-456',
+			systemPrompt: 'Updated prompt'
+		});
+
+		expect(mockChatPatch).toHaveBeenCalledWith(
+			expect.objectContaining({
+				model: 'llama3.2:latest',
+				companion_id: 'companion-456',
+				system_prompt: 'Updated prompt'
+			})
+		);
+	});
+
 	it('should generate response', async () => {
 		const chatId = 'chat-123';
 		const history = [{ role: 'user', content: 'Hello' }];
@@ -149,5 +187,26 @@ describe('ChatService', () => {
 				body: expect.stringContaining('Hello')
 			})
 		);
+	});
+
+	it('should never store private reasoning as assistant content', async () => {
+		const mockStream = new ReadableStream({
+			start(controller) {
+				const data = JSON.stringify({
+					message: { content: '<think>private chain of thought</think>Visible answer' },
+					done: true
+				});
+				controller.enqueue(new TextEncoder().encode(data + '\n'));
+				controller.close();
+			}
+		});
+
+		(global.fetch as any).mockResolvedValue({ ok: true, body: mockStream });
+
+		const response = await chatService.generateResponse('chat-123', [{ role: 'user', content: 'Hello' }]);
+
+		expect(response).toBe('Visible answer');
+		expect(mockMessagePatch).toHaveBeenLastCalledWith({ content: 'Visible answer', status: 'done' });
+		expect(JSON.stringify(mockMessagePatch.mock.calls)).not.toContain('private chain of thought');
 	});
 });

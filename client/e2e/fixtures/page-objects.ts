@@ -247,20 +247,18 @@ export class AppPage {
 								indexedDB.deleteDatabase(db.name);
 							});
 						})
-						.catch(() => {
-							// Best-effort cleanup for browser databases.
-						});
+						.catch(() => {});
 				} else {
 					// Fallback: delete known databases
 					try {
 						indexedDB.deleteDatabase('wollama_db');
 					} catch {
-						// Best-effort cleanup for browser databases.
+						// Database may not exist in this browser context.
 					}
 					try {
 						indexedDB.deleteDatabase('rxdb_wollama');
 					} catch {
-						// Best-effort cleanup for browser databases.
+						// Database may not exist in this browser context.
 					}
 				}
 			});

@@ -384,7 +384,7 @@
 
 		data-dialog-panel {
 			position: relative;
-			z-index: 1;
+			z-index: var(--z-dropdown);
 			flex-direction: column;
 			max-height: 90dvh;
 			padding: var(--pad-xl);

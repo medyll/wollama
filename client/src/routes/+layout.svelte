@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { App } from '@capacitor/app';
 	import ToastContainer from '$components/ui/ToastContainer.svelte';
+	import PermissionPromptOverlay from '$lib/components/tool/PermissionPromptOverlay.svelte';
 	import ServerConnectionCheck from '$components/setup/ServerConnectionCheck.svelte';
 	import SplashScreen from '$components/ui/SplashScreen.svelte';
 	import Sidebar from '$components/ui/Sidebar.svelte';
@@ -80,12 +81,14 @@
 </script>
 
 <ToastContainer />
+<PermissionPromptOverlay />
 <ServerConnectionCheck />
 <SplashScreen />
-<SyncStatus />
-<OfflineIndicator />
 
 {#if userState.preferences.onboarding_completed}
+	<a class="skip-link" href="#main-content">Aller au contenu principal</a>
+	<SyncStatus />
+	<OfflineIndicator />
 	<app-shell-component>
 		<Sidebar />
 		<button
@@ -96,17 +99,20 @@
 			aria-label={t('ui.close')}
 		></button>
 
-		<app-content>
-			<app-header>
+		<app-shell-content>
+			<app-shell-header>
 				<div class="flex-none md:hidden">
 					<SidebarTrigger />
 				</div>
 				<div class="mr-2 hidden flex-none md:block">
 					<SidebarTrigger visible={!uiState.sidebarOpen} />
 				</div>
-				<a href="/chat" class="app-brand">Wollama</a>
+				<a href="/chat" class="app-brand" aria-label="Wollama — chat">
+					<span class="app-brand-mark" aria-hidden="true">W</span>
+					<span>Wollama</span>
+				</a>
 				{#if uiState.pageTitle}
-					<span class="hidden max-w-[200px] truncate text-lg font-normal opacity-70 sm:inline-block md:max-w-md">
+					<span class="app-page-title">
 						{uiState.pageTitle}
 					</span>
 				{/if}
@@ -128,12 +134,12 @@
 					{/if}
 					<UserMenu />
 				</div>
-			</app-header>
+			</app-shell-header>
 
-			<app-main>
+			<app-shell-main id="main-content" tabindex="-1">
 				{@render children()}
-			</app-main>
-		</app-content>
+			</app-shell-main>
+		</app-shell-content>
 	</app-shell-component>
 {:else}
 	<main class="h-screen w-screen overflow-hidden">

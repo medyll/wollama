@@ -8,6 +8,9 @@ import { config } from './config.js';
 import { SttService } from './services/stt.service.js';
 import { TtsService } from './services/tts.service.js';
 import { OllamaService } from './services/ollama.service.js';
+import { conversationOrchestrator } from './orchestration/conversation-orchestrator.js';
+import { registerBuiltinRuntimes } from './orchestration/register.js';
+import { connectionManager } from './mcp/connection-manager.js';
 import { PromptService } from './services/prompt.service.js';
 import { sidecarService } from './services/sidecar.service.js';
 import { hookRegistry } from './services/hook-registry.service.js';
@@ -17,6 +20,9 @@ import skillsRouter from './routes/skills.js';
 import hooksRouter from './routes/hooks.js';
 import agentsRouter from './routes/agents.js';
 import ragRouter from './routes/rag.js';
+import mcpRouter from './routes/mcp.js';
+import runsRouter from './routes/runs.js';
+import permissionsRouter from './routes/permissions.js';
 
 import cors from 'cors';
 import helmet from 'helmet';
@@ -59,6 +65,8 @@ app.use((req, res, next) => {
 });
 const port = config.server.port;
 
+registerBuiltinRuntimes();
+
 // Server State
 const serverState = {
 	ollamaReady: false
@@ -82,6 +90,33 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason, promise) => {
 	console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+// MCP stdio connections spawn real child processes — always tear them down on exit
+// so a restart never leaves orphaned agent processes behind.
+let shuttingDown = false;
+async function interruptOpenRuns() {
+	// Same semantics as acp-team's own crash recovery: mark orphaned runs
+	// `interrupted` rather than pretending to resume them after restart.
+	try {
+		const db = dbManager.getDb('runs');
+		const result = await db.find({ selector: { status: { $in: ['queued', 'running', 'waiting_input', 'cancelling'] } } });
+		for (const doc of (result.docs as any[]) ?? []) {
+			await db.put({ ...doc, status: 'interrupted', finished_at: new Date().toISOString() });
+		}
+	} catch (err) {
+		console.error('Failed to mark open runs as interrupted:', err);
+	}
+}
+async function shutdownMcp(signal: string) {
+	if (shuttingDown) return;
+	shuttingDown = true;
+	console.log(`Received ${signal}, closing MCP connections...`);
+	await interruptOpenRuns();
+	await connectionManager.closeAll();
+}
+process.on('SIGINT', () => void shutdownMcp('SIGINT').then(() => process.exit(0)));
+process.on('SIGTERM', () => void shutdownMcp('SIGTERM').then(() => process.exit(0)));
+process.on('beforeExit', () => void shutdownMcp('beforeExit'));
 
 // Mount PouchDB Server
 // This exposes the databases at /_db/{dbname}
@@ -117,6 +152,15 @@ app.use('/api/agents', agentsRouter);
 
 // RAG routes
 app.use('/api/rag', ragRouter);
+
+// MCP routes (M3)
+app.use('/api/mcp', mcpRouter);
+
+// Run routes (M4)
+app.use('/api/runs', runsRouter);
+
+// Permission routes (M6)
+app.use('/api/permissions', permissionsRouter);
 
 // Audio Routes
 app.post('/api/audio/transcribe', upload.single('file'), async (req, res) => {
@@ -260,20 +304,27 @@ app.post('/api/chat/generate', async (req, res) => {
 			// If OllamaService.chat throws, we can still send a JSON error if we haven't written data.
 
 			try {
-				const response = await OllamaService.chat({
-					model,
-					messages,
-					stream: true
-				});
+				const ctx = { chat_id, user_id, companion_id, origin: 'chat' as const };
 
-				// Only set headers if we successfully got a response stream
-				res.setHeader('Content-Type', 'application/x-ndjson');
-				res.setHeader('Transfer-Encoding', 'chunked');
-
-				for await (const part of response) {
-					res.write(JSON.stringify(part) + '\n');
-				}
-				res.end();
+				// Headers are set lazily on the first chunk, same as the original
+				// behavior of only sending NDJSON headers once a response stream was
+				// actually obtained. A failure before the first chunk (e.g. 404 model
+				// not found) still reaches the outer catch with res.headersSent === false.
+				let headersSent = false;
+				await conversationOrchestrator.runChat(
+					{ model, messages, stream: true, ctx },
+					{
+						writeChunk: (o) => {
+							if (!headersSent) {
+								res.setHeader('Content-Type', 'application/x-ndjson');
+								res.setHeader('Transfer-Encoding', 'chunked');
+								headersSent = true;
+							}
+							res.write(JSON.stringify(o) + '\n');
+						},
+						end: () => res.end()
+					}
+				);
 			} catch (error: any) {
 				// If headers are not sent, we can send a proper JSON error
 				if (!res.headersSent) {
@@ -294,12 +345,9 @@ app.post('/api/chat/generate', async (req, res) => {
 				}
 			}
 		} else {
-			const response = await OllamaService.chat({
-				model,
-				messages,
-				stream: false
-			});
-			res.json(response);
+			const ctx = { chat_id, user_id, companion_id, origin: 'chat' as const };
+			const result = await conversationOrchestrator.runChat({ model, messages, stream: false, ctx });
+			res.json(result);
 		}
 	} catch (error: any) {
 		console.error('Chat generation error:', error);
@@ -486,6 +534,7 @@ const initializeOllama = async () => {
 		try {
 			// 1. Check connection by listing models
 			const list = await OllamaService.list();
+			serverState.ollamaReady = true;
 			logger.success('OLLAMA', 'Connection established');
 
 			// 2. Check if default model exists
@@ -521,6 +570,7 @@ const initializeOllama = async () => {
 
 			return; // Success, exit function
 		} catch (error: any) {
+			serverState.ollamaReady = false;
 			const isLastAttempt = i === maxRetries - 1;
 
 			// If first attempt fails and it looks like the service is down (and local), try to start it
@@ -643,8 +693,8 @@ app.listen(port, async () => {
 
 	// Allow tests to skip heavy external initializations (Ollama, audio, sidecar)
 	if (process.env.SKIP_HEAVY_SETUP !== 'true') {
-		await ensureAudioSetup();
 		await initializeOllama();
+		await ensureAudioSetup();
 		await initializeTTS();
 	} else {
 		logger.info('SERVER', 'Skipping heavy setup (SKIP_HEAVY_SETUP=true)');

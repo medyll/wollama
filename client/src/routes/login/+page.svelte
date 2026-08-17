@@ -33,7 +33,7 @@
 		>
 			<div class="field-stack">
 				<label for="password">Password</label>
-				<input id="password" type="password" bind:value={password} autocomplete="current-password" />
+				<input id="password" name="password" type="password" bind:value={password} autocomplete="current-password" />
 			</div>
 
 			{#if error}

@@ -288,17 +288,15 @@
 <div class="settings-page">
 	<div class="mx-auto max-w-3xl">
 		<!-- Section: Header -->
-		<div class="mb-8 flex items-center justify-between">
+		<header class="page-header page-header-centered">
 			<button class="btn-icon" onclick={() => window.history.back()} aria-label="Back">
 				<Icon icon="lucide:arrow-left" class="h-6 w-6" />
 			</button>
-			<div class="flex-1 text-center">
-				<h1 class="text-4xl font-bold">{t('ui.settings')}</h1>
-				<p class="py-2 opacity-70">{t('settings.subtitle')}</p>
+			<div class="page-header-copy">
+				<h1>{t('ui.settings')}</h1>
+				<p class="page-description">{t('settings.subtitle')}</p>
 			</div>
-			<div class="w-12"></div>
-			<!-- Spacer for centering -->
-		</div>
+		</header>
 
 		<div class="join join-vertical bg-base-100 w-full shadow-xl">
 			<!-- Section: User Profile -->
@@ -505,10 +503,7 @@
 									{/if}
 								</button>
 								<div class="bg-base-300 relative h-4 flex-1 overflow-hidden rounded-full">
-									<div
-										class="bg-success h-full transition-all duration-100 ease-out"
-										style="width: {micLevel}%"
-									></div>
+									<div class="mic-level-fill" style="width: {micLevel}%"></div>
 								</div>
 							</div>
 						</div>
@@ -1048,7 +1043,7 @@
 			inset: 0;
 			padding: var(--pad-xl);
 			overflow-y: auto;
-			background: var(--color-surface-raised);
+			background: var(--wollama-shell-bg);
 		}
 
 		.join-vertical {
@@ -1074,7 +1069,7 @@
 
 		.collapse > input:first-child {
 			position: absolute;
-			z-index: 1;
+			z-index: var(--z-dropdown);
 			inset: 0 0 auto;
 			width: 100%;
 			height: 3.5rem;
@@ -1171,6 +1166,12 @@
 			border-top-color: var(--color-primary);
 			border-radius: var(--radius-full);
 			animation: settings-spin var(--duration-spin) linear infinite;
+		}
+
+		.mic-level-fill {
+			height: 100%;
+			background: var(--color-success);
+			transition: width var(--transition-fast);
 		}
 
 		.bg-base-100 {

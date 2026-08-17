@@ -1,6 +1,5 @@
-import { randomUUID } from 'crypto';
+import { toolExecutor } from '../orchestration/tool-executor.js';
 import { dbManager } from '../db/database.js';
-import { getAgent } from '../agents/index.js';
 import type { ToolCall } from '../../shared/types/agents.js';
 
 export interface AgentRunRequest {
@@ -17,50 +16,24 @@ export interface AgentRunResponse {
 	error?: string;
 }
 
+/**
+ * Thin wrapper over toolExecutor — all persistence (tool_calls writes) and dispatch
+ * now live there, so builtin agents share one execution path with MCP tools instead
+ * of a parallel one. See docs/architecture/mcp-client-acp-team-investigation.md.
+ */
 export class AgentRunnerService {
 	static async run(req: AgentRunRequest): Promise<AgentRunResponse> {
-		const { slug, input, message_id = 'standalone', agent_id = slug } = req;
+		const { slug } = req;
 
-		const handler = getAgent(slug);
-		if (!handler) {
-			return { tool_call_id: '', status: 'error', error: `No agent registered for slug: ${slug}` };
+		const result = await toolExecutor.executeById(`builtin:${slug}`, req.input, {
+			origin: 'api',
+			message_id: req.message_id
+		});
+
+		if (!result.ok) {
+			return { tool_call_id: result.tool_call_id ?? '', status: 'error', error: result.error ?? result.content };
 		}
-
-		const tool_call_id = randomUUID();
-		const db = dbManager.getDb('tool_calls');
-
-		const record: ToolCall & { _id: string } = {
-			_id: tool_call_id,
-			tool_call_id,
-			message_id,
-			agent_id,
-			status: 'running',
-			input,
-			started_at: new Date().toISOString()
-		};
-
-		await db.put(record);
-
-		try {
-			const output = await handler(input);
-			const existing: any = await db.get(tool_call_id);
-			await db.put({
-				...existing,
-				status: 'done',
-				output,
-				finished_at: new Date().toISOString()
-			});
-			return { tool_call_id, status: 'done', output };
-		} catch (err: any) {
-			const existing: any = await db.get(tool_call_id);
-			await db.put({
-				...existing,
-				status: 'error',
-				error: err?.message ?? 'Unknown error',
-				finished_at: new Date().toISOString()
-			});
-			return { tool_call_id, status: 'error', error: err?.message ?? 'Unknown error' };
-		}
+		return { tool_call_id: result.tool_call_id ?? '', status: 'done', output: result.data };
 	}
 
 	static async getStatus(tool_call_id: string): Promise<ToolCall | null> {

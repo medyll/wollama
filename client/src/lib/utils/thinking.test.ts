@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseThinking } from './thinking';
+import { parseThinking, stripPrivateReasoning } from './thinking';
 
 describe('Thinking Utils', () => {
 	it('should handle empty or null content', () => {
@@ -41,5 +41,25 @@ describe('Thinking Utils', () => {
 			response: 'Answer',
 			isThinking: false
 		});
+	});
+});
+
+describe('Private reasoning sanitization', () => {
+	it('should remove completed thinking blocks from visible content', () => {
+		expect(stripPrivateReasoning('<think>secret reasoning</think>Final answer')).toBe('Final answer');
+	});
+
+	it('should hide an unclosed thinking block while streaming', () => {
+		expect(stripPrivateReasoning('Visible prefix<think>unfinished secret')).toBe('Visible prefix');
+	});
+
+	it('should remove analysis and reasoning variants case-insensitively', () => {
+		expect(stripPrivateReasoning('<ANALYSIS>private</ANALYSIS>Answer<reasoning>hidden</reasoning>')).toBe('Answer');
+	});
+
+	it('should preserve ordinary assistant content', () => {
+		expect(stripPrivateReasoning('A normal answer with <strong>markup</strong>.')).toBe(
+			'A normal answer with <strong>markup</strong>.'
+		);
 	});
 });

@@ -389,10 +389,12 @@ IMPORTANT:
 
 	tool_calls: {
 		primaryKey: 'tool_call_id',
-		indexes: ['message_id', 'agent_id', 'status', 'started_at'],
+		indexes: ['message_id', 'agent_id', 'status', 'started_at', 'tool_id', 'chat_id'],
 		fk: {
-			message_id: { table: 'messages', required: true, multiple: false },
-			agent_id: { table: 'agents', required: true, multiple: false }
+			// Optional: an MCP tool call may start before a message is persisted, and
+			// may not target a known `agents` row at all.
+			message_id: { table: 'messages', required: false, multiple: false },
+			agent_id: { table: 'agents', required: false, multiple: false }
 		},
 		template: {
 			presentation: 'tool_call_id',
@@ -400,8 +402,8 @@ IMPORTANT:
 		},
 		fields: {
 			tool_call_id: { type: 'uuid', required: true },
-			message_id: { type: 'uuid', required: true },
-			agent_id: { type: 'uuid', required: true },
+			message_id: { type: 'uuid' },
+			agent_id: { type: 'uuid' },
 			skill_id: { type: 'uuid' }, // nullable — set when triggered by a skill
 			status: {
 				type: 'string',
@@ -413,7 +415,107 @@ IMPORTANT:
 			output: { type: 'object', properties: {} },
 			error: { type: 'string' },
 			started_at: { type: 'timestamp', required: true, auto: true },
+			finished_at: { type: 'timestamp' },
+			// Orchestration / MCP extensions
+			tool_id: { type: 'string', required: true }, // e.g. 'mcp:acp-team:agent_start'
+			server_id: { type: 'string', required: true }, // 'builtin' | 'acp-team' | ...
+			tool_name: { type: 'string', required: true }, // wire name given to the model
+			chat_id: { type: 'uuid', default: '' }, // indexed — must always be supplied, '' if none
+			run_id: { type: 'uuid' }, // set when the call started a run (see `runs`); not indexed
+			risk: { type: 'string', enum: ['read', 'write', 'execute', 'external'] },
+			origin: { type: 'string', enum: ['chat', 'api'], default: 'chat' },
+			duration_ms: { type: 'number' }
+		}
+	},
+
+	runs: {
+		primaryKey: 'run_id',
+		indexes: ['chat_id', 'status', 'started_at'],
+		fk: {
+			chat_id: { table: 'chats', required: false, multiple: false },
+			message_id: { table: 'messages', required: false, multiple: false }
+		},
+		template: {
+			presentation: 'run_id',
+			card_lines: ['agent', 'status', 'started_at', 'finished_at']
+		},
+		fields: {
+			run_id: { type: 'uuid', required: true },
+			backend: { type: 'string', required: true }, // e.g. 'acp-team'
+			remote_run_id: { type: 'string', required: true },
+			chat_id: { type: 'uuid', default: '' },
+			message_id: { type: 'uuid' },
+			tool_call_id: { type: 'uuid' },
+			agent: { type: 'string', required: true },
+			mode: { type: 'string', required: true, enum: ['plan', 'default', 'auto'], default: 'plan' },
+			model: { type: 'string' },
+			cwd: { type: 'string', required: true },
+			status: {
+				type: 'string',
+				required: true,
+				enum: [
+					'queued',
+					'running',
+					'waiting_input',
+					'cancelling',
+					'completed',
+					'failed',
+					'cancelled',
+					'interrupted',
+					'timed_out'
+				],
+				default: 'queued'
+			},
+			last_event_seq: { type: 'number', default: 0 },
+			result: { type: 'object', properties: {} },
+			error: { type: 'string' },
+			started_at: { type: 'timestamp', required: true, auto: true },
 			finished_at: { type: 'timestamp' }
+		}
+	},
+
+	run_events: {
+		primaryKey: 'run_event_id',
+		indexes: ['run_id', 'seq'],
+		fk: {
+			run_id: { table: 'runs', required: true, multiple: false }
+		},
+		template: {
+			presentation: 'run_event_id',
+			card_lines: ['type', 'seq', 'created_at']
+		},
+		fields: {
+			run_event_id: { type: 'uuid', required: true },
+			run_id: { type: 'uuid', required: true },
+			seq: { type: 'number', required: true },
+			type: { type: 'string', required: true },
+			payload: { type: 'object', properties: {} },
+			created_at: { type: 'timestamp', required: true, auto: true }
+		}
+	},
+
+	// Declared now, first written at M6 (write-mode authorization grants).
+	mcp_grants: {
+		primaryKey: 'grant_id',
+		indexes: ['user_id', 'tool_id', 'expires_at'],
+		fk: {
+			user_id: { table: 'users', required: true, multiple: false }
+		},
+		template: {
+			presentation: 'grant_id',
+			card_lines: ['tool_id', 'scope', 'expires_at']
+		},
+		fields: {
+			grant_id: { type: 'uuid', required: true },
+			user_id: { type: 'uuid', required: true },
+			server_id: { type: 'string', required: true },
+			tool_id: { type: 'string', default: '' },
+			risk: { type: 'string', required: true, enum: ['read', 'write', 'execute', 'external'] },
+			workspace: { type: 'string' },
+			scope: { type: 'string', required: true, enum: ['once', 'session', 'persistent'] },
+			granted_at: { type: 'timestamp', required: true, auto: true },
+			expires_at: { type: 'timestamp' },
+			revoked_at: { type: 'timestamp' }
 		}
 	}
 };

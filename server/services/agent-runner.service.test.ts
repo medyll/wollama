@@ -1,8 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock the agents registry
+// AgentRunnerService now delegates to toolExecutor -> builtinRuntime -> agents/index.js's
+// listBuiltins(). Mock that instead of the old getAgent() so the executor's descriptor
+// lookup + validation path is exercised for real.
 vi.mock('../agents/index.js', () => ({
-	getAgent: vi.fn()
+	listBuiltins: vi.fn()
+}));
+
+// Auto-approve is normally scoped to web-search/page-fetch; broaden it for these tests
+// so arbitrary test slugs don't get denied by policy.
+vi.mock('../config.js', () => ({
+	config: {
+		tools: {
+			enabled: true,
+			maxIterations: 4,
+			autoApprove: { includes: () => true }
+		},
+		mcp: { acpTeam: { enabled: false, entry: '', dataDir: '' }, workspaceAllowlist: [], servers: [] }
+	}
 }));
 
 // Mock dbManager
@@ -13,10 +28,12 @@ vi.mock('../db/database.js', () => ({
 }));
 
 import { AgentRunnerService } from './agent-runner.service.js';
-import { getAgent } from '../agents/index.js';
+import { listBuiltins } from '../agents/index.js';
 import { dbManager } from '../db/database.js';
+import { toolCatalog } from '../orchestration/tool-catalog.js';
+import { builtinRuntime } from '../orchestration/builtin.runtime.js';
 
-const mockGetAgent = vi.mocked(getAgent);
+const mockListBuiltins = vi.mocked(listBuiltins);
 const mockGetDb = vi.mocked(dbManager.getDb);
 
 function makeDb(docStore: Record<string, any> = {}) {
@@ -39,11 +56,14 @@ function makeDb(docStore: Record<string, any> = {}) {
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	toolCatalog.register(builtinRuntime);
 });
 
 describe('AgentRunnerService.run', () => {
 	it('returns error when no agent found for slug', async () => {
-		mockGetAgent.mockReturnValue(null);
+		mockListBuiltins.mockReturnValue({});
+		mockGetDb.mockReturnValue(makeDb() as any);
+
 		const result = await AgentRunnerService.run({ slug: 'missing', input: {} });
 		expect(result.status).toBe('error');
 		expect(result.error).toContain('missing');
@@ -53,7 +73,12 @@ describe('AgentRunnerService.run', () => {
 		const store: Record<string, any> = {};
 		const db = makeDb(store);
 		mockGetDb.mockReturnValue(db as any);
-		mockGetAgent.mockReturnValue(async () => ({ answer: 42 }));
+		mockListBuiltins.mockReturnValue({
+			'test-agent': {
+				descriptor: { name: 'test-agent', description: 'test', inputSchema: {}, risk: 'read' },
+				run: async () => ({ answer: 42 })
+			}
+		});
 
 		const result = await AgentRunnerService.run({ slug: 'test-agent', input: { q: 'hello' } });
 		expect(result.status).toBe('done');
@@ -69,8 +94,13 @@ describe('AgentRunnerService.run', () => {
 		const store: Record<string, any> = {};
 		const db = makeDb(store);
 		mockGetDb.mockReturnValue(db as any);
-		mockGetAgent.mockReturnValue(async () => {
-			throw new Error('boom');
+		mockListBuiltins.mockReturnValue({
+			'bad-agent': {
+				descriptor: { name: 'bad-agent', description: 'test', inputSchema: {}, risk: 'read' },
+				run: async () => {
+					throw new Error('boom');
+				}
+			}
 		});
 
 		const result = await AgentRunnerService.run({ slug: 'bad-agent', input: {} });
