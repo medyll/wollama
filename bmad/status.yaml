@@ -91,3 +91,19 @@ sprints:
       name: 'Release preparation and stabilization'
       status: active
       stories: ['S7-01', 'S7-02', 'S7-03', 'S7-04', 'S7-05', 'S7-06', 'S7-07']
+
+audit:
+    last_run: '2026-03-11'
+    type: 'full'
+    baseline: false
+    score: null
+    project_type: 'single-package'
+    packages_scanned: []
+    critical: 2
+    major: 3
+    minor: 1
+    info: 0
+    artifact: 'bmad/artifacts/audit-report.md'
+    auto_stories_created:
+        - CODE-QL-001
+        - SEC-001
