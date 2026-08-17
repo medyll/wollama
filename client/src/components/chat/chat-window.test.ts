@@ -60,7 +60,7 @@ vi.mock('$app/navigation', () => ({
 	goto: vi.fn()
 }));
 
-// TODO: Re-enable after SvelteKit SSR vs DOM test environment is resolved
+// TODO: Rewrite mocks for the current ChatWindow service surface before re-enabling.
 describe.skip('ChatWindow', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -89,12 +89,10 @@ describe.skip('ChatWindow', () => {
 
 		it('should display messages when chatId is provided', async () => {
 			// Mock chat service to return messages
-			vi.mocked(await import('$lib/services/chat.service')).chatService.getChatHistory = vi
-				.fn()
-				.mockResolvedValue([
-					{ message_id: '1', role: 'user', content: 'Hello' },
-					{ message_id: '2', role: 'assistant', content: 'Hi there!' }
-				]);
+			vi.mocked(await import('$lib/services/chat.service')).chatService.getChatHistory = vi.fn().mockResolvedValue([
+				{ message_id: '1', role: 'user', content: 'Hello' },
+				{ message_id: '2', role: 'assistant', content: 'Hi there!' }
+			]);
 
 			render(ChatWindow, {
 				props: {

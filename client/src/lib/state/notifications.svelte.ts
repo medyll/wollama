@@ -17,8 +17,10 @@ class NotificationState {
 	constructor() {
 		if (typeof window !== 'undefined') {
 			// Detect Electron (nodeIntegration: true)
-			// @ts-ignore
-			this.isElectron = !!(window.process && window.process.versions && window.process.versions.electron);
+			const electronWindow = window as Window & {
+				process?: { versions?: { electron?: string } };
+			};
+			this.isElectron = Boolean(electronWindow.process?.versions?.electron);
 
 			window.addEventListener('focus', () => (this.isFocused = true));
 			window.addEventListener('blur', () => (this.isFocused = false));

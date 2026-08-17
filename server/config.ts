@@ -30,12 +30,21 @@ export const config = {
 	},
 	stt: {
 		url: process.env.STT_URL || 'http://127.0.0.1:9000/v1/audio/transcriptions',
-		enabled: process.env.STT_ENABLED === 'true' || true, // Default to true to try local
+		enabled: process.env.STT_ENABLED !== 'false',
 		provider: process.env.STT_PROVIDER || 'local', // 'openai' | 'local'
 		binaryPath:
 			process.env.STT_BINARY_PATH ||
 			path.resolve(__dirname, 'bin', 'whisper', process.platform === 'win32' ? 'main.exe' : 'main'),
 		modelPath: process.env.STT_MODEL_PATH || path.resolve(__dirname, 'bin', 'whisper', 'ggml-base.bin')
+	},
+	rag: {
+		embedModel: process.env.RAG_EMBED_MODEL || 'nomic-embed-text',
+		chunkSize: Number(process.env.RAG_CHUNK_SIZE) || 500,
+		chunkOverlap: Number(process.env.RAG_CHUNK_OVERLAP) || 50,
+		topK: Number(process.env.RAG_TOP_K) || 5,
+		minScore: Number(process.env.RAG_MIN_SCORE) || 0.5,
+		// Directory where per-user flat vector index files are persisted
+		vectorDir: process.env.RAG_VECTOR_DIR ? path.resolve(process.env.RAG_VECTOR_DIR) : path.resolve(__dirname, 'db_data', 'vectors')
 	},
 	tts: {
 		url: process.env.TTS_URL || 'http://127.0.0.1:9000/v1/audio/speech',

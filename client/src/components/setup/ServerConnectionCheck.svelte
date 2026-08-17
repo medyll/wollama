@@ -181,3 +181,89 @@
 		</div>
 	</aside>
 {/if}
+
+<style>
+	.connection-banner {
+		position: fixed;
+		right: var(--pad-md);
+		bottom: var(--pad-md);
+		z-index: var(--z-overlay);
+		display: grid;
+		width: min(32rem, calc(100vw - (2 * var(--pad-md))));
+		gap: var(--gap-md);
+		padding: var(--pad-md);
+		border: var(--border-width) solid var(--color-warning);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface-raised);
+		box-shadow: var(--shadow-lg);
+		color: var(--color-text);
+	}
+
+	.connection-banner-header,
+	.connection-banner-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--gap-sm);
+	}
+
+	.connection-banner-header h3,
+	.connection-banner p {
+		margin: 0;
+	}
+
+	.connection-banner-header svg {
+		width: var(--icon-size-md);
+		height: var(--icon-size-md);
+		flex: none;
+		color: var(--color-warning);
+	}
+
+	.connection-banner .form-control,
+	.connection-banner label {
+		display: grid;
+		gap: var(--gap-xs);
+	}
+
+	.connection-banner input {
+		width: 100%;
+		padding: var(--pad-sm);
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface);
+		color: var(--color-text);
+		font-family: var(--font-mono);
+	}
+
+	.connection-banner-actions {
+		justify-content: flex-end;
+		flex-wrap: wrap;
+	}
+
+	.connection-banner-actions button {
+		padding: var(--pad-xs) var(--pad-sm);
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface);
+		color: var(--color-text);
+		cursor: pointer;
+	}
+
+	.connection-banner-actions button:last-child {
+		border-color: var(--color-primary);
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+	}
+
+	.connection-banner-actions button:disabled {
+		cursor: wait;
+		opacity: 0.6;
+	}
+
+	@media (width < 48rem) {
+		.connection-banner {
+			right: var(--pad-sm);
+			bottom: var(--pad-sm);
+			width: calc(100vw - (2 * var(--pad-sm)));
+		}
+	}
+</style>

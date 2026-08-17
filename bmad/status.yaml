@@ -1,55 +1,31 @@
-# BMAD Status
+# BMAD Status — Single Source of Truth
 project: wollama
-phase: release
-progress: 100
-next_action: 'DEVELOPMENT COMPLETE — Ready for production deployment'
-next_command: 'bmad status'
-next_role: scrum
-active_role: dev
-notes: 'DEVELOPMENT COMPLETE. v0.0.9 released: Build passes, tests pass (237), tagged and pushed to GitHub. App is production-ready. Sprint 3 complete: S3-01 (SkillAutocomplete) + S3-02 (skills API pipeline) done. CODE-QL-001 merged to main (PR #13).'
+phase: testing
+progress: 93
+next_action: "Rewrite the chat and companion Playwright contracts"
+next_command: "bmad test e2e-chat-companions"
+next_role: tester
+active_role: tester
+last_updated: "2026-07-17"
+notes: "Chromium E2E baseline is reliable: 6 active checks pass and 22 incompatible legacy checks are explicitly skipped. TypeScript checks, 216 client tests, and 74 server tests pass; 55 legacy client unit assertions remain skipped."
 
 phases:
-    - name: planning
-      status: done
-    - name: development
-      status: in_progress
-    - name: testing
-      status: upcoming
-    - name: release
-      status: upcoming
-
-artifacts:
-    prd: done
-    architecture: done
-    tech-spec: done
-    audit-report: done
-
-sprints:
-    - id: 1
-      name: 'Foundation DB — 4 nouvelles tables + interfaces TS'
-      status: done
-      stories: ['S1-01']
-    - id: 2
-      name: 'Hook Pipeline — middleware pre/post-send'
-      status: done
-      stories: []
-    - id: 3
-      name: 'Skills + Slash commands + Autocomplete'
-      status: done
-      stories: ['S3-01','S3-02']
-    - id: 4
-      name: 'Agents built-in — WebSearch, PageFetch'
-      status: done
-      stories: ['S4-01','S4-02','S4-03','S4-04']
-    - id: 5
-      name: 'Frontend UX — ToolCallMessage, HookInspector, Settings'
-      status: done
-      stories: ['S5-01','S5-02','S5-03','S5-04']
-    - id: 6
-      name: 'Polish, tests, cross-platform validation'
-      status: done
-      stories: ['S6-01','S6-02','S6-03','S6-04','S6-05','S6-06']
-    - id: 7
-      name: 'Release Preparation & Mobile Optimization'
-      status: active
-      stories: ['S7-01','S7-02','S7-03','S7-04','S7-05','S7-06']
+    - init
+    - analysis
+    - planning
+    - execution
+audit:
+  last_run: "2026-03-11"
+  type: "full"
+  baseline: false
+  score: null
+  project_type: "single-package"
+  packages_scanned: []
+  critical: 2
+  major: 3
+  minor: 1
+  info: 0
+  artifact: "bmad/artifacts/audit-report.md"
+  auto_stories_created:
+    - CODE-QL-001
+    - SEC-001

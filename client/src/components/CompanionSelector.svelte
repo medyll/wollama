@@ -68,109 +68,76 @@
 	}
 </script>
 
-<div class="companion-selector" role="region" aria-label="Companion Selection">
+<companion-component role="region" aria-label="Companion Selection">
 	{#if !onSelect}
-	<div class="selector-header mb-4">
+	<header>
 		<h2 class="text-2xl font-bold">Choose Your Companion</h2>
-		<p class="mt-2 text-gray-600">
+		<p>
 			Select a pre-configured companion to start chatting. You can customize or create new ones later.
 		</p>
-	</div>
+	</header>
 	{/if}
 
 	{#if isLoading}
-		<div class="loading-state flex h-64 items-center justify-center">
-			<div class="spinner" aria-label="Loading companions">
-				<div class="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
-			</div>
-		</div>
+		<p role="status">Loading companions…</p>
 	{:else if error}
-		<div class="error-state alert alert-error" role="alert">
+		<div class="status-message" data-status="critical" role="alert">
 			<p>{error}</p>
 		</div>
 	{:else if companions.length === 0}
-		<div class="empty-state alert alert-info" role="alert">
+		<div class="empty-state" role="status">
 			<p>No companions available. Please refresh or contact support.</p>
 		</div>
 	{:else}
-		<div class="companions-scroll-container max-h-[40vh] overflow-y-auto" data-testid="companion-selector">
-			<div class="companions-grid grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+		<div class="overflow-y-auto" data-testid="companion-selector">
+			<companion-grid>
 				{#each companions as companion, index (companion.user_companion_id)}
-					<div
+					<companion-card
 						data-companion-id={companion.user_companion_id}
 						data-testid="companion-card"
-						class="companion-card card bg-base-100 cursor-pointer shadow-sm transition-all duration-200 hover:shadow-md"
-						class:ring-2={selectedId === companion.user_companion_id}
-						class:ring-primary={selectedId === companion.user_companion_id}
 						aria-pressed={selectedId === companion.user_companion_id}
 						aria-label={`Select ${companion.name} companion`}
 						tabindex="0"
 						role="button"
 						onclick={() => handleSelect(companion)}
-						onkeydown={(e) => handleKeyDown(e, index)}
+						onkeydown={(e: KeyboardEvent) => handleKeyDown(e, index)}
 						onfocus={() => handleCardFocus(index)}
 					>
-						<div class="card-body p-2">
-							<!-- Avatar Section -->
 							{#if companion.avatar}
-								<div class="mx-auto mb-1 h-12 w-12">
 									<img
 										src={companion.avatar}
 										alt={`${companion.name} avatar`}
-										class="h-full w-full rounded-lg object-cover"
+										class="companion-avatar"
 									/>
-								</div>
 							{:else}
-								<div
-									class="from-primary to-secondary mx-auto mb-1 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br text-lg font-bold text-white"
+								<span
+									class="companion-avatar flex items-center justify-center bg-primary text-on-primary font-bold"
 									aria-label={`${companion.name} placeholder`}
 								>
 									{companion.name.charAt(0).toUpperCase()}
-								</div>
+								</span>
 							{/if}
 
-							<!-- Name (compact) -->
-							<h3 class="line-clamp-1 text-center text-xs font-semibold">
+							<h3 class="companion-name">
 								{companion.name}
 							</h3>
 
-							<!-- Badge -->
 							{#if companion.companion_id}
-								<div class="badge badge-primary badge-outline badge-xs mx-auto">Default</div>
+								<span class="badge">Default</span>
 							{:else}
-								<div class="badge badge-secondary badge-outline badge-xs mx-auto">Personal</div>
+								<span class="badge">Personal</span>
 							{/if}
 
-							<!-- Description (minimal) -->
 							{#if companion.description}
-								<p class="line-clamp-1 text-center text-xs text-gray-600">
+								<p class="companion-description">
 									{companion.description}
 								</p>
 							{/if}
 
-							<!-- Metadata (compact) -->
-							<div class="metadata-section mt-1 flex flex-wrap items-center justify-center gap-1">
-								{#if companion.model}
-									<span class="badge badge-xs badge-outline" title={`Model: ${companion.model}`}>
-										{companion.model.split(':')[0]}
-									</span>
-								{/if}
-								{#if companion.specialization}
-									<span
-										class="badge badge-xs badge-ghost"
-										title={`Specialization: ${companion.specialization}`}
-									>
-										{companion.specialization.slice(0, 5)}
-									</span>
-								{/if}
-							</div>
-
-							<!-- Actions (if customize callback) -->
 							{#if onCustomize}
-								<div class="actions-section mt-1">
 									<button
 										type="button"
-										class="btn btn-secondary btn-xs w-full"
+										class="btn-secondary btn-sm"
 										onclick={(e) => {
 											e.stopPropagation();
 											e.preventDefault();
@@ -180,100 +147,10 @@
 									>
 										Customize
 									</button>
-								</div>
 							{/if}
-						</div>
-					</div>
+					</companion-card>
 				{/each}
-			</div>
+			</companion-grid>
 		</div>
 	{/if}
-</div>
-
-<style>
-	.companion-selector {
-		padding: 1rem;
-		max-width: 1000px;
-		margin: 0 auto;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.selector-header {
-		text-align: center;
-		margin-bottom: 1rem;
-	}
-
-	.companions-scroll-container {
-		flex: 1;
-		overflow-y: auto;
-		overflow-x: hidden;
-		border-radius: 0.5rem;
-		padding-right: 0.5rem;
-	}
-
-	/* Custom scrollbar styling */
-	.companions-scroll-container::-webkit-scrollbar {
-		width: 6px;
-	}
-
-	.companions-scroll-container::-webkit-scrollbar-track {
-		background: rgba(0, 0, 0, 0.1);
-		border-radius: 3px;
-	}
-
-	.companions-scroll-container::-webkit-scrollbar-thumb {
-		background: rgba(0, 0, 0, 0.3);
-		border-radius: 3px;
-	}
-
-	.companions-scroll-container::-webkit-scrollbar-thumb:hover {
-		background: rgba(0, 0, 0, 0.5);
-	}
-
-	.companion-card {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		transition:
-			box-shadow 200ms ease,
-			transform 200ms ease;
-		min-height: 100%;
-	}
-
-	.companion-card:hover {
-		transform: translateY(-1px);
-	}
-
-	.companion-card:focus {
-		outline: 2px solid var(--primary-color, #570df8);
-		outline-offset: 1px;
-	}
-
-	.metadata-section {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.25rem;
-		justify-content: center;
-	}
-
-	.line-clamp-1 {
-		display: -webkit-box;
-		line-clamp: 1;
-		-webkit-line-clamp: 1;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-
-	@media (max-width: 640px) {
-		.companion-selector {
-			padding: 0.75rem;
-		}
-
-		:global(.companions-grid) {
-			grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-		}
-	}
-</style>
+</companion-component>

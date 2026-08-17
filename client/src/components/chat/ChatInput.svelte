@@ -5,7 +5,7 @@
 	import AudioToggle from '$components/chat/AudioToggle.svelte';
 	import DataButton from '$components/ui_data/DataButton.svelte';
 	import SkillAutocomplete from '$components/SkillAutocomplete.svelte';
-	import type { Companion } from '$types/data';
+	import type { Companion, UserCompanion } from '$types/data';
 
 	let {
 		value = $bindable(''),
@@ -22,7 +22,7 @@
 		files: string[];
 		isRecording: boolean;
 		isTranscribing: boolean;
-		currentCompagnon: Companion;
+		currentCompagnon: Companion | UserCompanion;
 		chatId?: string;
 		onsend: () => void;
 		onrecord: () => void;
@@ -82,25 +82,23 @@
 	});
 </script>
 
-<div class="mx-auto w-full md:max-w-[1150px]">
+<section class="chat-composer">
 	<!-- Top Bar: Companion, Audio, Delete -->
-	<div class="relative mb-4 flex items-center justify-between px-2">
+	<header class="chat-composer-toolbar">
 		<!-- Left: Companion -->
-		<div
-			class="flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-70"
+		<button
+			type="button"
+			class="companion-control"
 			onclick={oncompanionclick}
-			role="button"
-			tabindex="0"
-			onkeydown={(e) => e.key === 'Enter' && oncompanionclick()}
 			title={t('ui.choose_companion') || 'Choose companion'}
 			aria-label={t('ui.choose_companion') || 'Choose companion'}
 		>
-			<span class="text-xs font-medium opacity-70">{currentCompagnon.name}</span>
-			<span class="badge badge-xs badge-ghost opacity-50">{currentCompagnon.model}</span>
-		</div>
+			<strong>{currentCompagnon.name}</strong>
+			<span class="badge">{currentCompagnon.model}</span>
+		</button>
 
 		<!-- Center: Audio Toggle -->
-		<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+		<div class="audio-control">
 			<AudioToggle />
 		</div>
 
@@ -110,7 +108,7 @@
 				<DataButton table="chats" table_id={chatId} mode="delete" confirm={true} />
 			{/if}
 		</div>
-	</div>
+	</header>
 
 	<!-- File Previews -->
 	{#if files.length > 0}
@@ -118,17 +116,15 @@
 			{#each files as file, i}
 				<div class="group relative shrink-0">
 					{#if file.startsWith('data:image')}
-						<img src={file} alt="preview" class="border-base-content/10 h-20 w-20 rounded-lg border object-cover" />
+						<img src={file} alt="preview" class="file-preview" />
 					{:else}
-						<div
-							class="bg-base-200 border-base-content/10 flex h-20 w-20 flex-col items-center justify-center rounded-lg border"
-						>
+						<div class="file-preview file-placeholder">
 							<Icon icon="lucide:file" class="h-8 w-8 opacity-50" />
 							<span class="text-[10px] opacity-50">File</span>
 						</div>
 					{/if}
 					<button
-						class="btn btn-circle btn-xs btn-error absolute -top-2 -right-2 opacity-0 shadow-md transition-opacity group-hover:opacity-100"
+						class="file-remove"
 						onclick={() => removeFile(i)}
 						title={t('ui.remove_file') || 'Remove file'}
 						aria-label={t('ui.remove_file') || 'Remove file'}>✕</button
@@ -138,14 +134,12 @@
 		</div>
 	{/if}
 
-	<div
-		class="bg-base-200 border-base-content/10 focus-within:border-primary relative rounded-2xl border p-2 shadow-sm transition-colors"
-	>
+	<div class="composer-surface">
 		<textarea
 			bind:this={textareaRef}
 			placeholder={t('ui.type_message')}
 			aria-label={t('ui.type_message')}
-			class="textarea textarea-ghost relative z-0 max-h-[180px] min-h-12 w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-base focus:outline-none"
+			class="composer-input"
 			rows="1"
 			bind:value
 			oninput={autoResize}
@@ -167,6 +161,10 @@
 						// Auto-invoke the selected builtin skill and populate the input with the result
 						try {
 							const slug = skill.slug || skill.name || skill.skill_id;
+							if (!slug) {
+								toast.error('Skill invocation failed');
+								return;
+							}
 							const res = await fetch(`/api/skills/${encodeURIComponent(slug)}/invoke`, {
 								method: 'POST',
 								headers: { 'Content-Type': 'application/json' },
@@ -187,12 +185,12 @@
 			</div>
 		{/if}
 
-		<div class="relative z-10 mt-1 flex items-center justify-between px-1">
+		<footer class="composer-actions">
 			<!-- Left: Attachments -->
 			<div>
 				<input type="file" class="hidden" multiple bind:this={fileInput} onchange={handleFileSelect} />
 				<button
-					class="btn btn-ghost btn-sm btn-circle"
+					class="btn-icon btn-sm"
 					aria-label={t('ui.add_attachment') || 'Add attachment'}
 					title={t('ui.add_attachment') || 'Add attachment'}
 					onclick={triggerFileInput}
@@ -205,7 +203,7 @@
 			<div>
 				{#if !value.trim()}
 					<button
-						class="btn btn-circle btn-sm {isRecording ? 'btn-error animate-pulse' : 'btn-ghost'}"
+						class={isRecording ? 'btn-danger btn-sm' : 'btn-icon btn-sm'}
 						onclick={onrecord}
 						aria-label={isRecording
 							? t('ui.stop_recording') || 'Stop recording'
@@ -216,7 +214,7 @@
 						disabled={isTranscribing}
 					>
 						{#if isTranscribing}
-							<span class="loading loading-spinner loading-xs"></span>
+							<span>…</span>
 						{:else if isRecording}
 							<Icon icon="lucide:square" class="h-5 w-5" />
 						{:else}
@@ -225,7 +223,7 @@
 					</button>
 				{:else}
 					<button
-						class="btn btn-primary btn-sm btn-circle"
+						class="btn-primary btn-sm"
 						onclick={onsend}
 						aria-label={t('ui.send_message') || 'Send message'}
 						title={t('ui.send_message') || 'Send message'}
@@ -235,7 +233,132 @@
 					</button>
 				{/if}
 			</div>
-		</div>
+		</footer>
 	</div>
-</div>
+</section>
 
+<style>
+	.chat-composer {
+		display: flex;
+		width: min(100%, 72rem);
+		margin-inline: auto;
+		flex-direction: column;
+		gap: var(--gap-sm);
+	}
+
+	.chat-composer-toolbar {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: center;
+		gap: var(--gap-sm);
+	}
+
+	.companion-control {
+		display: flex;
+		min-width: 0;
+		align-items: center;
+		justify-self: start;
+		gap: var(--gap-xs);
+		padding: var(--pad-xs) var(--pad-sm);
+		border: 0;
+		border-radius: var(--radius-sm);
+		background: transparent;
+		color: var(--color-text);
+		cursor: pointer;
+	}
+
+	.companion-control:hover {
+		background: var(--color-surface-hover);
+	}
+
+	.audio-control {
+		grid-column: 2;
+	}
+
+	.chat-composer-toolbar > :last-child {
+		justify-self: end;
+	}
+
+	.composer-surface {
+		position: relative;
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-sunken);
+		overflow: visible;
+		transition: border-color var(--transition-fast);
+	}
+
+	.file-preview {
+		display: flex;
+		width: 5rem;
+		height: 5rem;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-raised);
+		object-fit: cover;
+	}
+
+	.file-remove {
+		position: absolute;
+		top: calc(var(--pad-sm) * -1);
+		right: calc(var(--pad-sm) * -1);
+		display: grid;
+		width: 1.5rem;
+		height: 1.5rem;
+		place-items: center;
+		padding: 0;
+		border: 0;
+		border-radius: var(--radius-full);
+		background: var(--color-critical);
+		color: var(--color-on-primary);
+		box-shadow: var(--shadow-sm);
+		opacity: 0;
+		transition: opacity var(--transition-fast);
+	}
+
+	.group:hover .file-remove,
+	.file-remove:focus-visible {
+		opacity: 1;
+	}
+
+	.composer-surface:focus-within {
+		border-color: var(--color-primary);
+	}
+
+	.composer-input {
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 3rem;
+		max-height: 11rem;
+		padding: var(--pad-sm) var(--pad-md);
+		border: 0;
+		background: transparent;
+		resize: none;
+		overflow-y: auto;
+	}
+
+	.composer-input:focus {
+		outline: none;
+	}
+
+	.composer-actions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: var(--pad-xs) var(--pad-sm);
+		border-top: var(--border-width) solid var(--color-border);
+	}
+
+	@media (width < 48rem) {
+		.chat-composer-toolbar {
+			grid-template-columns: minmax(0, 1fr) auto auto;
+		}
+
+		.companion-control .badge {
+			display: none;
+		}
+	}
+</style>

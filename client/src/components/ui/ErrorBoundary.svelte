@@ -32,8 +32,8 @@
 	{#if fallback}
 		{@render fallback({ error: errorMessage, onRetry: retry })}
 	{:else}
-		<div class="flex min-h-[200px] flex-col items-center justify-center gap-4 rounded-lg border-critical bg-base-200 p-6 text-center" style="border-width: var(--border-width)">
-			<div class="text-4xl" style="color: var(--color-critical)">
+		<error-boundary-state>
+			<div class="error-icon">
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path
 						stroke-linecap="round"
@@ -44,12 +44,41 @@
 				</svg>
 			</div>
 			<h3 class="text-lg font-semibold">{t('ui.error.something_went_wrong') || 'Something went wrong'}</h3>
-			<p class="text-base-content/70 text-sm">{errorMessage}</p>
-			<button class="btn btn-primary" onclick={retry}>
+			<p>{errorMessage}</p>
+			<button class="btn-primary" onclick={retry}>
 				{t('ui.error.retry') || 'Retry'}
 			</button>
-		</div>
+		</error-boundary-state>
 	{/if}
 {:else}
 	{@render children()}
 {/if}
+
+<style>
+	@layer components {
+		error-boundary-state {
+			display: flex;
+			min-height: 12.5rem;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			gap: var(--gap-lg);
+			padding: var(--pad-xl);
+			border: var(--border-width) solid var(--color-critical);
+			background: var(--color-surface-raised);
+			border-radius: var(--radius-lg);
+			text-align: center;
+		}
+
+		error-boundary-state p {
+			margin: 0;
+			color: var(--color-text-muted);
+			font-size: var(--text-sm);
+		}
+
+		.error-icon {
+			color: var(--color-critical);
+			font-size: var(--text-2xl);
+		}
+	}
+</style>

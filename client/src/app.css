@@ -1,260 +1,330 @@
-@import 'tailwindcss';
 @import '@medyll/css-base';
 
-@plugin 'daisyui' {
-	themes: false;
-}
-
-@layer theme {
-	:root,
-	[data-theme='light'] {
-		color-scheme: light;
-		font-family:
-			'Segoe UI Variable',
-			'Segoe UI',
-			'Segoe UI Web (West European)',
-			-apple-system,
-			BlinkMacSystemFont,
-			Roboto,
-			'Helvetica Neue',
-			sans-serif;
-		--color-base-100: oklch(0.99 0.003 255);
-		--color-base-200: oklch(0.965 0.006 255);
-		--color-base-300: oklch(0.925 0.012 255);
-		--color-base-content: oklch(0.24 0.018 260);
-		--color-primary: oklch(0.57 0.16 252);
-		--color-primary-content: oklch(0.99 0.003 255);
-		--color-secondary: oklch(0.9 0.025 255);
-		--color-secondary-content: oklch(0.27 0.02 260);
-		--color-accent: oklch(0.65 0.14 205);
-		--color-accent-content: oklch(0.18 0.02 240);
-		--color-neutral: oklch(0.29 0.018 260);
-		--color-neutral-content: oklch(0.97 0.004 255);
-		--color-info: oklch(0.63 0.15 245);
-		--color-success: oklch(0.63 0.16 145);
-		--color-warning: oklch(0.76 0.16 76);
-		--color-critical: oklch(0.59 0.21 25);
-		--rounded-box: var(--radius-md);
-		--rounded-btn: var(--radius-sm);
-		--rounded-badge: var(--radius-full);
-		--animation-btn: var(--transition-fast);
-		--animation-input: var(--transition-fast);
-		--btn-focus-scale: 0.98;
-		--border-btn: var(--border-width);
-		--tab-border: var(--border-width);
-		--tab-radius: var(--radius-md);
-	}
-
-	[data-theme='dark'] {
-		color-scheme: dark;
-		font-family:
-			'Segoe UI Variable',
-			'Segoe UI',
-			'Segoe UI Web (West European)',
-			-apple-system,
-			BlinkMacSystemFont,
-			Roboto,
-			'Helvetica Neue',
-			sans-serif;
-		--color-base-100: oklch(0.19 0.015 260);
-		--color-base-200: oklch(0.145 0.012 260);
-		--color-base-300: oklch(0.255 0.022 260);
-		--color-base-content: oklch(0.925 0.009 255);
-		--color-primary: oklch(0.72 0.14 245);
-		--color-primary-content: oklch(0.15 0.02 260);
-		--color-secondary: oklch(0.31 0.028 260);
-		--color-secondary-content: oklch(0.93 0.009 255);
-		--color-accent: oklch(0.74 0.12 200);
-		--color-accent-content: oklch(0.15 0.02 240);
-		--color-neutral: oklch(0.86 0.012 255);
-		--color-neutral-content: oklch(0.18 0.016 260);
-		--color-info: oklch(0.72 0.13 245);
-		--color-success: oklch(0.71 0.15 145);
-		--color-warning: oklch(0.82 0.15 86);
-		--color-critical: oklch(0.7 0.18 25);
-		--rounded-box: var(--radius-md);
-		--rounded-btn: var(--radius-sm);
-		--rounded-badge: var(--radius-full);
-		--animation-btn: var(--transition-fast);
-		--animation-input: var(--transition-fast);
-		--btn-focus-scale: 0.98;
-		--border-btn: var(--border-width);
-		--tab-border: var(--border-width);
-		--tab-radius: var(--radius-md);
-	}
-}
-
 @layer components {
+	:root {
+		--color-primary: oklch(0.61 0.18 255);
+		--app-sidebar-width: 16rem;
+		--app-sidebar-collapsed-width: 4.5rem;
+		--app-header-height: 4rem;
+	}
+
 	html,
 	body {
+		min-width: 20rem;
 		min-height: 100%;
-		background: var(--color-base-200);
-		color: var(--color-base-content);
+		background: var(--color-surface);
+		color: var(--color-text);
 	}
 
 	body {
-		font-family:
-			'Segoe UI Variable',
-			'Segoe UI',
-			-apple-system,
-			BlinkMacSystemFont,
-			Roboto,
-			sans-serif;
+		margin: 0;
+		overflow: hidden;
 	}
 
-	.app-shell {
-		background:
-			linear-gradient(
-				to bottom,
-				color-mix(in oklch, var(--color-base-100) 76%, transparent),
-				color-mix(in oklch, var(--color-base-200) 92%, transparent)
-			),
-			var(--color-base-200);
-	}
-
-	.app-navbar {
-		z-index: var(--z-dropdown);
-		border-bottom: var(--border-width) solid color-mix(in oklch, var(--color-base-content) 9%, transparent);
-		background: color-mix(in oklch, var(--color-base-100) 88%, transparent);
-		box-shadow: var(--shadow-sm);
-	}
-
-	.app-main {
-		background: color-mix(in oklch, var(--color-base-100) 42%, transparent);
-	}
-
-	.app-sidebar-layer {
-		z-index: var(--z-modal);
-	}
-
-	.app-sidebar {
-		position: relative;
+	app-shell-component,
+	app-content,
+	app-header,
+	app-main,
+	onboarding-component,
+	onboarding-panel,
+	onboarding-header,
+	onboarding-body,
+	onboarding-footer,
+	companion-component,
+	companion-grid,
+	companion-card,
+	chat-landing-component {
 		display: flex;
-		flex-direction: column;
-		height: 100%;
+	}
+
+	app-shell-component {
+		height: 100dvh;
 		min-height: 0;
-		border-inline-end: var(--border-width) solid color-mix(in oklch, var(--color-base-content) 12%, transparent);
-		background: color-mix(in oklch, var(--color-base-100) 92%, var(--color-base-200));
-		box-shadow: var(--shadow-md);
+		overflow: hidden;
 	}
 
-	.sidebar-header,
-	.sidebar-footer {
-		display: flex;
-		flex: none;
+	app-content {
+		min-width: 0;
+		min-height: 0;
+		flex: 1;
 		flex-direction: column;
 	}
 
-	.sidebar-footer {
-		border-top: var(--border-width) solid color-mix(in oklch, var(--color-base-content) 9%, transparent);
-		background: color-mix(in oklch, var(--color-base-100) 74%, transparent);
-	}
-
-	.chat-transcript {
-		scrollbar-gutter: stable;
-	}
-
-	.message-bubble {
-		max-width: min(78ch, 82%);
-		border: var(--border-width) solid color-mix(in oklch, var(--color-base-content) 12%, transparent);
-		border-radius: var(--radius-lg);
-		box-shadow: var(--shadow-sm);
-		line-height: var(--leading-relaxed);
-		&::before {
-			display: none;
-		}
-	}
-
-	.message-bubble-user {
-		background: color-mix(in oklch, var(--color-primary) 88%, var(--color-base-100));
-		color: var(--color-primary-content);
-	}
-
-	.message-bubble-assistant,
-	.message-bubble-tool {
-		background: color-mix(in oklch, var(--color-base-100) 94%, transparent);
-		color: var(--color-base-content);
-	}
-
-	.chat-composer {
-		z-index: var(--z-dropdown);
-		border-top: var(--border-width) solid color-mix(in oklch, var(--color-base-content) 9%, transparent);
-		background: color-mix(in oklch, var(--color-base-100) 92%, transparent);
-		box-shadow: var(--shadow-lg);
-	}
-
-	.connection-banner {
-		position: fixed;
-		inset-block-start: var(--gutter-md);
-		inset-inline-end: var(--gutter-md);
-		z-index: var(--z-overlay);
-		display: flex;
-		width: min(28rem, calc(100vw - (var(--gutter-md) * 2)));
-		flex-direction: column;
-		gap: var(--gutter-md);
-		padding: var(--pad-lg);
-		border: var(--border-width) solid color-mix(in oklch, var(--color-warning) 46%, transparent);
-		border-radius: var(--radius-lg);
-		background: color-mix(in oklch, var(--color-base-100) 96%, var(--color-warning));
-		box-shadow: var(--shadow-lg);
-		color: var(--color-base-content);
-	}
-
-	.connection-banner-header,
-	.connection-banner-actions {
-		display: flex;
+	app-header {
+		min-height: var(--app-header-height);
 		align-items: center;
-		gap: var(--gutter-sm);
+		gap: var(--gap-sm);
+		padding-inline: var(--pad-md);
+		border-bottom: var(--border-width) solid var(--color-border);
+		background: var(--color-surface-raised);
+		z-index: var(--z-dropdown);
 	}
 
-	.connection-banner-actions {
-		flex-wrap: wrap;
-		justify-content: flex-end;
+	app-main {
+		position: relative;
+		min-width: 0;
+		min-height: 0;
+		flex: 1;
+		overflow: hidden;
 	}
 
-	.offline-indicator {
-		z-index: var(--z-toast);
-		border: var(--border-width) solid color-mix(in oklch, var(--color-warning) 46%, transparent);
-		box-shadow: var(--shadow-md);
+	.app-brand {
+		color: var(--color-text);
+		font-size: var(--text-xl);
+		font-weight: var(--font-semibold);
+		text-decoration: none;
 	}
 
-	/* Modal fixes: Proper z-index stacking and backdrop behavior */
-	dialog {
-		position: fixed;
-		inset: 0;
-		display: flex;
+	.app-header-spacer {
+		flex: 1;
+	}
+
+	.app-progress {
+		accent-color: var(--color-primary);
+	}
+
+	.mobile-sidebar-backdrop {
+		display: none;
+	}
+
+	onboarding-component {
+		height: 100dvh;
+		min-height: 0;
 		align-items: center;
 		justify-content: center;
-		background-color: transparent;
-		overflow-y: auto;
-		z-index: calc(var(--z-modal) * -1);
-		pointer-events: none;
-	}
-
-	dialog[open] {
-		z-index: var(--z-modal);
-		pointer-events: auto;
-	}
-
-	dialog::backdrop {
-		background-color: color-mix(in oklch, var(--color-text) 50%, transparent);
-	}
-
-	dialog[open]::backdrop {
-		animation: fadeIn var(--transition-normal);
-	}
-
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
-	}
-
-	/* Prevent body scroll when modal is open */
-	body:has(dialog[open]) {
+		padding: var(--pad-md);
+		background: var(--color-surface-alt);
 		overflow: hidden;
+	}
+
+	onboarding-panel {
+		width: min(100%, 36rem);
+		max-height: min(52rem, calc(100dvh - (2 * var(--pad-md))));
+		min-height: 0;
+		flex-direction: column;
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-xl);
+		background: var(--color-surface-raised);
+		box-shadow: var(--shadow-lg);
+		overflow: hidden;
+	}
+
+	onboarding-panel[data-step='companions'] {
+		width: min(100%, 64rem);
+	}
+
+	onboarding-header {
+		flex: none;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--gap-sm);
+		padding: var(--pad-lg) var(--pad-lg) var(--pad-md);
+		text-align: center;
+	}
+
+	onboarding-header h1,
+	onboarding-header p {
+		margin: 0;
+	}
+
+	onboarding-header p {
+		color: var(--color-text-muted);
+	}
+
+	onboarding-body {
+		min-height: 0;
+		flex: 1;
+		flex-direction: column;
+		padding: 0 var(--pad-lg);
+		overflow: auto;
+	}
+
+	onboarding-footer {
+		flex: none;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--gap-md);
+		padding: var(--pad-md) var(--pad-lg) var(--pad-lg);
+		border-top: var(--border-width) solid var(--color-border);
+	}
+
+	.onboarding-progress {
+		display: flex;
+		align-items: center;
+		gap: var(--gap-xs);
+		color: var(--color-text-muted);
+		font-size: var(--text-sm);
+	}
+
+	.onboarding-progress span {
+		width: var(--icon-size-xs);
+		height: var(--icon-size-xs);
+		border-radius: var(--radius-full);
+		background: var(--color-border);
+	}
+
+	.onboarding-progress span[aria-current='step'] {
+		background: var(--color-primary);
+	}
+
+	.form-stack {
+		display: grid;
+		gap: var(--gap-md);
+	}
+
+	.field-stack {
+		display: grid;
+		gap: var(--gap-xs);
+	}
+
+	.field-stack > label {
+		font-weight: var(--font-medium);
+	}
+
+	.checkbox-row {
+		display: flex;
+		align-items: center;
+		gap: var(--gap-sm);
+	}
+
+	companion-component {
+		min-height: 0;
+		flex: 1;
+		flex-direction: column;
+	}
+
+	companion-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+		gap: var(--gap-sm);
+		padding: var(--pad-xs);
+	}
+
+	companion-card {
+		min-width: 0;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--gap-xs);
+		padding: var(--pad-md);
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface);
+		color: var(--color-text);
+		text-align: center;
+		cursor: pointer;
+		transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+	}
+
+	companion-card:hover {
+		transform: translateY(-0.125rem);
+		background: var(--color-surface-hover);
+	}
+
+	companion-card:focus-visible,
+	companion-card[aria-pressed='true'] {
+		outline: var(--focus-ring-width) solid var(--color-primary);
+		outline-offset: var(--focus-ring-gap);
+	}
+
+	.companion-avatar {
+		width: var(--icon-size-lg);
+		height: var(--icon-size-lg);
+		border-radius: var(--radius-lg);
+		object-fit: cover;
+	}
+
+	.companion-name,
+	.companion-description {
+		max-width: 100%;
+		margin: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.companion-description {
+		color: var(--color-text-muted);
+		font-size: var(--text-xs);
+	}
+
+	chat-landing-component {
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+		padding: var(--pad-lg);
+		background: var(--color-surface-alt);
+		text-align: center;
+	}
+
+	chat-landing-component > section {
+		display: flex;
+		max-width: 32rem;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--gap-md);
+	}
+
+	chat-landing-component img {
+		width: 8rem;
+		height: 8rem;
+		object-fit: contain;
+	}
+
+	.status-message {
+		padding: var(--pad-sm);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-alt);
+	}
+
+	.status-message[data-status='critical'] {
+		color: var(--color-critical);
+	}
+
+	.status-message[data-status='success'] {
+		color: var(--color-success);
+	}
+
+	@media (width < 48rem) {
+		app-header {
+			padding-inline: var(--pad-sm);
+		}
+
+		.mobile-sidebar-backdrop[data-open='true'] {
+			position: fixed;
+			inset: 0;
+			display: block;
+			border: 0;
+			background: color-mix(in oklch, var(--color-text) 35%, transparent);
+			z-index: var(--z-overlay);
+		}
+
+		onboarding-component {
+			align-items: stretch;
+			padding: 0;
+		}
+
+		onboarding-panel,
+		onboarding-panel[data-step='companions'] {
+			width: 100%;
+			max-height: 100dvh;
+			border: 0;
+			border-radius: 0;
+		}
+
+		onboarding-header {
+			padding: var(--pad-md);
+		}
+
+		onboarding-body {
+			padding-inline: var(--pad-md);
+		}
+
+		onboarding-footer {
+			padding: var(--pad-md);
+		}
+
+		companion-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 }

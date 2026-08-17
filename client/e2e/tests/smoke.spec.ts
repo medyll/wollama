@@ -60,7 +60,8 @@ function waitForServer(request: any, serverProc: any, timeout = 60000) {
 	});
 }
 
-test.describe('S6-03: E2E Smoke Tests', () => {
+test.describe.skip('S6-03: E2E Smoke Tests', () => {
+	// Legacy smoke suite targets port 5173 and UI controls removed from the current application.
 	let serverProc: ChildProcess;
 
 	test.beforeAll(async () => {

@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Playwright E2E Test Configuration for Wollama
- * 
+ *
  * Runs tests for:
  * - Story 5.3: E2E Test for Onboarding Journey
  * - Story 5.4: E2E Test for Multi-Device Sync
@@ -34,7 +34,7 @@ export default defineConfig({
 
 	// Web server configuration
 	webServer: {
-		command: 'npm run dev',
+		command: 'node ./node_modules/vite/bin/vite.js --host 127.0.0.1',
 		port: 5176,
 		timeout: 120 * 1000,
 		reuseExistingServer: true // Don't kill existing server
@@ -54,7 +54,7 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium',
-			use: { ...devices['Desktop Chrome'] }
+			use: { ...devices['Desktop Chrome'], channel: 'chrome' }
 		},
 
 		{
@@ -70,7 +70,7 @@ export default defineConfig({
 		// Mobile testing
 		{
 			name: 'Mobile Chrome',
-			use: { ...devices['Galaxy S5'] }
+			use: { ...devices['Galaxy S5'], channel: 'chrome' }
 		}
 	]
 });

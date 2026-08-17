@@ -48,37 +48,32 @@
 	}
 </script>
 
-<div class="container mx-auto p-4">
+<companions-page>
 	<!-- Section: Header -->
 	<h1 class="mb-6 text-center text-3xl font-bold">Choisir un Compagnon</h1>
 
 	<!-- Section: Companion Grid -->
 	{#if isLoading}
-		<div class="flex h-64 items-center justify-center">
-			<div class="spinner">
-				<div class="border-primary h-10 w-10 animate-spin rounded-full border-4 border-t-transparent"></div>
-			</div>
-		</div>
+		<companions-state aria-busy="true"><span class="loading-ellipsis">Loading companions</span></companions-state>
 	{:else if error}
-		<div class="alert alert-error">
+		<div class="status-message" data-status="critical" role="alert">
 			<p>{error}</p>
 		</div>
 	{:else if companions.length === 0}
-		<div class="alert alert-info">
+		<div class="status-message" data-status="info">
 			<p>No companions available</p>
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+		<companions-grid>
 			{#each companions as companion (getCompanionId(companion))}
-				<div class="card bg-base-100 border-base-content/5 border shadow-xl transition-shadow hover:shadow-2xl">
-					<div class="card-body">
-						<h2 class="card-title">{companion.name}</h2>
+				<companion-card>
+					<companion-card-body>
+						<h2>{companion.name}</h2>
 
 						<!-- Badge: System or Personal -->
 						<div
-							class="badge"
-							class:badge-primary={isSystemCompanion(companion)}
-							class:badge-secondary={!isSystemCompanion(companion)}
+							class="companion-kind"
+							data-kind={isSystemCompanion(companion) ? 'default' : 'personal'}
 						>
 							{isSystemCompanion(companion) ? 'Default' : 'Personal'}
 						</div>
@@ -87,16 +82,16 @@
 
 						<!-- Model and Specialization -->
 						<div class="flex gap-2 text-xs">
-							<span class="badge badge-outline">{companion.model}</span>
+							<span class="metadata-pill">{companion.model}</span>
 							{#if companion.specialization}
-								<span class="badge badge-ghost">{companion.specialization}</span>
+								<span class="metadata-pill">{companion.specialization}</span>
 							{/if}
 						</div>
 
 						<!-- Actions -->
-						<div class="card-actions mt-4 justify-between">
+						<companion-actions>
 							<button
-								class="btn btn-primary btn-sm"
+								class="btn-primary btn-sm"
 								onclick={() => startChat(companion)}
 								aria-label={`Chat with ${companion.name}`}
 							>
@@ -106,7 +101,7 @@
 							{#if isSystemCompanion(companion)}
 								<!-- System companion: Customize button -->
 								<button
-									class="btn btn-secondary btn-sm"
+									class="btn-secondary btn-sm"
 									onclick={() => handleCustomize(companion)}
 									aria-label={`Customize ${companion.name}`}
 								>
@@ -115,22 +110,110 @@
 							{:else}
 								<!-- User companion: Edit button -->
 								<button
-									class="btn btn-accent btn-sm"
+									class="btn-outline btn-sm"
 									onclick={() => handleEdit(companion)}
 									aria-label={`Edit ${companion.name}`}
 								>
 									Edit
 								</button>
 							{/if}
-						</div>
-					</div>
-				</div>
+						</companion-actions>
+					</companion-card-body>
+				</companion-card>
 			{/each}
-		</div>
+		</companions-grid>
 	{/if}
 
 	<!-- Section: Footer -->
 	<div class="mt-8 text-center">
-		<a href="/chat" class="btn btn-ghost">Retour</a>
+		<a href="/chat" class="btn-ghost">Retour</a>
 	</div>
-</div>
+</companions-page>
+
+<style>
+	@layer components {
+		companions-page,
+		companions-state,
+		companions-grid,
+		companion-card,
+		companion-card-body,
+		companion-actions {
+			display: flex;
+		}
+
+		companions-page {
+			width: min(100%, 76rem);
+			margin-inline: auto;
+			padding: var(--pad-lg);
+			flex-direction: column;
+		}
+
+		companions-state {
+			min-height: 16rem;
+			align-items: center;
+			justify-content: center;
+		}
+
+		companions-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+			gap: var(--gap-lg);
+		}
+
+		companion-card {
+			background: var(--color-surface);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-sm);
+			transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+		}
+
+		companion-card:hover {
+			box-shadow: var(--shadow-md);
+			transform: translateY(-1px);
+		}
+
+		companion-card-body {
+			width: 100%;
+			flex-direction: column;
+			gap: var(--gap-md);
+			padding: var(--pad-lg);
+		}
+
+		companion-card-body h2 {
+			margin: 0;
+		}
+
+		.companion-kind,
+		.metadata-pill {
+			display: inline-flex;
+			align-self: flex-start;
+			padding: var(--pad-xs) var(--pad-sm);
+			border-radius: var(--radius-full);
+			font-size: var(--text-xs);
+			font-weight: var(--font-medium);
+		}
+
+		.companion-kind {
+			background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+			color: var(--color-primary);
+		}
+
+		.companion-kind[data-kind='personal'] {
+			background: color-mix(in srgb, var(--color-secondary) 12%, var(--color-surface));
+			color: var(--color-secondary);
+		}
+
+		.metadata-pill {
+			border: var(--border-width) solid var(--color-border);
+			color: var(--color-text-muted);
+		}
+
+		companion-actions {
+			justify-content: space-between;
+			gap: var(--gap-sm);
+			margin-block-start: auto;
+			padding-block-start: var(--pad-sm);
+		}
+	}
+</style>

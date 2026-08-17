@@ -14,7 +14,7 @@ class HookRegistry {
 		try {
 			const db = dbManager.getDb('hooks');
 			const result = await db.find({ selector: { is_enabled: true } });
-			const hooks: Hook[] = result.docs as Hook[];
+			const hooks = result.docs as unknown as Hook[];
 
 			this.cache.clear();
 			for (const hook of hooks) {

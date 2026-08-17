@@ -27,21 +27,20 @@
 	{/if}
 
 	{#if parsed.thinking !== null}
-		<div class="collapse-arrow bg-base-200/50 border-base-300/50 collapse overflow-hidden rounded-xl border">
-			<input type="checkbox" bind:checked={isOpen} />
-			<div class="collapse-title flex min-h-0 items-center gap-2 py-2 text-xs font-medium opacity-70">
+		<details class="thinking-panel" bind:open={isOpen}>
+			<summary>
 				<Icon
 					icon="fluent:brain-circuit-24-regular"
 					class="h-4 w-4 {parsed.isThinking ? 'text-primary animate-pulse' : ''}"
 				/>
 				<span>{parsed.isThinking ? 'Thinking...' : 'Thought Process'}</span>
-			</div>
-			<div class="collapse-content border-base-300/30 bg-base-200/30 border-t text-sm opacity-80">
+			</summary>
+			<div class="thinking-content">
 				<div class="prose prose-sm dark:prose-invert max-w-none py-2 leading-relaxed italic">
 					{@html parseMarkdown(parsed.thinking)}
 				</div>
 			</div>
-		</div>
+		</details>
 	{/if}
 
 	{#if parsed.response}
@@ -52,3 +51,33 @@
 		<!-- Empty state -->
 	{/if}
 </div>
+
+<style>
+	@layer components {
+		.thinking-panel {
+			overflow: hidden;
+			background: color-mix(in srgb, var(--color-surface-raised) 50%, transparent);
+			border: var(--border-width) solid var(--color-border);
+			border-radius: var(--radius-lg);
+		}
+
+		.thinking-panel summary {
+			display: flex;
+			align-items: center;
+			gap: var(--gap-sm);
+			padding: var(--pad-sm) var(--pad-md);
+			color: var(--color-text-muted);
+			font-size: var(--text-xs);
+			font-weight: var(--font-medium);
+			cursor: pointer;
+		}
+
+		.thinking-content {
+			padding-inline: var(--pad-md);
+			border-top: var(--border-width) solid var(--color-border);
+			background: color-mix(in srgb, var(--color-surface-raised) 30%, transparent);
+			color: var(--color-text-muted);
+			font-size: var(--text-sm);
+		}
+	}
+</style>

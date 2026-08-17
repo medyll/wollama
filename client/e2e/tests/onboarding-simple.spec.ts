@@ -50,16 +50,16 @@ test.describe('Onboarding - Basic Flow', () => {
 		await page.waitForLoadState('networkidle');
 
 		// Fill in profile
-		await page.locator('#nickname').click();
-		await page.locator('#nickname').type('TestUser');
-		await page.waitForTimeout(500);
+		const nicknameInput = page.locator('#nickname');
+		await nicknameInput.fill('TestUser');
+		await expect(nicknameInput).toHaveValue('TestUser');
 		await page.locator('[data-testid="wizard-next-button"]').click();
-		
-		// Wait for auto connection test
-		await page.waitForTimeout(8000);
 
-		// Connection test should have run (message should appear)
-		const connectionMessage = page.locator('[data-testid="connection-success"], [data-testid="connection-error"]');
-		await expect(connectionMessage).toBeVisible({ timeout: 10000 });
+		// A successful check advances automatically; an unsuccessful check remains visible.
+		const connectionOutcome = page
+			.getByTestId('connection-success')
+			.or(page.getByTestId('connection-error'))
+			.or(page.getByTestId('companion-selector'));
+		await expect(connectionOutcome.first()).toBeVisible({ timeout: 15000 });
 	});
 });

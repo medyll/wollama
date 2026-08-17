@@ -1,13 +1,15 @@
 import { hookRegistry } from './hook-registry.service.js';
 import { injectDatetimeHook } from './hooks/inject-datetime.hook.js';
 import { trimWhitespaceHook } from './hooks/trim-whitespace.hook.js';
+import { ragRetrieveHook } from './hooks/rag-retrieve.hook.js';
 import { logger } from '../utils/logger.js';
 import type { HookContext, HookEvent, HookHandler, Hook } from '../../shared/types/hooks.js';
 
 /** Map of builtin handler_ref → HookHandler implementations */
 const BUILTIN_HANDLERS = new Map<string, HookHandler>([
 	['inject-datetime', injectDatetimeHook],
-	['trim-whitespace', trimWhitespaceHook]
+	['trim-whitespace', trimWhitespaceHook],
+	['rag-retrieve', ragRetrieveHook]
 ]);
 
 /**

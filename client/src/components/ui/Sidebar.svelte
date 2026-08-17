@@ -37,14 +37,12 @@
 </script>
 
 <aside
-	class="app-sidebar transition-all duration-300 {uiState.sidebarOpen
-		? uiState.sidebarCollapsed
-			? 'w-20'
-			: 'w-64'
-		: 'h-full w-0 overflow-hidden'}"
+	class="app-sidebar"
+	data-open={uiState.sidebarOpen}
+	data-collapsed={uiState.sidebarCollapsed}
 	aria-label="Sidebar"
 >
-	<div class="sidebar-header gap-2 p-2">
+	<div class="sidebar-header">
 		<!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
 		<div
 			class="hidden md:flex {uiState.sidebarCollapsed
@@ -56,19 +54,19 @@
 			</div>
 
 			{#if !uiState.sidebarCollapsed}
-				<button class="btn btn-ghost btn-square btn-sm" aria-label="Search" onclick={() => goto('/search')}>
+				<button class="btn-icon btn-sm" aria-label="Search" onclick={() => goto('/search')}>
 					<Icon icon="fluent:search-24-regular" class="h-5 w-5" />
 				</button>
 			{/if}
 		</div>
 		{#if uiState.sidebarCollapsed}
-			<button class="btn btn-ghost btn-square btn-sm mx-auto" aria-label="Search" onclick={() => goto('/search')}>
+			<button class="btn-icon btn-sm mx-auto" aria-label="Search" onclick={() => goto('/search')}>
 				<Icon icon="fluent:search-24-regular" class="h-5 w-5" />
 			</button>
 		{/if}
 
 		<button
-			class="btn btn-ghost btn-block {uiState.sidebarCollapsed ? 'px-0' : 'justify-start'}"
+			class="sidebar-action"
 			onclick={createNewChat}
 			title={t('ui.newChat')}
 		>
@@ -79,16 +77,13 @@
 		</button>
 	</div>
 
-	<nav id="sidebar-nav" class="flex-1 space-y-2 overflow-y-auto p-2" aria-label={t('ui.myChats')} data-testid="chat-list">
+	<nav id="sidebar-nav" class="sidebar-nav" aria-label={t('ui.myChats')} data-testid="chat-list">
 		{#if !uiState.sidebarCollapsed}
 			{#each chats as chat}
 				<a
 					href="/chat/{chat.chat_id}"
-					class="btn btn-ghost btn-block no-animation justify-start font-normal {$page.url.pathname.includes(
-						chat.chat_id
-					)
-						? 'btn-active'
-						: ''}"
+					class="sidebar-chat-link"
+					aria-current={$page.url.pathname.includes(chat.chat_id) ? 'page' : undefined}
 					title={chat.title}
 					data-testid="chat-list-item"
 				>
@@ -99,12 +94,12 @@
 		{/if}
 	</nav>
 
-	<div class="sidebar-footer gap-2 p-4">
+	<div class="sidebar-footer">
 		<div class="flex justify-end px-2">
 			<SidebarCollapse />
 		</div>
 		<button
-			class="btn btn-ghost btn-block {uiState.sidebarCollapsed ? 'px-0' : 'justify-start'}"
+			class="sidebar-action"
 			onclick={() => goto('/settings')}
 			title={t('ui.settings')}
 		>
@@ -115,3 +110,82 @@
 		</button>
 	</div>
 </aside>
+
+<style>
+	.app-sidebar {
+		display: flex;
+		width: var(--app-sidebar-width);
+		min-width: var(--app-sidebar-width);
+		height: calc(100dvh - (2 * var(--pad-sm)));
+		margin: var(--marg-sm);
+		flex-direction: column;
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface-alt);
+		box-shadow: var(--shadow-sm);
+		overflow: hidden;
+		transition: width var(--transition-normal), min-width var(--transition-normal), transform var(--transition-normal);
+		z-index: var(--z-modal);
+	}
+
+	.app-sidebar[data-collapsed='true'] {
+		width: var(--app-sidebar-collapsed-width);
+		min-width: var(--app-sidebar-collapsed-width);
+	}
+
+	.sidebar-header,
+	.sidebar-footer {
+		display: flex;
+		flex-direction: column;
+		gap: var(--gap-sm);
+		padding: var(--pad-sm);
+	}
+
+	.sidebar-footer {
+		border-top: var(--border-width) solid var(--color-border);
+	}
+
+	.sidebar-nav {
+		min-height: 0;
+		flex: 1;
+		padding: var(--pad-sm);
+		overflow-y: auto;
+	}
+
+	.sidebar-action,
+	.sidebar-chat-link {
+		display: flex;
+		width: 100%;
+		min-width: 0;
+		align-items: center;
+		gap: var(--gap-sm);
+		padding: var(--pad-sm);
+		border: 0;
+		border-radius: var(--radius-sm);
+		background: transparent;
+		color: var(--color-text);
+		text-align: left;
+		text-decoration: none;
+		cursor: pointer;
+	}
+
+	.sidebar-action:hover,
+	.sidebar-chat-link:hover,
+	.sidebar-chat-link[aria-current='page'] {
+		background: var(--color-surface-hover);
+	}
+
+	@media (width < 48rem) {
+		.app-sidebar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			height: calc(100dvh - (2 * var(--pad-sm)));
+			transform: translateX(calc(-100% - var(--marg-sm)));
+		}
+
+		.app-sidebar[data-open='true'] {
+			transform: translateX(0);
+		}
+	}
+</style>

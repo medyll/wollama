@@ -31,9 +31,10 @@
 
 <div class="mt-2 flex items-center gap-2">
 	<!-- Section: Rating -->
-	<div class="join gap-2">
+	<div class="rating-actions">
 		<button
-			class="btn btn-ghost btn-xs btn-square join-item {rating === 'good' ? 'text-success' : ''}"
+			class="btn-icon btn-xs"
+			data-rating={rating === 'good' ? 'good' : undefined}
 			onclick={() => handleRate('good')}
 			title="Good response"
 			aria-label="Rate good"
@@ -41,8 +42,8 @@
 			<Icon icon={rating === 'good' ? 'lucide:thumbs-up' : 'lucide:thumbs-up'} class="h-4 w-4" />
 		</button>
 		<button
-			class="btn btn-ghost btn-xs btn-square join-item"
-			style="color: {rating === 'bad' ? 'var(--color-critical)' : 'inherit'}"
+			class="btn-icon btn-xs"
+			data-rating={rating === 'bad' ? 'bad' : undefined}
 			onclick={() => handleRate('bad')}
 			title="Bad response"
 			aria-label="Rate bad"
@@ -54,9 +55,9 @@
 	<div class="divider divider-horizontal mx-0"></div>
 
 	<!-- Section: Copy -->
-	<button class="btn btn-ghost btn-xs btn-square" onclick={copyToClipboard} title="Copy" aria-label="Copy to clipboard">
+	<button class="btn-icon btn-xs" onclick={copyToClipboard} title="Copy" aria-label="Copy to clipboard">
 		{#if isCopied}
-			<Icon icon="fluent:checkmark-24-regular" class="text-success h-4 w-4" />
+			<Icon icon="fluent:checkmark-24-regular" class="action-success h-4 w-4" />
 		{:else}
 			<Icon icon="fluent:copy-24-regular" class="h-4 w-4" />
 		{/if}
@@ -65,7 +66,7 @@
 	<!-- Section: Reload (only if onRegenerate is provided) -->
 	{#if onRegenerate}
 		<button
-			class="btn btn-ghost btn-xs btn-square"
+			class="btn-icon btn-xs"
 			onclick={onRegenerate}
 			title="Regenerate"
 			aria-label="Regenerate response"
@@ -75,7 +76,25 @@
 	{/if}
 
 	<!-- Section: Share -->
-	<button class="btn btn-ghost btn-xs btn-square" title="Share" aria-label="Share">
+	<button class="btn-icon btn-xs" title="Share" aria-label="Share">
 		<Icon icon="fluent:share-24-regular" class="h-4 w-4" />
 	</button>
 </div>
+
+<style>
+	@layer components {
+		.rating-actions {
+			display: flex;
+			gap: var(--gap-sm);
+		}
+
+		button[data-rating='good'],
+		:global(.action-success) {
+			color: var(--color-success);
+		}
+
+		button[data-rating='bad'] {
+			color: var(--color-critical);
+		}
+	}
+</style>

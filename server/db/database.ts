@@ -109,6 +109,30 @@ class DatabaseManager {
 		}
 		logger.success('DB', 'Companions seeding completed');
 	}
+
+	public async seedHooks() {
+		const db = this.getDb('hooks');
+		const id = 'builtin:rag-retrieve';
+		try {
+			await db.get(id);
+		} catch (err: any) {
+			if (err.status !== 404) throw err;
+			await db.put({
+				_id: id,
+				hook_id: id,
+				name: 'RAG Retrieve',
+				event: 'pre-send',
+				handler_type: 'builtin',
+				handler_ref: 'rag-retrieve',
+				priority: 50,
+				scope: 'global',
+				is_enabled: true,
+				config: {},
+				created_at: Date.now()
+			});
+			logger.info('DB', 'Seeded builtin hook: rag-retrieve');
+		}
+	}
 }
 
 export const dbManager = new DatabaseManager(appSchema);

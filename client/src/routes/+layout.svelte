@@ -19,6 +19,7 @@
 	import { DataInitializer } from '$lib/services/data-initializer';
 	import { page } from '$app/stores';
 	import { enableReplication, disableReplication } from '$lib/db';
+	import { t } from '$lib/state/i18n.svelte';
 	let { children } = $props();
 
 	$effect(() => {
@@ -85,27 +86,31 @@
 <OfflineIndicator />
 
 {#if userState.preferences.onboarding_completed}
-	<div class="drawer md:drawer-open app-shell h-screen overflow-hidden">
-		<!-- Section: Drawer Toggle -->
-		<input id="main-drawer" type="checkbox" class="drawer-toggle" bind:checked={uiState.sidebarOpen} />
+	<app-shell-component>
+		<Sidebar />
+		<button
+			type="button"
+			class="mobile-sidebar-backdrop"
+			data-open={uiState.sidebarOpen}
+			onclick={() => (uiState.sidebarOpen = false)}
+			aria-label={t('ui.close')}
+		></button>
 
-		<div class="drawer-content relative flex h-full flex-col">
-			<!-- Section: Navbar -->
-			<header class="navbar app-navbar min-h-16">
+		<app-content>
+			<app-header>
 				<div class="flex-none md:hidden">
 					<SidebarTrigger />
 				</div>
 				<div class="mr-2 hidden flex-none md:block">
 					<SidebarTrigger visible={!uiState.sidebarOpen} />
 				</div>
-				<div class="flex flex-1 items-center gap-2">
-					<a href="/chat" class="btn btn-ghost text-xl">Wollama</a>
+				<a href="/chat" class="app-brand">Wollama</a>
 					{#if uiState.pageTitle}
 						<span class="hidden max-w-[200px] truncate text-lg font-normal opacity-70 sm:inline-block md:max-w-md">
 							{uiState.pageTitle}
 						</span>
 					{/if}
-				</div>
+				<span class="app-header-spacer"></span>
 				<div class="flex flex-none items-center gap-2">
 					{#if downloadState.isPulling}
 						<div class="mr-2 hidden w-40 flex-col text-xs md:flex">
@@ -114,7 +119,7 @@
 								<span>{downloadState.progress}%</span>
 							</div>
 							<progress
-								class="progress progress-primary h-1.5 w-full"
+								class="app-progress w-full"
 								value={downloadState.progress}
 								max="100"
 								aria-label="Download progress"
@@ -123,22 +128,14 @@
 					{/if}
 					<UserMenu />
 				</div>
-			</header>
+			</app-header>
 
-			<!-- Section: Main Content -->
-			<main class="app-main relative flex-1 overflow-hidden">
+			<app-main>
 				{@render children()}
-			</main>
-		</div>
-
-		<!-- Section: Sidebar -->
-		<div class="drawer-side app-sidebar-layer">
-			<label for="main-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-			<Sidebar />
-		</div>
-	</div>
+			</app-main>
+		</app-content>
+	</app-shell-component>
 {:else}
-	<!-- Onboarding mode: no sidebar/navbar -->
 	<main class="h-screen w-screen overflow-hidden">
 		{@render children()}
 	</main>

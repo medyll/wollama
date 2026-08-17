@@ -17,7 +17,8 @@ test.setTimeout(60 * 1000);
 // Use baseURL from playwright.config.ts
 const BASE_URL = 'http://localhost:5176';
 
-test.describe('S7-07: Companion Management', () => {
+test.describe.skip('S7-07: Companion Management', () => {
+	// Legacy specification: companion CRUD is not exposed by the current chat selector.
 	test.beforeEach(async ({ page }) => {
 		// Set up clean state for each test
 		await setupTestState(page);
