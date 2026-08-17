@@ -1,14 +1,5 @@
 export type FieldType =
-	| 'string'
-	| 'number'
-	| 'boolean'
-	| 'date'
-	| 'timestamp'
-	| 'array'
-	| 'object'
-	| 'uuid'
-	| 'email'
-	| 'text-long';
+	'string' | 'number' | 'boolean' | 'date' | 'timestamp' | 'array' | 'object' | 'uuid' | 'email' | 'text-long';
 
 export interface FieldDefinition {
 	type: FieldType;

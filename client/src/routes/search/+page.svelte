@@ -97,11 +97,7 @@
 			</search-empty>
 		{:else if results.length > 0}
 			{#each results as result}
-				<button
-					class="search-result"
-					onclick={() => navigateToResult(result)}
-					transition:fade
-				>
+				<button class="search-result" onclick={() => navigateToResult(result)} transition:fade>
 					<div class="mb-1 flex items-start justify-between">
 						<div class="flex items-center gap-2">
 							{#if result.type === 'chat'}
@@ -215,7 +211,9 @@
 			border-radius: var(--radius-md);
 			box-shadow: var(--shadow-sm);
 			text-align: start;
-			transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+			transition:
+				box-shadow var(--transition-fast),
+				transform var(--transition-fast);
 		}
 
 		.search-result:hover {

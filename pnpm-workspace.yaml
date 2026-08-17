@@ -1,19 +1,19 @@
 packages:
-  - client
-  - server
-  - shared
-  - packages/*
+    - client
+    - server
+    - shared
+    - packages/*
 
 overrides:
-  rxdb>ajv: ^8.18.0
-  rxdb>ws: ^8.21.0
+    rxdb>ajv: ^8.18.0
+    rxdb>ws: ^8.21.0
 
 allowBuilds:
-  '@firebase/util': true
-  '@parcel/watcher': true
-  electron: true
-  esbuild: true
-  ffmpeg-static: true
-  leveldown: true
-  protobufjs: true
-  rxdb: true
+    '@firebase/util': true
+    '@parcel/watcher': true
+    electron: true
+    esbuild: true
+    ffmpeg-static: true
+    leveldown: true
+    protobufjs: true
+    rxdb: true

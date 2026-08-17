@@ -84,11 +84,7 @@
 	/>
 
 	{#if showAutocomplete && suggestions.length > 0}
-		<ul
-			id="skill-autocomplete-list"
-			class="skill-suggestions"
-			role="listbox"
-		>
+		<ul id="skill-autocomplete-list" class="skill-suggestions" role="listbox">
 			{#each suggestions as item, index}
 				<li role="option" aria-selected={index === selectedIndex} onmouseenter={() => (selectedIndex = index)}>
 					<button

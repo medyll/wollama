@@ -71,10 +71,7 @@
 						<h2>{companion.name}</h2>
 
 						<!-- Badge: System or Personal -->
-						<div
-							class="companion-kind"
-							data-kind={isSystemCompanion(companion) ? 'default' : 'personal'}
-						>
+						<div class="companion-kind" data-kind={isSystemCompanion(companion) ? 'default' : 'personal'}>
 							{isSystemCompanion(companion) ? 'Default' : 'Personal'}
 						</div>
 
@@ -165,7 +162,9 @@
 			border: var(--border-width) solid var(--color-border);
 			border-radius: var(--radius-lg);
 			box-shadow: var(--shadow-sm);
-			transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+			transition:
+				box-shadow var(--transition-fast),
+				transform var(--transition-fast);
 		}
 
 		companion-card:hover {

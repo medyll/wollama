@@ -65,12 +65,7 @@
 
 	<!-- Section: Reload (only if onRegenerate is provided) -->
 	{#if onRegenerate}
-		<button
-			class="btn-icon btn-xs"
-			onclick={onRegenerate}
-			title="Regenerate"
-			aria-label="Regenerate response"
-		>
+		<button class="btn-icon btn-xs" onclick={onRegenerate} title="Regenerate" aria-label="Regenerate response">
 			<Icon icon="fluent:arrow-clockwise-24-regular" class="h-4 w-4" />
 		</button>
 	{/if}

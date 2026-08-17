@@ -44,7 +44,9 @@ export const config = {
 		topK: Number(process.env.RAG_TOP_K) || 5,
 		minScore: Number(process.env.RAG_MIN_SCORE) || 0.5,
 		// Directory where per-user flat vector index files are persisted
-		vectorDir: process.env.RAG_VECTOR_DIR ? path.resolve(process.env.RAG_VECTOR_DIR) : path.resolve(__dirname, 'db_data', 'vectors')
+		vectorDir: process.env.RAG_VECTOR_DIR
+			? path.resolve(process.env.RAG_VECTOR_DIR)
+			: path.resolve(__dirname, 'db_data', 'vectors')
 	},
 	tts: {
 		url: process.env.TTS_URL || 'http://127.0.0.1:9000/v1/audio/speech',

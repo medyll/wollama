@@ -193,8 +193,7 @@
 
 		<!-- Description -->
 		<div class="field-stack">
-			<label for="description"><span class="field-label">Description</span>
-			</label>
+			<label for="description"><span class="field-label">Description</span> </label>
 			<textarea
 				id="description"
 				placeholder="Brief description of this companion"
@@ -207,8 +206,7 @@
 
 		<!-- System Prompt -->
 		<div class="field-stack">
-			<label for="system-prompt"><span class="field-label">System Prompt *</span>
-			</label>
+			<label for="system-prompt"><span class="field-label">System Prompt *</span> </label>
 			<textarea
 				id="system-prompt"
 				placeholder="Base instructions for the AI..."
@@ -228,8 +226,7 @@
 
 		<!-- Model Selection -->
 		<div class="field-stack">
-			<label for="model"><span class="field-label">Model *</span>
-			</label>
+			<label for="model"><span class="field-label">Model *</span> </label>
 			<select
 				id="model"
 				aria-invalid={validationErrors.model ? 'true' : undefined}
@@ -253,8 +250,7 @@
 		<div class="form-grid">
 			<!-- Voice ID -->
 			<div class="field-stack">
-				<label for="voice-id"><span class="field-label">Voice ID</span>
-				</label>
+				<label for="voice-id"><span class="field-label">Voice ID</span> </label>
 				<input
 					id="voice-id"
 					type="text"
@@ -267,8 +263,7 @@
 
 			<!-- Voice Tone -->
 			<div class="field-stack">
-				<label for="voice-tone"><span class="field-label">Voice Tone</span>
-				</label>
+				<label for="voice-tone"><span class="field-label">Voice Tone</span> </label>
 				<select id="voice-tone" bind:value={voiceTone} disabled={isSaving}>
 					<option value="neutral">Neutral</option>
 					<option value="fast">Fast</option>
@@ -282,8 +277,7 @@
 		<div class="form-grid">
 			<!-- Mood -->
 			<div class="field-stack">
-				<label for="mood"><span class="field-label">Mood</span>
-				</label>
+				<label for="mood"><span class="field-label">Mood</span> </label>
 				<select id="mood" bind:value={mood} disabled={isSaving}>
 					<option value="neutral">Neutral</option>
 					<option value="happy">Happy</option>
@@ -298,8 +292,7 @@
 
 			<!-- Specialization -->
 			<div class="field-stack">
-				<label for="specialization"><span class="field-label">Specialization</span>
-				</label>
+				<label for="specialization"><span class="field-label">Specialization</span> </label>
 				<input
 					id="specialization"
 					type="text"
@@ -313,8 +306,7 @@
 
 		<!-- Avatar (optional) -->
 		<div class="field-stack">
-			<label for="avatar"><span class="field-label">Avatar URL</span>
-			</label>
+			<label for="avatar"><span class="field-label">Avatar URL</span> </label>
 			<input
 				id="avatar"
 				type="text"

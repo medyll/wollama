@@ -1,35 +1,35 @@
 <script lang="ts">
-  interface ToolCallMessage {
-    toolName: string;
-    toolId: string;
-    timestamp: number;
-    inputs: Record<string, unknown>;
-    outputs?: Record<string, unknown>;
-  }
+	interface ToolCallMessage {
+		toolName: string;
+		toolId: string;
+		timestamp: number;
+		inputs: Record<string, unknown>;
+		outputs?: Record<string, unknown>;
+	}
 
-  const { message } = $props();
+	const { message } = $props();
 </script>
 
 <tool-call-message>
-  <div class="flex justify-between items-start">
-    <div>
-      <div class="font-semibold">Tool: {message.toolName}</div>
-      <div class="text-sm text-muted">{message.toolId}</div>
-    </div>
-    <div class="text-sm text-muted">{new Date(message.timestamp).toLocaleString()}</div>
-  </div>
-  <div class="mt-2 text-sm">
-    <details>
-      <summary class="cursor-pointer">Inputs</summary>
-      <pre class="text-xs mt-2">{JSON.stringify(message.inputs, null, 2)}</pre>
-    </details>
-    {#if message.outputs}
-    <details class="mt-2">
-      <summary class="cursor-pointer">Outputs</summary>
-      <pre class="text-xs mt-2">{JSON.stringify(message.outputs, null, 2)}</pre>
-    </details>
-    {/if}
-  </div>
+	<div class="flex items-start justify-between">
+		<div>
+			<div class="font-semibold">Tool: {message.toolName}</div>
+			<div class="text-muted text-sm">{message.toolId}</div>
+		</div>
+		<div class="text-muted text-sm">{new Date(message.timestamp).toLocaleString()}</div>
+	</div>
+	<div class="mt-2 text-sm">
+		<details>
+			<summary class="cursor-pointer">Inputs</summary>
+			<pre class="mt-2 text-xs">{JSON.stringify(message.inputs, null, 2)}</pre>
+		</details>
+		{#if message.outputs}
+			<details class="mt-2">
+				<summary class="cursor-pointer">Outputs</summary>
+				<pre class="mt-2 text-xs">{JSON.stringify(message.outputs, null, 2)}</pre>
+			</details>
+		{/if}
+	</div>
 </tool-call-message>
 
 <style>

@@ -173,7 +173,7 @@
 					{/each}
 				</tbody>
 			</table>
-	</div>
+		</div>
 	{/if}
 </data-list>
 

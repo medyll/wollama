@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
  * S6-05: Cross-Platform Build Verification Script
- * 
+ *
  * Usage: node verify-builds.js
- * 
+ *
  * This script:
  * 1. Checks Electron build configuration
  * 2. Validates Android/Capacitor configuration
@@ -70,7 +70,7 @@ const clientPkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'client/package.jso
 if (clientPkg.build) {
 	console.log('✅ Electron build config found');
 	results.passed.push('Electron build config');
-	
+
 	if (clientPkg.build.appId) {
 		console.log(`   App ID: ${clientPkg.build.appId}`);
 	}
@@ -94,7 +94,7 @@ try {
 	const capacitorConfig = JSON.parse(fs.readFileSync(path.join(ROOT, 'client/capacitor.config.json'), 'utf-8'));
 	console.log('✅ Capacitor config found');
 	results.passed.push('Capacitor config');
-	
+
 	if (capacitorConfig.appId) {
 		console.log(`   App ID: ${capacitorConfig.appId}`);
 	}
@@ -118,13 +118,9 @@ run('npm run check', 'Type check all projects');
 
 // 5. Check build artifacts directories
 console.log('\n📦 Checking build directories...');
-const buildDirs = [
-	'client/build',
-	'client/android',
-	'client/electron'
-];
+const buildDirs = ['client/build', 'client/android', 'client/electron'];
 
-buildDirs.forEach(dir => {
+buildDirs.forEach((dir) => {
 	const fullPath = path.join(ROOT, dir);
 	if (fs.existsSync(fullPath)) {
 		console.log(`✅ ${dir} exists`);
@@ -155,6 +151,6 @@ if (results.errors.length > 0) {
 } else {
 	console.log('\n✅ Build verification PASSED');
 	console.log('\nNext steps:');
-console.log('  1. Electron: npm run dev:electron');
-console.log('  2. Android: npm run build && npx cap sync && npx cap run android');
+	console.log('  1. Electron: npm run dev:electron');
+	console.log('  2. Android: npm run build && npx cap sync && npx cap run android');
 }

@@ -245,108 +245,97 @@
 		</onboarding-header>
 
 		<onboarding-body>
-				{#if currentStep === 0}
-					<form class="form-stack" onsubmit={(event) => { event.preventDefault(); handleNext(); }}>
-						<div class="field-stack">
-							<label for="nickname">Nickname</label>
-							<input
-								type="text"
-								id="nickname"
-								placeholder="How should we call you?"
-								bind:value={nickname}
-							/>
-						</div>
-
-						<div>
-							<label class="checkbox-row">
-								<input type="checkbox" bind:checked={isSharedMachine} />
-								<span>This is a shared machine (Secure my profile)</span>
-							</label>
-						</div>
-
-						{#if isSharedMachine}
-							<div class="field-stack">
-								<label for="password">Password / PIN</label>
-								<input
-									type="password"
-									id="password"
-									placeholder="Enter a secure password"
-									bind:value={password}
-								/>
-							</div>
-							<div class="field-stack">
-								<label for="email">Email (Optional)</label>
-								<input
-									type="email"
-									id="email"
-									placeholder="For recovery"
-									bind:value={email}
-								/>
-							</div>
-						{/if}
-
-						{#if profileError}
-							<div class="status-message" data-status="critical" role="alert">
-								<Icon icon="lucide:alert-circle" class="h-4 w-4" />
-								<span>{profileError}</span>
-							</div>
-						{/if}
-					</form>
-				{/if}
-
-				{#if currentStep === 1}
+			{#if currentStep === 0}
+				<form
+					class="form-stack"
+					onsubmit={(event) => {
+						event.preventDefault();
+						handleNext();
+					}}
+				>
 					<div class="field-stack">
-						<label for="server-url">Ollama Server URL</label>
-						<input
-							id="server-url"
-							type="text"
-							placeholder="http://localhost:11434"
-							bind:value={serverUrl}
-							disabled={isTestingConnection}
-							aria-label="Server URL input"
-							data-testid="server-url-input"
-						/>
-						<small>Example: http://localhost:11434</small>
-
-						{#if isTestingConnection}
-							<div class="status-message" role="status" aria-live="polite">
-								<p>
-									Testing connection...
-								</p>
-							</div>
-						{:else if connectionMessage}
-							<div
-								class="status-message"
-								data-status={connectionSuccess ? 'success' : 'critical'}
-								role="alert"
-								aria-live="polite"
-								data-testid={connectionSuccess ? 'connection-success' : 'connection-error'}
-							>
-								<p>
-									{connectionSuccess ? '✓ ' : '⚠ '}{connectionMessage}
-								</p>
-								{#if connectionSuggestion && !connectionSuccess}
-									<p class="mt-2 text-xs opacity-80">
-										{connectionSuggestion}
-									</p>
-								{/if}
-								{#if !connectionSuccess}
-									<p class="mt-2 text-xs opacity-70">
-										You can continue anyway, but you'll need to configure Ollama later.
-									</p>
-								{/if}
-							</div>
-						{/if}
+						<label for="nickname">Nickname</label>
+						<input type="text" id="nickname" placeholder="How should we call you?" bind:value={nickname} />
 					</div>
-				{/if}
 
-				{#if currentStep === 2}
-					<CompanionSelector
-						onSelect={(companion) => {
-							selectedCompanion = companion;
-						}}
+					<div>
+						<label class="checkbox-row">
+							<input type="checkbox" bind:checked={isSharedMachine} />
+							<span>This is a shared machine (Secure my profile)</span>
+						</label>
+					</div>
+
+					{#if isSharedMachine}
+						<div class="field-stack">
+							<label for="password">Password / PIN</label>
+							<input type="password" id="password" placeholder="Enter a secure password" bind:value={password} />
+						</div>
+						<div class="field-stack">
+							<label for="email">Email (Optional)</label>
+							<input type="email" id="email" placeholder="For recovery" bind:value={email} />
+						</div>
+					{/if}
+
+					{#if profileError}
+						<div class="status-message" data-status="critical" role="alert">
+							<Icon icon="lucide:alert-circle" class="h-4 w-4" />
+							<span>{profileError}</span>
+						</div>
+					{/if}
+				</form>
+			{/if}
+
+			{#if currentStep === 1}
+				<div class="field-stack">
+					<label for="server-url">Ollama Server URL</label>
+					<input
+						id="server-url"
+						type="text"
+						placeholder="http://localhost:11434"
+						bind:value={serverUrl}
+						disabled={isTestingConnection}
+						aria-label="Server URL input"
+						data-testid="server-url-input"
 					/>
-				{/if}
+					<small>Example: http://localhost:11434</small>
+
+					{#if isTestingConnection}
+						<div class="status-message" role="status" aria-live="polite">
+							<p>Testing connection...</p>
+						</div>
+					{:else if connectionMessage}
+						<div
+							class="status-message"
+							data-status={connectionSuccess ? 'success' : 'critical'}
+							role="alert"
+							aria-live="polite"
+							data-testid={connectionSuccess ? 'connection-success' : 'connection-error'}
+						>
+							<p>
+								{connectionSuccess ? '✓ ' : '⚠ '}{connectionMessage}
+							</p>
+							{#if connectionSuggestion && !connectionSuccess}
+								<p class="mt-2 text-xs opacity-80">
+									{connectionSuggestion}
+								</p>
+							{/if}
+							{#if !connectionSuccess}
+								<p class="mt-2 text-xs opacity-70">
+									You can continue anyway, but you'll need to configure Ollama later.
+								</p>
+							{/if}
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			{#if currentStep === 2}
+				<CompanionSelector
+					onSelect={(companion) => {
+						selectedCompanion = companion;
+					}}
+				/>
+			{/if}
 		</onboarding-body>
 
 		<onboarding-footer>
@@ -364,24 +353,29 @@
 				<small>Step {currentStep + 1} of {totalSteps}</small>
 			</div>
 			<div class="toolbar">
-					<button class="btn-ghost btn-sm" onclick={handleSkip} aria-label="Skip onboarding" data-testid="wizard-skip-button">Skip</button>
-					<button
-						class="btn-primary btn-sm"
-						onclick={handleNext}
-						disabled={isTestingConnection ||
-							(currentStep === 0 && (!nickname.trim() || (isSharedMachine && !password.trim()))) ||
-							(currentStep === 2 && !selectedCompanion)}
-						aria-label={currentStep === totalSteps - 1 ? 'Complete onboarding' : 'Next step'}
-						data-testid="wizard-next-button"
-					>
-						{#if isTestingConnection}
-							Testing...
-						{:else if currentStep === totalSteps - 1}
-							Complete Setup
-						{:else}
-							Next
-						{/if}
-					</button>
+				<button
+					class="btn-ghost btn-sm"
+					onclick={handleSkip}
+					aria-label="Skip onboarding"
+					data-testid="wizard-skip-button">Skip</button
+				>
+				<button
+					class="btn-primary btn-sm"
+					onclick={handleNext}
+					disabled={isTestingConnection ||
+						(currentStep === 0 && (!nickname.trim() || (isSharedMachine && !password.trim()))) ||
+						(currentStep === 2 && !selectedCompanion)}
+					aria-label={currentStep === totalSteps - 1 ? 'Complete onboarding' : 'Next step'}
+					data-testid="wizard-next-button"
+				>
+					{#if isTestingConnection}
+						Testing...
+					{:else if currentStep === totalSteps - 1}
+						Complete Setup
+					{:else}
+						Next
+					{/if}
+				</button>
 			</div>
 		</onboarding-footer>
 	</onboarding-panel>

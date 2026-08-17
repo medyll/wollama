@@ -63,9 +63,7 @@
 	<companion-customize-content>
 		<!-- Header -->
 		<div class="mb-8">
-			<button class="btn-ghost btn-sm" onclick={() => goto('/compagnons')} aria-label="Back to companions">
-				← Back
-			</button>
+			<button class="btn-ghost btn-sm" onclick={() => goto('/compagnons')} aria-label="Back to companions"> ← Back </button>
 			<h1 class="text-3xl font-bold">
 				{isNew ? 'Customize Companion' : 'Edit Companion'}
 			</h1>

@@ -3,10 +3,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-	plugins: [
-		tailwindcss(),
-		sveltekit()
-	],
+	plugins: [tailwindcss(), sveltekit()],
 	resolve: {
 		conditions: ['browser']
 	},
@@ -23,14 +20,8 @@ export default defineConfig({
 		},
 		coverage: {
 			provider: 'v8',
-			include: [
-				'src/lib/**/*.{ts,svelte}',
-				'src/components/**/*.{ts,svelte}'
-			],
-			exclude: [
-				'src/lib/**/*.test.ts',
-				'src/lib/index.ts'
-			],
+			include: ['src/lib/**/*.{ts,svelte}', 'src/components/**/*.{ts,svelte}'],
+			exclude: ['src/lib/**/*.test.ts', 'src/lib/index.ts'],
 			thresholds: {
 				lines: 60,
 				functions: 60,

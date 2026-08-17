@@ -1,6 +1,6 @@
 /**
  * Page Objects for Wollama E2E Tests
- * 
+ *
  * Encapsulates locators and interactions for different pages
  * Makes tests more maintainable and readable
  */
@@ -179,10 +179,7 @@ export class ChatPage {
 	}
 
 	async waitForAssistantMessage() {
-		await this.page
-			.locator('[data-testid="chat-message"][data-role="assistant"]')
-			.first()
-			.waitFor({ state: 'visible' });
+		await this.page.locator('[data-testid="chat-message"][data-role="assistant"]').first().waitFor({ state: 'visible' });
 	}
 
 	async waitForLoadingComplete() {
@@ -243,15 +240,22 @@ export class AppPage {
 			await this.page.evaluate(() => {
 				// Manually delete known databases
 				if (indexedDB.databases) {
-					indexedDB.databases().then((databases: any[]) => {
-						databases.forEach((db: any) => {
-							indexedDB.deleteDatabase(db.name);
-						});
-					}).catch(() => {});
+					indexedDB
+						.databases()
+						.then((databases: any[]) => {
+							databases.forEach((db: any) => {
+								indexedDB.deleteDatabase(db.name);
+							});
+						})
+						.catch(() => {});
 				} else {
 					// Fallback: delete known databases
-					try { indexedDB.deleteDatabase('wollama_db'); } catch {}
-					try { indexedDB.deleteDatabase('rxdb_wollama'); } catch {}
+					try {
+						indexedDB.deleteDatabase('wollama_db');
+					} catch {}
+					try {
+						indexedDB.deleteDatabase('rxdb_wollama');
+					} catch {}
 				}
 			});
 		} catch (e) {

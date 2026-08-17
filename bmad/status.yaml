@@ -2,12 +2,12 @@
 project: wollama
 phase: testing
 progress: 93
-next_action: "Rewrite the chat and companion Playwright contracts"
-next_command: "bmad test e2e-chat-companions"
+next_action: 'Rewrite the chat and companion Playwright contracts'
+next_command: 'bmad test e2e-chat-companions'
 next_role: tester
 active_role: tester
-last_updated: "2026-07-17"
-notes: "Chromium E2E baseline is reliable: 6 active checks pass and 22 incompatible legacy checks are explicitly skipped. TypeScript checks, 216 client tests, and 74 server tests pass; 55 legacy client unit assertions remain skipped."
+last_updated: '2026-07-17'
+notes: 'Chromium E2E baseline is reliable: 6 active checks pass and 22 incompatible legacy checks are explicitly skipped. TypeScript checks, 216 client tests, and 74 server tests pass; 55 legacy client unit assertions remain skipped.'
 
 phases:
     - init
@@ -15,17 +15,17 @@ phases:
     - planning
     - execution
 audit:
-  last_run: "2026-03-11"
-  type: "full"
-  baseline: false
-  score: null
-  project_type: "single-package"
-  packages_scanned: []
-  critical: 2
-  major: 3
-  minor: 1
-  info: 0
-  artifact: "bmad/artifacts/audit-report.md"
-  auto_stories_created:
-    - CODE-QL-001
-    - SEC-001
+    last_run: '2026-03-11'
+    type: 'full'
+    baseline: false
+    score: null
+    project_type: 'single-package'
+    packages_scanned: []
+    critical: 2
+    major: 3
+    minor: 1
+    info: 0
+    artifact: 'bmad/artifacts/audit-report.md'
+    auto_stories_created:
+        - CODE-QL-001
+        - SEC-001

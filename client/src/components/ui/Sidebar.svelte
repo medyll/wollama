@@ -36,12 +36,7 @@
 	}
 </script>
 
-<aside
-	class="app-sidebar"
-	data-open={uiState.sidebarOpen}
-	data-collapsed={uiState.sidebarCollapsed}
-	aria-label="Sidebar"
->
+<aside class="app-sidebar" data-open={uiState.sidebarOpen} data-collapsed={uiState.sidebarCollapsed} aria-label="Sidebar">
 	<div class="sidebar-header">
 		<!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
 		<div
@@ -65,11 +60,7 @@
 			</button>
 		{/if}
 
-		<button
-			class="sidebar-action"
-			onclick={createNewChat}
-			title={t('ui.newChat')}
-		>
+		<button class="sidebar-action" onclick={createNewChat} title={t('ui.newChat')}>
 			<Icon icon="fluent:compose-24-regular" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.newChat')}
@@ -98,11 +89,7 @@
 		<div class="flex justify-end px-2">
 			<SidebarCollapse />
 		</div>
-		<button
-			class="sidebar-action"
-			onclick={() => goto('/settings')}
-			title={t('ui.settings')}
-		>
+		<button class="sidebar-action" onclick={() => goto('/settings')} title={t('ui.settings')}>
 			<Icon icon="fluent:settings-24-regular" class="h-5 w-5 {uiState.sidebarCollapsed ? '' : 'mr-2'}" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.settings')}
@@ -124,7 +111,10 @@
 		background: var(--color-surface-alt);
 		box-shadow: var(--shadow-sm);
 		overflow: hidden;
-		transition: width var(--transition-normal), min-width var(--transition-normal), transform var(--transition-normal);
+		transition:
+			width var(--transition-normal),
+			min-width var(--transition-normal),
+			transform var(--transition-normal);
 		z-index: var(--z-modal);
 	}
 
