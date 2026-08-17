@@ -98,7 +98,7 @@ export const SttService = {
 			const wavStats = await fs.promises.stat(tempWavFile);
 			console.log(`[STT] WAV file ready. Size: ${wavStats.size} bytes`);
 
-			return new Promise((resolve, reject) => {
+			return new Promise((resolve) => {
 				// Clean language code (e.g. 'fr-FR' -> 'fr')
 				const langCode = language === 'auto' ? 'auto' : language.split(/[-_]/)[0].toLowerCase();
 

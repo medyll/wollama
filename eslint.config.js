@@ -11,7 +11,7 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 export default ts.config(
 	includeIgnoreFile(gitignorePath),
 	{
-		ignores: ['**/_old/**', '**/.venv/**', '**/*.test.*']
+		ignores: ['**/_old/**', '**/.venv/**', '**/.tmp/**', '**/dist/**', '**/resources/**', '**/*.test.*']
 	},
 	js.configs.recommended,
 	...ts.configs.recommended,
@@ -38,6 +38,7 @@ export default ts.config(
 			}
 		},
 		rules: {
+			'no-undef': 'off',
 			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/no-unused-vars': [
 				'warn',

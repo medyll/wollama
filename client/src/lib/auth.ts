@@ -44,7 +44,7 @@ export class AuthService {
 	async startSync() {
 		if (!userState.isAuthenticated || !userState.uid) return;
 
-		const db = await getDatabase();
+		await getDatabase();
 
 		// Enable replication to: http://server/_db/user_{uid}_{collection}
 		// We pass the user credentials to the replication manager

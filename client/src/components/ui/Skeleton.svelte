@@ -6,7 +6,7 @@
 		animated?: boolean;
 	}
 
-	const { width, height, borderRadius = 'rounded', animated = true } = $props();
+	const { width, height, borderRadius = 'rounded', animated = true }: Props = $props();
 
 	// Use $derived for reactive computation (Svelte 5)
 	const widthClass = $derived(width ? (width.includes('%') ? `w-[${width}]` : `w-full`) : 'w-full');

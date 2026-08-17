@@ -7,7 +7,7 @@
 		outputs?: Record<string, unknown>;
 	}
 
-	const { message } = $props();
+	const { message }: { message: ToolCallMessage } = $props();
 </script>
 
 <tool-call-message>

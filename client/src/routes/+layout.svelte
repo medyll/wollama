@@ -30,7 +30,7 @@
 
 	$effect(() => {
 		// Close sidebar on navigation (mobile)
-		const path = $page.url.pathname;
+		void $page.url.pathname;
 		// Only close on mobile if needed, but uiState.sidebarOpen is shared.
 		// Maybe we want to keep it open on desktop?
 		// For now, let's just close it if it's mobile (we can check window width or just rely on user intent)

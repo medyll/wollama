@@ -10,7 +10,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { setupTestState, waitForChatReady, selectCompanion, getCompanionList } from '../fixtures/test-setup';
+import { setupTestState, waitForChatReady } from '../fixtures/test-setup';
 
 test.setTimeout(60 * 1000);
 

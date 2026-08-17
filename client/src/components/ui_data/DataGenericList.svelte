@@ -22,7 +22,6 @@
 
 	// Get schema definition for the table
 	let tableDef = $derived(appSchema[tableName]);
-	let cardLines = $derived(tableDef?.template?.card_lines || []);
 	let presentationField = $derived(tableDef?.template?.presentation || 'id');
 
 	let tableColumns = $derived.by(() => {

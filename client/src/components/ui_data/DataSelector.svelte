@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { appSchema } from '../../../../shared/db/database-scheme';
 	import { DataGenericService } from '$lib/services/data-generic.service';
-	import Icon from '@iconify/svelte';
 
 	let {
 		tableName,

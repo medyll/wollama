@@ -33,7 +33,7 @@ function getWindowState() {
 	try {
 		const data = fs.readFileSync(stateFile, 'utf8');
 		return JSON.parse(data);
-	} catch (e) {
+	} catch {
 		return { width: 1200, height: 800 };
 	}
 }

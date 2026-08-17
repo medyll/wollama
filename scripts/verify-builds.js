@@ -101,7 +101,7 @@ try {
 	if (capacitorConfig.android) {
 		console.log('   Android platform configured');
 	}
-} catch (e) {
+} catch {
 	// Try .ts version
 	if (fs.existsSync(path.join(ROOT, 'client/capacitor.config.ts'))) {
 		console.log('✅ Capacitor config (TypeScript) found');

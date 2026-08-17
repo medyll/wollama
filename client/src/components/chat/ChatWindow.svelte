@@ -279,19 +279,6 @@
 			console.error('Error regenerating response:', e);
 		}
 	}
-
-	function handleMessageClick(event: MouseEvent) {
-		const target = event.target as HTMLElement;
-		const btn = target.closest('.copy-btn');
-		if (btn) {
-			const code = decodeURIComponent(btn.getAttribute('data-code') || '');
-			if (code) {
-				navigator.clipboard.writeText(code).then(() => {
-					toast.success(t('ui.copied_to_clipboard') || 'Copied to clipboard');
-				});
-			}
-		}
-	}
 </script>
 
 <CompanionSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
