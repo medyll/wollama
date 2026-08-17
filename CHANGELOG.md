@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. See [standa
 ## [0.0.9] - 2026-03-27
 
 ### Added
+
 - **Skills System**: Slash commands for quick actions (/translate, /summarize, etc.)
 - **Hooks System**: Pre/post message processing pipeline for custom logic
 - **Agents**: Built-in WebSearch and PageFetch agents for external data retrieval
@@ -17,6 +18,7 @@ All notable changes to this project will be documented in this file. See [standa
 - **ErrorBoundary Component**: Graceful error handling with retry
 
 ### Changed
+
 - **Chat Input**: Auto-resizing textarea (max 50vh) with transparent background
 - **Message Bubbles**: Rounded corners (2xl), cleaner design without tails
 - **Message Actions**: Always visible below assistant messages
@@ -24,12 +26,14 @@ All notable changes to this project will be documented in this file. See [standa
 - **Test Coverage**: 237+ tests across backend and frontend
 
 ### Fixed
+
 - Loading states for chat list, messages, and settings
 - Error handling with user-friendly messages and retry options
 - Toast notifications for copy, toggle, and error states
 - Various UI polish improvements
 
 ### Technical
+
 - Svelte 5 Runes syntax throughout
 - Vitest for unit testing (client + server)
 - Playwright for E2E testing
@@ -40,11 +44,13 @@ All notable changes to this project will be documented in this file. See [standa
 ## [0.0.8] - 2026-03-20
 
 ### Added
+
 - User preferences management
 - Companion customization
 - Multi-language support (i18n)
 
 ### Changed
+
 - Improved offline-first sync with RxDB/PouchDB
 
 ---
@@ -52,6 +58,7 @@ All notable changes to this project will be documented in this file. See [standa
 ## [0.0.7] - 2026-03-10
 
 ### Added
+
 - Voice input (STT) with Whisper
 - Voice output (TTS) with Piper
 - Dark/Light theme support

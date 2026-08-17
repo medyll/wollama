@@ -13,8 +13,6 @@ const isWindows = process.platform === 'win32';
 const pythonCmd = isWindows ? 'python' : 'python3';
 const venvPython = isWindows ? path.join(venvPath, 'Scripts', 'python.exe') : path.join(venvPath, 'bin', 'python');
 
-const pipCmd = isWindows ? path.join(venvPath, 'Scripts', 'pip.exe') : path.join(venvPath, 'bin', 'pip');
-
 async function runCommand(command, args, cwd = __dirname) {
 	return new Promise((resolve, reject) => {
 		console.log(`> ${command} ${args.join(' ')}`);

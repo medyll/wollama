@@ -24,16 +24,3 @@ export interface ToolCall {
 	started_at: string;
 	finished_at?: string;
 }
-
-export interface AgentRunRequest {
-	agent_id: string;
-	skill_id?: string;
-	message_id: string;
-	input: Record<string, unknown>;
-}
-
-export interface AgentRunResult {
-	tool_call_id: string;
-	output: Record<string, unknown>;
-	error?: string;
-}

@@ -38,9 +38,7 @@ describe('SttService', () => {
 		});
 
 		it('should call transcribeLocal when provider is local', async () => {
-			const transcribeLocalSpy = vi
-				.spyOn(SttService as any, 'transcribeLocal')
-				.mockResolvedValue('mocked text');
+			const transcribeLocalSpy = vi.spyOn(SttService as any, 'transcribeLocal').mockResolvedValue('mocked text');
 
 			await SttService.transcribe(mockAudioBuffer, 'test.wav', 'fr');
 

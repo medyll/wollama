@@ -6,6 +6,7 @@
 4. Settings Loading States - Added to Settings page
 
 Implementation Summary:
+
 - Skeleton component for loading placeholders (chat list, messages, settings)
 - ErrorBoundary component for graceful error handling with retry
 - Toast notifications already exist in ToastContainer.svelte
@@ -13,6 +14,7 @@ Implementation Summary:
 - Skill/hook toggle toasts added in Settings page
 
 Files Modified:
+
 - client/src/components/ui/Skeleton.svelte (NEW)
 - client/src/components/ui/ErrorBoundary.svelte (NEW)
 - client/src/components/chat/ChatWindow.svelte (loading states added)

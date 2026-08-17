@@ -1,0 +1,45 @@
+{
+	"schemaVersion": 2,
+	"controller": {
+		"default": "claude",
+		"model": null
+	},
+	"interaction": {
+		"language": "fr",
+		"confirmWrites": true
+	},
+	"discovery": {
+		"requireOfficialSources": true,
+		"maxAgeDays": 30
+	},
+	"runtime": {
+		"enabledAgents": null,
+		"maxConcurrentPerAgent": 2,
+		"resilience": {
+			"httpTimeoutMs": 15000,
+			"agentTimeoutMs": 600000,
+			"maxResponseBytes": 16777216,
+			"retryAttempts": 3
+		},
+		"agents": {
+			"kimi": {
+				"model": null,
+				"mode": "auto",
+				"permission": "allow"
+			},
+			"codex": {
+				"model": null,
+				"mode": "default"
+			},
+			"opencode": {
+				"model": null,
+				"mode": "default",
+				"permission": "allow"
+			},
+			"ollama": {
+				"model": null
+			}
+		},
+		"customAgents": []
+	}
+}

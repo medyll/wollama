@@ -10,7 +10,6 @@
 import { Page, expect } from '@playwright/test';
 
 const BASE_URL = process.env.APP_BASE_URL || 'http://localhost:5176';
-const API_URL = process.env.API_URL || 'http://localhost:3000';
 
 /**
  * Complete onboarding flow programmatically
@@ -23,7 +22,7 @@ export async function completeOnboarding(
 		skipOllamaTest?: boolean;
 	}
 ) {
-	const { nickname = 'Test User', model = 'mistral', skipOllamaTest = true } = options || {};
+	const { nickname = 'Test User', skipOllamaTest = true } = options || {};
 
 	await page.goto(`${BASE_URL}/onboarding`);
 	await page.waitForLoadState('networkidle');

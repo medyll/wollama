@@ -7,7 +7,6 @@
 
 	let pollingTimer: any;
 	let tempUrl = $state(userState.preferences.serverUrl);
-	let currentErrorToastId: string | null = null;
 	let dialog = $state<HTMLDialogElement>();
 
 	$effect(() => {

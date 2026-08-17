@@ -47,12 +47,7 @@
 </script>
 
 {#if isVisible}
-	<dialog
-		class="splash-dialog"
-		bind:this={dialog}
-		oncancel={(e) => e.preventDefault()}
-		aria-labelledby="splash-title"
-	>
+	<dialog class="splash-dialog" bind:this={dialog} oncancel={(e) => e.preventDefault()} aria-labelledby="splash-title">
 		<section>
 			<img src="/assets/lama.png" alt="" />
 			<h1 id="splash-title">Wollama</h1>

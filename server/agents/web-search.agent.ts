@@ -1,65 +1,82 @@
 export interface WebSearchResult {
-    title: string;
-    url: string;
-    snippet: string;
+	title: string;
+	url: string;
+	snippet: string;
 }
 
 export interface WebSearchOutput {
-    query: string;
-    results: WebSearchResult[];
-    error?: string;
+	query: string;
+	results: WebSearchResult[];
+	error?: string;
 }
 
 export class WebSearchAgent {
-    static readonly slug = 'web-search';
+	static readonly slug = 'web-search';
 
-    static async run(input: { query: string }): Promise<WebSearchOutput> {
-        const { query } = input;
+	static readonly descriptor = {
+		name: 'web-search',
+		description: 'Search the web via DuckDuckGo Instant Answer for a query and return up to 5 results.',
+		inputSchema: {
+			type: 'object',
+			properties: {
+				query: { type: 'string', description: 'The search query' }
+			},
+			required: ['query']
+		},
+		risk: 'external' as const
+	};
 
-        if (!query || typeof query !== 'string' || query.trim() === '') {
-            return { query: query ?? '', results: [], error: 'Query must be a non-empty string' };
-        }
+	static async run(input: { query: string }): Promise<WebSearchOutput> {
+		const { query } = input;
 
-        const q = query.trim();
+		if (!query || typeof query !== 'string' || query.trim() === '') {
+			return { query: query ?? '', results: [], error: 'Query must be a non-empty string' };
+		}
 
-        try {
-            const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`;
-            const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-            if (!res.ok) {
-                return { query: q, results: [], error: `Search API returned ${res.status}` };
-            }
+		const q = query.trim();
 
-            const data: any = await res.json();
-            const results: WebSearchResult[] = [];
+		try {
+			const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`;
+			const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+			if (!res.ok) {
+				return { query: q, results: [], error: `Search API returned ${res.status}` };
+			}
 
-            // Abstract (top result)
-            if (data.AbstractText && data.AbstractURL) {
-                results.push({
-                    title: data.Heading ?? q,
-                    url: data.AbstractURL,
-                    snippet: data.AbstractText
-                });
-            }
+			const data: any = await res.json();
+			const results: WebSearchResult[] = [];
 
-            // Related topics
-            if (Array.isArray(data.RelatedTopics)) {
-                for (const topic of data.RelatedTopics) {
-                    if (topic.FirstURL && topic.Text) {
-                        results.push({ title: topic.Text.split(' - ')[0] ?? topic.Text, url: topic.FirstURL, snippet: topic.Text });
-                        if (results.length >= 5) break;
-                    }
-                }
-            }
+			// Abstract (top result)
+			if (data.AbstractText && data.AbstractURL) {
+				results.push({
+					title: data.Heading ?? q,
+					url: data.AbstractURL,
+					snippet: data.AbstractText
+				});
+			}
 
-            if (results.length === 0) {
-                return { query: q, results: [], error: 'No results found' };
-            }
+			// Related topics
+			if (Array.isArray(data.RelatedTopics)) {
+				for (const topic of data.RelatedTopics) {
+					if (topic.FirstURL && topic.Text) {
+						results.push({
+							title: topic.Text.split(' - ')[0] ?? topic.Text,
+							url: topic.FirstURL,
+							snippet: topic.Text
+						});
+						if (results.length >= 5) break;
+					}
+				}
+			}
 
-            return { query: q, results };
-        } catch (err: any) {
-            return { query: q, results: [], error: err?.message ?? 'Network error' };
-        }
-    }
+			if (results.length === 0) {
+				return { query: q, results: [], error: 'No results found' };
+			}
+
+			return { query: q, results };
+		} catch (err: any) {
+			return { query: q, results: [], error: err?.message ?? 'Network error' };
+		}
+	}
 }
 
 export default WebSearchAgent;

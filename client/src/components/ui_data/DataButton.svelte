@@ -71,12 +71,7 @@
 	{/if}
 
 	<!-- Section: Main Button -->
-	<button
-		class="btn-icon btn-sm"
-		class:opacity-0={isConfirming}
-		onclick={handleClick}
-		aria-label={mode}
-	>
+	<button class="btn-icon btn-sm" class:opacity-0={isConfirming} onclick={handleClick} aria-label={mode}>
 		<Icon icon={displayIcon} class="h-5 w-5" />
 	</button>
 </div>

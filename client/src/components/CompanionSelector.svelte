@@ -70,12 +70,10 @@
 
 <companion-component role="region" aria-label="Companion Selection">
 	{#if !onSelect}
-	<header>
-		<h2 class="text-2xl font-bold">Choose Your Companion</h2>
-		<p>
-			Select a pre-configured companion to start chatting. You can customize or create new ones later.
-		</p>
-	</header>
+		<header>
+			<h2 class="text-2xl font-bold">Choose Your Companion</h2>
+			<p>Select a pre-configured companion to start chatting. You can customize or create new ones later.</p>
+		</header>
 	{/if}
 
 	{#if isLoading}
@@ -103,51 +101,47 @@
 						onkeydown={(e: KeyboardEvent) => handleKeyDown(e, index)}
 						onfocus={() => handleCardFocus(index)}
 					>
-							{#if companion.avatar}
-									<img
-										src={companion.avatar}
-										alt={`${companion.name} avatar`}
-										class="companion-avatar"
-									/>
-							{:else}
-								<span
-									class="companion-avatar flex items-center justify-center bg-primary text-on-primary font-bold"
-									aria-label={`${companion.name} placeholder`}
-								>
-									{companion.name.charAt(0).toUpperCase()}
-								</span>
-							{/if}
+						{#if companion.avatar}
+							<img src={companion.avatar} alt={`${companion.name} avatar`} class="companion-avatar" />
+						{:else}
+							<span
+								class="companion-avatar bg-primary text-on-primary flex items-center justify-center font-bold"
+								aria-label={`${companion.name} placeholder`}
+							>
+								{companion.name.charAt(0).toUpperCase()}
+							</span>
+						{/if}
 
-							<h3 class="companion-name">
-								{companion.name}
-							</h3>
+						<h3 class="companion-name">
+							{companion.name}
+						</h3>
 
-							{#if companion.companion_id}
-								<span class="badge">Default</span>
-							{:else}
-								<span class="badge">Personal</span>
-							{/if}
+						{#if companion.companion_id}
+							<span class="badge">Default</span>
+						{:else}
+							<span class="badge">Personal</span>
+						{/if}
 
-							{#if companion.description}
-								<p class="companion-description">
-									{companion.description}
-								</p>
-							{/if}
+						{#if companion.description}
+							<p class="companion-description">
+								{companion.description}
+							</p>
+						{/if}
 
-							{#if onCustomize}
-									<button
-										type="button"
-										class="btn-secondary btn-sm"
-										onclick={(e) => {
-											e.stopPropagation();
-											e.preventDefault();
-											onCustomize(companion);
-										}}
-										aria-label={`Customize ${companion.name}`}
-									>
-										Customize
-									</button>
-							{/if}
+						{#if onCustomize}
+							<button
+								type="button"
+								class="btn-secondary btn-sm"
+								onclick={(e) => {
+									e.stopPropagation();
+									e.preventDefault();
+									onCustomize(companion);
+								}}
+								aria-label={`Customize ${companion.name}`}
+							>
+								Customize
+							</button>
+						{/if}
 					</companion-card>
 				{/each}
 			</companion-grid>

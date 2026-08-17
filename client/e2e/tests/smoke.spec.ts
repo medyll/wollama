@@ -25,7 +25,7 @@ test.setTimeout(60 * 1000);
 // Helper to wait for server
 function waitForServer(request: any, serverProc: any, timeout = 60000) {
 	const start = Date.now();
-	return new Promise<void>(async (resolve, reject) => {
+	return new Promise<void>((resolve, reject) => {
 		let resolved = false;
 
 		const checkHealth = async () => {
@@ -50,13 +50,17 @@ function waitForServer(request: any, serverProc: any, timeout = 60000) {
 
 		serverProc.stdout?.on('data', onData);
 
-		while (!resolved && Date.now() - start < timeout) {
-			await checkHealth();
-			if (resolved) break;
-			await new Promise((r) => setTimeout(r, 500));
-		}
+		void (async () => {
+			while (!resolved && Date.now() - start < timeout) {
+				await checkHealth();
+				if (resolved) break;
+				await new Promise((r) => setTimeout(r, 500));
+			}
 
-		if (!resolved) reject(new Error('Server timeout'));
+			serverProc.stdout?.off('data', onData);
+
+			if (!resolved) reject(new Error('Server timeout'));
+		})().catch(reject);
 	});
 }
 

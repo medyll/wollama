@@ -13,6 +13,8 @@
 	import ThinkingMessage from '$components/chat/ThinkingMessage.svelte';
 	import ChatInput from '$components/chat/ChatInput.svelte';
 	import ToolCallMessage from '$components/chat/tool-call-message.svelte';
+	import RunTimeline from '$lib/components/tool/RunTimeline.svelte';
+	import { runStore } from '$lib/services/run.service.svelte.js';
 	import Icon from '@iconify/svelte';
 	import type { Companion, UserCompanion } from '$types/data';
 	import { goto } from '$app/navigation';
@@ -38,6 +40,9 @@
 
 	let messages = $state<any[]>([]);
 	let visibleMessages = $derived(messages.filter((message) => message.role !== 'system'));
+	// Runs (M4/M5): supervised agent_start calls for this chat, kept fresh by
+	// run.service.svelte.ts's REST polling — see that file for why RxDB isn't used here.
+	let activeRunsForChat = $derived(Object.values(runStore.runs).filter((run) => run.chat_id === chatId));
 	let chatContainer = $state<HTMLDivElement>();
 	let userHasScrolledUp = $state(false);
 	let availableModels = $state<string[]>([]);
@@ -112,6 +117,7 @@
 		}
 
 		let sub: any;
+		void runStore.loadForChat(chatId);
 
 		(async () => {
 			// Load chat details to get title
@@ -331,19 +337,6 @@
 			console.error('Error regenerating response:', e);
 		}
 	}
-
-	function handleMessageClick(event: MouseEvent) {
-		const target = event.target as HTMLElement;
-		const btn = target.closest('.copy-btn');
-		if (btn) {
-			const code = decodeURIComponent(btn.getAttribute('data-code') || '');
-			if (code) {
-				navigator.clipboard.writeText(code).then(() => {
-					toast.success(t('ui.copied_to_clipboard') || 'Copied to clipboard');
-				});
-			}
-		}
-	}
 </script>
 
 <CompanionSelector bind:isOpen={isCompagnonModalOpen} onSelect={onCompagnonSelected} />
@@ -451,6 +444,14 @@
 			{/each}
 		</chat-message-list>
 
+		{#if activeRunsForChat.length > 0}
+			<chat-active-runs>
+				{#each activeRunsForChat as run (run.run_id)}
+					<RunTimeline runId={run.run_id} />
+				{/each}
+			</chat-active-runs>
+		{/if}
+
 		<chat-composer-dock>
 			<ChatInput
 				bind:value={messageInput}
@@ -553,6 +554,13 @@
 			padding: var(--pad-2xl) var(--pad-lg) var(--pad-xl);
 			overflow-y: auto;
 			scrollbar-gutter: stable;
+		}
+
+		chat-active-runs {
+			display: flex;
+			flex-direction: column;
+			gap: var(--gap-sm, var(--pad-sm));
+			padding: 0 var(--pad-lg) var(--pad-sm);
 		}
 
 		chat-message {

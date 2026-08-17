@@ -59,7 +59,7 @@ describe('CompanionService - Companion Ownership Model (Story 5.1)', () => {
 
 		// Mock the DataGenericService constructor
 		const DataGenericServiceMock = vi.mocked(DataGenericService);
-		DataGenericServiceMock.mockImplementation(function(this: unknown, collectionName: string) {
+		DataGenericServiceMock.mockImplementation(function (this: unknown, collectionName: string) {
 			if (collectionName === 'companions') {
 				return mockSystemService;
 			}
@@ -420,7 +420,7 @@ describe('CompanionService - Companion Ownership Model (Story 5.1)', () => {
 				}
 			];
 
-			const results = await Promise.all(operations.map(op => op()));
+			const results = await Promise.all(operations.map((op) => op()));
 
 			// All should reference same system companion
 			expect(results[0].companion_id).toBe(results[1].companion_id);
