@@ -17,32 +17,32 @@ test.setTimeout(120 * 1000);
 function waitForServer(request: any, serverProc: any, timeout = 120000) {
 	const start = Date.now();
 	return new Promise<void>((resolve, reject) => {
-		let resolved = false;
+		void (async () => {
+			let resolved = false;
 
-		const checkHealth = async () => {
-			try {
-				const r = await request.get(`${SERVER_URL}/api/health`);
-				if (r.ok()) {
+			const checkHealth = async () => {
+				try {
+					const r = await request.get(`${SERVER_URL}/api/health`);
+					if (r.ok()) {
+						resolved = true;
+						resolve();
+					}
+				} catch (e) {
+					// ignore
+				}
+			};
+
+			// Listen for server stdout message as an early indicator
+			const onData = (d: Buffer) => {
+				const s = d.toString();
+				if (s.includes('Listening on port') || s.includes('Listening on')) {
 					resolved = true;
 					resolve();
 				}
-			} catch (e) {
-				// ignore
-			}
-		};
+			};
 
-		// Listen for server stdout message as an early indicator
-		const onData = (d: Buffer) => {
-			const s = d.toString();
-			if (s.includes('Listening on port') || s.includes('Listening on')) {
-				resolved = true;
-				resolve();
-			}
-		};
+			serverProc.stdout?.on('data', onData);
 
-		serverProc.stdout?.on('data', onData);
-
-		void (async () => {
 			while (!resolved && Date.now() - start < timeout) {
 				await checkHealth();
 				if (resolved) break;

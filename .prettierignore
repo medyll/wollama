@@ -6,10 +6,29 @@ src-tauri
 
 # Build & Dependencies
 node_modules
+**/node_modules/**
+.pnpm-store
+**/.pnpm-store/**
 .svelte-kit
+**/.svelte-kit/**
 build
+**/build/**
 dist
+**/dist*/**
 coverage
+.tmp
+**/.tmp/**
+**/resources/**
+**/android/**
+**/playwright-report/**
+**/test-results/**
+**/pouch__all_dbs__/**
+_replicator
+_users
+.acp-team
+.agents
+.claude
+.codex
 .env
 .env.*
 

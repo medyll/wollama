@@ -20,6 +20,8 @@ server/db_data/
 **/db_data/
 /data/*
 /server/bin/*
+/client/electron/backend/
+/client/dist_electron*/
 /client/android/gradle/*
 playwright-report/
 test-results/

@@ -148,6 +148,14 @@ npm run <command> -w @wollama/server   # Server-specific commands
 - **Naming pattern**: `functionName_shouldDoSomething`
 - **Run single file**: `npm run test:client -- path/to/test.test.ts`
 
+### Non-Negotiable Database Safety
+
+- Never delete, reset, migrate destructively, or otherwise modify real user databases or ODB data during development or testing.
+- Tests that need storage must create a uniquely named disposable directory under the system temporary directory and remove only that directory.
+- Never run verification against the development port (`3000`), packaged production port (`3210`), or the production Electron `userData` profile.
+- Verify packaged builds only with `npm run smoke:electron -- <absolute-path-to-packaged-executable>` from `client/`. The launcher fails closed unless both the profile and port are isolated.
+- Backward compatibility with retired Wollama versions is not required. Add a compatibility measure only when it is necessary to protect current real user data from destructive changes.
+
 ## Important Considerations
 
 ### Prerequisites

@@ -1,8 +1,10 @@
-import { app, BrowserWindow, utilityProcess } from 'electron';
+import { app, BrowserWindow, ipcMain, utilityProcess } from 'electron';
 import path from 'path';
 import serve from 'electron-serve';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { BackendManager } from './backend-manager.js';
+import { resolveIsolatedTestRuntime } from './test-runtime.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,68 +12,21 @@ const __dirname = path.dirname(__filename);
 const loadURL = serve({ directory: 'build' });
 
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
+const testRuntime = resolveIsolatedTestRuntime();
+if (testRuntime) app.setPath('userData', testRuntime.profileDirectory);
+
+const developmentServerUrl = 'http://127.0.0.1:3000';
+const productionServerPort = testRuntime?.serverPort ?? 3210;
+const productionServerUrl = `http://127.0.0.1:${productionServerPort}`;
+const appIcon = isDev ? path.join(__dirname, '../static/favicon.png') : path.join(app.getAppPath(), 'build', 'favicon.png');
 const stateFile = path.join(app.getPath('userData'), 'window-state.json');
 
 let mainWindow;
-let serverProcess;
+let backendManager;
 
-const SERVER_URL = 'http://127.0.0.1:3000';
-
-async function isServerReady() {
-	try {
-		const response = await fetch(`${SERVER_URL}/api/health`, {
-			signal: AbortSignal.timeout(1000)
-		});
-		return response.ok;
-	} catch {
-		return false;
-	}
-}
-
-async function waitForServer(timeoutMs = 15000) {
-	const deadline = Date.now() + timeoutMs;
-	while (Date.now() < deadline) {
-		if (await isServerReady()) return true;
-		await new Promise((resolve) => setTimeout(resolve, 250));
-	}
-	return false;
-}
-
-async function startBundledServer() {
-	if (!app.isPackaged || (await isServerReady())) return;
-
-	const serverRoot = path.join(process.resourcesPath, 'wollama-server');
-	const serverEntry = path.join(serverRoot, 'dist', 'server', 'server.js');
-	const audioRoot = path.join(serverRoot, 'bin');
-	const dataRoot = path.join(app.getPath('userData'), 'server-data');
-
-	serverProcess = utilityProcess.fork(serverEntry, [], {
-		cwd: serverRoot,
-		serviceName: 'Wollama Server',
-		stdio: 'pipe',
-		env: {
-			...process.env,
-			PORT: '3000',
-			HOST: '127.0.0.1',
-			DB_PATH: path.join(dataRoot, 'db'),
-			RAG_VECTOR_DIR: path.join(dataRoot, 'vectors'),
-			STT_BINARY_PATH: path.join(audioRoot, 'whisper', process.platform === 'win32' ? 'main.exe' : 'main'),
-			STT_MODEL_PATH: path.join(audioRoot, 'whisper', 'ggml-base.bin'),
-			TTS_BINARY_PATH: path.join(audioRoot, 'piper', process.platform === 'win32' ? 'piper.exe' : 'piper'),
-			TTS_MODEL_DIR: path.join(audioRoot, 'piper')
-		}
-	});
-
-	serverProcess.stdout?.on('data', (data) => console.log(`[Wollama Server] ${data.toString().trim()}`));
-	serverProcess.stderr?.on('data', (data) => console.error(`[Wollama Server] ${data.toString().trim()}`));
-	serverProcess.on('exit', (code) => {
-		console.log(`Wollama Server exited with code ${code}`);
-		serverProcess = undefined;
-	});
-
-	if (!(await waitForServer())) {
-		console.error('Wollama Server did not become ready before the startup timeout');
-	}
+const hasSingleInstanceLock = app.requestSingleInstanceLock();
+if (!hasSingleInstanceLock) {
+	app.quit();
 }
 
 function getWindowState() {
@@ -91,6 +46,34 @@ function saveWindowState(bounds) {
 	}
 }
 
+function createBackendManager() {
+	const backendEntry = path.join(app.getAppPath(), 'electron', 'backend', 'server.js');
+	const serverDataPath = path.join(app.getPath('userData'), 'server-data');
+
+	return new BackendManager({
+		url: productionServerUrl,
+		startProcess: () => {
+			const child = utilityProcess.fork(backendEntry, [], {
+				cwd: app.getPath('userData'),
+				env: {
+					...process.env,
+					NODE_ENV: 'production',
+					HOST: '127.0.0.1',
+					PORT: String(productionServerPort),
+					DB_PATH: serverDataPath,
+					SKIP_HEAVY_SETUP: 'true'
+				},
+				serviceName: 'Wollama Backend',
+				stdio: 'pipe'
+			});
+
+			child.stdout?.on('data', (data) => console.log(`[backend] ${data.toString().trim()}`));
+			child.stderr?.on('data', (data) => console.error(`[backend] ${data.toString().trim()}`));
+			return child;
+		}
+	});
+}
+
 async function createWindow() {
 	const splash = new BrowserWindow({
 		width: 500,
@@ -98,13 +81,23 @@ async function createWindow() {
 		transparent: true,
 		frame: false,
 		alwaysOnTop: true,
-		icon: path.join(__dirname, '../static/favicon.png'),
-		center: true
+		icon: appIcon,
+		center: true,
+		show: !testRuntime?.headless
 	});
-	await splash.loadFile(path.join(__dirname, 'splash.html'));
-	await Promise.all([startBundledServer(), new Promise((resolve) => setTimeout(resolve, 1200))]);
+	splash.loadFile(path.join(__dirname, 'splash.html'));
+
+	if (!isDev) {
+		backendManager ||= createBackendManager();
+		try {
+			await backendManager.ensureStarted();
+		} catch (error) {
+			console.error('Packaged backend startup failed. The UI will offer recovery controls.', error);
+		}
+	}
 
 	const state = getWindowState();
+	const serverUrl = isDev ? developmentServerUrl : productionServerUrl;
 
 	mainWindow = new BrowserWindow({
 		x: state.x,
@@ -112,24 +105,25 @@ async function createWindow() {
 		width: state.width,
 		height: state.height,
 		webPreferences: {
-			nodeIntegration: true,
-			contextIsolation: false
-			// preload: path.join(__dirname, 'preload.js')
+			nodeIntegration: false,
+			contextIsolation: true,
+			preload: path.join(__dirname, 'preload.cjs'),
+			additionalArguments: [`--wollama-server-url=${serverUrl}`]
 		},
-		icon: path.join(__dirname, '../build/favicon.png'),
+		icon: appIcon,
 		show: false
 	});
 
 	mainWindow.once('ready-to-show', () => {
-		mainWindow.show();
+		if (!testRuntime?.headless) mainWindow.show();
 		splash.destroy();
 	});
 
 	if (isDev) {
-		mainWindow.loadURL('http://localhost:5176');
+		await mainWindow.loadURL('http://localhost:5176');
 		mainWindow.webContents.openDevTools();
 	} else {
-		loadURL(mainWindow);
+		await loadURL(mainWindow);
 	}
 
 	mainWindow.on('close', () => {
@@ -143,11 +137,50 @@ async function createWindow() {
 	});
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+	if (!hasSingleInstanceLock) return;
+
+	ipcMain.handle('backend:status', () => {
+		if (isDev) {
+			return { url: developmentServerUrl, status: 'development', error: null, managed: false };
+		}
+
+		return (
+			backendManager?.getStatus() ?? {
+				url: productionServerUrl,
+				status: 'stopped',
+				error: null,
+				managed: false
+			}
+		);
+	});
+
+	ipcMain.handle('backend:restart', async () => {
+		if (isDev) {
+			return { url: developmentServerUrl, status: 'development', error: null, managed: false };
+		}
+
+		backendManager ||= createBackendManager();
+		try {
+			return await backendManager.restart();
+		} catch {
+			return backendManager.getStatus();
+		}
+	});
+
+	createWindow().catch((error) => {
+		console.error('Failed to create the main window', error);
+	});
+});
+
+app.on('second-instance', () => {
+	if (!mainWindow) return;
+	if (mainWindow.isMinimized()) mainWindow.restore();
+	mainWindow.focus();
+});
 
 app.on('before-quit', () => {
-	serverProcess?.kill();
-	serverProcess = undefined;
+	backendManager?.stop();
 });
 
 app.on('window-all-closed', function () {
@@ -155,5 +188,9 @@ app.on('window-all-closed', function () {
 });
 
 app.on('activate', function () {
-	if (mainWindow === null) createWindow();
+	if (mainWindow === null) {
+		createWindow().catch((error) => {
+			console.error('Failed to recreate the main window', error);
+		});
+	}
 });

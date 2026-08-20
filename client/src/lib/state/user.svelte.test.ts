@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { UserState } from './user.svelte';
 
 // $app/environment is mocked in vitest.setup.ts → browser: true
@@ -9,6 +9,7 @@ describe('UserState', () => {
 
 	beforeEach(() => {
 		localStorage.clear();
+		delete window.wollamaDesktop;
 		user = new UserState();
 	});
 
@@ -26,7 +27,7 @@ describe('UserState', () => {
 		it('has default preferences', () => {
 			expect(user.preferences.ollamaUrl).toBe('http://localhost:11434');
 			expect(user.preferences.locale).toBe('en');
-			expect(user.preferences.theme).toBe('fluent-light');
+			expect(user.preferences.theme).toBe('light');
 		});
 	});
 
@@ -203,7 +204,7 @@ describe('UserState', () => {
 			user.preferences.theme = 'dark';
 			user.preferences.locale = 'fr';
 			user.reset();
-			expect(user.preferences.theme).toBe('fluent-light');
+			expect(user.preferences.theme).toBe('light');
 			expect(user.preferences.locale).toBe('en');
 		});
 

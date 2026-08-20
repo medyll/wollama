@@ -13,6 +13,7 @@
 	import DataGenericList from '$components/ui_data/DataGenericList.svelte';
 	import DataUpdate from '$components/ui_data/DataUpdate.svelte';
 	import { ragService, type RagDocument } from '$lib/services/rag.service';
+	import { APP_THEMES } from '$lib/theme';
 
 	import { onDestroy } from 'svelte';
 
@@ -153,32 +154,6 @@
 			isMonitoringMic = false;
 		}
 	});
-
-	const themes = [
-		'fluent-light',
-		'fluent-dark',
-		'light',
-		'dark',
-		'cupcake',
-		'bumblebee',
-		'emerald',
-		'corporate',
-		'synthwave',
-		'retro',
-		'cyberpunk',
-		'valentine',
-		'halloween',
-		'garden',
-		'forest',
-		'aqua',
-		'lofi',
-		'pastel',
-		'fantasy',
-		'wireframe',
-		'black',
-		'luxury',
-		'dracula'
-	];
 
 	async function loadCompanions() {
 		try {
@@ -455,21 +430,21 @@
 						<label class="label" for="theme">
 							<span class="label-text">{t('settings.theme')}</span>
 						</label>
-						<div class="grid grid-cols-3 gap-2 md:grid-cols-5">
-							{#each themes as theme}
+						<div class="grid grid-cols-2 gap-2">
+							{#each APP_THEMES as theme}
 								<button
 									class="btn flex h-auto flex-col gap-1 rounded-xl border-2 p-2 {userState.preferences.theme ===
-									theme
+									theme.id
 										? 'border-primary'
 										: 'border-base-content/10'}"
-									onclick={() => (userState.preferences.theme = theme)}
-									data-theme={theme}
-									aria-label="Select theme {theme}"
+									onclick={() => (userState.preferences.theme = theme.id)}
+									data-theme={theme.id}
+									aria-label="Select {theme.label} theme"
 								>
 									<div class="bg-base-100 border-base-content/10 h-4 w-full rounded border"></div>
 									<div class="bg-primary h-4 w-full rounded"></div>
 									<div class="bg-secondary h-4 w-full rounded"></div>
-									<span class="text-[10px] font-bold capitalize">{theme}</span>
+									<span class="text-[10px] font-bold">{theme.label}</span>
 								</button>
 							{/each}
 						</div>

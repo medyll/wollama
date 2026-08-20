@@ -6,6 +6,7 @@
 	"scripts": {
 		"build": "tsc",
 		"dev": "pnpm exec tsx watch server.ts",
+		"build:electron": "node build-electron.mjs",
 		"check": "tsc --noEmit",
 		"test": "concurrently \"pnpm dev\" \"pnpm exec tsx test-server.ts\" --kill-others --success first",
 		"test:unit": "vitest run",

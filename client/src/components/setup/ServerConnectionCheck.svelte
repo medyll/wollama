@@ -5,15 +5,10 @@
 	import { t } from '$lib/state/i18n.svelte';
 	import { onMount, onDestroy } from 'svelte';
 
-	let pollingTimer: any;
+	let pollingTimer: ReturnType<typeof setInterval> | undefined;
 	let tempUrl = $state(userState.preferences.serverUrl);
-	let dialog = $state<HTMLDialogElement>();
-
-	$effect(() => {
-		if (!dialog) return;
-		if (connectionState.showModal && !dialog.open) dialog.showModal();
-		if (!connectionState.showModal && dialog.open) dialog.close();
-	});
+	let isRestartingBackend = $state(false);
+	let isDesktopRuntime = $state(false);
 
 	async function checkConnection(isAuto = false) {
 		connectionState.setChecking(true);
@@ -58,6 +53,7 @@
 			if (connectionState.isConnected) {
 				// Transition from Connected -> Disconnected
 				connectionState.setConnected(false);
+				connectionState.showModal = true;
 
 				// "in case of fail, the bubble must be red, autoclose off" -> CHANGED TO: "show notification with auto_close"
 				toast.error(t('status.server_inaccessible'), 5000);
@@ -84,7 +80,29 @@
 		toast.info(t('status.offline_mode'));
 	}
 
+	async function restartPackagedBackend() {
+		if (!window.wollamaDesktop) return;
+
+		isRestartingBackend = true;
+		try {
+			const status = await window.wollamaDesktop.restartBackend();
+			tempUrl = status.url;
+			userState.preferences.serverUrl = status.url;
+			userState.save();
+
+			if (status.status === 'running') {
+				await checkConnection();
+			} else {
+				toast.error(status.error || t('status.still_inaccessible'), 5000);
+			}
+		} finally {
+			isRestartingBackend = false;
+		}
+	}
+
 	onMount(() => {
+		isDesktopRuntime = !!window.wollamaDesktop;
+
 		// Initial check
 		checkConnection(true);
 
@@ -100,88 +118,152 @@
 </script>
 
 {#if connectionState.showModal}
-	<dialog bind:this={dialog} class="connection-dialog" aria-labelledby="modal-title" oncancel={goOffline}>
-		<section>
-			<h3
-				id="modal-title"
-				class={`flex items-center gap-2 text-lg font-bold ${!connectionState.isConnected ? 'text-error' : 'text-warning'}`}
+	<!-- This alert intentionally stays below the sidebar layer so navigation and Settings remain reachable. -->
+	<aside class="connection-banner" role="alert" aria-live="assertive" aria-labelledby="connection-banner-title">
+		<div class="connection-banner-header">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="text-warning h-6 w-6"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				><path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+				/></svg
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-					/></svg
-				>
+			<h3 id="connection-banner-title" class="text-lg font-semibold">
 				{#if !connectionState.isConnected}
 					{t('status.server_inaccessible')}
 				{:else}
 					Ollama Service Unavailable
 				{/if}
 			</h3>
-			<p class="py-4">
-				{#if !connectionState.isConnected}
-					{t('status.check_server')}
-				{:else}
-					The backend server is connected, but the Ollama AI engine is not responding. Please check your Ollama
-					installation.
-				{/if}
-			</p>
+		</div>
+		<p class="text-sm opacity-80">
+			{#if !connectionState.isConnected}
+				{t('status.check_server')}
+			{:else}
+				The backend is connected, but Ollama is not responding. Check the Ollama installation or continue offline.
+			{/if}
+		</p>
 
-			<div class="field-stack">
-				<label for="server-url-input">{t('settings.server_url')}</label>
-				<input
-					id="server-url-input"
-					type="text"
-					bind:value={tempUrl}
-					class="font-mono"
-					placeholder="http://localhost:3000"
-				/>
-			</div>
+		<div class="form-control w-full">
+			<label class="label" for="server-url-input">
+				<span class="label-text">{t('settings.server_url')}</span>
+			</label>
+			<input
+				id="server-url-input"
+				type="url"
+				bind:value={tempUrl}
+				class="input input-bordered w-full font-mono"
+				placeholder="http://localhost:3000"
+			/>
+		</div>
 
-			<div class="toolbar">
-				<button class="btn-ghost" onclick={goOffline}>{t('status.continue_offline')}</button>
-				<button class="btn-primary" onclick={updateUrl} disabled={connectionState.isChecking}>
-					{#if connectionState.isChecking}
-						{t('status.connecting')}...
-					{:else}
-						{t('status.retry')}
-					{/if}
+		<div class="connection-banner-actions">
+			<button class="btn btn-ghost btn-sm" onclick={goOffline}>{t('status.continue_offline')}</button>
+			{#if isDesktopRuntime}
+				<button class="btn btn-outline btn-sm" onclick={restartPackagedBackend} disabled={isRestartingBackend}>
+					{isRestartingBackend ? `${t('status.connecting')}...` : 'Restart local server'}
 				</button>
-			</div>
-		</section>
-	</dialog>
+			{/if}
+			<button class="btn btn-primary btn-sm" onclick={updateUrl} disabled={connectionState.isChecking}>
+				{#if connectionState.isChecking}
+					<span class="loading loading-spinner loading-xs"></span>
+					{t('status.connecting')}...
+				{:else}
+					{t('status.retry')}
+				{/if}
+			</button>
+		</div>
+	</aside>
 {/if}
 
 <style>
-	.connection-dialog {
+	.connection-banner {
+		position: fixed;
+		right: var(--pad-md);
+		bottom: var(--pad-md);
+		z-index: var(--z-overlay);
+		display: grid;
 		width: min(32rem, calc(100vw - (2 * var(--pad-md))));
-		max-width: none;
-		padding: 0;
-		border: var(--border-width) solid var(--color-border);
+		gap: var(--gap-md);
+		padding: var(--pad-md);
+		border: var(--border-width) solid var(--color-warning);
 		border-radius: var(--radius-lg);
 		background: var(--color-surface-raised);
+		box-shadow: var(--shadow-lg);
 		color: var(--color-text);
 	}
 
-	.connection-dialog::backdrop {
-		background: color-mix(in oklch, var(--color-text) 40%, transparent);
-		backdrop-filter: blur(0.25rem);
+	.connection-banner-header,
+	.connection-banner-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--gap-sm);
 	}
 
-	.connection-dialog section {
-		display: grid;
-		gap: var(--gap-md);
-		padding: var(--pad-lg);
-	}
-
-	.connection-dialog h3,
-	.connection-dialog p {
+	.connection-banner-header h3,
+	.connection-banner p {
 		margin: 0;
 	}
 
-	.connection-dialog .toolbar {
+	.connection-banner-header svg {
+		width: var(--icon-size-md);
+		height: var(--icon-size-md);
+		flex: none;
+		color: var(--color-warning);
+	}
+
+	.connection-banner .form-control,
+	.connection-banner label {
+		display: grid;
+		gap: var(--gap-xs);
+	}
+
+	.connection-banner input {
+		width: 100%;
+		padding: var(--pad-sm);
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface);
+		color: var(--color-text);
+		font-family: var(--font-mono);
+	}
+
+	.connection-banner-actions {
 		justify-content: flex-end;
+		flex-wrap: wrap;
+	}
+
+	.connection-banner-actions button {
+		padding: var(--pad-xs) var(--pad-sm);
+		border: var(--border-width) solid var(--color-border);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface);
+		color: var(--color-text);
+		cursor: pointer;
+	}
+
+	.connection-banner-actions button:last-child {
+		border-color: var(--color-primary);
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+	}
+
+	.connection-banner-actions button:disabled {
+		cursor: wait;
+		opacity: 0.6;
+	}
+
+	@media (width < 48rem) {
+		.connection-banner {
+			right: var(--pad-sm);
+			bottom: var(--pad-sm);
+			width: calc(100vw - (2 * var(--pad-sm)));
+		}
 	}
 </style>

@@ -46,10 +46,10 @@ importers:
         specifier: ^3.7.4
         version: 3.9.5
       prettier-plugin-svelte:
-        specifier: ^3.4.0
+        specifier: ^3.5.2
         version: 3.5.2(prettier@3.9.5)(svelte@5.56.6(@typescript-eslint/types@8.64.0))
       prettier-plugin-tailwindcss:
-        specifier: ^0.7.2
+        specifier: ^0.7.4
         version: 0.7.4(prettier-plugin-svelte@3.5.2(prettier@3.9.5)(svelte@5.56.6(@typescript-eslint/types@8.64.0)))(prettier@3.9.5)
       standard-version:
         specifier: ^9.5.0
@@ -84,6 +84,9 @@ importers:
       electron-serve:
         specifier: ^3.0.0
         version: 3.0.1
+      ffmpeg-static:
+        specifier: ^5.3.0
+        version: 5.3.0
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
@@ -202,9 +205,6 @@ importers:
       postcss-nesting:
         specifier: ^13.0.2
         version: 13.0.2(postcss@8.5.20)
-      pouchdb:
-        specifier: ^9.0.0
-        version: 9.0.0
       prettier:
         specifier: ^3.7.4
         version: 3.9.5

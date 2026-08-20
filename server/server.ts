@@ -135,6 +135,7 @@ app.use(express.json());
 // API Routes
 app.get('/api/health', (req, res) => {
 	res.json({
+		service: 'wollama',
 		status: 'ok',
 		ollama: serverState.ollamaReady
 	});

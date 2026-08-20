@@ -9,7 +9,7 @@
 
 {#if isOffline || isSyncing}
 	<div
-		class="bg-warning text-warning-content fixed right-4 bottom-4 flex items-center gap-2 rounded-lg px-4 py-2 shadow-lg"
+		class="offline-indicator bg-warning text-warning-content fixed right-4 bottom-4 flex items-center gap-2 rounded-lg px-4 py-2"
 		role="status"
 		aria-live="polite"
 	>

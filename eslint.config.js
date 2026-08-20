@@ -11,7 +11,7 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 export default ts.config(
 	includeIgnoreFile(gitignorePath),
 	{
-		ignores: ['**/_old/**', '**/.venv/**', '**/*.test.*']
+		ignores: ['**/_old/**', '**/.venv/**', '**/.tmp/**', '**/dist/**', '**/resources/**', '**/*.test.*']
 	},
 	js.configs.recommended,
 	...ts.configs.recommended,
@@ -32,23 +32,13 @@ export default ts.config(
 
 		languageOptions: {
 			parserOptions: {
-				projectService: {
-					allowDefaultProject: [
-						'*.js',
-						'*.ts',
-						'client/*.js',
-						'client/*.ts',
-						'client/electron/*.js',
-						'server/*.js',
-						'server/test-server.ts'
-					]
-				},
 				extraFileExtensions: ['.svelte'],
 				parser: ts.parser,
 				svelteConfig
 			}
 		},
 		rules: {
+			'no-undef': 'off',
 			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/no-unused-vars': [
 				'warn',
@@ -63,6 +53,12 @@ export default ts.config(
 			'svelte/no-navigation-without-resolve': 'off',
 			'@typescript-eslint/no-unused-expressions': 'off',
 			'@typescript-eslint/ban-ts-comment': 'off'
+		}
+	},
+	{
+		files: ['**/*.cjs'],
+		rules: {
+			'@typescript-eslint/no-require-imports': 'off'
 		}
 	}
 );
