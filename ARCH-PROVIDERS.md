@@ -1,6 +1,6 @@
 # Wollama Multi-Provider Architecture (design)
 
-> Status: **proposal**, nothing implemented. Written 2026-08-21 against commit `1192f8f`.
+> Status: **P0 implemented** (registry + `LlmProvider` + per-request resolution); P1 onwards is still a proposal. Written 2026-08-23 against `main`.
 > Goal: extend Wollama beyond Ollama to Codex CLI, opencode, the Anthropic API, and any OpenAI-compatible endpoint (OpenRouter, LM Studio, vLLM, …) configurable at runtime from the settings panel.
 > `ARCH.md` describes the current (Ollama-only) system; this document describes the target and the migration.
 
@@ -8,21 +8,32 @@
 
 ## 1. Current state (verified)
 
-Wollama is hard-wired to Ollama. There is no provider abstraction anywhere in the repo, and no prior design work on one — no doc, no story, no branch, no TODO entry.
+Wollama runs on Ollama only, but the seam is not missing — the tool/MCP orchestration work (M0–M7) already introduced a provider indirection for a different reason.
 
-| Fact | Evidence |
-| --- | --- |
-| Single LLM backend, no interface | `server/services/ollama.service.ts` is a 70-line pass-through over the `ollama` npm client |
-| Chat endpoint calls Ollama directly | `server/server.ts:263` and `:297` (`OllamaService.chat`), streaming written as NDJSON |
-| Model management is Ollama-shaped | `/api/models` → `OllamaService.list()`, `/api/models/pull` → `OllamaService.pull()` (`server/server.ts:323`, `:333`) |
-| Bootstrap pulls a default model | `server/server.ts:488`–`:498` |
-| RAG embeddings via Ollama | `server/services/rag/embed.ts` → `OllamaService.embed()` |
-| Config assumes one host | `server/config.ts` → `config.ollama.{host,defaultModel}` |
-| Schema stores a bare model string | `shared/db/database-scheme.ts` — `model: string` on `companions`, `user_companions`, `chats`, `messages`; `default_model` on `user_preferences` |
-| Client sends the model name only | `client/src/lib/services/chat.service.ts:234` |
-| ~30 client/server files reference Ollama | incl. `ChatWindow.svelte`, `CompanionEditor.svelte`, `OnboardingWizard.svelte`, `ServerConnectionCheck.svelte`, `user.svelte.ts` |
+**What already exists** (`server/orchestration/`):
 
-Only pre-existing "provider" notions in the repo are unrelated: STT/TTS `provider: 'openai' \| 'local'` (`server/config.ts`) and the web-search provider in `bmad/artifacts/stories/S4-01.md`.
+| Fact                                                 | Evidence                                                                                                        |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| A `ProviderAdapter` contract with normalized chunks  | `types.ts` — `ProviderChunk` is `text \| tool_calls \| done`, each carrying the raw provider record             |
+| An Ollama implementation of it                       | `ollama.provider.ts` — normalizes ollama chunks, maps tool descriptors, builds tool messages                    |
+| A provider-agnostic, express-free chat loop          | `conversation-orchestrator.ts` — `createConversationOrchestrator(provider)` loops turns until no tool is called |
+| Wire events already ride alongside the ollama stream | `{"wollama": <WollamaEvent>}` for tool calls, permission requests and supervised runs                           |
+
+**What was still Ollama-bound** (the P0 gap this branch closes):
+
+| Fact                                     | Evidence                                                                                                                                        |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| One adapter bound at import time         | `conversationOrchestrator = createConversationOrchestrator()` defaulted to `ollamaProvider`; `runChat` had no way to name a backend             |
+| The adapter had no identity or metadata  | no id, family, capabilities, model listing or health probe — nothing the registry, `/api/providers` or the UI could read                        |
+| Model management is Ollama-shaped        | `/api/models` → `OllamaService.list()`, `/api/models/pull` → `OllamaService.pull()`                                                             |
+| Bootstrap pulls a default model          | `server/server.ts` startup path calls `OllamaService.list()` / `.pull()` directly                                                               |
+| RAG embeddings via Ollama                | `server/services/rag/embed.ts` → `OllamaService.embed()`                                                                                        |
+| Config assumes one host                  | `server/config.ts` → `config.ollama.{host,defaultModel}`                                                                                        |
+| Schema stores a bare model string        | `shared/db/database-scheme.ts` — `model: string` on `companions`, `user_companions`, `chats`, `messages`; `default_model` on `user_preferences` |
+| Client sends the model name only         | `client/src/lib/services/chat.service.ts` posts `{ model, messages, … }` with no provider                                                       |
+| ~30 client/server files reference Ollama | incl. `ChatWindow.svelte`, `CompanionEditor.svelte`, `OnboardingWizard.svelte`, `ServerConnectionCheck.svelte`, `user.svelte.ts`                |
+
+Only pre-existing "provider" notions outside orchestration are unrelated: STT/TTS `provider: 'openai' \| 'local'` (`server/config.ts`) and the web-search provider in `bmad/artifacts/stories/S4-01.md`.
 
 ---
 
@@ -43,11 +54,11 @@ Wollama owns the conversation. Full message history is sent on every turn; the p
 The agent owns the conversation, the tool loop, the sandbox and the working directory. Wollama sends a prompt into a **session** and consumes an **event stream**. History replay is not our job — resumption is done by session id.
 
 - **codex** — `codex exec` CLI. Billed against the user's existing ChatGPT plan (the cost argument).
-- **opencode** — `opencode run` CLI *or* `opencode serve` HTTP server. Provider-agnostic itself; billing depends on whichever provider the user configured inside opencode.
+- **opencode** — `opencode run` CLI _or_ `opencode serve` HTTP server. Provider-agnostic itself; billing depends on whichever provider the user configured inside opencode.
 
 Consequences of Family B that Wollama does not currently handle:
 
-1. **Tool calls happen inside the agent.** Wollama's `agent-runner.service.ts`, `hook-pipeline`, skills and `tool_calls` collection duplicate machinery the agent already has. For agent providers, Wollama's server-side agents/skills must be *disabled*, not merged — otherwise two tool loops fight.
+1. **Tool calls happen inside the agent.** Wollama's `agent-runner.service.ts`, `hook-pipeline`, skills and `tool_calls` collection duplicate machinery the agent already has. For agent providers, Wollama's server-side agents/skills must be _disabled_, not merged — otherwise two tool loops fight.
 2. **The agent has a working directory and can write files.** Ollama chat cannot. This is a security boundary, not a feature flag (see §7).
 3. **Events are not tokens.** `item.started/updated/completed`, tool invocations, diffs, reasoning. The client currently renders only `message.content` deltas.
 4. **Session state lives outside RxDB.** A chat that continues an agent session needs the external session id persisted next to it.
@@ -77,7 +88,7 @@ ProviderRegistry (server/services/providers/index.ts)
         │        └─ N instances: OpenRouter, LM Studio, vLLM…    │
         │                                                        │
         └─ agent family ─────────────────────────────────────────┤
-            codex.provider.ts     → spawn `codex exec --json`     
+            codex.provider.ts     → spawn `codex exec --json`
             opencode.provider.ts  → `opencode serve` + @opencode-ai/sdk
                                                                  │
                                                                  ▼
@@ -95,47 +106,43 @@ export type ProviderFamily = 'http' | 'agent';
 
 export interface ProviderCapabilities {
 	streaming: boolean;
-	tools: boolean;          // provider runs its own tool loop
-	embeddings: boolean;     // can serve /api/rag
-	modelManagement: boolean;// pull / delete / show
+	tools: boolean; // provider runs its own tool loop
+	embeddings: boolean; // can serve /api/rag
+	modelManagement: boolean; // pull / delete / show
 	vision: boolean;
-	systemPrompt: boolean;   // false for agents that own their own system prompt
-	sessions: boolean;       // requires session id persistence
+	systemPrompt: boolean; // false for agents that own their own system prompt
+	sessions: boolean; // requires session id persistence
 	filesystemAccess: boolean; // agent can read/write the host FS
 	requiresApiKey: boolean;
 	requiresBinary?: string; // e.g. 'codex', 'opencode'
 }
 
 export interface ProviderModel {
-	id: string;              // 'mistral:latest', 'claude-opus-5', 'gpt-5.1-codex'
+	id: string; // 'mistral:latest', 'claude-opus-5', 'gpt-5.1-codex'
 	label: string;
 	providerId: string;
 	contextWindow?: number;
 }
 
-export interface ChatChunk {
-	type: 'text' | 'reasoning' | 'tool' | 'usage' | 'done' | 'error';
-	content?: string;
-	toolName?: string;
-	usage?: { input: number; output: number };
-	sessionId?: string;      // agent family: echo back to persist
-	raw?: unknown;
-}
-
-export interface LlmProvider {
-	id: string;
-	family: ProviderFamily;
-	capabilities: ProviderCapabilities;
-	isAvailable(): Promise<boolean>;            // health check, drives /api/health
+// server/orchestration/types.ts — extends the existing ProviderAdapter rather than
+// replacing it, so the orchestrator's tool loop and its tests are untouched.
+export interface LlmProvider extends ProviderAdapter {
+	readonly id: string; // instance id, not a type name
+	readonly type: ProviderType;
+	readonly family: ProviderFamily;
+	readonly label: string;
+	readonly capabilities: ProviderCapabilities;
+	isAvailable(): Promise<boolean>; // resolves false, never throws
 	listModels(): Promise<ProviderModel[]>;
-	chat(req: ChatRequest, signal: AbortSignal): AsyncIterable<ChatChunk>;
 	embed?(input: string[]): Promise<number[][]>;
 }
 ```
 
-`ChatRequest` carries `{ model, messages, sessionId?, workingDir?, stream }`.
+**No new chunk type is needed.** `ProviderChunk` (`text | tool_calls | done`, each keeping `raw`) already does this job for the tool loop; the agent family adds its cases there when P4 lands, rather than introducing a parallel `ChatChunk` vocabulary.
 
-### 3.2 Provider *types* vs provider *instances* (dynamic configuration)
+`ProviderChatRequest` carries `{ model, messages, tools?, stream }`; the agent family adds `sessionId?` and `workingDir?` in P4.
+
+### 3.2 Provider _types_ vs provider _instances_ (dynamic configuration)
 
 The registry must not be a hardcoded list. Two distinct concepts:
 
@@ -144,17 +151,17 @@ The registry must not be a hardcoded list. Two distinct concepts:
 
 ```ts
 export interface ProviderInstance {
-	id: string;                 // uuid, stable — referenced by chats/companions
-	type: ProviderType;         // which adapter drives it
-	label: string;              // user-facing, editable, non-unique
+	id: string; // uuid, stable — referenced by chats/companions
+	type: ProviderType; // which adapter drives it
+	label: string; // user-facing, editable, non-unique
 	enabled: boolean;
-	baseUrl?: string;           // openai-compatible / ollama
+	baseUrl?: string; // openai-compatible / ollama
 	defaultModel?: string;
-	models?: ProviderModel[];   // cached catalogue; refreshable
+	models?: ProviderModel[]; // cached catalogue; refreshable
 	modelSource: 'auto' | 'manual'; // auto = GET /models, manual = user-entered list
 	headers?: Record<string, string>; // extra headers (HTTP-Referer, X-OpenRouter-Title, org ids…)
 	options?: Record<string, unknown>; // per-type extras (workingDir for agents, port for opencode)
-	hasApiKey: boolean;         // the key itself is NEVER in this object — see §7
+	hasApiKey: boolean; // the key itself is NEVER in this object — see §7
 }
 ```
 
@@ -164,7 +171,9 @@ The registry therefore resolves `providerId` → `ProviderInstance` → adapter 
 
 ### 3.3 Wire format
 
-Keep NDJSON on `/api/chat/generate`. Today the server forwards raw Ollama chunks; that leaks the provider shape to the client. Normalize to `ChatChunk` and adapt the client reader once. The Ollama adapter maps `{ message: { content } }` → `{ type: 'text', content }`, so the change is contained.
+Keep NDJSON on `/api/chat/generate`, and keep the ollama-shaped payload for now: the client reads `json.message.content`, `json.done` and the `json.wollama` side-channel, and P0 must not move that. The normalization already happens one layer in — providers emit `ProviderChunk`, the orchestrator re-serializes.
+
+The provider-shaped wire is a debt to pay when the first non-ollama provider ships (P2): either the adapter re-shapes its output into the ollama envelope, or the envelope becomes neutral and the client reader is adapted once. Decide it in P2, not before.
 
 ---
 
@@ -223,7 +232,7 @@ Two integration paths — **prefer the server**:
 
 Path 1 gives typed clients, abort support and session listing for one long-lived child process; path 2 pays process startup per turn. Use `sidecar.service.ts` to own the lifecycle.
 
-`--model` takes `provider/model`, which means opencode has its *own* provider namespace nested inside ours. Surface it as `opencode:anthropic/claude-opus-5` rather than flattening.
+`--model` takes `provider/model`, which means opencode has its _own_ provider namespace nested inside ours. Surface it as `opencode:anthropic/claude-opus-5` rather than flattening.
 
 ---
 
@@ -235,12 +244,12 @@ Path 1 gives typed clients, abort support and session listing for one long-lived
 
 Add to `shared/db/database-scheme.ts`:
 
-| Collection | Field | Notes |
-| --- | --- | --- |
-| `user_preferences` | `default_provider: string` | default `'ollama'` |
-| `companions`, `user_companions` | `provider_id: string` | default `'ollama'` |
-| `chats` | `provider_id: string`, `external_session_id?: string` | session id for agent family |
-| `messages` | `provider_id?: string` | a chat may switch providers mid-thread |
+| Collection                      | Field                                                 | Notes                                  |
+| ------------------------------- | ----------------------------------------------------- | -------------------------------------- |
+| `user_preferences`              | `default_provider: string`                            | default `'ollama'`                     |
+| `companions`, `user_companions` | `provider_id: string`                                 | default `'ollama'`                     |
+| `chats`                         | `provider_id: string`, `external_session_id?: string` | session id for agent family            |
+| `messages`                      | `provider_id?: string`                                | a chat may switch providers mid-thread |
 
 RxDB requires a schema version bump plus a migration strategy per touched collection; the strategy is a constant fill (`provider_id: 'ollama'` — the id of the seeded default Ollama instance). Server-side PouchDB documents need the same default applied lazily on read — there is no migration runner on that side today.
 
@@ -248,10 +257,10 @@ RxDB requires a schema version bump plus a migration strategy per touched collec
 
 Two candidate homes, and the choice is forced by secrets:
 
-| Option | Verdict |
-| --- | --- |
+| Option                                         | Verdict                                                                                                                                                                                                                                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A collection in `shared/db/database-scheme.ts` | **No.** Every PouchDB database created through `dbManager` is served, unauthenticated, at `/_db/{name}` (`server/server.ts:90` mounts `expressPouchDB` with no auth middleware in front of it). Provider configs would be publicly readable and writable on a LAN-bound server. |
-| A server-side store outside the replicated set | **Yes.** Instance configs live in a JSON file owned by a new `provider-config.service.ts`, in a directory distinct from `config.database.dir`, file mode `0600`. |
+| A server-side store outside the replicated set | **Yes.** Instance configs live in a JSON file owned by a new `provider-config.service.ts`, in a directory distinct from `config.database.dir`, file mode `0600`.                                                                                                                |
 
 Split accordingly:
 
@@ -267,21 +276,21 @@ A user switching device loses provider configs (they are server-side, per instan
 
 ## 6. HTTP surface changes
 
-| Endpoint | Change |
-| --- | --- |
-| `POST /api/chat/generate` | accept `provider_id` + optional `session_id`; route through the registry; emit normalized `ChatChunk` NDJSON; return `session_id` in the terminal chunk for agent providers |
-| `GET /api/providers` | **new** — list provider instances, redacted, with `capabilities` and live availability |
-| `GET /api/provider-types` | **new** — the closed set of adapters + their presets, to build the "add provider" form |
-| `POST /api/providers` | **new** — create an instance (accepts `apiKey`, stores it in the secret store, returns the redacted record) |
-| `PATCH /api/providers/:id` | **new** — update; an omitted `apiKey` keeps the stored one, an empty string clears it |
-| `DELETE /api/providers/:id` | **new** — refuse (`409`) while chats still reference it, or require `?force=true` and leave the orphan references readable |
-| `POST /api/providers/:id/test` | **new** — connection probe: `GET /models` + a minimal completion; returns latency, model count, and the resolved capabilities |
-| `POST /api/providers/:id/models/refresh` | **new** — re-fetch and cache the catalogue for `modelSource: 'auto'` |
-| `GET /api/models` | aggregate across enabled instances; each entry gains `providerId`. Keep the flat Ollama shape behind `?provider=ollama` until the client migrates |
-| `POST /api/models/pull` | Ollama-only; return `409` with a typed error when the target provider lacks `modelManagement` |
-| `GET /api/health` | per-provider status map instead of a single Ollama boolean |
-| RAG (`server/routes/rag.ts`, `services/rag/embed.ts`) | stays on Ollama for v1; guard with `capabilities.embeddings` and a clear error otherwise |
-| Hooks / skills / agents | skip Wollama's tool pipeline when `family === 'agent'` (the agent runs its own) |
+| Endpoint                                              | Change                                                                                                                                                                      |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /api/chat/generate`                             | accept `provider_id` + optional `session_id`; route through the registry; emit normalized `ChatChunk` NDJSON; return `session_id` in the terminal chunk for agent providers |
+| `GET /api/providers`                                  | **new** — list provider instances, redacted, with `capabilities` and live availability                                                                                      |
+| `GET /api/provider-types`                             | **new** — the closed set of adapters + their presets, to build the "add provider" form                                                                                      |
+| `POST /api/providers`                                 | **new** — create an instance (accepts `apiKey`, stores it in the secret store, returns the redacted record)                                                                 |
+| `PATCH /api/providers/:id`                            | **new** — update; an omitted `apiKey` keeps the stored one, an empty string clears it                                                                                       |
+| `DELETE /api/providers/:id`                           | **new** — refuse (`409`) while chats still reference it, or require `?force=true` and leave the orphan references readable                                                  |
+| `POST /api/providers/:id/test`                        | **new** — connection probe: `GET /models` + a minimal completion; returns latency, model count, and the resolved capabilities                                               |
+| `POST /api/providers/:id/models/refresh`              | **new** — re-fetch and cache the catalogue for `modelSource: 'auto'`                                                                                                        |
+| `GET /api/models`                                     | aggregate across enabled instances; each entry gains `providerId`. Keep the flat Ollama shape behind `?provider=ollama` until the client migrates                           |
+| `POST /api/models/pull`                               | Ollama-only; return `409` with a typed error when the target provider lacks `modelManagement`                                                                               |
+| `GET /api/health`                                     | per-provider status map instead of a single Ollama boolean                                                                                                                  |
+| RAG (`server/routes/rag.ts`, `services/rag/embed.ts`) | stays on Ollama for v1; guard with `capabilities.embeddings` and a clear error otherwise                                                                                    |
+| Hooks / skills / agents                               | skip Wollama's tool pipeline when `family === 'agent'` (the agent runs its own)                                                                                             |
 
 Bootstrap (`server/server.ts:488`) must stop assuming a pull is possible.
 
@@ -331,14 +340,14 @@ The panel is the feature, not a form. Screens:
 1. **List** — one row per instance: label, type badge, model count, availability dot (from `/api/providers`), enable/disable toggle, edit, delete. Env-seeded rows are marked read-only.
 2. **Add** — first pick a preset card (Ollama, Anthropic, OpenRouter, LM Studio, vLLM, Groq, Together, "Custom OpenAI-compatible", Codex, opencode), which prefills the form. Presets come from `/api/provider-types`, so new vendors appear without a client change.
 3. **Edit form** — fields shown by type:
-   - `label`, `enabled`
-   - `baseUrl` (openai-compatible, ollama)
-   - `apiKey` — write-only, placeholder `••••` when `hasApiKey`, "Clear key" action
-   - `defaultModel`
-   - **Models**: `auto` (with a Refresh button and a searchable list) or `manual` (free-text list) — auto must degrade to manual on failure, never dead-end
-   - **Extra headers**: key/value repeater (prefilled `HTTP-Referer` / `X-OpenRouter-Title` for the OpenRouter preset)
-   - **Capabilities**: checkboxes with the probe's suggestion prefilled
-   - agent types: working directory picker + the explicit filesystem-access opt-in from §7
+    - `label`, `enabled`
+    - `baseUrl` (openai-compatible, ollama)
+    - `apiKey` — write-only, placeholder `••••` when `hasApiKey`, "Clear key" action
+    - `defaultModel`
+    - **Models**: `auto` (with a Refresh button and a searchable list) or `manual` (free-text list) — auto must degrade to manual on failure, never dead-end
+    - **Extra headers**: key/value repeater (prefilled `HTTP-Referer` / `X-OpenRouter-Title` for the OpenRouter preset)
+    - **Capabilities**: checkboxes with the probe's suggestion prefilled
+    - agent types: working directory picker + the explicit filesystem-access opt-in from §7
 4. **Test connection** — visible result: reachable, model count, latency, first-token latency. This is what makes a self-hosted endpoint debuggable without reading server logs.
 
 Placement: alongside the existing settings routes, reusing the current form components — an instance editor is the same shape as `CompanionEditor.svelte`.
@@ -355,15 +364,15 @@ Placement: alongside the existing settings routes, reusing the current form comp
 
 ## 9. Phasing
 
-| Phase | Content | Risk |
-| --- | --- | --- |
-| **P0** | `LlmProvider` interface, registry, instance resolution, Ollama adapter, normalized `ChatChunk`. Single seeded instance. Behaviour identical. | low — pure refactor, covered by existing `ollama.service.test.ts` |
-| **P1** | Instance store + secret store + `/api/providers` CRUD + auth on `/_db` and the write routes + the settings panel. Still Ollama-only, but now multi-instance (several Ollama hosts). | medium — new persistence, security work |
-| **P1b** | Schema migration (`provider_id` everywhere) + model picker grouped by provider. | medium — RxDB migration, both DB sides |
-| **P2** | `openai-compatible` adapter + presets (OpenRouter first). **Highest value per unit of work**: one adapter unlocks OpenRouter, LM Studio, vLLM, Groq, an OpenAI key — and Claude through OpenRouter without an Anthropic key. | medium — SSE normalization, heterogeneous endpoints |
-| **P3** | Native Anthropic adapter (`@anthropic-ai/sdk`): adaptive thinking, prompt caching, per-token usage. Only worth it after P2, since P2 already reaches Claude. | low-medium once P2 exists |
-| **P4** | opencode via `opencode serve` + SDK, reusing `sidecar.service.ts`. First agent-family provider: session persistence, event rendering, pipeline bypass. | high — new interaction model |
-| **P5** | codex via `codex exec --json`. Same event plumbing as P4, different transport. | medium once P4 lands |
+| Phase     | Content                                                                                                                                                                                                                                                        | Risk                                                |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| **P0** ✅ | `LlmProvider` (extends the existing `ProviderAdapter`), `ProviderRegistry`, per-request resolution via `provider_id`, ollama registered as the seeded default, `GET /api/providers`, capability guard on `/api/models/pull`. Wire format and client untouched. | low — done; 162 server tests green                  |
+| **P1**    | Instance store + secret store + `/api/providers` CRUD + auth on `/_db` and the write routes + the settings panel. Still Ollama-only, but now multi-instance (several Ollama hosts).                                                                            | medium — new persistence, security work             |
+| **P1b**   | Schema migration (`provider_id` everywhere) + model picker grouped by provider.                                                                                                                                                                                | medium — RxDB migration, both DB sides              |
+| **P2**    | `openai-compatible` adapter + presets (OpenRouter first). **Highest value per unit of work**: one adapter unlocks OpenRouter, LM Studio, vLLM, Groq, an OpenAI key — and Claude through OpenRouter without an Anthropic key.                                   | medium — SSE normalization, heterogeneous endpoints |
+| **P3**    | Native Anthropic adapter (`@anthropic-ai/sdk`): adaptive thinking, prompt caching, per-token usage. Only worth it after P2, since P2 already reaches Claude.                                                                                                   | low-medium once P2 exists                           |
+| **P4**    | opencode via `opencode serve` + SDK, reusing `sidecar.service.ts`. First agent-family provider: session persistence, event rendering, pipeline bypass.                                                                                                         | high — new interaction model                        |
+| **P5**    | codex via `codex exec --json`. Same event plumbing as P4, different transport.                                                                                                                                                                                 | medium once P4 lands                                |
 
 P0–P1b are the real work; P2–P5 are adapters once the seams exist. Do not start P2 before P0, or the second provider gets welded into `server.ts` the same way Ollama is today — and do not ship P2 before P1's auth work, since that is the release where the server starts holding user API keys.
 

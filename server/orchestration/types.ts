@@ -1,6 +1,8 @@
 // Core contracts for the Wollama tool/MCP orchestration layer.
 // See docs/architecture/mcp-client-acp-team-investigation.md for the design rationale.
 
+import type { ProviderCapabilities, ProviderFamily, ProviderModel, ProviderType } from '../../shared/types/provider.js';
+
 export type ToolRisk = 'read' | 'write' | 'execute' | 'external';
 
 export interface ToolDescriptor {
@@ -86,6 +88,29 @@ export interface ProviderAdapter {
 	chat(req: ProviderChatRequest): Promise<ProviderTurn>;
 	/** builds the assistant + tool messages to append before the next turn */
 	buildToolMessages(calls: ToolCallRequest[], results: ToolResult[]): unknown[];
+}
+
+/**
+ * A registered, addressable LLM backend: a ProviderAdapter plus the identity and
+ * metadata the registry, the HTTP surface and the client UI need.
+ *
+ * `id` is an instance id, not a type name — several instances may share a type
+ * (three ollama hosts, two OpenRouter accounts). Today the registry seeds exactly
+ * one instance per configured type; runtime-created instances land in P1.
+ */
+export interface LlmProvider extends ProviderAdapter {
+	readonly id: string;
+	readonly type: ProviderType;
+	readonly family: ProviderFamily;
+	/** user-facing name, editable once instances are configurable */
+	readonly label: string;
+	readonly capabilities: ProviderCapabilities;
+	/** health probe; drives /api/health and the availability dot in the UI.
+	 *  Must resolve false rather than throw when the backend is unreachable. */
+	isAvailable(): Promise<boolean>;
+	listModels(): Promise<ProviderModel[]>;
+	/** only meaningful when capabilities.embeddings is true */
+	embed?(input: string[]): Promise<number[][]>;
 }
 
 export type RunStatus =

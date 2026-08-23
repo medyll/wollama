@@ -10,6 +10,8 @@ import { TtsService } from './services/tts.service.js';
 import { OllamaService } from './services/ollama.service.js';
 import { conversationOrchestrator } from './orchestration/conversation-orchestrator.js';
 import { registerBuiltinRuntimes } from './orchestration/register.js';
+import { registerProviders } from './orchestration/register-providers.js';
+import { providerRegistry } from './orchestration/provider-registry.js';
 import { connectionManager } from './mcp/connection-manager.js';
 import { PromptService } from './services/prompt.service.js';
 import { sidecarService } from './services/sidecar.service.js';
@@ -66,6 +68,7 @@ app.use((req, res, next) => {
 const port = config.server.port;
 
 registerBuiltinRuntimes();
+registerProviders();
 
 // Server State
 const serverState = {
@@ -137,7 +140,10 @@ app.get('/api/health', (req, res) => {
 	res.json({
 		service: 'wollama',
 		status: 'ok',
-		ollama: serverState.ollamaReady
+		// Kept for existing clients (ServerConnectionCheck, onboarding) which equate
+		// "healthy" with "ollama reachable"; `providers` is the multi-backend view.
+		ollama: serverState.ollamaReady,
+		providers: providerRegistry.list().map((p) => ({ id: p.id, type: p.type, family: p.family }))
 	});
 });
 
@@ -232,7 +238,7 @@ app.post('/api/audio/speak', async (req, res) => {
 
 app.post('/api/chat/generate', async (req, res) => {
 	try {
-		const { model, messages, stream, context, chat_id, user_id, companion_id } = req.body;
+		const { model, messages, stream, context, chat_id, user_id, companion_id, provider_id } = req.body;
 
 		// Process Context if available
 		if (context) {
@@ -312,7 +318,7 @@ app.post('/api/chat/generate', async (req, res) => {
 				// not found) still reaches the outer catch with res.headersSent === false.
 				let headersSent = false;
 				await conversationOrchestrator.runChat(
-					{ model, messages, stream: true, ctx },
+					{ model, messages, stream: true, ctx, provider_id },
 					{
 						writeChunk: (o) => {
 							if (!headersSent) {
@@ -346,7 +352,13 @@ app.post('/api/chat/generate', async (req, res) => {
 			}
 		} else {
 			const ctx = { chat_id, user_id, companion_id, origin: 'chat' as const };
-			const result = await conversationOrchestrator.runChat({ model, messages, stream: false, ctx });
+			const result = await conversationOrchestrator.runChat({
+				model,
+				messages,
+				stream: false,
+				ctx,
+				provider_id
+			});
 			res.json(result);
 		}
 	} catch (error: any) {
@@ -368,21 +380,56 @@ app.post('/api/chat/generate', async (req, res) => {
 });
 
 // Model Management Routes
+// Provider Routes
+app.get('/api/providers', async (req, res) => {
+	try {
+		res.json({ default: providerRegistry.getDefaultId(), providers: await providerRegistry.summaries() });
+	} catch (error) {
+		console.error('Error listing providers:', error);
+		res.status(500).json({ error: 'Failed to list providers' });
+	}
+});
+
 app.get('/api/models', async (req, res) => {
 	try {
-		const list = await OllamaService.list();
-		res.json(list);
-	} catch (error) {
+		const providerId = typeof req.query.provider === 'string' ? req.query.provider : undefined;
+		const models = await providerRegistry.listModels(providerId);
+		// `models[].raw` keeps ollama's own record shape (name, size, digest, details)
+		// so existing consumers of this endpoint are unaffected; providerId/id/label are
+		// additive, and providers without a raw record synthesize an equivalent entry.
+		res.json({
+			models: models.map((m) => ({
+				...(m.raw && typeof m.raw === 'object' ? m.raw : { name: m.id }),
+				id: m.id,
+				label: m.label,
+				providerId: m.providerId,
+				...(m.contextWindow ? { contextWindow: m.contextWindow } : {})
+			}))
+		});
+	} catch (error: any) {
 		console.error('Error listing models:', error);
-		res.status(500).json({ error: 'Failed to list models' });
+		res.status(error?.status_code === 404 ? 404 : 500).json({ error: 'Failed to list models' });
 	}
 });
 
 app.post('/api/models/pull', async (req, res) => {
 	try {
-		const { model } = req.body;
+		const { model, provider_id } = req.body;
 		if (!model) {
 			res.status(400).json({ error: 'Model name is required' });
+			return;
+		}
+
+		// Pulling is an ollama-family concept. Fail loudly rather than pulling into the
+		// wrong backend when a caller aims this at a provider that has no such notion.
+		const provider = providerRegistry.get(provider_id);
+		if (!provider.capabilities.modelManagement) {
+			res.status(409).json({
+				error: {
+					code: 'MODEL_MANAGEMENT_UNSUPPORTED',
+					message: `Provider '${provider.id}' does not support pulling models`
+				}
+			});
 			return;
 		}
 
