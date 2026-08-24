@@ -1,6 +1,9 @@
 import { OllamaService } from '../services/ollama.service.js';
+import { config } from '../config.js';
+import { NO_CAPABILITIES } from '../../shared/types/provider.js';
+import type { ProviderCapabilities, ProviderModel } from '../../shared/types/provider.js';
 import type {
-	ProviderAdapter,
+	LlmProvider,
 	ProviderChatRequest,
 	ProviderChunk,
 	ProviderTurn,
@@ -58,7 +61,58 @@ async function* normalizeStream(response: AsyncIterable<unknown>): AsyncIterable
 	}
 }
 
-export const ollamaProvider: ProviderAdapter = {
+const OLLAMA_CAPABILITIES: ProviderCapabilities = {
+	...NO_CAPABILITIES,
+	streaming: true,
+	tools: true,
+	embeddings: true,
+	modelManagement: true,
+	// Per-model in reality (llava yes, mistral no); true here means the transport
+	// carries images, which is what the client needs to decide whether to offer
+	// an attach button at all.
+	vision: true,
+	systemPrompt: true
+};
+
+/** Maps ollama's own model records to ProviderModel while keeping the raw record,
+ *  which existing consumers of /api/models still read (size, digest, details). */
+function toProviderModels(list: unknown): ProviderModel[] {
+	const models = isRecord(list) && Array.isArray(list.models) ? list.models : [];
+	return models.filter(isRecord).map((m) => {
+		const name = typeof m.name === 'string' ? m.name : typeof m.model === 'string' ? m.model : '';
+		return { id: name, label: name, providerId: 'ollama', raw: m };
+	});
+}
+
+export const ollamaProvider: LlmProvider = {
+	id: 'ollama',
+	type: 'ollama',
+	family: 'http',
+	label: 'Ollama',
+	capabilities: OLLAMA_CAPABILITIES,
+
+	async isAvailable(): Promise<boolean> {
+		try {
+			await OllamaService.list();
+			return true;
+		} catch {
+			return false;
+		}
+	},
+
+	async listModels(): Promise<ProviderModel[]> {
+		return toProviderModels(await OllamaService.list());
+	},
+
+	async embed(input: string[]): Promise<number[][]> {
+		const result = (await OllamaService.embed({
+			model: config.rag.embedModel,
+			input
+		})) as { embeddings?: number[][] };
+		if (!result?.embeddings) throw new Error('Ollama returned no embeddings');
+		return result.embeddings;
+	},
+
 	async chat(req: ProviderChatRequest): Promise<ProviderTurn> {
 		const payload: Record<string, unknown> = {
 			model: req.model,

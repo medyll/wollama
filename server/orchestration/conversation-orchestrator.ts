@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { config } from '../config.js';
 import { sanitizeOllamaResponse } from '../services/ollama-response.js';
-import { ollamaProvider } from './ollama.provider.js';
+import { providerRegistry } from './provider-registry.js';
 import { toolCatalog } from './tool-catalog.js';
 import { toolExecutor } from './tool-executor.js';
 import { runManager } from './run-manager.js';
@@ -18,6 +18,11 @@ export interface RunChatRequest {
 	messages: unknown[];
 	stream: boolean;
 	ctx: ExecutionContext;
+	/** Provider instance to run this turn against. Omitted means the registry default,
+	 *  which keeps single-provider (ollama-only) installs unchanged. Ignored when an
+	 *  adapter was injected into createConversationOrchestrator (tests, and any caller
+	 *  that has already resolved the provider itself). */
+	provider_id?: string;
 }
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -57,9 +62,13 @@ function wollamaEvent(event: WollamaEvent) {
  * Kept express-free (StreamSink instead of `res`) so the loop is unit-testable without
  * an HTTP server.
  */
-export function createConversationOrchestrator(provider: ProviderAdapter = ollamaProvider) {
+export function createConversationOrchestrator(injected?: ProviderAdapter) {
 	return {
 		async runChat(req: RunChatRequest, sink?: StreamSink): Promise<unknown | void> {
+			// An injected adapter wins over req.provider_id: the caller already decided.
+			// Otherwise resolve per request, so one orchestrator instance serves every
+			// provider instead of one singleton per backend.
+			const provider = injected ?? providerRegistry.get(req.provider_id);
 			const messages = [...req.messages];
 			const maxIterations = config.tools.maxIterations;
 			let metricsAcc: Record<string, unknown> = {};
