@@ -1,234 +1,166 @@
 /**
  * E2E Tests - Chat Management (S7-07)
  *
- * Tests for chat CRUD operations:
- * 1. Create a new chat
- * 2. Rename a chat
- * 3. Delete a chat
- * 4. Switch between chats
- * 5. Message persistence across chats
+ * Covers the chat lifecycle as the app actually implements it:
+ * 1. Start a new chat from the sidebar
+ * 2. A chat row is created on the first message, and appears in the sidebar
+ * 3. Assistant replies stream into the transcript
+ * 4. Switching between chats keeps each transcript isolated
+ * 5. Deleting a chat from the composer toolbar (with confirmation)
+ *
+ * Renaming is deliberately not covered: titles are generated on creation and the
+ * UI exposes no rename control. Add specs here when one ships.
  */
 
 import { test, expect } from '@playwright/test';
-import { setupTestState, waitForChatReady, createNewChat, sendMessage } from '../fixtures/test-setup';
+import {
+	setupTestState,
+	waitForChatReady,
+	createNewChat,
+	sendMessage,
+	mockChatGeneration,
+	mockServerHealth,
+	deleteCurrentChat
+} from '../fixtures/test-setup';
 
 test.setTimeout(60 * 1000);
 
-// Use baseURL from playwright.config.ts
-const BASE_URL = 'http://localhost:5176';
+/** Sidebar link for a chat, addressed by id so the test never depends on ordering. */
+function chatLink(page: import('@playwright/test').Page, chatUrl: string) {
+	const chatId = new URL(chatUrl).pathname.split('/').pop();
+	return page.locator(`[data-testid="chat-list-item"][href="/chat/${chatId}"]`);
+}
 
-test.describe.skip('S7-07: Chat Management', () => {
-	// Legacy specification: the current /chat route is a landing page and chat CRUD controls changed.
+test.describe('S7-07: Chat Management', () => {
 	test.beforeEach(async ({ page }) => {
-		// Set up clean state for each test
 		await setupTestState(page);
+		await mockServerHealth(page);
+		await mockChatGeneration(page);
 	});
 
 	test.describe('Create New Chat', () => {
-		test('should create a new chat from empty state', async ({ page }) => {
-			await page.goto(`${BASE_URL}/chat`);
+		test('should open an empty composer on a new chat', async ({ page }) => {
+			await page.goto('/chat/new');
 			await waitForChatReady(page);
 
-			// Click "New Chat" button in sidebar
-			await createNewChat(page);
-
-			// Chat should be cleared and ready for new message
-			await expect(page.getByTestId('message-input')).toBeVisible();
 			await expect(page.getByTestId('message-input')).toHaveValue('');
+			await expect(page.getByTestId('chat-message')).toHaveCount(0);
 		});
 
-		test('should create a new chat after sending a message', async ({ page }) => {
-			await page.goto(`${BASE_URL}/chat`);
+		test('should persist the chat in the sidebar after the first message', async ({ page }) => {
+			await page.goto('/chat/new');
 			await waitForChatReady(page);
 
-			// Send a message to create initial chat
 			await sendMessage(page, 'First message in chat 1', { waitForResponse: false });
 
-			// Message should appear
-			await expect(page.locator('[data-testid="chat-message"]').first()).toBeVisible({ timeout: 5000 });
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(1, { timeout: 10_000 });
+			await expect(page).toHaveURL(/\/chat\/[0-9a-f-]{36}$/, { timeout: 10_000 });
+		});
 
-			// Create new chat
+		test('should clear the transcript when starting another chat', async ({ page }) => {
+			await page.goto('/chat/new');
+			await waitForChatReady(page);
+
+			await sendMessage(page, 'First message in chat 1', { waitForResponse: false });
+			await expect(page.getByTestId('chat-message').first()).toBeVisible();
+
 			await createNewChat(page);
 
-			// Previous messages should be cleared
-			await expect(page.locator('[data-testid="chat-message"]')).not.toBeVisible();
+			await expect(page.getByTestId('chat-message')).toHaveCount(0);
+			await expect(page.getByTestId('message-input')).toHaveValue('');
 		});
 	});
 
-	test.describe('Rename Chat', () => {
-		test('should rename a chat from sidebar', async ({ page }) => {
-			await page.goto(`${BASE_URL}/chat`);
+	test.describe('Assistant Response', () => {
+		test('should render the streamed assistant reply', async ({ page }) => {
+			await mockChatGeneration(page, { chunks: ['Mocked ', 'assistant ', 'reply.'] });
+
+			await page.goto('/chat/new');
 			await waitForChatReady(page);
 
-			// Create a chat with a message
-			await sendMessage(page, 'Test message for rename', { waitForResponse: false });
-			await page.waitForTimeout(2000);
+			await sendMessage(page, 'Hello there');
 
-			// Find chat in sidebar
-			const chatItem = page.getByTestId('chat-list-item').first();
-			await expect(chatItem).toBeVisible();
-
-			// Hover to show actions
-			await chatItem.hover();
-
-			// Click rename button (pencil icon or "Rename" text)
-			const renameBtn = chatItem.locator(
-				'button[title="Rename"], button:has-text("Rename"), .rename-btn, [aria-label*="rename" i]'
-			);
-			if (await renameBtn.isVisible()) {
-				await renameBtn.click();
-
-				// Edit dialog should appear
-				const editInput = page.locator('input[placeholder*="name" i], input[type="text"]').first();
-				await expect(editInput).toBeVisible();
-
-				// Type new name
-				await editInput.fill('Renamed Test Chat');
-				await editInput.press('Enter');
-
-				// Chat should be renamed
-				await expect(page.getByText('Renamed Test Chat')).toBeVisible({ timeout: 5000 });
-			}
+			const assistant = page.locator('[data-testid="chat-message"][data-role="assistant"]');
+			await expect(assistant).toHaveCount(1);
+			await expect(assistant).toContainText('Mocked assistant reply.', { timeout: 15_000 });
 		});
 	});
 
 	test.describe('Delete Chat', () => {
-		test('should delete a chat from sidebar', async ({ page }) => {
-			await page.goto(`${BASE_URL}/chat`);
+		test('should delete the open chat and leave the chat route', async ({ page }) => {
+			await page.goto('/chat/new');
 			await waitForChatReady(page);
-
-			// Create a chat with a message
 			await sendMessage(page, 'Message to be deleted', { waitForResponse: false });
-			await page.waitForTimeout(2000);
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(1, { timeout: 10_000 });
 
-			// Find chat in sidebar
-			const chatItem = page.getByTestId('chat-list-item').first();
-			await expect(chatItem).toBeVisible();
+			await deleteCurrentChat(page);
 
-			// Hover to show actions
-			await chatItem.hover();
-
-			// Click delete button (trash icon or "Delete" text)
-			const deleteBtn = chatItem.locator(
-				'button[title="Delete"], button:has-text("Delete"), .delete-btn, [aria-label*="delete" i]'
-			);
-			if (await deleteBtn.isVisible()) {
-				await deleteBtn.click();
-
-				// Confirmation dialog should appear
-				const confirmBtn = page.locator('button:has-text("Confirm"), button:has-text("Delete"), .btn-danger').first();
-				await expect(confirmBtn).toBeVisible();
-				await confirmBtn.click();
-
-				// Chat should be removed from list
-				await expect(chatItem).not.toBeVisible({ timeout: 5000 });
-			}
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(0, { timeout: 10_000 });
 		});
 
-		test('should cancel chat deletion', async ({ page }) => {
-			await page.goto(`${BASE_URL}/chat`);
+		test('should keep the chat when the confirmation is cancelled', async ({ page }) => {
+			await page.goto('/chat/new');
 			await waitForChatReady(page);
-
-			// Create a chat
 			await sendMessage(page, 'Message to keep', { waitForResponse: false });
-			await page.waitForTimeout(2000);
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(1, { timeout: 10_000 });
 
-			// Find chat in sidebar
-			const chatItem = page.getByTestId('chat-list-item').first();
-			await chatItem.hover();
+			await deleteCurrentChat(page, { confirm: false });
 
-			// Click delete
-			const deleteBtn = chatItem.locator(
-				'button[title="Delete"], button:has-text("Delete"), .delete-btn, [aria-label*="delete" i]'
-			);
-			if (await deleteBtn.isVisible()) {
-				await deleteBtn.click();
-
-				// Click cancel instead of confirm
-				const cancelBtn = page.locator('button:has-text("Cancel"), .btn-ghost').first();
-				if (await cancelBtn.isVisible()) {
-					await cancelBtn.click();
-
-					// Chat should still exist
-					await expect(chatItem).toBeVisible();
-				}
-			}
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(1);
+			await expect(page.getByText('Message to keep')).toBeVisible();
 		});
 	});
 
 	test.describe('Switch Between Chats', () => {
 		test('should switch between multiple chats', async ({ page }) => {
-			await page.goto(`${BASE_URL}/chat`);
+			await page.goto('/chat/new');
 			await waitForChatReady(page);
 
-			// Create first chat
 			await sendMessage(page, 'Message in chat 1', { waitForResponse: false });
-			await page.waitForTimeout(2000);
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(1, { timeout: 10_000 });
+			const chatA = page.url();
 
-			// Create second chat
 			await createNewChat(page);
-
 			await sendMessage(page, 'Message in chat 2', { waitForResponse: false });
-			await page.waitForTimeout(2000);
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(2, { timeout: 10_000 });
+			const chatB = page.url();
 
-			// Should see 2 chats in sidebar
-			const chatItems = page.getByTestId('chat-list-item');
-			await expect(chatItems).toHaveCount(2);
+			await chatLink(page, chatA).click();
+			await expect(page).toHaveURL(chatA);
+			await expect(page.getByText('Message in chat 1')).toBeVisible({ timeout: 10_000 });
+			await expect(page.getByText('Message in chat 2')).toBeHidden();
 
-			// Click on first chat
-			await chatItems.first().click();
-			await page.waitForTimeout(500);
-
-			// Should see message from chat 1
-			await expect(page.getByText('Message in chat 1')).toBeVisible();
-			await expect(page.getByText('Message in chat 2')).not.toBeVisible();
-
-			// Click on second chat
-			await chatItems.last().click();
-			await page.waitForTimeout(500);
-
-			// Should see message from chat 2
-			await expect(page.getByText('Message in chat 2')).toBeVisible();
-			await expect(page.getByText('Message in chat 1')).not.toBeVisible();
+			await chatLink(page, chatB).click();
+			await expect(page).toHaveURL(chatB);
+			await expect(page.getByText('Message in chat 2')).toBeVisible({ timeout: 10_000 });
+			await expect(page.getByText('Message in chat 1')).toBeHidden();
 		});
 	});
 
 	test.describe('Message Persistence', () => {
-		test('should preserve messages when switching chats', async ({ page }) => {
-			await page.goto(`${BASE_URL}/chat`);
+		test('should preserve every message of a chat across switches', async ({ page }) => {
+			await page.goto('/chat/new');
 			await waitForChatReady(page);
 
-			// Create chat A with multiple messages
 			await sendMessage(page, 'Chat A - Message 1', { waitForResponse: false });
-			await page.waitForTimeout(1000);
-
 			await sendMessage(page, 'Chat A - Message 2', { waitForResponse: false });
-			await page.waitForTimeout(2000);
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(1, { timeout: 10_000 });
+			const chatA = page.url();
 
-			// Create chat B
 			await createNewChat(page);
-
 			await sendMessage(page, 'Chat B - Message 1', { waitForResponse: false });
-			await page.waitForTimeout(2000);
+			await expect(page.getByTestId('chat-list-item')).toHaveCount(2, { timeout: 10_000 });
+			const chatB = page.url();
 
-			// Switch back to chat A
-			const chatItems = page.getByTestId('chat-list-item');
-			await chatItems.first().click();
-			await page.waitForTimeout(1000);
-
-			// Both messages from chat A should be visible
-			await expect(page.getByText('Chat A - Message 1')).toBeVisible();
+			await chatLink(page, chatA).click();
+			await expect(page.getByText('Chat A - Message 1')).toBeVisible({ timeout: 10_000 });
 			await expect(page.getByText('Chat A - Message 2')).toBeVisible();
-			await expect(page.getByText('Chat B - Message 1')).not.toBeVisible();
+			await expect(page.getByText('Chat B - Message 1')).toBeHidden();
 
-			// Switch back to chat B
-			await chatItems.last().click();
-			await page.waitForTimeout(1000);
-
-			// Message from chat B should be visible
-			await expect(page.getByText('Chat B - Message 1')).toBeVisible();
-			await expect(page.getByText('Chat A - Message 1')).not.toBeVisible();
-			await expect(page.getByText('Chat A - Message 2')).not.toBeVisible();
+			await chatLink(page, chatB).click();
+			await expect(page.getByText('Chat B - Message 1')).toBeVisible({ timeout: 10_000 });
+			await expect(page.getByText('Chat A - Message 1')).toBeHidden();
+			await expect(page.getByText('Chat A - Message 2')).toBeHidden();
 		});
 	});
 });
