@@ -1,4 +1,7 @@
 import { vi } from 'vitest';
+// Registers the jest-dom matchers (toBeInTheDocument, toBeDisabled, toHaveAttribute…)
+// that the component suites assert with.
+import '@testing-library/jest-dom/vitest';
 
 // Ensure browser-like environment for component tests
 if (typeof window !== 'undefined') {

@@ -1,17 +1,37 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/svelte';
+import { render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import * as navigation from '$app/navigation';
 vi.mock('$app/environment', () => ({ browser: true, dev: true, version: '1.0.0' }));
 
 vi.mock('$lib/state/user.svelte', () => ({
 	userState: {
+		uid: 'test-user',
 		currentUser: { user_id: 'test-user', username: 'testuser' },
+		nickname: '',
+		email: null,
+		password: null,
+		isSecured: false,
 		preferences: {
 			serverUrl: '',
+			ollamaUrl: 'http://localhost:11434',
 			onboarding_completed: false
-		}
+		},
+		save: vi.fn(),
+		setLocalProtection: vi.fn()
 	}
+}));
+
+vi.mock('$lib/state/ui.svelte', () => ({
+	uiState: {
+		setActiveCompanionId: vi.fn()
+	}
+}));
+
+// Step 1 auto-tests the Ollama connection on entry; keep that off the network.
+vi.mock('$lib/services/ollama.service', () => ({
+	normalizeServerUrl: (url: string) => url,
+	testOllamaConnection: vi.fn().mockResolvedValue({ success: false, error: 'Unable to connect' })
 }));
 
 import OnboardingPage from './OnboardingWizard.svelte';
@@ -22,57 +42,60 @@ vi.mock('$app/navigation', () => ({
 	goto: vi.fn()
 }));
 
-// Legacy onboarding-flow expectations remain skipped individually after the wizard redesign.
 describe('Onboarding Page (Story 1.1)', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		userState.nickname = '';
+		userState.preferences.onboarding_completed = false;
 	});
 
-	it.skip('should render onboarding wizard on component mount', () => {
+	it('should render the first wizard step on mount', () => {
 		render(OnboardingPage);
 
-		expect(screen.getByText('Welcome to Wollama')).toBeInTheDocument();
-		expect(screen.getByText(/Wollama is a local AI chat application/)).toBeInTheDocument();
+		expect(screen.getByTestId('onboarding-wizard')).toBeInTheDocument();
+		expect(screen.getByTestId('wizard-title').textContent).toBe('Set Up Your Profile');
 	});
 
-	it.skip('should display wizard explanation of what Wollama is (AC 3)', () => {
+	it('should explain what the current step asks for (AC 3)', () => {
 		render(OnboardingPage);
 
-		const description = screen.getByText(/Wollama is a local AI chat application/);
-		expect(description).toBeInTheDocument();
-		expect(description.textContent).toContain('local AI chat');
+		expect(screen.getByText(/Choose a nickname and optional password/)).toBeInTheDocument();
 	});
 
-	it.skip('should have a Next button to proceed (AC 4)', async () => {
+	it('should have a Next button, disabled until the step is valid (AC 4)', async () => {
 		render(OnboardingPage);
 
 		const nextButton = screen.getByRole('button', { name: /next step/i });
 		expect(nextButton).toBeInTheDocument();
-		expect(nextButton).toBeEnabled();
+		// Step 0 requires a nickname before it can be left.
+		expect(nextButton).toBeDisabled();
+
+		await userEvent.type(screen.getByLabelText('Nickname'), 'Meddy');
+
+		await waitFor(() => expect(nextButton).toBeEnabled());
 	});
 
-	it.skip('should redirect to setup when Next button is clicked on final step', async () => {
-		const gotoMock = vi.fn();
-		vi.mocked(navigation.goto).mockImplementation(gotoMock);
-
+	it('should advance to the server step and persist the nickname', async () => {
 		render(OnboardingPage);
 
-		const nextButton = screen.getByRole('button', { name: /start setup/i });
-		await userEvent.click(nextButton);
+		await userEvent.type(screen.getByLabelText('Nickname'), 'Meddy');
+		await userEvent.click(screen.getByRole('button', { name: /next step/i }));
 
-		expect(gotoMock).toHaveBeenCalledWith('/chat');
+		await waitFor(() => {
+			expect(screen.getByTestId('wizard-title').textContent).toBe('Configure Ollama Server');
+		});
+		expect(userState.nickname).toBe('Meddy');
+		expect(userState.save).toHaveBeenCalled();
 	});
 
-	it.skip('should redirect to setup when Skip button is clicked', async () => {
-		const gotoMock = vi.fn();
-		vi.mocked(navigation.goto).mockImplementation(gotoMock);
-
+	it('should redirect to a fresh chat when Skip is clicked', async () => {
 		render(OnboardingPage);
 
-		const skipButton = screen.getByRole('button', { name: /skip/i });
-		await userEvent.click(skipButton);
+		await userEvent.click(screen.getByRole('button', { name: /skip onboarding/i }));
 
-		expect(gotoMock).toHaveBeenCalledWith('/chat');
+		await waitFor(() => {
+			expect(navigation.goto).toHaveBeenCalledWith('/chat/new');
+		});
 	});
 
 	it('should display step indicator', () => {
@@ -82,26 +105,22 @@ describe('Onboarding Page (Story 1.1)', () => {
 		expect(progressBars.length).toBeGreaterThan(0);
 	});
 
-	it.skip('should mark onboarding_completed flag when completing', async () => {
-		const gotoMock = vi.fn();
-		vi.mocked(navigation.goto).mockImplementation(gotoMock);
-
-		// Set current user
-		userState.currentUser = { user_id: 'test-user', username: 'testuser' };
-
+	it('should mark onboarding_completed when the wizard finishes', async () => {
 		render(OnboardingPage);
 
-		const nextButton = screen.getByRole('button', { name: /start setup/i });
-		await userEvent.click(nextButton);
+		await userEvent.click(screen.getByRole('button', { name: /skip onboarding/i }));
 
-		// Verify flag was set
-		expect(userState.preferences.onboarding_completed).toBe(true);
+		await waitFor(() => {
+			expect(userState.preferences.onboarding_completed).toBe(true);
+		});
+		expect(userState.save).toHaveBeenCalled();
 	});
 
-	it.skip('should be accessible with keyboard navigation', async () => {
+	it('should label every control for assistive technology', () => {
 		render(OnboardingPage);
 
 		const buttons = screen.getAllByRole('button');
+		expect(buttons.length).toBeGreaterThan(0);
 		buttons.forEach((btn) => {
 			expect(btn).toHaveAttribute('aria-label');
 		});

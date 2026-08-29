@@ -28,7 +28,8 @@ beforeEach(() => {
 	});
 });
 
-// Legacy rating expectations remain skipped until persistence is implemented.
+// Rating is component-local state (not persisted yet): assertions target the
+// data-rating / aria-pressed contract the component actually exposes.
 describe('MessageActions', () => {
 	const mockMessage = {
 		message_id: 'msg-123',
@@ -108,7 +109,7 @@ describe('MessageActions', () => {
 	});
 
 	describe('Rating', () => {
-		it.skip('should rate response as good when thumbs up clicked', async () => {
+		it('should rate response as good when thumbs up clicked', async () => {
 			render(MessageActions, {
 				props: {
 					message: mockMessage
@@ -118,11 +119,13 @@ describe('MessageActions', () => {
 			const thumbsUpBtn = screen.getByLabelText('Rate good');
 			await fireEvent.click(thumbsUpBtn);
 
-			// Button should show active state
-			expect(thumbsUpBtn).toHaveClass('text-success');
+			await waitFor(() => {
+				expect(thumbsUpBtn.getAttribute('data-rating')).toBe('good');
+				expect(thumbsUpBtn.getAttribute('aria-pressed')).toBe('true');
+			});
 		});
 
-		it.skip('should rate response as bad when thumbs down clicked', async () => {
+		it('should rate response as bad when thumbs down clicked', async () => {
 			render(MessageActions, {
 				props: {
 					message: mockMessage
@@ -132,11 +135,13 @@ describe('MessageActions', () => {
 			const thumbsDownBtn = screen.getByLabelText('Rate bad');
 			await fireEvent.click(thumbsDownBtn);
 
-			// Button should show active state
-			expect(thumbsDownBtn).toHaveClass('text-error');
+			await waitFor(() => {
+				expect(thumbsDownBtn.getAttribute('data-rating')).toBe('bad');
+				expect(thumbsDownBtn.getAttribute('aria-pressed')).toBe('true');
+			});
 		});
 
-		it.skip('should toggle off rating when same button clicked twice', async () => {
+		it('should toggle off rating when same button clicked twice', async () => {
 			render(MessageActions, {
 				props: {
 					message: mockMessage
@@ -145,13 +150,17 @@ describe('MessageActions', () => {
 
 			const thumbsUpBtn = screen.getByLabelText('Rate good');
 			await fireEvent.click(thumbsUpBtn);
+			await waitFor(() => expect(thumbsUpBtn.getAttribute('aria-pressed')).toBe('true'));
+
 			await fireEvent.click(thumbsUpBtn);
 
-			// Rating should be cleared
-			expect(thumbsUpBtn).not.toHaveClass('text-success');
+			await waitFor(() => {
+				expect(thumbsUpBtn.getAttribute('data-rating')).toBeNull();
+				expect(thumbsUpBtn.getAttribute('aria-pressed')).toBe('false');
+			});
 		});
 
-		it.skip('should switch rating when different button clicked', async () => {
+		it('should switch rating when different button clicked', async () => {
 			render(MessageActions, {
 				props: {
 					message: mockMessage
@@ -162,10 +171,14 @@ describe('MessageActions', () => {
 			const thumbsDownBtn = screen.getByLabelText('Rate bad');
 
 			await fireEvent.click(thumbsUpBtn);
+			await waitFor(() => expect(thumbsUpBtn.getAttribute('aria-pressed')).toBe('true'));
+
 			await fireEvent.click(thumbsDownBtn);
 
-			expect(thumbsUpBtn).not.toHaveClass('text-success');
-			expect(thumbsDownBtn).toHaveClass('text-error');
+			await waitFor(() => {
+				expect(thumbsUpBtn.getAttribute('aria-pressed')).toBe('false');
+				expect(thumbsDownBtn.getAttribute('aria-pressed')).toBe('true');
+			});
 		});
 	});
 
@@ -201,10 +214,11 @@ describe('MessageActions', () => {
 	});
 
 	describe('Accessibility', () => {
-		it.skip('should have proper ARIA labels on all buttons', async () => {
+		it('should have proper ARIA labels on all buttons', async () => {
 			render(MessageActions, {
 				props: {
-					message: mockMessage
+					message: mockMessage,
+					onRegenerate: vi.fn()
 				}
 			});
 

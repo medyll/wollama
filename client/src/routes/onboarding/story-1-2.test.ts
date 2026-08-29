@@ -1,27 +1,43 @@
-import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest';
-import { render, screen } from '@testing-library/svelte';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
-import * as navigation from '$app/navigation';
 vi.mock('$app/environment', () => ({ browser: true, dev: true, version: '1.0.0' }));
 
 vi.mock('$lib/state/user.svelte', () => ({
 	userState: {
+		uid: 'test-user',
 		currentUser: { user_id: 'test-user', username: 'testuser' },
+		nickname: '',
+		email: null,
+		password: null,
+		isSecured: false,
 		preferences: {
 			serverUrl: '',
+			ollamaUrl: 'http://localhost:11434',
 			onboarding_completed: false
-		}
+		},
+		save: vi.fn(),
+		setLocalProtection: vi.fn()
 	}
 }));
 
-const mockLocalStorage = {
-	getItem: vi.fn(() => null),
-	setItem: vi.fn(),
-	removeItem: vi.fn(),
-	clear: vi.fn()
-};
+vi.mock('$lib/state/ui.svelte', () => ({
+	uiState: {
+		setActiveCompanionId: vi.fn()
+	}
+}));
 
-vi.stubGlobal('localStorage', mockLocalStorage);
+// The wizard auto-advances to the companion step on a successful connection, which
+// mounts CompanionSelector — stub the data layer so that transition is inert.
+vi.mock('$lib/services/data-generic.service', () => ({
+	DataGenericService: class {
+		getQuery = vi.fn().mockResolvedValue({
+			$: { subscribe: () => ({ unsubscribe: vi.fn() }) }
+		});
+		find = vi.fn().mockResolvedValue([]);
+		create = vi.fn().mockResolvedValue(undefined);
+	}
+}));
 
 import OnboardingPage from './OnboardingWizard.svelte';
 import * as ollamaService from '$lib/services/ollama.service';
@@ -33,200 +49,168 @@ vi.mock('$app/navigation', () => ({
 }));
 
 // Mock Ollama service
-vi.mock('$lib/services/ollama.service');
+vi.mock('$lib/services/ollama.service', () => ({
+	normalizeServerUrl: (url: string) => url,
+	testOllamaConnection: vi.fn()
+}));
 
-// TODO: Rewrite for the current profile-first onboarding sequence before re-enabling.
-describe.skip('Onboarding Page - Story 1.2 (Server URL Configuration)', () => {
+/**
+ * Story 1.2 — Ollama server configuration.
+ *
+ * The wizard is profile-first: step 0 collects a nickname, step 1 configures the
+ * server. There is no explicit "Test Connection" button any more — entering step 1
+ * probes the server once, and a success auto-advances to the companion step.
+ */
+describe('Onboarding Page - Story 1.2 (Server URL Configuration)', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		userState.preferences.ollamaUrl = 'http://localhost:11434';
+		vi.mocked(ollamaService.testOllamaConnection).mockResolvedValue({
+			success: false,
+			error: 'Unable to connect'
+		} as never);
 	});
 
-	describe('Step 1: Server URL Input Form (Task 1)', () => {
-		it('should display server URL input field on step 1', async () => {
-			render(OnboardingPage);
+	/** Fills the profile step and moves to the server step. */
+	async function goToServerStep() {
+		render(OnboardingPage);
+		await userEvent.type(screen.getByLabelText('Nickname'), 'Meddy');
+		await userEvent.click(screen.getByRole('button', { name: /next step/i }));
+		await waitFor(() => {
+			expect(screen.getByTestId('wizard-title').textContent).toBe('Configure Ollama Server');
+		});
+	}
 
-			// Navigate to step 1 by clicking Next on step 0
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
+	describe('Step 1: Server URL Input Form', () => {
+		it('should display the server URL input on step 1', async () => {
+			await goToServerStep();
 
 			const serverUrlInput = screen.getByLabelText('Server URL input');
 			expect(serverUrlInput).toBeInTheDocument();
 			expect(serverUrlInput).toHaveAttribute('placeholder', 'http://localhost:11434');
 		});
 
-		it('should have Test Connection button', async () => {
-			render(OnboardingPage);
-
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
-
-			const testButton = screen.getByRole('button', { name: /test connection/i });
-			expect(testButton).toBeInTheDocument();
-		});
-
-		it('should have default localhost URL', async () => {
-			render(OnboardingPage);
-
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
+		it('should default to the stored Ollama URL', async () => {
+			await goToServerStep();
 
 			const serverUrlInput = screen.getByLabelText('Server URL input') as HTMLInputElement;
 			expect(serverUrlInput.value).toBe('http://localhost:11434');
 		});
+
+		it('should not require a manual Test Connection action', async () => {
+			await goToServerStep();
+
+			expect(screen.queryByRole('button', { name: /test connection/i })).toBeNull();
+		});
 	});
 
-	describe('Step 2: Health Check API Call (Task 2)', () => {
-		it('should call testOllamaConnection when Test Connection is clicked', async () => {
-			const mockTestConnection = vi.fn().mockResolvedValueOnce({ success: true });
-			vi.mocked(ollamaService.testOllamaConnection).mockImplementation(mockTestConnection);
+	describe('Step 2: Health Check API Call', () => {
+		it('should probe the server automatically when the step opens', async () => {
+			await goToServerStep();
 
-			render(OnboardingPage);
-
-			// Go to step 1
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
-
-			// Click test button
-			const testButton = screen.getByRole('button', { name: /test connection/i });
-			await userEvent.click(testButton);
-
-			expect(mockTestConnection).toHaveBeenCalled();
+			await waitFor(() => {
+				expect(ollamaService.testOllamaConnection).toHaveBeenCalledWith('http://localhost:11434');
+			});
 		});
 
-		it('should handle timeout error', async () => {
-			const mockTestConnection = vi.fn().mockResolvedValueOnce({
+		it('should probe only once per visit to the step', async () => {
+			await goToServerStep();
+
+			await waitFor(() => {
+				expect(ollamaService.testOllamaConnection).toHaveBeenCalledTimes(1);
+			});
+		});
+
+		it('should surface a timeout error', async () => {
+			vi.mocked(ollamaService.testOllamaConnection).mockResolvedValue({
 				success: false,
 				error: 'Connection timeout'
-			});
-			vi.mocked(ollamaService.testOllamaConnection).mockImplementation(mockTestConnection);
+			} as never);
 
-			render(OnboardingPage);
+			await goToServerStep();
 
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
-
-			const testButton = screen.getByRole('button', { name: /test connection/i });
-			await userEvent.click(testButton);
-
-			// Wait for async operation
-			await new Promise((resolve) => setTimeout(resolve, 100));
-
-			expect(screen.getByText(/timeout/i)).toBeInTheDocument();
+			expect(await screen.findByText(/timeout/i)).toBeInTheDocument();
 		});
 	});
 
-	describe('Step 3: Connection Feedback (Task 3)', () => {
-		it('should display success message on valid connection', async () => {
-			const mockTestConnection = vi.fn().mockResolvedValueOnce({ success: true });
-			vi.mocked(ollamaService.testOllamaConnection).mockImplementation(mockTestConnection);
+	describe('Step 3: Connection Feedback', () => {
+		it('should display a success message on a valid connection', async () => {
+			vi.mocked(ollamaService.testOllamaConnection).mockResolvedValue({ success: true } as never);
 
-			render(OnboardingPage);
+			await goToServerStep();
 
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
-
-			const testButton = screen.getByRole('button', { name: /test connection/i });
-			await userEvent.click(testButton);
-
-			await new Promise((resolve) => setTimeout(resolve, 100));
-
-			expect(screen.getByText(/connected successfully/i)).toBeInTheDocument();
+			expect(await screen.findByTestId('connection-success')).toHaveTextContent(/connected successfully/i);
 		});
 
-		it('should display error message on failed connection', async () => {
-			const mockTestConnection = vi.fn().mockResolvedValueOnce({
+		it('should display the error and a suggestion on a failed connection', async () => {
+			vi.mocked(ollamaService.testOllamaConnection).mockResolvedValue({
 				success: false,
-				error: 'Connection refused. Make sure Ollama is running.'
-			});
-			vi.mocked(ollamaService.testOllamaConnection).mockImplementation(mockTestConnection);
+				error: 'Connection refused. Make sure Ollama is running.',
+				suggestion: 'Start Ollama with `ollama serve`'
+			} as never);
 
-			render(OnboardingPage);
+			await goToServerStep();
 
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
-
-			const testButton = screen.getByRole('button', { name: /test connection/i });
-			await userEvent.click(testButton);
-
-			await new Promise((resolve) => setTimeout(resolve, 100));
-
-			expect(screen.getByText(/connection refused/i)).toBeInTheDocument();
+			const errorBox = await screen.findByTestId('connection-error');
+			expect(errorBox).toHaveTextContent(/connection refused/i);
+			expect(errorBox).toHaveTextContent(/ollama serve/i);
 		});
 
-		it('should disable Next button until connection succeeds', async () => {
-			const mockTestConnection = vi.fn().mockResolvedValueOnce({
-				success: false,
-				error: 'Connection failed'
-			});
-			vi.mocked(ollamaService.testOllamaConnection).mockImplementation(mockTestConnection);
+		it('should let the user continue past a failed connection', async () => {
+			await goToServerStep();
 
-			render(OnboardingPage);
-
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
-
-			const completeButton = screen.getByRole('button', { name: /complete setup/i });
-			expect(completeButton).toBeDisabled();
+			await screen.findByTestId('connection-error');
+			// Ollama can be configured later, so a failed probe must not trap the user.
+			expect(screen.getByRole('button', { name: /next step/i })).toBeEnabled();
 		});
 
-		it('should enable Next button after successful connection', async () => {
-			const mockTestConnection = vi.fn().mockResolvedValueOnce({ success: true });
-			vi.mocked(ollamaService.testOllamaConnection).mockImplementation(mockTestConnection);
+		it('should auto-advance to the companion step once connected', async () => {
+			vi.mocked(ollamaService.testOllamaConnection).mockResolvedValue({ success: true } as never);
 
-			render(OnboardingPage);
+			await goToServerStep();
 
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
-
-			const testButton = screen.getByRole('button', { name: /test connection/i });
-			await userEvent.click(testButton);
-
-			await new Promise((resolve) => setTimeout(resolve, 100));
-
-			const completeButton = screen.getByRole('button', { name: /complete setup/i });
-			expect(completeButton).not.toBeDisabled();
+			await waitFor(
+				() => {
+					expect(screen.getByTestId('wizard-title').textContent).toBe('Choose Your Companion');
+				},
+				{ timeout: 2000 }
+			);
 		});
 	});
 
-	describe('Step 4: Persistence (Task 4)', () => {
-		it('should store server URL on successful validation', async () => {
-			const mockTestConnection = vi.fn().mockResolvedValueOnce({ success: true });
-			vi.mocked(ollamaService.testOllamaConnection).mockImplementation(mockTestConnection);
+	describe('Step 4: Persistence', () => {
+		it('should store the validated server URL', async () => {
+			vi.mocked(ollamaService.testOllamaConnection).mockResolvedValue({ success: true } as never);
 
 			render(OnboardingPage);
+			await userEvent.type(screen.getByLabelText('Nickname'), 'Meddy');
+			await userEvent.click(screen.getByRole('button', { name: /next step/i }));
 
-			// Go to step 1
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
+			await waitFor(() => {
+				expect(userState.preferences.ollamaUrl).toBe('http://localhost:11434');
+			});
+		});
 
-			// Change URL
-			const serverUrlInput = screen.getByLabelText('Server URL input');
-			await userEvent.clear(serverUrlInput);
-			await userEvent.type(serverUrlInput, 'http://example.com:11434');
+		it('should leave the stored URL untouched when the probe fails', async () => {
+			userState.preferences.ollamaUrl = 'http://previous:11434';
 
-			// Test connection
-			const testButton = screen.getByRole('button', { name: /test connection/i });
-			await userEvent.click(testButton);
+			await goToServerStep();
 
-			await new Promise((resolve) => setTimeout(resolve, 100));
-
-			// Verify URL was stored
-			expect(userState.preferences.serverUrl).toBe('http://example.com:11434');
+			await screen.findByTestId('connection-error');
+			expect(userState.preferences.ollamaUrl).toBe('http://previous:11434');
 		});
 	});
 
-	describe('Accessibility (AC)', () => {
-		it('should have proper labels and aria attributes', async () => {
-			render(OnboardingPage);
-
-			const nextButton = screen.getByRole('button', { name: /next step/i });
-			await userEvent.click(nextButton);
+	describe('Accessibility', () => {
+		it('should label the URL field and announce the connection result', async () => {
+			await goToServerStep();
 
 			const serverUrlInput = screen.getByLabelText('Server URL input');
-			expect(serverUrlInput).toHaveAttribute('aria-label');
+			expect(serverUrlInput).toHaveAttribute('aria-label', 'Server URL input');
 
-			const testButton = screen.getByRole('button', { name: /test connection/i });
-			expect(testButton).toHaveAttribute('aria-label');
+			const status = await screen.findByTestId('connection-error');
+			expect(status).toHaveAttribute('aria-live', 'polite');
+			expect(status).toHaveAttribute('role', 'alert');
 		});
 	});
 });

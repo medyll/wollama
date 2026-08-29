@@ -1,223 +1,127 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/svelte';
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/svelte';
 import ToolCallMessage from './tool-call-message.svelte';
 
-// TODO: Rewrite assertions for the current tool-call component contract before re-enabling.
-describe.skip('ToolCallMessage', () => {
-	const baseToolCall = {
-		tool_call_id: 'tc-123',
-		agent_id: 'agent-1',
-		agent_name: 'WebSearch',
-		status: 'running',
-		input: { query: 'test query' },
-		output: null,
-		started_at: Date.now()
+// Contract: the component is a pure renderer over a single `message` prop
+// ({ toolName, toolId, timestamp, inputs, outputs? }). Status, duration and
+// error rendering live in the run/tool-call card, not here.
+describe('ToolCallMessage', () => {
+	const baseMessage = {
+		toolName: 'WebSearch',
+		toolId: 'tc-123',
+		timestamp: Date.UTC(2026, 0, 15, 10, 30),
+		inputs: { query: 'test query' }
 	};
 
 	describe('Rendering', () => {
-		it('should render tool call with agent name', () => {
-			const { container } = render(ToolCallMessage, {
-				props: {
-					toolCall: baseToolCall
-				}
-			});
+		it('should render the tool name', () => {
+			const { container } = render(ToolCallMessage, { props: { message: baseMessage } });
 
-			expect(container.textContent).toContain('WebSearch');
+			expect(container.textContent).toContain('Tool: WebSearch');
 		});
 
-		it('should display loading spinner when status is running', () => {
-			render(ToolCallMessage, {
-				props: {
-					toolCall: { ...baseToolCall, status: 'running' }
-				}
-			});
+		it('should render the tool call id', () => {
+			const { container } = render(ToolCallMessage, { props: { message: baseMessage } });
 
-			// Should show loading indicator
-			const loadingElement = screen.getByTestId('tool-loading');
-			expect(loadingElement).toBeTruthy();
+			expect(container.textContent).toContain('tc-123');
 		});
 
-		it('should display result when status is done', () => {
-			const completedToolCall = {
-				...baseToolCall,
-				status: 'done' as const,
-				output: { results: ['result 1', 'result 2'] },
-				finished_at: Date.now()
-			};
+		it('should render a formatted timestamp', () => {
+			const { container } = render(ToolCallMessage, { props: { message: baseMessage } });
 
-			render(ToolCallMessage, {
-				props: {
-					toolCall: completedToolCall
-				}
-			});
-
-			// Should show output
-			expect(screen.getByTestId('tool-output')).toBeTruthy();
+			expect(container.textContent).toContain(new Date(baseMessage.timestamp).toLocaleString());
 		});
 
-		it('should display error message when status is error', () => {
-			const errorToolCall = {
-				...baseToolCall,
-				status: 'error' as const,
-				error: 'Tool execution failed'
-			};
+		it('should render inside a tool-call-message element', () => {
+			const { container } = render(ToolCallMessage, { props: { message: baseMessage } });
 
-			render(ToolCallMessage, {
-				props: {
-					toolCall: errorToolCall
-				}
-			});
-
-			// Should show error
-			expect(screen.getByTestId('tool-error')).toBeTruthy();
-			expect(screen.textContent).toContain('failed');
+			expect(container.querySelector('tool-call-message')).toBeTruthy();
 		});
 	});
 
 	describe('Input Display', () => {
-		it('should display tool input parameters', () => {
-			render(ToolCallMessage, {
-				props: {
-					toolCall: baseToolCall
-				}
-			});
+		it('should display tool input parameters as JSON', () => {
+			const { container } = render(ToolCallMessage, { props: { message: baseMessage } });
 
-			// Should show input query
-			expect(screen.textContent).toContain('test query');
+			expect(container.textContent).toContain('test query');
 		});
 
 		it('should handle complex input objects', () => {
-			const complexInput = {
-				...baseToolCall,
-				input: { url: 'https://example.com', depth: 2, filter: 'text' }
-			};
-
-			render(ToolCallMessage, {
+			const { container } = render(ToolCallMessage, {
 				props: {
-					toolCall: complexInput
+					message: {
+						...baseMessage,
+						inputs: { url: 'https://example.com', depth: 2, filter: 'text' }
+					}
 				}
 			});
 
-			expect(screen.textContent).toContain('example.com');
+			expect(container.textContent).toContain('example.com');
+			expect(container.textContent).toContain('depth');
+		});
+
+		it('should always expose an Inputs disclosure', () => {
+			render(ToolCallMessage, { props: { message: baseMessage } });
+
+			expect(screen.getByText('Inputs')).toBeTruthy();
 		});
 	});
 
 	describe('Output Display', () => {
-		it('should display tool output when available', () => {
-			const completedToolCall = {
-				...baseToolCall,
-				status: 'done' as const,
-				output: { summary: 'Search results summary' }
-			};
+		it('should not render an Outputs disclosure when outputs are absent', () => {
+			render(ToolCallMessage, { props: { message: baseMessage } });
 
-			render(ToolCallMessage, {
+			expect(screen.queryByText('Outputs')).toBeNull();
+		});
+
+		it('should display tool output when available', () => {
+			const { container } = render(ToolCallMessage, {
 				props: {
-					toolCall: completedToolCall
+					message: { ...baseMessage, outputs: { summary: 'Search results summary' } }
 				}
 			});
 
-			expect(screen.textContent).toContain('Search results summary');
+			expect(screen.getByText('Outputs')).toBeTruthy();
+			expect(container.textContent).toContain('Search results summary');
 		});
 
 		it('should handle array outputs', () => {
-			const completedToolCall = {
-				...baseToolCall,
-				status: 'done' as const,
-				output: { items: ['item 1', 'item 2', 'item 3'] }
-			};
-
-			render(ToolCallMessage, {
+			const { container } = render(ToolCallMessage, {
 				props: {
-					toolCall: completedToolCall
+					message: { ...baseMessage, outputs: { items: ['item 1', 'item 2', 'item 3'] } }
 				}
 			});
 
-			expect(screen.textContent).toContain('item 1');
-		});
-	});
-
-	describe('Timing', () => {
-		it('should display duration when completed', () => {
-			const startTime = Date.now() - 5000; // 5 seconds ago
-			const completedToolCall = {
-				...baseToolCall,
-				status: 'done' as const,
-				started_at: startTime,
-				finished_at: Date.now()
-			};
-
-			render(ToolCallMessage, {
-				props: {
-					toolCall: completedToolCall
-				}
-			});
-
-			// Should show some timing info
-			expect(screen.textContent).toBeTruthy();
+			expect(container.textContent).toContain('item 1');
+			expect(container.textContent).toContain('item 3');
 		});
 	});
 
 	describe('Different Agent Types', () => {
-		it('should render WebSearch agent call', () => {
-			const webSearchCall = {
-				...baseToolCall,
-				agent_name: 'WebSearch',
-				input: { query: 'weather today' }
-			};
-
-			render(ToolCallMessage, {
+		it('should render a PageFetch tool call', () => {
+			const { container } = render(ToolCallMessage, {
 				props: {
-					toolCall: webSearchCall
+					message: {
+						...baseMessage,
+						toolName: 'PageFetch',
+						inputs: { url: 'https://example.com/article' }
+					}
 				}
 			});
 
-			expect(screen.textContent).toContain('WebSearch');
+			expect(container.textContent).toContain('PageFetch');
+			expect(container.textContent).toContain('example.com/article');
 		});
 
-		it('should render PageFetch agent call', () => {
-			const pageFetchCall = {
-				...baseToolCall,
-				agent_name: 'PageFetch',
-				input: { url: 'https://example.com/article' }
-			};
-
-			render(ToolCallMessage, {
+		it('should render a custom tool call', () => {
+			const { container } = render(ToolCallMessage, {
 				props: {
-					toolCall: pageFetchCall
+					message: { ...baseMessage, toolName: 'CustomAgent', inputs: { action: 'process' } }
 				}
 			});
 
-			expect(screen.textContent).toContain('PageFetch');
-		});
-
-		it('should render custom agent call', () => {
-			const customCall = {
-				...baseToolCall,
-				agent_name: 'CustomAgent',
-				input: { action: 'process' }
-			};
-
-			render(ToolCallMessage, {
-				props: {
-					toolCall: customCall
-				}
-			});
-
-			expect(screen.textContent).toContain('CustomAgent');
-		});
-	});
-
-	describe('Accessibility', () => {
-		it('should have proper ARIA labels', () => {
-			render(ToolCallMessage, {
-				props: {
-					toolCall: baseToolCall
-				}
-			});
-
-			// Component should be accessibleible
-			const container = screen.getByTestId('tool-call-message');
-			expect(container).toBeTruthy();
+			expect(container.textContent).toContain('CustomAgent');
+			expect(container.textContent).toContain('process');
 		});
 	});
 });
