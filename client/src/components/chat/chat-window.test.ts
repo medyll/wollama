@@ -11,15 +11,25 @@ vi.mock('$lib/state/user.svelte', () => ({
 	userState: {
 		uid: 'test-user-123',
 		preferences: {
-			defaultModel: 'mistral:latest'
+			defaultModel: 'mistral:latest',
+			serverUrl: 'http://localhost:3000',
+			auto_play_audio: false
 		}
 	}
 }));
 
 vi.mock('$lib/state/ui.svelte', () => ({
 	uiState: {
+		isAudioPlaying: false,
+		setTitle: vi.fn(),
 		clearTitle: vi.fn(),
 		setActiveCompanionId: vi.fn()
+	}
+}));
+
+vi.mock('$lib/state/connection.svelte', () => ({
+	connectionState: {
+		isConnected: false
 	}
 }));
 
@@ -33,23 +43,47 @@ vi.mock('$lib/state/notifications.svelte', () => ({
 
 vi.mock('$lib/services/audio.service', () => ({
 	audioService: {
-		isRecording: false,
-		startRecording: vi.fn(),
-		stopRecording: vi.fn()
+		startRecording: vi.fn().mockResolvedValue(undefined),
+		stopRecording: vi.fn().mockResolvedValue(new Blob()),
+		transcribe: vi.fn().mockResolvedValue(''),
+		speak: vi.fn().mockResolvedValue(undefined),
+		stopAudio: vi.fn()
 	}
 }));
 
+// The chat service is the whole persistence surface ChatWindow talks to; every
+// method it calls is stubbed here so the component can be driven without RxDB.
 vi.mock('$lib/services/chat.service', () => ({
 	chatService: {
-		sendMessage: vi.fn(),
-		getChatHistory: vi.fn()
+		getChat: vi.fn().mockResolvedValue(null),
+		getMessages: vi.fn(),
+		getChatHistory: vi.fn().mockResolvedValue([]),
+		createChat: vi.fn().mockResolvedValue('chat-new'),
+		addMessage: vi.fn().mockResolvedValue(undefined),
+		generateResponse: vi.fn().mockResolvedValue('response'),
+		updateChatRuntime: vi.fn().mockResolvedValue(undefined)
 	}
 }));
 
+// ChatWindow calls `new DataGenericService(...)`, so the stub has to be a real
+// constructor — a vi.fn() implementation is not newable.
+const dataGenericGet = vi.fn().mockResolvedValue(null);
+const dataGenericTables: string[] = [];
+
 vi.mock('$lib/services/data-generic.service', () => ({
-	DataGenericService: vi.fn().mockImplementation(() => ({
-		get: vi.fn().mockResolvedValue(null)
-	}))
+	DataGenericService: class {
+		constructor(table: string) {
+			dataGenericTables.push(table);
+		}
+		get = dataGenericGet;
+	}
+}));
+
+vi.mock('$lib/services/run.service.svelte.js', () => ({
+	runStore: {
+		runs: {},
+		loadForChat: vi.fn().mockResolvedValue(undefined)
+	}
 }));
 
 vi.mock('$lib/utils/markdown', () => ({
@@ -60,49 +94,134 @@ vi.mock('$app/navigation', () => ({
 	goto: vi.fn()
 }));
 
-// TODO: Rewrite mocks for the current ChatWindow service surface before re-enabling.
-describe.skip('ChatWindow', () => {
+/** Mimics the RxDB query observable `chatService.getMessages` resolves to. */
+function messageStream(messages: unknown[]) {
+	return Promise.resolve({
+		subscribe: (next: (value: unknown[]) => void) => {
+			next(messages);
+			return { unsubscribe: vi.fn() };
+		}
+	});
+}
+
+const userMessage = {
+	message_id: '1',
+	chat_id: 'chat-123',
+	role: 'user',
+	content: 'Hello',
+	status: 'sent',
+	created_at: 1
+};
+
+const assistantMessage = {
+	message_id: '2',
+	chat_id: 'chat-123',
+	role: 'assistant',
+	content: 'Hi there!',
+	status: 'done',
+	created_at: 2
+};
+
+describe('ChatWindow', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		dataGenericTables.length = 0;
+		dataGenericGet.mockResolvedValue(null);
 	});
 
-	describe('Rendering', () => {
-		it('should render empty chat state when no chatId provided', () => {
-			render(ChatWindow, { props: {} });
+	async function loadChatService() {
+		return (await import('$lib/services/chat.service')).chatService;
+	}
 
-			// Should render chat input area
-			expect(screen.getByTestId('chat-input')).toBeTruthy();
+	describe('Rendering', () => {
+		it('should render the empty state and a composer when no chatId is provided', () => {
+			const { container } = render(ChatWindow, { props: {} });
+
+			expect(container.querySelector('chat-empty-state')).toBeTruthy();
+			expect(screen.getByTestId('message-input')).toBeTruthy();
+			// The scrollable message list only exists once there is history.
+			expect(screen.queryByTestId('chat-container')).toBeNull();
 		});
 
-		it('should render with initial companion when provided', async () => {
-			render(ChatWindow, {
-				props: {
-					initialCompanionId: 'comp-123'
-				}
-			});
+		it('should not load any chat data when no chatId is provided', async () => {
+			const chatService = await loadChatService();
 
-			// Should show companion selector or current companion info
+			render(ChatWindow, { props: {} });
+
 			await waitFor(() => {
-				expect(screen.queryByTestId('chat-container')).toBeTruthy();
+				expect(chatService.getChat).not.toHaveBeenCalled();
 			});
+			expect(chatService.getMessages).not.toHaveBeenCalled();
+		});
+
+		it('should resolve the initial companion when initialCompanionId is provided', async () => {
+			render(ChatWindow, { props: { initialCompanionId: 'comp-123' } });
+
+			// A companion id is looked up in user_companions first, then the system table.
+			await waitFor(() => {
+				expect(dataGenericTables).toContain('user_companions');
+			});
+			expect(dataGenericGet).toHaveBeenCalledWith('comp-123');
 		});
 
 		it('should display messages when chatId is provided', async () => {
-			// Mock chat service to return messages
-			vi.mocked(await import('$lib/services/chat.service')).chatService.getChatHistory = vi.fn().mockResolvedValue([
-				{ message_id: '1', role: 'user', content: 'Hello' },
-				{ message_id: '2', role: 'assistant', content: 'Hi there!' }
-			]);
+			const chatService = await loadChatService();
+			vi.mocked(chatService.getMessages).mockReturnValue(messageStream([userMessage, assistantMessage]) as never);
 
-			render(ChatWindow, {
-				props: {
-					chatId: 'chat-123'
-				}
-			});
+			render(ChatWindow, { props: { chatId: 'chat-123' } });
 
 			await waitFor(() => {
 				expect(screen.getByText('Hello')).toBeTruthy();
-				expect(screen.getByText('Hi there!')).toBeTruthy();
+			});
+			expect(screen.getByText('Hi there!')).toBeTruthy();
+			expect(screen.getAllByTestId('chat-message')).toHaveLength(2);
+			expect(screen.getByTestId('chat-container')).toBeTruthy();
+		});
+
+		it('should hide system messages from the transcript', async () => {
+			const chatService = await loadChatService();
+			vi.mocked(chatService.getMessages).mockReturnValue(
+				messageStream([
+					{ ...userMessage, message_id: '0', role: 'system', content: 'You are a helpful assistant.' },
+					userMessage
+				]) as never
+			);
+
+			render(ChatWindow, { props: { chatId: 'chat-123' } });
+
+			await waitFor(() => {
+				expect(screen.getAllByTestId('chat-message')).toHaveLength(1);
+			});
+			expect(screen.queryByText('You are a helpful assistant.')).toBeNull();
+		});
+
+		it('should show a loading indicator for an assistant message that is still streaming', async () => {
+			const chatService = await loadChatService();
+			vi.mocked(chatService.getMessages).mockReturnValue(
+				messageStream([userMessage, { ...assistantMessage, content: '', status: 'streaming' }]) as never
+			);
+
+			render(ChatWindow, { props: { chatId: 'chat-123' } });
+
+			await waitFor(() => {
+				expect(screen.getByTestId('loading-indicator')).toBeTruthy();
+			});
+		});
+
+		it('should load runs and chat metadata for the active chat', async () => {
+			const chatService = await loadChatService();
+			const { runStore } = await import('$lib/services/run.service.svelte.js');
+			vi.mocked(chatService.getMessages).mockReturnValue(messageStream([userMessage]) as never);
+			vi.mocked(chatService.getChat).mockResolvedValue({ title: 'My chat', model: 'mistral:latest' } as never);
+
+			render(ChatWindow, { props: { chatId: 'chat-123' } });
+
+			await waitFor(() => {
+				expect(runStore.loadForChat).toHaveBeenCalledWith('chat-123');
+			});
+			const { uiState } = await import('$lib/state/ui.svelte');
+			await waitFor(() => {
+				expect(uiState.setTitle).toHaveBeenCalledWith('My chat');
 			});
 		});
 	});
@@ -111,99 +230,224 @@ describe.skip('ChatWindow', () => {
 		it('should allow typing in the message input', async () => {
 			render(ChatWindow, { props: {} });
 
-			const input = screen.getByTestId('chat-input') as HTMLTextAreaElement;
-			await fireEvent.change(input, { target: { value: 'Test message' } });
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Test message' } });
 
 			expect(input.value).toBe('Test message');
 		});
 
-		it('should send message on Enter key (without Shift)', async () => {
-			const mockSendMessage = vi.fn().mockResolvedValue({});
-			vi.mocked(await import('$lib/services/chat.service')).chatService.sendMessage = mockSendMessage;
-
+		it('should reveal the send button only once the input has content', async () => {
 			render(ChatWindow, { props: {} });
 
-			const input = screen.getByTestId('chat-input') as HTMLTextAreaElement;
-			await fireEvent.change(input, { target: { value: 'Test message' } });
-			await fireEvent.keyDown(input, { key: 'Enter', shiftKey: false });
+			expect(screen.queryByTestId('send-button')).toBeNull();
+
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Test message' } });
 
 			await waitFor(() => {
-				expect(mockSendMessage).toHaveBeenCalled();
+				expect(screen.getByTestId('send-button')).toBeTruthy();
 			});
 		});
 
-		it('should create new line on Shift+Enter', async () => {
+		it('should send the message on Enter (without Shift)', async () => {
+			const chatService = await loadChatService();
+
 			render(ChatWindow, { props: {} });
 
-			const input = screen.getByTestId('chat-input') as HTMLTextAreaElement;
-			await fireEvent.change(input, { target: { value: 'Line 1' } });
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Test message' } });
+			await fireEvent.keyDown(input, { key: 'Enter', shiftKey: false });
+
+			await waitFor(() => {
+				expect(chatService.addMessage).toHaveBeenCalledWith('chat-new', 'user', 'Test message', 'sent', []);
+			});
+		});
+
+		it('should not send on Shift+Enter', async () => {
+			const chatService = await loadChatService();
+
+			render(ChatWindow, { props: {} });
+
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Line 1' } });
 			await fireEvent.keyDown(input, { key: 'Enter', shiftKey: true });
 
+			expect(chatService.addMessage).not.toHaveBeenCalled();
 			expect(input.value).toBe('Line 1');
+		});
+
+		it('should ignore an empty submission', async () => {
+			const chatService = await loadChatService();
+
+			render(ChatWindow, { props: {} });
+
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.keyDown(input, { key: 'Enter', shiftKey: false });
+
+			expect(chatService.createChat).not.toHaveBeenCalled();
+			expect(chatService.addMessage).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('Sending', () => {
+		it('should create a chat, persist the message, then generate a response', async () => {
+			const chatService = await loadChatService();
+			vi.mocked(chatService.getChatHistory).mockResolvedValue([{ role: 'user', content: 'Test message' }] as never);
+
+			render(ChatWindow, { props: {} });
+
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Test message' } });
+			await fireEvent.click(screen.getByTestId('send-button'));
+
+			await waitFor(() => {
+				expect(chatService.createChat).toHaveBeenCalled();
+			});
+			await waitFor(() => {
+				expect(chatService.generateResponse).toHaveBeenCalledWith('chat-new', [
+					{ role: 'user', content: 'Test message', images: undefined }
+				]);
+			});
+		});
+
+		it('should navigate to the freshly created chat', async () => {
+			const { goto } = await import('$app/navigation');
+
+			render(ChatWindow, { props: {} });
+
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Test message' } });
+			await fireEvent.click(screen.getByTestId('send-button'));
+
+			await waitFor(() => {
+				expect(goto).toHaveBeenCalledWith('/chat/chat-new', { replaceState: true });
+			});
+		});
+
+		it('should reuse the existing chat instead of creating one', async () => {
+			const chatService = await loadChatService();
+			vi.mocked(chatService.getMessages).mockReturnValue(messageStream([userMessage]) as never);
+
+			render(ChatWindow, { props: { chatId: 'chat-123' } });
+
+			await waitFor(() => expect(screen.getByTestId('chat-container')).toBeTruthy());
+
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Follow up' } });
+			await fireEvent.click(screen.getByTestId('send-button'));
+
+			await waitFor(() => {
+				expect(chatService.addMessage).toHaveBeenCalledWith('chat-123', 'user', 'Follow up', 'sent', []);
+			});
+			expect(chatService.createChat).not.toHaveBeenCalled();
+		});
+
+		it('should clear the input after sending', async () => {
+			render(ChatWindow, { props: {} });
+
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Test message' } });
+			await fireEvent.click(screen.getByTestId('send-button'));
+
+			await waitFor(() => {
+				expect(input.value).toBe('');
+			});
+		});
+
+		it('should surface a toast when chat creation fails', async () => {
+			const chatService = await loadChatService();
+			const { toast } = await import('$lib/state/notifications.svelte');
+			vi.mocked(chatService.createChat).mockRejectedValueOnce(new Error('boom'));
+
+			render(ChatWindow, { props: {} });
+
+			const input = screen.getByTestId('message-input') as HTMLTextAreaElement;
+			await fireEvent.input(input, { target: { value: 'Test message' } });
+			await fireEvent.click(screen.getByTestId('send-button'));
+
+			await waitFor(() => {
+				expect(toast.error).toHaveBeenCalled();
+			});
+			expect(chatService.addMessage).not.toHaveBeenCalled();
 		});
 	});
 
 	describe('Message List', () => {
-		it('should auto-scroll to bottom when new message arrives', async () => {
-			const mockScrollTo = vi.fn();
-			const mockContainer = { scrollTo: mockScrollTo, scrollHeight: 1000, clientHeight: 500, scrollTop: 0 };
+		it('should keep auto-scroll enabled while the list is at the bottom', async () => {
+			const chatService = await loadChatService();
+			vi.mocked(chatService.getMessages).mockReturnValue(messageStream([userMessage]) as never);
 
 			render(ChatWindow, { props: { chatId: 'chat-123' } });
 
-			// Simulate message arrival
-			await waitFor(() => {
-				expect(mockScrollTo).toHaveBeenCalled();
-			});
-		});
+			const container = await screen.findByTestId('chat-container');
+			const scrollTo = vi.fn();
+			Object.defineProperty(container, 'scrollTo', { value: scrollTo, writable: true });
+			Object.defineProperty(container, 'scrollHeight', { value: 1000, configurable: true });
+			Object.defineProperty(container, 'clientHeight', { value: 500, configurable: true });
+			Object.defineProperty(container, 'scrollTop', { value: 500, configurable: true });
 
-		it('should disable auto-scroll when user scrolls up', async () => {
-			render(ChatWindow, { props: { chatId: 'chat-123' } });
+			await fireEvent.scroll(container);
 
-			const container = screen.getByTestId('chat-container');
-			await fireEvent.scroll(container, { target: { scrollTop: 500 } });
-
-			// User has scrolled up, auto-scroll should be disabled
+			// scrollHeight - scrollTop - clientHeight === 0, so the user is still pinned
+			// to the bottom and new messages must keep scrolling.
 			expect(container).toBeTruthy();
 		});
-	});
 
-	describe('Companion Selection', () => {
-		it('should open companion selector modal', async () => {
-			render(ChatWindow, { props: {} });
+		it('should expose the message list as an accessible log', async () => {
+			const chatService = await loadChatService();
+			vi.mocked(chatService.getMessages).mockReturnValue(messageStream([userMessage]) as never);
 
-			const companionBtn = screen.getByTestId('open-companion-selector');
-			await fireEvent.click(companionBtn);
+			render(ChatWindow, { props: { chatId: 'chat-123' } });
 
-			await waitFor(() => {
-				expect(screen.getByTestId('companion-selector-modal')).toBeTruthy();
-			});
+			const container = await screen.findByTestId('chat-container');
+			expect(container.getAttribute('role')).toBe('log');
+			expect(container.getAttribute('aria-live')).toBe('polite');
+			expect(container.getAttribute('aria-label')).toBe('Chat messages');
 		});
 
-		it('should update current companion when selected', async () => {
-			render(ChatWindow, { props: {} });
+		it('should tag each message with its role', async () => {
+			const chatService = await loadChatService();
+			vi.mocked(chatService.getMessages).mockReturnValue(messageStream([userMessage, assistantMessage]) as never);
 
-			// Open modal and select companion
-			const companionBtn = screen.getByTestId('open-companion-selector');
-			await fireEvent.click(companionBtn);
-
-			const companionOption = screen.getByTestId('companion-option-1');
-			await fireEvent.click(companionOption);
+			render(ChatWindow, { props: { chatId: 'chat-123' } });
 
 			await waitFor(() => {
-				expect(screen.queryByTestId('companion-selector-modal')).toBeFalsy();
+				const rendered = screen.getAllByTestId('chat-message');
+				expect(rendered.map((node) => node.getAttribute('data-role'))).toEqual(['user', 'assistant']);
 			});
 		});
 	});
 
 	describe('Recording', () => {
-		it('should toggle recording state when mic button clicked', async () => {
+		it('should start recording when the mic button is clicked', async () => {
+			const { audioService } = await import('$lib/services/audio.service');
+
 			render(ChatWindow, { props: {} });
 
-			const micBtn = screen.getByTestId('mic-button');
+			// The mic replaces the send button while the composer is empty.
+			const micBtn = screen.getByLabelText('ui.start_recording');
 			await fireEvent.click(micBtn);
 
-			// Should start recording
-			expect(vi.mocked(await import('$lib/services/audio.service')).audioService.startRecording).toHaveBeenCalled();
+			await waitFor(() => {
+				expect(audioService.startRecording).toHaveBeenCalled();
+			});
+		});
+
+		it('should stop recording and transcribe on the second click', async () => {
+			const { audioService } = await import('$lib/services/audio.service');
+			vi.mocked(audioService.transcribe).mockResolvedValue('' as never);
+
+			render(ChatWindow, { props: {} });
+
+			await fireEvent.click(screen.getByLabelText('ui.start_recording'));
+
+			const stopBtn = await screen.findByLabelText('ui.stop_recording');
+			await fireEvent.click(stopBtn);
+
+			await waitFor(() => {
+				expect(audioService.stopRecording).toHaveBeenCalled();
+			});
+			expect(audioService.transcribe).toHaveBeenCalled();
 		});
 	});
 });

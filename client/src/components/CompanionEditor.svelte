@@ -5,7 +5,7 @@
 	import { userState } from '$lib/state/user.svelte';
 
 	interface Props {
-		companion: (Companion & { isSystem?: boolean }) | UserCompanion | null;
+		companion: Companion | UserCompanion | null;
 		isNew?: boolean;
 		onSave: (companion: UserCompanion) => void;
 		onCancel: () => void;

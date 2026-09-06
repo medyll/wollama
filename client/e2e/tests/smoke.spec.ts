@@ -1,180 +1,104 @@
 /**
  * E2E Smoke Tests - Critical User Flows (S6-03)
  *
- * Basic smoke tests for the most critical user flows:
- * 1. Send message and receive response
- * 2. Create new chat
- * 3. Open settings and toggle skill
- * 4. View and toggle hook
+ * The four flows that must never break:
+ * 1. Send a message and see the reply
+ * 2. Start a new chat
+ * 3. Reach settings
+ * 4. List and toggle a hook
+ *
+ * This suite drives the UI against a stubbed backend. It deliberately does not
+ * spawn the Node server — `skills.spec.ts` covers the real backend contract.
  */
 
 import { test, expect } from '@playwright/test';
-import { spawn, ChildProcess } from 'child_process';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, '..', '..', '..');
-const SERVER_PORT = 3002;
-const SERVER_URL = `http://127.0.0.1:${SERVER_PORT}`;
-const APP_URL = 'http://localhost:5173';
+import {
+	setupTestState,
+	waitForChatReady,
+	sendMessage,
+	createNewChat,
+	mockServerHealth,
+	mockChatGeneration,
+	mockHooks
+} from '../fixtures/test-setup';
 
 test.setTimeout(60 * 1000);
 
-// Helper to wait for server
-function waitForServer(request: any, serverProc: any, timeout = 60000) {
-	const start = Date.now();
-	return new Promise<void>((resolve, reject) => {
-		let resolved = false;
-
-		const checkHealth = async () => {
-			try {
-				const r = await request.get(`${SERVER_URL}/api/health`);
-				if (r.ok()) {
-					resolved = true;
-					resolve();
-				}
-			} catch (e) {
-				// ignore
-			}
-		};
-
-		const onData = (d: Buffer) => {
-			const s = d.toString();
-			if (s.includes('Listening on port') || s.includes('Listening on')) {
-				resolved = true;
-				resolve();
-			}
-		};
-
-		serverProc.stdout?.on('data', onData);
-
-		void (async () => {
-			while (!resolved && Date.now() - start < timeout) {
-				await checkHealth();
-				if (resolved) break;
-				await new Promise((r) => setTimeout(r, 500));
-			}
-
-			serverProc.stdout?.off('data', onData);
-
-			if (!resolved) reject(new Error('Server timeout'));
-		})().catch(reject);
-	});
-}
-
-test.describe.skip('S6-03: E2E Smoke Tests', () => {
-	// Legacy smoke suite targets port 5173 and UI controls removed from the current application.
-	let serverProc: ChildProcess;
-
-	test.beforeAll(async () => {
-		// Start server for tests
-		serverProc = spawn('npx', ['tsx', 'server.ts'], {
-			cwd: path.join(ROOT, 'server'),
-			env: { ...process.env, PORT: String(SERVER_PORT) },
-			stdio: 'pipe'
-		});
-
-		// Wait for server to be ready
-		await waitForServer(await import('playwright'), serverProc);
-	});
-
-	test.afterAll(async () => {
-		// Stop server
-		if (serverProc) {
-			serverProc.kill();
-		}
+test.describe('S6-03: E2E Smoke Tests', () => {
+	test.beforeEach(async ({ page }) => {
+		await setupTestState(page);
+		await mockServerHealth(page);
+		await mockChatGeneration(page, { reply: 'Smoke test reply.' });
 	});
 
 	test.describe('Critical Flow 1: Send Message', () => {
-		test('should send message and see it in chat', async ({ page }) => {
-			await page.goto(APP_URL);
+		test('should send a message and receive a reply', async ({ page }) => {
+			await page.goto('/chat/new');
+			await waitForChatReady(page);
 
-			// Wait for app to load
-			await page.waitForSelector('[data-testid="chat-input"]', { timeout: 10000 });
+			await sendMessage(page, 'Hello, this is a smoke test!');
 
-			// Type message
-			const input = page.getByTestId('chat-input');
-			await input.fill('Hello, this is a smoke test!');
-
-			// Send message
-			await input.press('Enter');
-
-			// Message should appear in chat
-			await expect(page.getByText('Hello, this is a smoke test!')).toBeVisible({ timeout: 5000 });
+			await expect(page.getByText('Hello, this is a smoke test!')).toBeVisible();
+			await expect(page.locator('[data-testid="chat-message"][data-role="assistant"]')).toContainText(
+				'Smoke test reply.',
+				{ timeout: 15_000 }
+			);
 		});
 	});
 
 	test.describe('Critical Flow 2: New Chat', () => {
-		test('should create new chat', async ({ page }) => {
-			await page.goto(APP_URL);
-			await page.waitForSelector('[data-testid="chat-input"]', { timeout: 10000 });
+		test('should start a new chat from the sidebar', async ({ page }) => {
+			await page.goto('/chat/new');
+			await waitForChatReady(page);
+			await sendMessage(page, 'First conversation', { waitForResponse: false });
+			await expect(page).toHaveURL(/\/chat\/[0-9a-f-]{36}$/, { timeout: 10_000 });
 
-			// Click "New Chat" button
-			const newChatBtn = page.getByTestId('new-chat-button');
-			if (await newChatBtn.isVisible()) {
-				await newChatBtn.click();
+			await createNewChat(page);
 
-				// Chat should be cleared
-				await expect(page.getByTestId('chat-input')).toBeVisible();
-			}
+			await expect(page).toHaveURL(/\/chat\/new$/);
+			await expect(page.getByTestId('chat-message')).toHaveCount(0);
 		});
 	});
 
-	test.describe('Critical Flow 3: Settings - Skills', () => {
-		test('should navigate to settings and toggle skill', async ({ page }) => {
-			await page.goto(APP_URL);
-			await page.waitForSelector('[data-testid="chat-input"]', { timeout: 10000 });
+	test.describe('Critical Flow 3: Settings', () => {
+		test('should open settings from the sidebar', async ({ page }) => {
+			await page.goto('/chat/new');
+			await waitForChatReady(page);
 
-			// Navigate to settings
-			const settingsBtn = page.getByTestId('settings-button');
-			if (await settingsBtn.isVisible()) {
-				await settingsBtn.click();
+			await page.locator('.sidebar-footer button', { hasText: /settings|paramètres/i }).click();
 
-				// Wait for settings page
-				await page.waitForSelector('[data-testid="settings-container"]', { timeout: 5000 });
-
-				// Find and toggle a skill
-				const skillToggle = page.getByTestId('skill-toggle').first();
-				if (await skillToggle.isVisible()) {
-					await skillToggle.click();
-
-					// Toggle should change state
-					await expect(skillToggle).toBeChecked();
-				}
-			}
+			await expect(page).toHaveURL(/\/settings$/, { timeout: 10_000 });
+			await expect(page.getByRole('checkbox', { name: 'Toggle Hooks' })).toBeAttached();
 		});
 	});
 
-	test.describe('Critical Flow 4: Settings - Hooks', () => {
-		test('should view hooks list and toggle hook', async ({ page }) => {
-			await page.goto(APP_URL);
-			await page.waitForSelector('[data-testid="chat-input"]', { timeout: 10000 });
+	test.describe('Critical Flow 4: Hooks', () => {
+		test('should list registered hooks and toggle one', async ({ page }) => {
+			const toggles = await mockHooks(page, [
+				{ _id: 'hook-1', name: 'Prompt enricher', event: 'pre_message', is_enabled: false, handler_type: 'builtin' }
+			]);
 
-			// Navigate to settings
-			const settingsBtn = page.getByTestId('settings-button');
-			if (await settingsBtn.isVisible()) {
-				await settingsBtn.click();
+			await page.goto('/settings');
+			await page.getByRole('checkbox', { name: 'Toggle Hooks' }).check();
 
-				// Wait for settings page
-				await page.waitForSelector('[data-testid="settings-container"]', { timeout: 5000 });
+			await expect(page.getByText('Prompt enricher')).toBeVisible({ timeout: 10_000 });
+			await expect(page.getByText('pre_message')).toBeVisible();
 
-				// Navigate to hooks tab/section
-				const hooksTab = page.getByTestId('hooks-tab');
-				if (await hooksTab.isVisible()) {
-					await hooksTab.click();
+			const hookToggle = page.locator('table input[type="checkbox"]').first();
+			await expect(hookToggle).not.toBeChecked();
+			await hookToggle.check();
 
-					// Find and toggle a hook
-					const hookToggle = page.getByTestId('hook-toggle').first();
-					if (await hookToggle.isVisible()) {
-						await hookToggle.click();
+			await expect(hookToggle).toBeChecked();
+			expect(toggles).toEqual([{ id: 'hook-1', is_enabled: true }]);
+		});
 
-						// Toggle should change state
-						await expect(hookToggle).toBeChecked();
-					}
-				}
-			}
+		test('should report an empty hook registry', async ({ page }) => {
+			await mockHooks(page, []);
+
+			await page.goto('/settings');
+			await page.getByRole('checkbox', { name: 'Toggle Hooks' }).check();
+
+			await expect(page.getByText('No hooks registered.')).toBeVisible({ timeout: 10_000 });
 		});
 	});
 });

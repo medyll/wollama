@@ -1,7 +1,23 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import CompanionEditor from './CompanionEditor.svelte';
 import type { Companion, UserCompanion } from '$types/data';
+
+// onMount pulls the model list from the configured Ollama host. Stub it so the
+// suite never depends on a live server.
+beforeEach(() => {
+	vi.stubGlobal(
+		'fetch',
+		vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({ models: [{ name: 'mistral:latest' }] })
+		})
+	);
+});
+
+afterEach(() => {
+	vi.unstubAllGlobals();
+});
 
 const mockSystemCompanion: Companion = {
 	companion_id: '1',
@@ -16,7 +32,6 @@ const mockSystemCompanion: Companion = {
 	is_locked: true
 };
 
-// Legacy expectations that no longer match the current form remain skipped individually.
 describe('CompanionEditor - Story 2.2', () => {
 	describe('Form Rendering', () => {
 		it('AC1: Should display form for new companion customization', () => {
@@ -61,7 +76,49 @@ describe('CompanionEditor - Story 2.2', () => {
 			expect(screen.getByLabelText(/avatar url/i)).toBeTruthy();
 		});
 
-		it.skip('AC3: Should pre-populate form with system companion data when customizing', () => {
+		it('AC3: Should start blank when customizing a system companion', () => {
+			render(CompanionEditor, {
+				props: {
+					companion: mockSystemCompanion,
+					isNew: true,
+					onSave: vi.fn(),
+					onCancel: vi.fn()
+				}
+			});
+
+			// A fork starts from an empty form: the source companion is only used as the
+			// parent at save time, never copied into the fields.
+			expect((screen.getByLabelText(/companion name/i) as HTMLInputElement).value).toBe('');
+			expect((screen.getByLabelText(/system prompt/i) as HTMLTextAreaElement).value).toBe('');
+		});
+
+		it('AC3: Should pre-populate form when editing an existing companion', async () => {
+			const userCompanion: UserCompanion = {
+				...mockSystemCompanion,
+				user_companion_id: 'user-1',
+				user_id: 'user-123'
+			};
+
+			render(CompanionEditor, {
+				props: {
+					companion: userCompanion,
+					isNew: false,
+					onSave: vi.fn(),
+					onCancel: vi.fn()
+				}
+			});
+
+			await waitFor(() => {
+				expect((screen.getByLabelText(/companion name/i) as HTMLInputElement).value).toBe(userCompanion.name);
+			});
+
+			expect((screen.getByLabelText(/system prompt/i) as HTMLTextAreaElement).value).toBe(userCompanion.system_prompt);
+			expect((screen.getByLabelText(/ai model/i) as HTMLSelectElement).value).toBe(userCompanion.model);
+		});
+	});
+
+	describe('Validation', () => {
+		function renderNew() {
 			const onSave = vi.fn();
 			const onCancel = vi.fn();
 
@@ -74,111 +131,64 @@ describe('CompanionEditor - Story 2.2', () => {
 				}
 			});
 
-			const nameInput = screen.getByLabelText(/companion name/i) as HTMLInputElement;
-			expect(nameInput.value).toBe(mockSystemCompanion.name);
+			return {
+				onSave,
+				nameInput: screen.getByLabelText('Companion name') as HTMLInputElement,
+				promptInput: screen.getByLabelText('System prompt') as HTMLTextAreaElement,
+				submitBtn: screen.getByText(/create companion|save changes/i)
+			};
+		}
 
-			const promptInput = screen.getByLabelText(/system prompt/i) as HTMLTextAreaElement;
-			expect(promptInput.value).toBe(mockSystemCompanion.system_prompt);
-		});
-	});
+		it('AC4: Should validate required fields (name, system_prompt, model)', async () => {
+			const { onSave, submitBtn } = renderNew();
 
-	describe('Validation', () => {
-		it('AC4: Should validate required fields (name, system_prompt, model)', () => {
-			const onSave = vi.fn();
-			const onCancel = vi.fn();
+			await fireEvent.click(submitBtn);
 
-			const { container } = render(CompanionEditor, {
-				props: {
-					companion: mockSystemCompanion,
-					isNew: true,
-					onSave,
-					onCancel
-				}
-			});
-
-			const nameInput = container.querySelector('input[aria-label="Companion name"]') as HTMLInputElement;
-			const submitBtn = screen.getByText(/create companion|save changes/i);
-
-			// Clear name and try to submit
-			nameInput.value = '';
-			fireEvent.change(nameInput);
-			fireEvent.click(submitBtn);
-
-			// Should show error
-			const errorMessage = screen.queryByText(/name is required/i);
-			expect(errorMessage).toBeTruthy();
+			expect(await screen.findByText(/name is required/i)).toBeTruthy();
+			expect(screen.getByText(/system prompt is required/i)).toBeTruthy();
+			expect(screen.getByText(/model is required/i)).toBeTruthy();
+			expect(onSave).not.toHaveBeenCalled();
 		});
 
-		it.skip('Should enforce minimum length on name (3 characters)', () => {
-			const onSave = vi.fn();
-			const onCancel = vi.fn();
+		it('Should enforce minimum length on name (3 characters)', async () => {
+			const { nameInput, submitBtn } = renderNew();
 
-			const { container } = render(CompanionEditor, {
-				props: {
-					companion: mockSystemCompanion,
-					isNew: true,
-					onSave,
-					onCancel
-				}
-			});
+			await fireEvent.input(nameInput, { target: { value: 'ab' } });
+			await fireEvent.click(submitBtn);
 
-			const nameInput = container.querySelector('input[aria-label="Companion name"]') as HTMLInputElement;
-			nameInput.value = 'ab';
-			fireEvent.change(nameInput);
-
-			const submitBtn = screen.getByText(/create companion|save changes/i);
-			fireEvent.click(submitBtn);
-
-			const errorMessage = screen.queryByText(/at least 3 characters/i);
-			expect(errorMessage).toBeTruthy();
+			expect(await screen.findByText(/at least 3 characters/i)).toBeTruthy();
 		});
 
-		it.skip('Should enforce maximum length on name (50 characters)', () => {
-			const onSave = vi.fn();
-			const onCancel = vi.fn();
+		it('Should enforce maximum length on name (50 characters)', async () => {
+			const { nameInput, submitBtn } = renderNew();
 
-			const { container } = render(CompanionEditor, {
-				props: {
-					companion: mockSystemCompanion,
-					isNew: true,
-					onSave,
-					onCancel
-				}
-			});
+			await fireEvent.input(nameInput, { target: { value: 'a'.repeat(51) } });
+			await fireEvent.click(submitBtn);
 
-			const nameInput = container.querySelector('input[aria-label="Companion name"]') as HTMLInputElement;
-			nameInput.value = 'a'.repeat(51);
-			fireEvent.change(nameInput);
-
-			const submitBtn = screen.getByText(/create companion|save changes/i);
-			fireEvent.click(submitBtn);
-
-			const errorMessage = screen.queryByText(/at most 50 characters/i);
-			expect(errorMessage).toBeTruthy();
+			expect(await screen.findByText(/at most 50 characters/i)).toBeTruthy();
 		});
 
-		it.skip('Should require system prompt with minimum 10 characters', () => {
-			const onSave = vi.fn();
-			const onCancel = vi.fn();
+		it('Should require system prompt with minimum 10 characters', async () => {
+			const { promptInput, submitBtn } = renderNew();
 
-			const { container } = render(CompanionEditor, {
-				props: {
-					companion: mockSystemCompanion,
-					isNew: true,
-					onSave,
-					onCancel
-				}
+			await fireEvent.input(promptInput, { target: { value: 'short' } });
+			await fireEvent.click(submitBtn);
+
+			expect(await screen.findByText(/at least 10 characters/i)).toBeTruthy();
+		});
+
+		it('Should clear a field error once the value becomes valid', async () => {
+			const { nameInput, submitBtn } = renderNew();
+
+			await fireEvent.click(submitBtn);
+			expect(await screen.findByText(/name is required/i)).toBeTruthy();
+
+			await fireEvent.input(nameInput, { target: { value: 'Valid Name' } });
+			await fireEvent.click(submitBtn);
+
+			await waitFor(() => {
+				expect(screen.queryByText(/name is required/i)).toBeNull();
 			});
-
-			const promptInput = container.querySelector('textarea[aria-label="System prompt"]') as HTMLTextAreaElement;
-			promptInput.value = 'short';
-			fireEvent.change(promptInput);
-
-			const submitBtn = screen.getByText(/create companion|save changes/i);
-			fireEvent.click(submitBtn);
-
-			const errorMessage = screen.queryByText(/at least 10 characters/i);
-			expect(errorMessage).toBeTruthy();
 		});
 	});
 

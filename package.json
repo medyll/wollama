@@ -17,6 +17,7 @@
 		"check": "pnpm --filter @wollama/client check && pnpm --filter @wollama/server check",
 		"test:client": "pnpm --filter @wollama/client test",
 		"test:server": "pnpm --filter @wollama/server test:unit",
+		"test:e2e-server": "pnpm --filter @wollama/server exec tsx --test ../client/e2e/fixtures/e2e-server.test.ts",
 		"setup:python": "node setup-python.js",
 		"setup:audio": "pnpm --filter @wollama/server setup:audio",
 		"lint": "prettier --check . && eslint .",

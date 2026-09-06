@@ -6,7 +6,7 @@
 	import type { Companion, UserCompanion } from '$types/data';
 	import { onMount } from 'svelte';
 
-	let companion: (Companion & { isSystem?: boolean }) | (UserCompanion & { isSystem?: boolean }) | null = $state(null);
+	let companion: Companion | UserCompanion | null = $state(null);
 	let isLoading = $state(true);
 	let error: string | null = $state(null);
 	let isNew = $state(false);
@@ -30,12 +30,10 @@
 				return;
 			}
 
-			// Check if it's a system companion (for forking)
-			if ('is_locked' in comp && comp.is_locked) {
-				companion = { ...(comp as Companion), isSystem: true };
-			} else {
-				companion = { ...(comp as UserCompanion), isSystem: false };
-			}
+			// Pass the stored document through untouched: the editor spreads it into the
+			// update it writes, and RxDB rejects any field the schema does not declare
+			// (a stray `isSystem` marker made every save fail with VD2).
+			companion = comp;
 		} catch (err) {
 			error = `Failed to load companion: ${err instanceof Error ? err.message : String(err)}`;
 			console.error('Error loading companion:', err);
