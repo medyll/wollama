@@ -176,6 +176,30 @@ export const enableReplication = async (userId: string, _token?: string) => {
 
 	console.log(`Starting replication for user ${userId}...`);
 
+	/**
+	 * CouchDB (and express-pouchdb) only create a database on PUT. Without this the
+	 * very first sync for a user 404s on every request, because nothing else ever
+	 * creates `user_<uid>_<table>` on the server.
+	 */
+	const ensureRemoteDatabase = async (url: string) => {
+		try {
+			// Creation is addressed without a trailing slash (CouchDB's `PUT /dbname`);
+			// replication then uses the slash-terminated form. Bounded so a server that
+			// stops answering cannot hold up app start.
+			const res = await fetch(url, { method: 'PUT', signal: AbortSignal.timeout(5000) });
+			// 201 created, 412 already exists — both fine.
+			if (!res.ok && res.status !== 412) {
+				console.warn(`Could not provision ${url}: ${res.status}`);
+			}
+		} catch (err) {
+			console.warn(`Could not provision ${url}:`, err);
+		}
+	};
+
+	// Provision every remote database up front, in parallel: doing it one collection
+	// at a time serialises a dozen round trips in front of the first sync.
+	await Promise.all(CLIENT_COLLECTIONS.map((tableName) => ensureRemoteDatabase(`${serverUrl}user_${userId}_${tableName}`)));
+
 	for (const tableName of CLIENT_COLLECTIONS) {
 		// Strategy: Per-User Database on Server
 		// The server DB name will be: user_{userId}_{tableName}

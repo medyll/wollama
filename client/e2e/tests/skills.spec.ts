@@ -1,93 +1,49 @@
 import { test, expect } from '@playwright/test';
-import { spawn, ChildProcess } from 'child_process';
-import path from 'path';
-import os from 'os';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import { startE2EServer, type E2EServer } from '../fixtures/e2e-server';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.resolve(__dirname, '..', '..', '..');
-const SERVER_DIR = path.join(ROOT, 'server');
 const SERVER_PORT = 3001;
 const SERVER_URL = `http://127.0.0.1:${SERVER_PORT}`;
 
 test.setTimeout(120 * 1000);
 
+/**
+ * Waits until the server answers /api/health.
+ *
+ * Readiness is deliberately not inferred from the "Listening on port" log line:
+ * the server prints it before it finishes creating its PouchDB indexes, and a
+ * find() issued in that window comes back empty.
+ */
 function waitForServer(request: any, serverProc: any, timeout = 120000) {
 	const start = Date.now();
 	return new Promise<void>((resolve, reject) => {
 		void (async () => {
-			let resolved = false;
-
-			const checkHealth = async () => {
+			while (Date.now() - start < timeout) {
 				try {
 					const r = await request.get(`${SERVER_URL}/api/health`);
 					if (r.ok()) {
-						resolved = true;
 						resolve();
+						return;
 					}
-				} catch (e) {
-					// ignore
+				} catch {
+					// server not up yet
 				}
-			};
-
-			// Listen for server stdout message as an early indicator
-			const onData = (d: Buffer) => {
-				const s = d.toString();
-				if (s.includes('Listening on port') || s.includes('Listening on')) {
-					resolved = true;
-					resolve();
-				}
-			};
-
-			serverProc.stdout?.on('data', onData);
-
-			while (!resolved && Date.now() - start < timeout) {
-				await checkHealth();
-				if (resolved) break;
 				await new Promise((r) => setTimeout(r, 500));
 			}
-
-			serverProc.stdout?.off('data', onData);
-
-			if (!resolved) reject(new Error('Server did not become ready in time'));
+			reject(new Error('Server did not become ready in time'));
 		})().catch(reject);
 	});
 }
 
-test.describe.skip('Skills E2E', () => {
-	// Legacy harness targets the former shared skills database and backend startup contract.
-	let serverProc: ChildProcess | null = null;
+test.describe('Skills E2E', () => {
+	let server: E2EServer | null = null;
 
 	test.beforeAll(
 		async () => {
-			// Start the server using the locally installed tsx binary so we run the TypeScript entrypoint
-			const tsxCmd = path.join(SERVER_DIR, 'node_modules', '.bin', process.platform === 'win32' ? 'tsx.cmd' : 'tsx');
-
-			// Use an isolated temporary DB path to avoid clashes with other running servers
-			const tmpDir = path.join(os.tmpdir(), `wollama-e2e-${Date.now()}`);
-			fs.mkdirSync(tmpDir, { recursive: true });
-			const spawnEnv = { ...process.env, DB_PATH: tmpDir, PORT: String(SERVER_PORT), SKIP_HEAVY_SETUP: 'true' };
-
-			if (process.platform === 'win32') {
-				// On Windows, execute via cmd to run the .cmd wrapper
-				serverProc = spawn('cmd', ['/c', tsxCmd, 'server.ts'], {
-					cwd: SERVER_DIR,
-					env: spawnEnv,
-					stdio: ['ignore', 'pipe', 'pipe']
-				});
-			} else {
-				serverProc = spawn(tsxCmd, ['server.ts'], {
-					cwd: SERVER_DIR,
-					env: spawnEnv,
-					stdio: ['ignore', 'pipe', 'pipe']
-				});
-			}
+			server = startE2EServer({ port: SERVER_PORT, databasePrefix: 'wollama-e2e' });
 
 			// Forward server logs to test output to aid debugging
-			serverProc.stdout?.on('data', (d) => console.log('[server]', d.toString()));
-			serverProc.stderr?.on('data', (d) => console.error('[server]', d.toString()));
+			server.process.stdout?.on('data', (d) => console.log('[server]', d.toString()));
+			server.process.stderr?.on('data', (d) => console.error('[server]', d.toString()));
 
 			// Do not await long readiness checks here to avoid Playwright hook timeouts.
 			// The test body will perform readiness polling with generous timeouts.
@@ -96,24 +52,15 @@ test.describe.skip('Skills E2E', () => {
 	);
 
 	test.afterAll(async () => {
-		if (serverProc) {
-			try {
-				serverProc.kill();
-			} catch (e) {
-				// ignore
-			}
-		}
+		await server?.stop();
 	});
 
-	test('autocomplete list and invoke builtin skill', async ({ request }) => {
-		// Wait for server readiness (health or stdout) with extended timeout
-		console.log('E2E: waiting for server readiness...');
-		await waitForServer(request, serverProc, 120000);
-		console.log('E2E: waitForServer resolved');
-		// Proceed to seeding directly; the PUT will create the DB/doc if needed.
-		// Seed a sample skill into the server PouchDB via the express-pouchdb HTTP API
+	test('lists a seeded skill and invokes its builtin handler', async ({ request }) => {
+		await waitForServer(request, server?.process, 120000);
+
+		// A unique document id keeps the seed idempotent when the temp database is reused.
 		const skillDoc = {
-			_id: 'skill:help',
+			_id: `skill:help-${Date.now()}`,
 			skill_id: 'help',
 			slug: 'help',
 			name: 'help',
@@ -124,32 +71,71 @@ test.describe.skip('Skills E2E', () => {
 			handler_ref: 'help'
 		};
 
-		console.log('E2E: seeding skill via PUT');
+		// Seed straight into the server's PouchDB over its own HTTP surface.
 		const putRes = await request.put(`${SERVER_URL}/_db/skills/${encodeURIComponent(skillDoc._id)}`, {
 			data: skillDoc
 		});
-		console.log('E2E: PUT status', putRes.status());
+		expect(putRes.status()).toBeGreaterThanOrEqual(200);
+		expect(putRes.status()).toBeLessThan(300);
+
+		// Index creation races startup, so poll rather than assert once.
+		await expect
+			.poll(
+				async () => {
+					const res = await request.get(`${SERVER_URL}/api/skills?q=help`);
+					if (!res.ok()) return null;
+					const list = (await res.json()) as Array<{ slug: string }>;
+					return list.find((skill) => skill.slug === 'help') ?? null;
+				},
+				{ timeout: 30_000 }
+			)
+			.not.toBeNull();
+
+		// The unfiltered listing must contain it too.
+		const allRes = await request.get(`${SERVER_URL}/api/skills`);
+		expect(allRes.ok()).toBeTruthy();
+		const all = (await allRes.json()) as Array<{ slug: string }>;
+		expect(all.some((skill) => skill.slug === 'help')).toBeTruthy();
+
+		// Invoking resolves the builtin handler and returns its output.
+		const invokeRes = await request.post(`${SERVER_URL}/api/skills/help/invoke`, {
+			data: { args: [] }
+		});
+		expect(invokeRes.ok()).toBeTruthy();
+		const body = (await invokeRes.json()) as { skill_id?: string; output?: string; result?: string };
+		expect(body.skill_id).toBe('help');
+		expect(typeof body.output === 'string' || typeof body.result === 'string').toBeTruthy();
+	});
+
+	test('rejects an unknown skill slug', async ({ request }) => {
+		await waitForServer(request, server?.process, 120000);
+
+		const res = await request.post(`${SERVER_URL}/api/skills/does-not-exist/invoke`, { data: { args: [] } });
+		expect(res.status()).toBe(404);
+	});
+
+	test('hides disabled skills from the listing', async ({ request }) => {
+		await waitForServer(request, server?.process, 120000);
+
+		const disabled = {
+			_id: `skill:disabled-example-${Date.now()}`,
+			skill_id: 'disabled-example',
+			slug: 'disabled-example',
+			name: 'disabled-example',
+			display_name: 'Disabled example',
+			description: 'Never listed',
+			is_enabled: false,
+			handler_type: 'builtin',
+			handler_ref: 'help'
+		};
+		const putRes = await request.put(`${SERVER_URL}/_db/skills/${encodeURIComponent(disabled._id)}`, {
+			data: disabled
+		});
 		expect(putRes.status()).toBeGreaterThanOrEqual(200);
 
-		// Search for the skill via the API
-		console.log('E2E: searching for skill via API');
-		const listRes = await request.get(`${SERVER_URL}/api/skills?q=help`);
-		console.log('E2E: list status', listRes.status());
-		expect(listRes.ok()).toBeTruthy();
-		const list = await listRes.json();
-		expect(Array.isArray(list)).toBeTruthy();
-		expect(list.find((s: any) => s.slug === 'help')).toBeTruthy();
-
-		// Invoke the builtin skill
-		console.log('E2E: invoking skill');
-		const invokeRes = await request.post(`${SERVER_URL}/api/skills/help/invoke`, {
-			data: { input: 'How do I use this app?' }
-		});
-		console.log('E2E: invoke status', invokeRes.status());
-		expect(invokeRes.ok()).toBeTruthy();
-		const body = await invokeRes.json();
-		// Builtin help handler returns an 'output' field in our implementations
-		expect(body).toBeDefined();
-		expect(typeof body.output === 'string' || typeof body.result === 'string').toBeTruthy();
+		const res = await request.get(`${SERVER_URL}/api/skills`);
+		expect(res.ok()).toBeTruthy();
+		const list = (await res.json()) as Array<{ slug: string }>;
+		expect(list.some((skill) => skill.slug === 'disabled-example')).toBeFalsy();
 	});
 });

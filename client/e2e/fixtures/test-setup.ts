@@ -85,9 +85,10 @@ export async function setupTestState(
 		nickname?: string;
 		model?: string;
 		uid?: string;
+		serverUrl?: string;
 	}
 ) {
-	const { nickname = 'Test User', model = 'mistral', uid = 'e2e-user' } = options || {};
+	const { nickname = 'Test User', model = 'mistral', uid = 'e2e-user', serverUrl } = options || {};
 
 	// Set localStorage directly to skip onboarding. A uid is part of that state:
 	// companion listing and chat ownership are scoped by user, and without one the
@@ -103,12 +104,13 @@ export async function setupTestState(
 					photoURL: null,
 					preferences: {
 						onboarding_completed: true,
-						defaultModel: data.model
+						defaultModel: data.model,
+						...(data.serverUrl ? { serverUrl: data.serverUrl } : {})
 					}
 				})
 			);
 		},
-		{ nickname, model, uid }
+		{ nickname, model, uid, serverUrl }
 	);
 }
 
@@ -171,6 +173,30 @@ export async function mockServerHealth(page: Page, options?: { ok?: boolean }) {
 			body: JSON.stringify({ status: ok ? 'ok' : 'down', ollama: ok })
 		});
 	});
+}
+
+/**
+ * Serve the hooks registry the settings page reads, and capture toggles.
+ * Returns the list of PATCH bodies the page sent.
+ */
+export async function mockHooks(
+	page: Page,
+	hooks: Array<{ _id: string; name: string; event: string; is_enabled: boolean; handler_type?: string }>
+) {
+	const toggles: Array<{ id: string; is_enabled: boolean }> = [];
+
+	await page.route('**/api/hooks', async (route) => {
+		await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(hooks) });
+	});
+
+	await page.route('**/api/hooks/*', async (route) => {
+		const id = decodeURIComponent(new URL(route.request().url()).pathname.split('/').pop() ?? '');
+		const body = route.request().postDataJSON() as { is_enabled: boolean };
+		toggles.push({ id, is_enabled: body.is_enabled });
+		await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+	});
+
+	return toggles;
 }
 
 /**
