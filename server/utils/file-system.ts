@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
+/** Filesystem helpers used to describe a workspace to a model. */
 export class FileSystemUtils {
 	static generateTree(dir: string, depth: number = 2, currentDepth: number = 0): string {
 		if (currentDepth > depth) return '';

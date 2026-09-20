@@ -50,4 +50,5 @@ class ToolCatalog {
 	}
 }
 
+/** The process-wide catalog. Runtimes register into it at startup. */
 export const toolCatalog = new ToolCatalog();

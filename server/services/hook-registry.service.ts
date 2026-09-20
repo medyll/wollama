@@ -51,4 +51,5 @@ class HookRegistry {
 	}
 }
 
+/** The process-wide hook registry. `load()` must run before the first pipeline call. */
 export const hookRegistry = new HookRegistry();

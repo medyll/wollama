@@ -9,6 +9,11 @@ import { stripPrivateReasoning } from '$lib/utils/thinking';
 import { runStore } from './run.service.svelte.js';
 import { permissionState } from '$lib/state/permissions.svelte.js';
 
+/**
+ * Everything a chat does: create and load chats, send a message, consume the
+ * NDJSON response stream, and dispatch the Wollama events it carries (tool calls,
+ * consent prompts, agent runs) to the matching state.
+ */
 export class ChatService {
 	async createChat(title?: string, model: string = userState.preferences.defaultModel, companionId?: string): Promise<string> {
 		console.log('Creating new chat...');
@@ -509,4 +514,5 @@ export class ChatService {
 	}
 }
 
+/** App-wide chat service. */
 export const chatService = new ChatService();

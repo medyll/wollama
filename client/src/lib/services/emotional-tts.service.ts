@@ -1,5 +1,6 @@
 import { userState } from '$lib/state/user.svelte';
 
+/** Emotion-tagged speech synthesis, via the server's proxy to the Python sidecar. */
 export class EmotionalTtsService {
 	static async synthesize(text: string, emotionTags: string[] = [], parameters: any = {}): Promise<ArrayBuffer> {
 		// Use the Server API which proxies to the Python Sidecar

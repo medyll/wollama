@@ -8,6 +8,13 @@ type ConnState =
 
 const BACKOFF_MS = [1000, 2000, 4000];
 
+/**
+ * Owns the live MCP connections, one per server id.
+ *
+ * Connections are opened lazily on first use and retried with a short backoff. A
+ * server that still fails is marked failed and stays that way, so a broken config
+ * cannot respawn a process in a loop.
+ */
 export class ConnectionManager {
 	private connections = new Map<string, ConnState>();
 	private configs = new Map<string, McpConnectionConfig>();
@@ -104,4 +111,5 @@ export class ConnectionManager {
 	}
 }
 
+/** The process-wide connection manager. */
 export const connectionManager = new ConnectionManager();

@@ -4,6 +4,12 @@ import { embedText } from './embed.js';
 import { vectorStore } from './vector-store.js';
 import type { RagDocumentChunk, RagRetrievedChunk } from '../../../shared/types/rag.js';
 
+/**
+ * Finds the chunks of this owner's documents that are closest to `query`.
+ *
+ * Returns at most `config.rag.topK` hits above `config.rag.minScore`, and an empty
+ * array for an empty query. Hits whose chunk row has gone missing are skipped.
+ */
 export async function retrieveContext(ownerId: string, query: string): Promise<RagRetrievedChunk[]> {
 	if (!ownerId || !query.trim()) return [];
 
@@ -24,6 +30,7 @@ export async function retrieveContext(ownerId: string, query: string): Promise<R
 	return results;
 }
 
+/** Renders retrieved chunks as the numbered block prepended to the prompt. Empty string for no chunks. */
 export function formatContextBlock(chunks: RagRetrievedChunk[]): string {
 	if (chunks.length === 0) return '';
 	const lines = chunks.map((c, i) => `[${i + 1}] ${c.text}`);

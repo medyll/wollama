@@ -135,4 +135,6 @@ class DatabaseManager {
 	}
 }
 
+/** The process-wide database manager, bound to the app schema. Owns one PouchDB
+ *  instance per declared table and seeds the builtin rows on startup. */
 export const dbManager = new DatabaseManager(appSchema);

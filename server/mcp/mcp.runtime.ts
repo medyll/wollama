@@ -2,6 +2,7 @@ import { connectionManager } from './connection-manager.js';
 import { toWireName } from '../orchestration/tool-catalog.js';
 import type { ExecutionContext, ToolDescriptor, ToolResult, ToolRisk, ToolRuntime } from '../orchestration/types.js';
 
+/** Risk level per tool name, for one MCP server. */
 export type RiskMap = Record<string, ToolRisk>;
 
 /** A generic ToolRuntime backed by one MCP connection. Risk is resolved via an

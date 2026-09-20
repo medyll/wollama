@@ -1,5 +1,6 @@
 const MAX_CONTENT_LENGTH = 4000;
 
+/** Result of a page fetch. `truncated` means the page was longer than the cap. */
 export interface PageFetchOutput {
 	url: string;
 	content: string;
@@ -29,6 +30,7 @@ function stripHtml(html: string): string {
 	return text.trim();
 }
 
+/** Builtin tool that fetches a URL and returns its text with the HTML stripped out. */
 export class PageFetchAgent {
 	static readonly slug = 'page-fetch';
 

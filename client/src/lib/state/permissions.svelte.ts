@@ -1,5 +1,6 @@
 import { userState } from '$lib/state/user.svelte';
 
+/** A consent prompt the server is waiting on, as it arrives on the chat stream. */
 export interface PermissionRequest {
 	request_id: string;
 	tool_id: string;
@@ -57,4 +58,5 @@ export class PermissionState {
 	}
 }
 
+/** App-wide consent-prompt queue. */
 export const permissionState = new PermissionState();

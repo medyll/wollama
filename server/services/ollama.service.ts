@@ -3,6 +3,7 @@ import { config } from '../config.js';
 
 const ollama = new Ollama({ host: config.ollama.host });
 
+/** Thin wrapper over the `ollama` client, bound to the configured host. */
 export const OllamaService = {
 	// Expose the raw instance
 	instance: ollama,

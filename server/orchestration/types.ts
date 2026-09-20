@@ -3,8 +3,13 @@
 
 import type { ProviderCapabilities, ProviderFamily, ProviderModel, ProviderType } from '../../shared/types/provider.js';
 
+/**
+ * What a tool is allowed to do, from the caller's point of view. Drives the
+ * permission prompts: `read` runs unattended, the others need a grant.
+ */
 export type ToolRisk = 'read' | 'write' | 'execute' | 'external';
 
+/** One callable tool, as advertised by a runtime and offered to the model. */
 export interface ToolDescriptor {
 	/** Namespaced id, e.g. 'builtin:web-search' | 'mcp:acp-team:agent_start' */
 	id: string;
@@ -19,6 +24,10 @@ export interface ToolDescriptor {
 	risk: ToolRisk;
 }
 
+/**
+ * Everything a tool call needs to know about who asked for it and under which
+ * grants it runs. Threaded from the HTTP layer down through tool-executor.ts.
+ */
 export interface ExecutionContext {
 	chat_id?: string;
 	user_id?: string;
@@ -46,6 +55,7 @@ export interface ExecutionContext {
 	hopCount?: number;
 }
 
+/** Outcome of a single tool call: what the model sees, plus what gets audited. */
 export interface ToolResult {
 	ok: boolean;
 	/** what goes back to the model as the `tool` message content */
@@ -57,26 +67,34 @@ export interface ToolResult {
 	tool_call_id?: string;
 }
 
+/**
+ * A source of tools — the builtin runtime, or one MCP server. Runtimes are
+ * registered by `serverId` and are the only things that actually invoke a tool.
+ */
 export interface ToolRuntime {
 	readonly serverId: string;
 	list(ctx: ExecutionContext): Promise<ToolDescriptor[]>;
 	call(toolId: string, input: unknown, ctx: ExecutionContext): Promise<ToolResult>;
 }
 
+/** A tool invocation as the model emitted it, before resolution to a descriptor. */
 export interface ToolCallRequest {
 	wireName: string;
 	args: Record<string, unknown>;
 }
 
+/** One decoded item from a provider's streaming response. */
 export type ProviderChunk =
 	| { kind: 'text'; delta: string; raw: unknown }
 	| { kind: 'tool_calls'; calls: ToolCallRequest[]; raw: unknown }
 	| { kind: 'done'; raw: unknown };
 
+/** A single provider round-trip, exposed as a stream of chunks. */
 export interface ProviderTurn {
 	stream: AsyncIterable<ProviderChunk>;
 }
 
+/** Provider-agnostic chat request. Adapters translate it to their own wire format. */
 export interface ProviderChatRequest {
 	model: string;
 	messages: unknown[];
@@ -84,6 +102,10 @@ export interface ProviderChatRequest {
 	stream: boolean;
 }
 
+/**
+ * The wire half of a provider: turns a chat request into a stream, and knows how
+ * to fold tool results back into the message list its API expects.
+ */
 export interface ProviderAdapter {
 	chat(req: ProviderChatRequest): Promise<ProviderTurn>;
 	/** builds the assistant + tool messages to append before the next turn */
@@ -113,15 +135,21 @@ export interface LlmProvider extends ProviderAdapter {
 	embed?(input: string[]): Promise<number[][]>;
 }
 
+/** Lifecycle state of an agent run, as reported by run-manager.ts. */
 export type RunStatus =
 	'queued' | 'running' | 'waiting_input' | 'cancelling' | 'completed' | 'failed' | 'cancelled' | 'interrupted' | 'timed_out';
 
+/** One event emitted by a run, ordered by the monotonic `seq` used to resume watching. */
 export interface RunEvent {
 	seq: number;
 	type: string;
 	payload: unknown;
 }
 
+/**
+ * An external agent runner (today: acp-team) that Wollama starts runs on and
+ * polls for events.
+ */
 export interface RunBackend {
 	readonly backendId: string;
 	/** Starts the remote run and returns its backend-side id. run-manager.ts mints and
@@ -140,6 +168,7 @@ export interface RunBackend {
 
 // Typed wire events written to the NDJSON stream alongside ollama chunks,
 // under the `{"wollama": <WollamaEvent>}` key. Unmodified clients ignore this key.
+/** Wollama-specific stream event. See the note above for how it rides the wire. */
 export type WollamaEvent =
 	| { type: 'tool_call'; tool_call_id: string; tool_id: string; risk: ToolRisk; input: unknown }
 	| { type: 'tool_result'; tool_call_id: string; ok: boolean; summary: string; run_id?: string }
@@ -158,6 +187,7 @@ export type WollamaEvent =
 	| { type: 'run_gap'; run_id: string; from_seq: number; to_seq: number }
 	| { type: 'run_ended'; run_id: string; status: RunStatus; error?: string };
 
+/** Write side of the NDJSON response stream, so the orchestrator stays HTTP-agnostic. */
 export interface StreamSink {
 	writeChunk(o: unknown): void;
 	end(): void;

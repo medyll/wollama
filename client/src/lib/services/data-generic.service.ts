@@ -3,6 +3,13 @@ import { appSchema } from '../../../../shared/db/database-scheme';
 import type { RxCollection } from 'rxdb';
 import { AbstractGenericService } from '../../../../shared/services/abstract-generic.service';
 
+/**
+ * CRUD over one schema-declared collection, backed by RxDB.
+ *
+ * The constructor resolves the collection's schema up front and throws when the
+ * collection is not declared, so a typo surfaces at construction rather than at
+ * first query.
+ */
 export class DataGenericService<T> extends AbstractGenericService<T> {
 	private tableDef: any;
 	private cardLines: string[];

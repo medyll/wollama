@@ -1,6 +1,12 @@
 import { dbManager } from '../db/database.js';
 import { AbstractGenericService } from '../../shared/services/abstract-generic.service.js';
 
+/**
+ * CRUD over one schema-declared table, backed by PouchDB.
+ *
+ * The constructor resolves the table's schema up front and throws when the table
+ * is not declared, so a typo surfaces at construction rather than at first query.
+ */
 export class GenericService<T> extends AbstractGenericService<T> {
 	constructor(tableName: string) {
 		const schema = dbManager.getSchema(tableName);

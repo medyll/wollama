@@ -1,15 +1,18 @@
+/** One hit from a web search. */
 export interface WebSearchResult {
 	title: string;
 	url: string;
 	snippet: string;
 }
 
+/** Result of a web search. `error` set means the search failed; `results` is then empty. */
 export interface WebSearchOutput {
 	query: string;
 	results: WebSearchResult[];
 	error?: string;
 }
 
+/** Builtin tool that searches the web via DuckDuckGo's Instant Answer API. */
 export class WebSearchAgent {
 	static readonly slug = 'web-search';
 

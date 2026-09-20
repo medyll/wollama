@@ -1,6 +1,8 @@
 import { userState } from '$lib/state/user.svelte';
 import { uiState } from '$lib/state/ui.svelte';
 
+/** Microphone recording and playback of synthesized speech. Holds the live
+ *  MediaRecorder and the audio element currently playing. */
 export class AudioService {
 	mediaRecorder: MediaRecorder | null = null;
 	audioChunks: Blob[] = [];
@@ -318,4 +320,5 @@ export class AudioService {
 	}
 }
 
+/** App-wide audio service. */
 export const audioService = new AudioService();

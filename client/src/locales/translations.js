@@ -4,6 +4,7 @@ import fr from './fr';
 
 import it from './it';
 
+/** Translation tables, keyed by locale. `en` is the fallback. */
 export const translations = {
 	de: de.de,
 	en: {

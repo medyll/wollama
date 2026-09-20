@@ -1,6 +1,8 @@
 import { DataGenericService } from './data-generic.service';
 import type { Companion, UserCompanion } from '$types/data';
 
+/** Reads companions from both collections, with a user's forks shadowing the
+ *  system companions they were forked from. */
 export class CompanionService {
 	private systemService: DataGenericService<Companion>;
 	private userService: DataGenericService<UserCompanion>;
@@ -108,4 +110,5 @@ export class CompanionService {
 	}
 }
 
+/** App-wide companion service. */
 export const companionService = new CompanionService();

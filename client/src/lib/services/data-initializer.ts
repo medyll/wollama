@@ -10,6 +10,7 @@ const DEFAULT_LANGUAGES = [
 	{ code: 'it', name: 'Italiano', flag: '🇮🇹' }
 ];
 
+/** Seeds the default companions and languages into the local database on first run. */
 export class DataInitializer {
 	static async initializeDefaults() {
 		await this.initializeData<Companion>('companions', DEFAULT_COMPANIONS, true);

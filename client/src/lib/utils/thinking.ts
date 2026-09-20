@@ -1,3 +1,8 @@
+/**
+ * A message split around its `<think>` block: what came before it, the reasoning
+ * itself, and the answer after it. `isThinking` means the block is still open, so
+ * `response` is not available yet.
+ */
 export interface ThinkingResult {
 	pre: string | null;
 	thinking: string | null;
@@ -5,6 +10,8 @@ export interface ThinkingResult {
 	isThinking: boolean;
 }
 
+/** Splits streamed content around its `<think>` block so the UI can render the
+ *  reasoning separately, including while the block is still open. */
 export function parseThinking(content: string | null | undefined): ThinkingResult {
 	if (!content || typeof content !== 'string') {
 		return { pre: null, thinking: null, response: content || '', isThinking: false };
@@ -30,6 +37,12 @@ export function parseThinking(content: string | null | undefined): ThinkingResul
 	return { pre, thinking: thinkContent, response: restContent, isThinking: false };
 }
 
+/**
+ * Removes `<think>`, `<analysis>` and `<reasoning>` blocks from content.
+ *
+ * An unclosed block truncates everything after it, so a partially streamed
+ * reasoning block is never shown.
+ */
 export function stripPrivateReasoning(content: string | null | undefined): string {
 	if (!content || typeof content !== 'string') return '';
 

@@ -1,6 +1,9 @@
+/** Corner or edge of the viewport the toast stack is anchored to. */
 export type ToastPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center';
+/** Severity of a toast, which picks its color and icon. */
 export type ToastType = 'info' | 'success' | 'warning' | 'error';
 
+/** One queued toast. A `timeout` of 0 keeps it up until dismissed. */
 export interface Toast {
 	id: string;
 	message: string;
@@ -92,4 +95,9 @@ class NotificationState {
 	}
 }
 
+/**
+ * App-wide notification state. Call `send` (or the `success`/`error`/`warning`/
+ * `info` helpers) rather than `add`: `send` also raises a system notification when
+ * running under Electron with the window unfocused.
+ */
 export const toast = new NotificationState();

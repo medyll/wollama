@@ -1,3 +1,4 @@
+/** CRUD contract every table service implements. */
 export interface IGenericService<T> {
 	getAll(): Promise<T[]>;
 	get(id: string): Promise<T | null>;
@@ -7,6 +8,11 @@ export interface IGenericService<T> {
 	find(selector: Record<string, unknown>, sort?: Array<string | Record<string, 'asc' | 'desc'>>): Promise<T[]>;
 }
 
+/**
+ * Table-bound base for the CRUD services. Holds the table name and primary key;
+ * the storage itself is supplied by the subclass (PouchDB on the server, RxDB on
+ * the client).
+ */
 export abstract class AbstractGenericService<T> implements IGenericService<T> {
 	protected tableName: string;
 	protected primaryKey: string;

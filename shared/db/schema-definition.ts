@@ -1,6 +1,12 @@
+/** Value kinds a field can hold. Drives validation, the generated UI and the storage mapping. */
 export type FieldType =
 	'string' | 'number' | 'boolean' | 'date' | 'timestamp' | 'array' | 'object' | 'uuid' | 'email' | 'text-long';
 
+/**
+ * One column of a table. Beyond type and constraints it carries two optional
+ * blocks: `ui` for how the generated form renders the field, and `ai` for fields
+ * whose value a model fills in.
+ */
 export interface FieldDefinition {
 	type: FieldType;
 	required?: boolean;
@@ -24,6 +30,7 @@ export interface FieldDefinition {
 	};
 }
 
+/** One table: its key, its indexes, its fields, its foreign keys and how rows are presented. */
 export interface TableDefinition {
 	primaryKey: string;
 	indexes?: string[];
@@ -36,6 +43,7 @@ export interface TableDefinition {
 	};
 }
 
+/** The whole schema, keyed by table name. */
 export interface DatabaseSchema {
 	[tableName: string]: TableDefinition;
 }

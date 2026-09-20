@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/** One HTTP-transport MCP server the operator configured. */
 export interface McpHttpServerConfig {
 	id: string;
 	url: string;
@@ -26,6 +27,7 @@ function parseHttpServers(json: string | undefined): McpHttpServerConfig[] {
 	}
 }
 
+/** Process-wide configuration, resolved from the environment at import time. */
 export const config = {
 	server: {
 		port: Number(process.env.PORT) || 3000,

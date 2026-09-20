@@ -3,6 +3,13 @@ const DEFAULT_POLL_INTERVAL_MS = 250;
 
 const delay = (duration) => new Promise((resolve) => setTimeout(resolve, duration));
 
+/**
+ * Starts the bundled server from the desktop app and waits for it to answer.
+ *
+ * Polls `url` until it responds or `startTimeoutMs` elapses. An already-running
+ * server is adopted rather than restarted, and only a process this manager spawned
+ * is ever stopped by it.
+ */
 export class BackendManager {
 	constructor({
 		url,

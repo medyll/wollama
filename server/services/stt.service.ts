@@ -13,6 +13,8 @@ if (ffmpegPath) {
 }
 
 // Service for Speech-to-Text (Whisper)
+/** Speech-to-text via Whisper. Audio is transcoded with ffmpeg first. Returns
+ *  nothing useful when `config.stt.enabled` is false. */
 export const SttService = {
 	async transcribe(audioBuffer: Buffer, filename: string = 'audio.wav', language: string = 'auto'): Promise<string> {
 		if (!config.stt.enabled) {

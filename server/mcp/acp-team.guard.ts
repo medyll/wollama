@@ -10,6 +10,7 @@ function isRecord(v: unknown): v is Record<string, unknown> {
 	return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
+/** Either the sanitized input to pass on, or the refusal to return to the model. */
 export type GuardResult = { ok: true; input: Record<string, unknown> } | { ok: false; result: ToolResult };
 
 /**

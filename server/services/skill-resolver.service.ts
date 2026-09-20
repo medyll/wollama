@@ -1,6 +1,7 @@
 import type { ParsedSlashCommand, Skill } from '../../shared/types/skills.js';
 import { dbManager } from '../db/database.js';
 
+/** Turns a raw `/command args` message into the skill it refers to. */
 export class SkillResolver {
 	static parseSlashCommand(input: string): ParsedSlashCommand | null {
 		if (!input || typeof input !== 'string') return null;

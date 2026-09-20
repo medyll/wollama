@@ -1,6 +1,7 @@
 import { OllamaService } from '../ollama.service.js';
 import { config } from '../../config.js';
 
+/** Embeds one string with the configured RAG model. Throws if the model returns nothing. */
 export async function embedText(text: string): Promise<number[]> {
 	const result = await OllamaService.embed({
 		model: config.rag.embedModel,
@@ -14,6 +15,7 @@ export async function embedText(text: string): Promise<number[]> {
 	return embedding;
 }
 
+/** Embeds several strings in one call. Throws unless one vector comes back per input. */
 export async function embedBatch(texts: string[]): Promise<number[][]> {
 	const result = await OllamaService.embed({
 		model: config.rag.embedModel,

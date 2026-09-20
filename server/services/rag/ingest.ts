@@ -7,6 +7,7 @@ import { embedBatch } from './embed.js';
 import { vectorStore } from './vector-store.js';
 import type { RagDocument, RagDocumentChunk, DocumentSource } from '../../../shared/types/rag.js';
 
+/** What to index: the text itself, plus where it came from. */
 export interface IngestParams {
 	ownerId: string;
 	source: DocumentSource;
@@ -16,6 +17,13 @@ export interface IngestParams {
 	mimeType?: string;
 }
 
+/**
+ * Chunks, embeds and stores a document.
+ *
+ * The document row is written first with status `pending` and flipped to `indexed`
+ * once its chunks are in. Failures do not throw: the row is flipped to `error`
+ * with the reason in `error`, and that row is returned.
+ */
 export async function ingestDocument(params: IngestParams): Promise<RagDocument> {
 	const { ownerId, source, title, text, sourceRef, mimeType } = params;
 	const documentsDb = dbManager.getDb('documents');
@@ -82,6 +90,7 @@ export async function ingestDocument(params: IngestParams): Promise<RagDocument>
 	}
 }
 
+/** Removes a document, its chunks and its vectors. Scoped to `ownerId`. */
 export async function deleteDocument(ownerId: string, documentId: string): Promise<void> {
 	const documentsDb = dbManager.getDb('documents');
 	const chunksDb = dbManager.getDb('document_chunks');

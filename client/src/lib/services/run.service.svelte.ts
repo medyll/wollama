@@ -6,9 +6,11 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 // cannot use $state. Kept under services/ (not state/) since this module also owns
 // the fetch/polling logic, not just reactive fields.
 
+/** Lifecycle state of a run. Mirrors the server's `RunStatus`. */
 export type RunStatus =
 	'queued' | 'running' | 'waiting_input' | 'cancelling' | 'completed' | 'failed' | 'cancelled' | 'interrupted' | 'timed_out';
 
+/** A run as the server reports it. Mirrors the server's `RunDoc`. */
 export interface RunDoc {
 	run_id: string;
 	backend: string;
@@ -28,6 +30,7 @@ export interface RunDoc {
 	finished_at?: string;
 }
 
+/** One event of a run, ordered by `seq`. Mirrors the server's `RunEventDoc`. */
 export interface RunEventDoc {
 	run_event_id: string;
 	run_id: string;
@@ -161,4 +164,5 @@ export class RunStore {
 	}
 }
 
+/** App-wide run state: reactive fields the UI reads, plus the polling and cancel calls. */
 export const runStore = new RunStore();

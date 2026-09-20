@@ -5,6 +5,7 @@ import path from 'path';
 import os from 'os';
 
 // Service for Text-to-Speech
+/** Text-to-speech. Returns `null` when `config.tts.enabled` is false. */
 export const TtsService = {
 	async speak(
 		text: string,

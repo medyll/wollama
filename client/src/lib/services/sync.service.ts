@@ -3,6 +3,7 @@ import { toast } from '$lib/state/notifications.svelte';
 import { t } from '$lib/state/i18n.svelte';
 import { getDatabase } from '$lib/db';
 
+/** One queued write waiting to reach the server, with its retry count. */
 export interface SyncQueueItem {
 	id: string;
 	operation: 'create' | 'update' | 'delete';
@@ -14,6 +15,10 @@ export interface SyncQueueItem {
 	error?: string;
 }
 
+/**
+ * Queues local writes while offline and flushes them once the connection is back,
+ * on a periodic timer and on the network-status event.
+ */
 export class SyncService {
 	private syncQueue: Map<string, SyncQueueItem> = new Map();
 	private isSyncing = false;
@@ -202,4 +207,5 @@ export class SyncService {
 }
 
 // Singleton instance
+/** App-wide sync service. Starts its timer and network listener on construction. */
 export const syncService = new SyncService();

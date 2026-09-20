@@ -2,8 +2,10 @@ import { listBuiltins } from '../agents/index.js';
 import { toWireName } from './tool-catalog.js';
 import type { ExecutionContext, ToolDescriptor, ToolResult, ToolRuntime } from './types.js';
 
+/** Server id the in-process tools are namespaced under. */
 export const SERVER_ID = 'builtin';
 
+/** ToolRuntime over the in-process agents in `server/agents` — no transport involved. */
 export const builtinRuntime: ToolRuntime = {
 	serverId: SERVER_ID,
 

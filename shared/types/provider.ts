@@ -15,6 +15,7 @@ export type ProviderFamily = 'http' | 'agent';
  *  instances of one of these types, not new types. */
 export type ProviderType = 'ollama' | 'anthropic' | 'openai-compatible' | 'codex' | 'opencode';
 
+/** What a provider supports. Read by the client to decide which UI affordances to show. */
 export interface ProviderCapabilities {
 	streaming: boolean;
 	/** provider can consume tool descriptors and emit tool calls */
@@ -35,6 +36,7 @@ export interface ProviderCapabilities {
 	requiresBinary?: string;
 }
 
+/** One model offered by a provider. */
 export interface ProviderModel {
 	/** provider-scoped model id, e.g. 'mistral:latest' | 'anthropic/claude-opus-5' */
 	id: string;
@@ -72,4 +74,5 @@ export const NO_CAPABILITIES: ProviderCapabilities = {
 	requiresApiKey: false
 };
 
+/** Provider used when nothing else is configured or selected. */
 export const DEFAULT_PROVIDER_ID = 'ollama';

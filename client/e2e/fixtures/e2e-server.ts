@@ -14,12 +14,14 @@ const stopPromises = new WeakMap<ChildProcess, Promise<void>>();
 let hooksInstalled = false;
 let handlingSignal = false;
 
+/** A server started for one test run, with the throwaway database it was given. */
 export interface E2EServer {
 	process: ChildProcess;
 	databasePath: string;
 	stop: () => Promise<void>;
 }
 
+/** Where to run the test server and which database prefix to isolate it under. */
 export interface StartE2EServerOptions {
 	port: number;
 	databasePrefix: string;
@@ -147,6 +149,12 @@ function removeShutdownHooks() {
 	process.off('SIGTERM', onSigterm);
 }
 
+/**
+ * Spawns a Wollama server on `port` against a fresh temp database.
+ *
+ * The process runs under a supervisor and is registered for cleanup, so a test
+ * run that is killed does not leave a server behind.
+ */
 export function startE2EServer(options: StartE2EServerOptions): E2EServer {
 	const databasePath = mkdtempSync(path.join(os.tmpdir(), `${options.databasePrefix}-`));
 	const tsxCli = requireFromServer.resolve('tsx/cli');

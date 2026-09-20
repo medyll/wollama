@@ -13,6 +13,8 @@ const OUTPUT_TRUNCATE_BYTES = 8 * 1024;
 // ExecutionContext.hopCount. Wollama's own call graph never exceeds 1 today.
 const MAX_HOPS = 8;
 
+/** Raised when a call cannot proceed without asking the user. Everything here ends
+ *  up in the consent prompt. */
 export interface PermissionRequestEvent {
 	request_id: string;
 	tool_id: string;
@@ -25,6 +27,7 @@ export interface PermissionRequestEvent {
 	host?: string;
 }
 
+/** Per-call hooks into an execution. */
 export interface ExecuteOptions {
 	/** Called synchronously the moment a call needs live consent — lets the caller
 	 *  (conversation-orchestrator) surface a `permission_request` WollamaEvent to the
@@ -179,6 +182,10 @@ async function executeDescriptor(
 	}
 }
 
+/**
+ * Runs tool calls end to end: resolve the tool, validate its input, clear it with
+ * permissionService, invoke the runtime under a timeout, and write the audit row.
+ */
 export const toolExecutor = {
 	/** Resolves a model-issued tool call (by wire name) and executes it. */
 	async execute(call: ToolCallRequest, ctx: ExecutionContext, opts: ExecuteOptions = {}): Promise<ToolResult> {

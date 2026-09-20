@@ -3,6 +3,7 @@ import type { RiskMap } from './mcp.runtime.js';
 // Static risk classification for acp-team's tools. Unmapped tools default to
 // 'execute' (fail closed) inside createMcpRuntime — a newly added acp-team tool is
 // never silently treated as safe.
+/** Risk level per acp-team tool. See the note above for the fail-closed default. */
 export const ACP_TEAM_RISK_MAP: RiskMap = {
 	// Inspection — safe to auto-approve.
 	agent_list: 'read',

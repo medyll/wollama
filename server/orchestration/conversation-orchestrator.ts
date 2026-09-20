@@ -13,6 +13,7 @@ import type { ExecutionContext, ProviderAdapter, StreamSink, ToolCallRequest, To
 // docs/architecture/mcp-client-acp-team-investigation.md and the implementation plan.
 const AGENT_START_TOOL_ID = `mcp:${ACP_TEAM_SERVER_ID}:agent_start`;
 
+/** One chat turn to run, with the context the tool calls it triggers will inherit. */
 export interface RunChatRequest {
 	model: string;
 	messages: unknown[];
@@ -172,4 +173,5 @@ export function createConversationOrchestrator(injected?: ProviderAdapter) {
 	};
 }
 
+/** The orchestrator the HTTP routes use: resolves the provider from the registry. */
 export const conversationOrchestrator = createConversationOrchestrator();

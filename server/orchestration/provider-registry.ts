@@ -93,4 +93,5 @@ export class ProviderRegistry {
 	}
 }
 
+/** The process-wide registry. Populated by register-providers.ts at startup. */
 export const providerRegistry = new ProviderRegistry();

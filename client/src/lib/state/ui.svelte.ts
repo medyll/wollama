@@ -1,3 +1,4 @@
+/** Chrome-level UI state: page title, sidebar, audio indicator, active companion. */
 export class UIState {
 	pageTitle = $state('');
 	sidebarCollapsed = $state(false);
@@ -30,4 +31,5 @@ export class UIState {
 	}
 }
 
+/** App-wide UI state. */
 export const uiState = new UIState();

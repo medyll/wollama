@@ -1,5 +1,6 @@
 import { userState } from '$lib/state/user.svelte';
 
+/** A document in the knowledge base, as the server reports it. Mirrors the shared `RagDocument`. */
 export interface RagDocument {
 	document_id: string;
 	owner_id: string;
@@ -22,6 +23,7 @@ function ownerId(): string {
 	return userState.uid || 'anonymous';
 }
 
+/** Knowledge-base calls: list, upload and delete documents for the current user. */
 export const ragService = {
 	async listDocuments(): Promise<RagDocument[]> {
 		const res = await fetch(`${baseUrl()}/api/rag/documents?owner_id=${encodeURIComponent(ownerId())}`);

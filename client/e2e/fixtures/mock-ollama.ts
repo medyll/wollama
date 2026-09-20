@@ -14,6 +14,7 @@
 
 import http from 'http';
 
+/** The stub Ollama server described above. */
 export class MockOllamaServer {
 	private server: http.Server | null = null;
 	private port: number;

@@ -6,6 +6,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { logger } from '../utils/logger.js';
 import { createSecureFetch } from './http-security.js';
 
+/** How to reach one MCP server: spawn it over stdio, or call it over HTTP. */
 export type McpConnectionConfig =
 	| { id: string; transport: 'stdio'; command: string; args: string[]; cwd?: string; env?: Record<string, string> }
 	| {
@@ -19,18 +20,24 @@ export type McpConnectionConfig =
 			allowPrivateHost?: boolean;
 	  };
 
+/** One tool as advertised by an MCP server, before Wollama namespaces it. */
 export interface McpToolInfo {
 	name: string;
 	description?: string;
 	inputSchema: Record<string, unknown>;
 }
 
+/** Flattened result of an MCP tool call: `text` for the model, `structured` for storage. */
 export interface McpCallResult {
 	isError: boolean;
 	text: string;
 	structured?: unknown;
 }
 
+/**
+ * A live connection to one MCP server. This is the whole surface the rest of
+ * Wollama sees — no SDK types leak past it.
+ */
 export interface McpClientHandle {
 	readonly id: string;
 	listTools(): Promise<McpToolInfo[]>;
@@ -159,6 +166,7 @@ async function connectHttp(cfg: Extract<McpConnectionConfig, { transport: 'http'
 	return buildHandle(cfg.id, client, exitCallbacks);
 }
 
+/** Connects to an MCP server over the transport its config names. */
 export async function connectMcp(cfg: McpConnectionConfig): Promise<McpClientHandle> {
 	if (cfg.transport === 'stdio') return connectStdio(cfg);
 	return connectHttp(cfg);

@@ -2,6 +2,7 @@ import net from 'net';
 import dns from 'dns';
 import type { FetchLike } from '@modelcontextprotocol/client';
 
+/** Limits applied to outbound MCP HTTP requests: which hosts, how big, how long. */
 export interface HttpSecurityOptions {
 	/** Hostnames explicitly trusted to resolve to a private/loopback address — the one
 	 *  escape hatch, set only via server config (never by a tool, model, or client
@@ -14,6 +15,8 @@ export interface HttpSecurityOptions {
 const DEFAULT_MAX_RESPONSE_BYTES = 16 * 1024 * 1024; // 16MB
 const DEFAULT_TIMEOUT_MS = 30_000;
 
+/** Thrown when a request is refused before it goes out — typically a target that
+ *  resolves to a private or loopback address without being allowlisted. */
 export class BlockedRequestError extends Error {
 	constructor(message: string) {
 		super(message);
@@ -21,6 +24,7 @@ export class BlockedRequestError extends Error {
 	}
 }
 
+/** Thrown when a response exceeds the configured byte cap. */
 export class ResponseTooLargeError extends Error {
 	constructor(limit: number) {
 		super(`Response exceeded the ${limit}-byte limit`);

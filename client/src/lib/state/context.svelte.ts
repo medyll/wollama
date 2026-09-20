@@ -1,5 +1,6 @@
 import { userState } from './user.svelte';
 
+/** A file attached to the conversation, either picked by the user or detected automatically. */
 export type ContextFile = {
 	name: string;
 	path: string;
@@ -7,6 +8,7 @@ export type ContextFile = {
 	source: 'user' | 'auto'; // user selected or auto-detected
 };
 
+/** The files attached to the current conversation, deduplicated by path. */
 export class ContextState {
 	activeFiles = $state<ContextFile[]>([]);
 
@@ -33,4 +35,5 @@ export class ContextState {
 	}
 }
 
+/** App-wide attached-file state. */
 export const contextState = new ContextState();

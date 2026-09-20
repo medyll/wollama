@@ -166,6 +166,8 @@ const _createDatabase = async () => {
 // Store replication states to be able to cancel them
 const replicationStates: any[] = [];
 
+/** Starts two-way replication of this user's collections against the configured
+ *  server. Cancels any replication already running first. */
 export const enableReplication = async (userId: string, _token?: string) => {
 	const db = await getDatabase();
 	const baseUrl = userState.preferences.serverUrl || 'http://localhost:3000';
@@ -231,12 +233,14 @@ export const enableReplication = async (userId: string, _token?: string) => {
 	}
 };
 
+/** Cancels every running replication. Safe to call when none is running. */
 export const disableReplication = async () => {
 	console.log('Stopping replication...');
 	await Promise.all(replicationStates.map((state) => state.cancel()));
 	replicationStates.length = 0;
 };
 
+/** Returns the singleton local database, creating it on first call. */
 export const getDatabase = () => {
 	if (!dbPromise) {
 		dbPromise = _createDatabase();
@@ -245,6 +249,7 @@ export const getDatabase = () => {
 	return dbPromise;
 };
 
+/** Stops replication and deletes the local database. Destructive: all local data goes. */
 export const destroyDatabase = async () => {
 	await disableReplication();
 	if (dbPromise) {

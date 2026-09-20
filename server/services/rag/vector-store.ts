@@ -90,4 +90,5 @@ function cosineSimilarity(a: number[], b: number[]): number {
 	return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
+/** The process-wide vector index. */
 export const vectorStore = new VectorStore();

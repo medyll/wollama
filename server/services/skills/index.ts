@@ -10,6 +10,8 @@ const registry: Record<string, SkillHandler> = {
 	summarize: summarizeSkill
 };
 
+/** Resolves a skill's `handler_ref` to its builtin implementation, or `null`.
+ *  A path-like ref (`skills/help`) is matched on its last segment. */
 export const getBuiltinHandler = (ref: string): SkillHandler | null => {
 	if (!ref) return null;
 	// handler_ref may be 'help' or 'skills/help' etc. Normalize simple names

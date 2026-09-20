@@ -2,6 +2,8 @@ import { userState } from './state/user.svelte';
 import { getDatabase, enableReplication, disableReplication } from './db';
 
 // Mock Auth Service - In production, replace with Firebase/Supabase/Auth0
+/** Sign-in and sign-out, and the replication they start and stop. The provider is
+ *  still mocked — see the note above. */
 export class AuthService {
 	async signInWithGoogle() {
 		// 1. Perform OAuth flow (Mocked here)
@@ -52,4 +54,5 @@ export class AuthService {
 	}
 }
 
+/** App-wide auth service. */
 export const authService = new AuthService();

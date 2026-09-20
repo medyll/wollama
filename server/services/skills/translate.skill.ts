@@ -1,3 +1,5 @@
+/** `/translate <lang> <text>` — placeholder translator: echoes the text tagged with
+ *  the target language. No model is called yet. */
 export default async function translateSkill(args: string[] = []) {
 	// naive mock: first arg is target language, rest is text
 	if (!args || args.length === 0) {

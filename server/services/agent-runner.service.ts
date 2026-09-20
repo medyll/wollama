@@ -2,6 +2,7 @@ import { toolExecutor } from '../orchestration/tool-executor.js';
 import { dbManager } from '../db/database.js';
 import type { ToolCall } from '../../shared/types/agents.js';
 
+/** A builtin agent to run, by slug, plus the message it is attributed to. */
 export interface AgentRunRequest {
 	slug: string;
 	input: Record<string, unknown>;
@@ -9,6 +10,7 @@ export interface AgentRunRequest {
 	agent_id?: string;
 }
 
+/** Outcome of an agent run, with the id of the audit row written for it. */
 export interface AgentRunResponse {
 	tool_call_id: string;
 	status: 'running' | 'done' | 'error';

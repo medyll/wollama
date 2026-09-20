@@ -1,6 +1,8 @@
 import { enableReplication, disableReplication } from '../db';
 import { userState } from './user.svelte';
 
+/** Connectivity state for the server and for Ollama. Setting the server connection
+ *  also starts or stops database replication. */
 export class ConnectionState {
 	isConnected = $state(true);
 	isOllamaConnected = $state(false);
@@ -49,4 +51,5 @@ export class ConnectionState {
 	}
 }
 
+/** App-wide connectivity state. */
 export const connectionState = new ConnectionState();

@@ -1,3 +1,5 @@
+/** Assembles the system prompt from the companion's base prompt, the user profile
+ *  and the user's custom instructions. */
 export class PromptService {
 	static buildSystemPrompt(baseSystemPrompt: string, profile: any, userPrompts: any[] = []): string {
 		let prompt = baseSystemPrompt || 'You are a helpful AI assistant.';

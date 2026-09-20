@@ -23,6 +23,7 @@ interface DefaultCompanion {
 	is_locked: boolean;
 }
 
+/** Companions seeded on first run, on both the server and the client. */
 export const DEFAULT_COMPANIONS: DefaultCompanion[] = [
 	{
 		companion_id: '1',

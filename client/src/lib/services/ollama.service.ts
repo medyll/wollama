@@ -3,8 +3,10 @@
  * Handles communication with Ollama server
  */
 
+/** Why a health check failed. Each value maps to a message and a suggested fix. */
 export type ErrorType = 'invalid-url' | 'connection-refused' | 'timeout' | 'dns-failure' | 'server-error' | 'unknown';
 
+/** Outcome of a health check, with the user-facing message and suggestion when it failed. */
 export interface OllamaHealthCheckResult {
 	success: boolean;
 	error?: string;

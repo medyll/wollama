@@ -20,11 +20,18 @@ function compile(toolId: string, schema: Record<string, unknown>): ValidateFunct
 	return validateFn;
 }
 
+/** Outcome of validating a tool's input. `errors` holds ajv's message when invalid. */
 export interface ValidationResult {
 	valid: boolean;
 	errors?: string;
 }
 
+/**
+ * Validates a tool call's input against the tool's JSON Schema.
+ *
+ * Compiled validators are cached per `toolId`. A schema that fails to compile is
+ * reported as an invalid input rather than being allowed to throw.
+ */
 export function validateToolInput(toolId: string, schema: Record<string, unknown>, input: unknown): ValidationResult {
 	try {
 		const validateFn = compile(toolId, schema);

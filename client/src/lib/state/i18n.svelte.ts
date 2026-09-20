@@ -40,5 +40,8 @@ class I18nState {
 	}
 }
 
+/** App-wide translation state. Reads the locale from `userState`, so lookups stay
+ *  reactive and fall back to English for an unknown locale. */
 export const i18n = new I18nState();
+/** Shorthand for `i18n.t`: resolves a dot-separated key and interpolates `vars`. */
 export const t = (key: string, vars?: Record<string, string | number>) => i18n.t(key, vars);

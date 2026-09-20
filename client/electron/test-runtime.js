@@ -2,8 +2,17 @@ import { lstatSync, realpathSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+/** Required prefix on the throwaway profile directory name. */
 export const TEST_PROFILE_PREFIX = 'wollama-packaged-smoke-';
 
+/**
+ * Resolves the profile directory and port for a packaged smoke test, or `null`
+ * when not in test mode.
+ *
+ * Throws unless the profile is a disposable directory inside the system temp
+ * directory whose name carries {@link TEST_PROFILE_PREFIX} — symlinks included, so
+ * a test run can never be pointed at a real user profile.
+ */
 export function resolveIsolatedTestRuntime(environment = process.env, temporaryDirectory = os.tmpdir()) {
 	if (environment.WOLLAMA_TEST_MODE !== '1') return null;
 

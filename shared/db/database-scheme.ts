@@ -1,6 +1,8 @@
 import type { DatabaseSchema } from './schema-definition.js';
 
 // don't forget to update the version number in the file client\src\lib\db.ts when changing the schema
+/** The application schema: every table, its fields, indexes and presentation.
+ *  Single source of truth for both the server's PouchDB and the client's RxDB. */
 export const appSchema: DatabaseSchema = {
 	users: {
 		primaryKey: 'user_id',

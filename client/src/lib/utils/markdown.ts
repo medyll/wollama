@@ -24,6 +24,7 @@ const renderer = {
 const marked = new Marked();
 marked.use({ renderer });
 
+/** Renders Markdown to HTML, with code blocks highlighted and given a copy button. */
 export function parseMarkdown(content: string): string {
 	return marked.parse(content) as string;
 }

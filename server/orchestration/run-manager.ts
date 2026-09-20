@@ -5,6 +5,10 @@ import type { ExecutionContext, RunBackend, RunStatus, ToolResult } from './type
 const WAIT_MS = 25_000;
 const TERMINAL: readonly RunStatus[] = ['completed', 'failed', 'cancelled', 'interrupted', 'timed_out'];
 
+/**
+ * Persisted state of one agent run, in the `runs` database. `run_id` is minted
+ * by this module; `remote_run_id` is the id the backend knows it by.
+ */
 export interface RunDoc {
 	run_id: string;
 	backend: string;
@@ -24,6 +28,7 @@ export interface RunDoc {
 	finished_at?: string;
 }
 
+/** One event of a run, in the `run_events` database. `seq` is the resume cursor. */
 export interface RunEventDoc {
 	run_event_id: string;
 	run_id: string;
@@ -33,6 +38,7 @@ export interface RunEventDoc {
 	created_at: string;
 }
 
+/** Arguments for starting a run. Everything past `cwd` is optional provenance. */
 export interface StartRunRequest {
 	backendId: string;
 	agent: string;
@@ -57,10 +63,12 @@ const cancelFlags = new Set<string>();
 // 'cancelling' before our own guard would have caught up.
 const cancelIssued = new Set<string>();
 
+/** Makes a backend available to `start`, keyed by its `backendId`. */
 export function registerRunBackend(backend: RunBackend): void {
 	backends.set(backend.backendId, backend);
 }
 
+/** Removes a backend. Runs already started on it keep their persisted rows. */
 export function unregisterRunBackend(backendId: string): void {
 	backends.delete(backendId);
 }
@@ -303,6 +311,7 @@ async function startFromToolCall(
 	}
 }
 
+/** Public surface of the run manager: start runs, then query or cancel them. */
 export const runManager = {
 	start: startRun,
 	startFromToolCall,

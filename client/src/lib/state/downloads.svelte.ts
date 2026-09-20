@@ -64,4 +64,6 @@ class DownloadState {
 	}
 }
 
+/** App-wide model-download state. One pull at a time; further pulls are refused
+ *  while one is running. */
 export const downloadState = new DownloadState();

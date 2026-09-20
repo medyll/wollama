@@ -12,8 +12,11 @@ const SECRET = resolveSecret();
 const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
+/** Which of the two tokens in a pair this is. Verifying checks the type, so a
+ *  refresh token cannot be replayed as an access token. */
 export type TokenType = 'access' | 'refresh';
 
+/** Claims carried inside a token. Both timestamps are unix milliseconds. */
 export interface TokenPayload {
 	userId: string;
 	type: TokenType;
@@ -21,6 +24,7 @@ export interface TokenPayload {
 	iat: number; // unix ms
 }
 
+/** Thrown when a token is malformed, forged, expired, or of the wrong type. */
 export class AuthError extends Error {
 	constructor(
 		message: string,
@@ -62,6 +66,13 @@ function verify(token: string): TokenPayload {
 	return payload;
 }
 
+/**
+ * Issues and verifies the HMAC-signed tokens used for authentication.
+ *
+ * Tokens are `base64url(payload).base64url(hmac-sha256)`, signed with
+ * `AUTH_SECRET` — which is required in production and falls back to a known dev
+ * value otherwise.
+ */
 export const authService = {
 	/**
 	 * Generate an access + refresh token pair for a user.

@@ -1,6 +1,9 @@
+/** How a skill's `handler_ref` is resolved: an in-process function, an LLM prompt, or an agent. */
 export type HandlerType = 'builtin' | 'llm' | 'agent';
+/** How widely a skill is available. */
 export type ScopeType = 'global' | 'user' | 'companion';
 
+/** A slash command the user can invoke in a chat, and what runs behind it. */
 export interface Skill {
 	skill_id: string;
 	name: string; // slug: "translate"
@@ -17,6 +20,7 @@ export interface Skill {
 	updated_at: string;
 }
 
+/** One resolved call of a skill, with the message it was triggered from. */
 export interface SkillInvocation {
 	skill: Skill;
 	args: string[]; // tokens after /command
@@ -25,6 +29,7 @@ export interface SkillInvocation {
 	user_id: string;
 }
 
+/** What a skill handler returns. `error` set means the invocation failed. */
 export interface SkillResult {
 	skill_id: string;
 	output: string;

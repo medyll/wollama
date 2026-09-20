@@ -84,6 +84,7 @@ function toProviderModels(list: unknown): ProviderModel[] {
 	});
 }
 
+/** The Ollama provider: local models over the Ollama HTTP API, with tool calling and embeddings. */
 export const ollamaProvider: LlmProvider = {
 	id: 'ollama',
 	type: 'ollama',

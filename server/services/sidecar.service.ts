@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import net from 'net';
 
+/** Spawns and supervises the Python sidecar process on a free local port. */
 export class SidecarService {
 	private process: ChildProcess | null = null;
 	private port: number | null = null;
@@ -119,4 +120,5 @@ export class SidecarService {
 	}
 }
 
+/** The process-wide sidecar. */
 export const sidecarService = new SidecarService();

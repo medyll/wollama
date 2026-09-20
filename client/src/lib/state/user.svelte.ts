@@ -12,6 +12,7 @@ function getDefaultServerUrl() {
 	return DEVELOPMENT_SERVER_URL;
 }
 
+/** The signed-in user and their preferences, persisted locally. */
 export class UserState {
 	nickname = $state('');
 	isConfigured = $state(false);
@@ -152,4 +153,5 @@ export class UserState {
 	}
 }
 
+/** App-wide user state. */
 export const userState = new UserState();

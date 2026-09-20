@@ -59,6 +59,7 @@ function resolveHandler(hook: Hook): HookHandler | undefined {
 	return undefined;
 }
 
+/** Runs the registered hooks for an event, and builds the context they run against. */
 export const hookPipeline = {
 	/**
 	 * Run hooks for the given event.

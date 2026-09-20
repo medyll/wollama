@@ -1,3 +1,5 @@
+/** `/summarize <text>` — placeholder summarizer: returns the first sentence, or the
+ *  first 100 characters when there is no sentence break. */
 export default async function summarizeSkill(args: string[] = []) {
 	const text = args.join(' ');
 	if (!text) return { output: 'No text provided to summarize' };

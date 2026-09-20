@@ -9,6 +9,7 @@ interface MetadataResponse {
 	tags?: string[];
 }
 
+/** Asks the model for a chat's title, description, category and tags. */
 export class MetadataService {
 	private static async generate(prompt: string, system: string): Promise<MetadataResponse | null> {
 		const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');

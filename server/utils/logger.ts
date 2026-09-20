@@ -30,6 +30,7 @@ const colors = {
 	}
 };
 
+/** Console logger. Every call takes a context tag (the subsystem) and a message. */
 export const logger = {
 	info: (ctx: string, msg: string) =>
 		console.log(`${colors.fg.cyan}[INFO]    ${colors.fg.magenta}[${ctx}]${colors.reset} ${msg}`),

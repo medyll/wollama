@@ -3,9 +3,15 @@ import { dbManager } from '../db/database.js';
 import { config } from '../config.js';
 import type { ExecutionContext, ToolDescriptor, ToolRisk } from './types.js';
 
+/** Verdict on a tool call: run it, refuse it, or go ask the user. */
 export type PermissionDecision = 'allow' | 'deny' | 'ask';
+/** How long a granted permission lasts. */
 export type PermissionScope = 'once' | 'session' | 'persistent';
 
+/**
+ * A persisted permission grant. A grant covers one (tool_id, workspace) pair for
+ * one user; `revoked_at` or a past `expires_at` makes it inert.
+ */
 export interface GrantDoc {
 	grant_id: string;
 	user_id: string;
@@ -85,6 +91,7 @@ async function persistGrant(
 	await db.put(doc);
 }
 
+/** Decides whether tool calls may run, and records the grants that answer allows. */
 export const permissionService = {
 	/**
 	 * Decides whether a call may proceed outright ('allow'), must be refused

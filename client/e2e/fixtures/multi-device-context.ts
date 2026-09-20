@@ -12,6 +12,7 @@ interface DeviceTestConfig {
 	freshState: boolean;
 }
 
+/** One simulated device: its browser context, its page, and how to drive them. */
 export class DeviceInstance {
 	page: Page;
 	context: BrowserContext;
@@ -243,6 +244,7 @@ export class DeviceInstance {
 	}
 }
 
+/** Two devices replicating against a shared PouchDB, for sync tests. */
 export class MultiDeviceContext {
 	deviceA: DeviceInstance;
 	deviceB: DeviceInstance;
