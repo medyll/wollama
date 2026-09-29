@@ -12,6 +12,7 @@ allowBuilds:
     '@firebase/util': true
     '@parcel/watcher': true
     electron: true
+    electron-winstaller: false
     esbuild: true
     ffmpeg-static: true
     leveldown: true
