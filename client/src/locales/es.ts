@@ -4,6 +4,11 @@ export default {
 			promptCenter: 'centro del prompt'
 		},
 		settings: {
+			groups: {
+				personal: 'Personal',
+				assistant: 'Asistente',
+				advanced: 'Avanzado'
+			},
 			auth: 'autenticación',
 			avatar: 'avatar',
 			avatar_email: 'email de gravatar',

@@ -14,6 +14,11 @@ export const translations = {
 			systemPrompt: 'system prompt'
 		},
 		settings: {
+			groups: {
+				personal: 'Personal',
+				assistant: 'Assistant',
+				advanced: 'Advanced'
+			},
 			subtitle: 'Customize your Wollama experience',
 			nickname: 'Nickname / Identity',
 			nickname_placeholder: 'How should I call you?',

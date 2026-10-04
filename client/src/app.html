@@ -8,6 +8,10 @@
 		/>
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- Establish layer priority before any route or framework stylesheet loads. -->
+		<style>
+			@layer reset, tokens, theme, components, utilities;
+		</style>
 		<title>Wollama</title>
 		<script>
 			let storedTheme = 'light';

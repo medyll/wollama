@@ -23,9 +23,29 @@
 		--wollama-active-bg: color-mix(in oklch, var(--color-primary) 14%, transparent);
 		--wollama-focus-ring: color-mix(in oklch, var(--color-primary) 48%, transparent);
 	}
+
+	:root[data-theme='light'] {
+		color-scheme: light;
+	}
+
+	:root[data-theme='dark'] {
+		color-scheme: dark;
+	}
 }
 
 @layer components {
+	/* Components often reset text margins; retain line-box leading so adjacent
+	   titles and descriptions remain readable without compensating for trimming. */
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p {
+		text-box-trim: none;
+	}
+
 	::selection {
 		background: color-mix(in oklch, var(--color-primary) 24%, transparent);
 	}

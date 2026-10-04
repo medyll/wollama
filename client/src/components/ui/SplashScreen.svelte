@@ -18,7 +18,9 @@
 		const checkServer = async () => {
 			try {
 				const baseUrl = userState.preferences.serverUrl.replace(/\/$/, '');
-				const res = await fetch(`${baseUrl}/api/health`);
+				const res = await fetch(`${baseUrl}/api/health`, {
+					signal: AbortSignal.timeout(5000)
+				});
 				return res.ok;
 			} catch (e) {
 				console.error('Splash screen connection check failed:', e);
@@ -59,8 +61,13 @@
 
 <style>
 	.splash-dialog {
+		position: fixed;
+		inset: 0;
+		margin: auto;
 		width: min(28rem, calc(100vw - (2 * var(--pad-md))));
 		max-width: none;
+		max-height: calc(100dvh - (2 * var(--pad-md)));
+		overflow-y: auto;
 		padding: 0;
 		border: var(--border-width) solid var(--color-border);
 		border-radius: var(--radius-lg);

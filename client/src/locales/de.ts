@@ -1,6 +1,11 @@
 export default {
 	de: {
 		settings: {
+			groups: {
+				personal: 'Persönlich',
+				assistant: 'Assistent',
+				advanced: 'Erweitert'
+			},
 			auth: 'Authentifizierung',
 			avatar: 'Avatar',
 			avatar_email: 'E-Mail vom Gravatar',

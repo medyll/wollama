@@ -118,6 +118,7 @@ async function createWindow() {
 		if (!testRuntime?.headless) mainWindow.show();
 		splash.destroy();
 	});
+	mainWindow.setMenu(null);
 
 	if (isDev) {
 		await mainWindow.loadURL('http://localhost:5176');

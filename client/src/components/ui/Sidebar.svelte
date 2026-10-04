@@ -2,7 +2,8 @@
 	import { t } from '$lib/state/i18n.svelte';
 	import { uiState } from '$lib/state/ui.svelte';
 	import { chatService } from '$lib/services/chat.service';
-	import { goto } from '$app/navigation';
+	import { goto, pushState } from '$app/navigation';
+	import { page as routePage } from '$app/state';
 	import { page } from '$app/stores';
 	import Icon from '@iconify/svelte';
 	import SidebarCollapse from '$components/ui/SidebarCollapse.svelte';
@@ -44,11 +45,7 @@
 >
 	<div class="sidebar-header">
 		<!-- Section: Desktop Navicon (Collapse Toggle) & Search -->
-		<div
-			class="hidden md:flex {uiState.sidebarCollapsed
-				? 'flex-col items-center gap-2'
-				: 'flex-row items-center justify-between'} p-2"
-		>
+		<div class="sidebar-tools" hidden={uiState.sidebarCollapsed}>
 			<div class="flex items-center gap-1">
 				<SidebarTrigger class="btn-sm" title={t('ui.close')} visible={!uiState.sidebarCollapsed} />
 			</div>
@@ -60,7 +57,7 @@
 			{/if}
 		</div>
 		{#if uiState.sidebarCollapsed}
-			<button class="btn-icon btn-sm mx-auto" aria-label="Search" onclick={() => goto('/search')}>
+			<button class="sidebar-action sidebar-search" aria-label="Search" onclick={() => goto('/search')}>
 				<Icon icon="fluent:search-24-regular" class="h-5 w-5" />
 			</button>
 		{/if}
@@ -96,10 +93,15 @@
 	</nav>
 
 	<div class="sidebar-footer">
-		<div class="flex justify-end px-2">
+		<div class="sidebar-collapse-control">
 			<SidebarCollapse />
 		</div>
-		<button type="button" class="sidebar-action" onclick={() => goto('/settings')} title={t('ui.settings')}>
+		<button
+			type="button"
+			class="sidebar-action"
+			onclick={() => pushState('/settings', { ...routePage.state, settingsOverlay: true })}
+			title={t('ui.settings')}
+		>
 			<Icon icon="fluent:settings-24-regular" class="h-5 w-5" aria-hidden="true" />
 			{#if !uiState.sidebarCollapsed}
 				{t('ui.settings')}
@@ -141,6 +143,40 @@
 
 		.sidebar-footer {
 			border-top: var(--border-width) solid var(--wollama-border-subtle);
+		}
+
+		.sidebar-tools {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.sidebar-tools[hidden] {
+			display: none;
+		}
+
+		.sidebar-collapse-control {
+			display: flex;
+			justify-content: flex-end;
+		}
+
+		.app-sidebar[data-collapsed='true'] :is(.sidebar-header, .sidebar-footer) {
+			align-items: center;
+		}
+
+		.app-sidebar[data-collapsed='true'] .sidebar-action,
+		.sidebar-collapse-control :global(button) {
+			width: 2.5rem;
+			height: 2.5rem;
+			min-height: 2.5rem;
+			padding: 0;
+			justify-content: center;
+			flex: none;
+		}
+
+		.app-sidebar[data-collapsed='true'] .sidebar-collapse-control {
+			width: 100%;
+			justify-content: center;
 		}
 
 		.sidebar-nav {

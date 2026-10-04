@@ -4,6 +4,11 @@ export default {
 			systemPrompt: 'invite de système'
 		},
 		settings: {
+			groups: {
+				personal: 'Personnel',
+				assistant: 'Assistant',
+				advanced: 'Avancé'
+			},
 			subtitle: 'Personnalisez votre expérience Wollama',
 			nickname: 'Surnom / Identité',
 			nickname_placeholder: 'Comment dois-je vous appeler ?',

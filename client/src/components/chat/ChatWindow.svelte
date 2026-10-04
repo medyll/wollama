@@ -679,7 +679,8 @@
 		}
 
 		chat-composer-dock :global(chat-composer-component) {
-			width: 100%;
+			width: min(100%, var(--app-reading-width));
+			margin-inline: auto;
 		}
 
 		@media (max-width: 48rem) {

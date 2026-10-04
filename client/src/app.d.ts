@@ -16,3 +16,12 @@ declare global {
 		};
 	}
 }
+declare global {
+	namespace App {
+		interface PageState {
+			settingsOverlay?: boolean;
+		}
+	}
+}
+
+export {};

@@ -19,6 +19,8 @@
 	import { downloadState } from '$lib/state/downloads.svelte';
 	import { DataInitializer } from '$lib/services/data-initializer';
 	import { page } from '$app/stores';
+	import { page as routePage } from '$app/state';
+	import SettingsPage from './settings/+page.svelte';
 	import { enableReplication, disableReplication } from '$lib/db';
 	import { t } from '$lib/state/i18n.svelte';
 	let { children } = $props();
@@ -84,6 +86,10 @@
 <PermissionPromptOverlay />
 <ServerConnectionCheck />
 <SplashScreen />
+
+{#if routePage.state.settingsOverlay && routePage.route.id !== '/settings'}
+	<SettingsPage />
+{/if}
 
 {#if userState.preferences.onboarding_completed}
 	<a class="skip-link" href="#main-content">Aller au contenu principal</a>
