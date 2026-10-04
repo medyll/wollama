@@ -8,6 +8,7 @@ import { MetadataService } from './metadata.service';
 import { stripPrivateReasoning } from '$lib/utils/thinking';
 import { runStore } from './run.service.svelte.js';
 import { permissionState } from '$lib/state/permissions.svelte.js';
+import { resolveProviderModel } from '$lib/provider-model';
 
 /**
  * Everything a chat does: create and load chats, send a message, consume the
@@ -249,6 +250,7 @@ export class ChatService {
 		}
 
 		// Retry logic with exponential backoff
+		const selection = resolveProviderModel(chat?.model || userState.preferences.defaultModel);
 		const maxRetries = 3;
 		let lastError: Error | null = null;
 
@@ -260,7 +262,8 @@ export class ChatService {
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						model: chat?.model || userState.preferences.defaultModel,
+						model: selection.model,
+						provider_id: selection.providerId,
 						messages: ollamaMessages,
 						stream: true,
 						context: contextState.getPayload(),

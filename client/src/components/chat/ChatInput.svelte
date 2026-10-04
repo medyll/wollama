@@ -6,6 +6,7 @@
 	import DataButton from '$components/ui_data/DataButton.svelte';
 	import SkillAutocomplete from '$components/SkillAutocomplete.svelte';
 	import type { Companion, UserCompanion } from '$types/data';
+	import { providerModelLabel, resolveProviderModel } from '$lib/provider-model';
 
 	let {
 		value = $bindable(''),
@@ -36,8 +37,9 @@
 	let modelOptions = $derived(
 		Array.from(new Set([currentCompagnon.model, ...models].filter((model): model is string => Boolean(model))))
 	);
+	let supportsAttachmentsAndSkills = $derived(resolveProviderModel(currentCompagnon.model).providerId === 'ollama');
 
-	let fileInput: HTMLInputElement;
+	let fileInput = $state<HTMLInputElement>();
 	let textareaRef: HTMLTextAreaElement;
 	let showAutocomplete = $state(false);
 
@@ -48,7 +50,7 @@
 	}
 
 	function triggerFileInput() {
-		fileInput.click();
+		fileInput?.click();
 	}
 
 	function handleFileSelect(event: Event) {
@@ -138,7 +140,7 @@
 						title="Model"
 					>
 						{#each modelOptions as model}
-							<option value={model}>{model}</option>
+							<option value={model}>{providerModelLabel(model)}</option>
 						{/each}
 					</select>
 				</label>
@@ -169,10 +171,9 @@
 					onsend();
 				}
 			}}
-			data-testid="message-input"
-		></textarea>
+			data-testid="message-input"></textarea>
 
-		{#if showAutocomplete}
+		{#if showAutocomplete && supportsAttachmentsAndSkills}
 			<div class="absolute top-16 right-4 left-4 z-20">
 				<SkillAutocomplete
 					query={value}
@@ -210,15 +211,24 @@
 			<p id="composer-hint" class="composer-hint">Enter to send · Shift + Enter for a new line</p>
 
 			<div class="composer-submit-actions">
-				<input type="file" name="attachments" class="hidden" multiple bind:this={fileInput} onchange={handleFileSelect} />
-				<button
-					class="btn-icon btn-sm"
-					aria-label={t('ui.add_attachment') || 'Add attachment'}
-					title={t('ui.add_attachment') || 'Add attachment'}
-					onclick={triggerFileInput}
-				>
-					<Icon icon="lucide:paperclip" class="h-5 w-5 opacity-70" />
-				</button>
+				{#if supportsAttachmentsAndSkills}
+					<input
+						type="file"
+						name="attachments"
+						class="hidden"
+						multiple
+						bind:this={fileInput}
+						onchange={handleFileSelect}
+					/>
+					<button
+						class="btn-icon btn-sm"
+						aria-label={t('ui.add_attachment') || 'Add attachment'}
+						title={t('ui.add_attachment') || 'Add attachment'}
+						onclick={triggerFileInput}
+					>
+						<Icon icon="lucide:paperclip" class="h-5 w-5 opacity-70" />
+					</button>
+				{/if}
 			</div>
 
 			<!-- Right: Send / Mic -->

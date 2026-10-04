@@ -1,6 +1,7 @@
 import { userState } from '$lib/state/user.svelte';
 import { getDatabase } from '$lib/db';
 import type { Chat } from '$types/data';
+import { resolveProviderModel } from '$lib/provider-model';
 
 interface MetadataResponse {
 	title?: string;
@@ -11,9 +12,9 @@ interface MetadataResponse {
 
 /** Asks the model for a chat's title, description, category and tags. */
 export class MetadataService {
-	private static async generate(prompt: string, system: string): Promise<MetadataResponse | null> {
+	private static async generate(prompt: string, system: string, selection: string): Promise<MetadataResponse | null> {
 		const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
-		const model = userState.preferences.defaultModel;
+		const { model, providerId } = resolveProviderModel(selection);
 
 		try {
 			const response = await fetch(`${serverUrl}/api/chat/generate`, {
@@ -21,6 +22,7 @@ export class MetadataService {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					model,
+					provider_id: providerId,
 					messages: [
 						{ role: 'system', content: system },
 						{ role: 'user', content: prompt }
@@ -50,7 +52,10 @@ export class MetadataService {
 		}
 	}
 
-	static async generateChatMetadata(chatContent: string): Promise<MetadataResponse | null> {
+	static async generateChatMetadata(
+		chatContent: string,
+		selection = userState.preferences.defaultModel
+	): Promise<MetadataResponse | null> {
 		const categoryPresets = [
 			'Coding',
 			'Design',
@@ -83,11 +88,13 @@ export class MetadataService {
 
 		const system = `Tu es un assistant expert en classification et résumé. Tu réponds uniquement en JSON valide.`;
 
-		return this.generate(prompt, system);
+		return this.generate(prompt, system, selection);
 	}
 
 	static async updateChatMetadata(chatId: string) {
 		const db = await getDatabase();
+		const chat = await db.chats.findOne(chatId).exec();
+		if (!chat) return;
 
 		const messages = await db.messages
 			.find({
@@ -100,10 +107,9 @@ export class MetadataService {
 		if (messages.length < 2) return; // Need at least some context
 
 		const content = messages.map((m: any) => `${m.role}: ${m.content}`).join('\n');
-		const metadata = await this.generateChatMetadata(content);
+		const metadata = await this.generateChatMetadata(content, chat.model || 'mistral:latest');
 
 		if (metadata) {
-			const chat = await db.chats.findOne(chatId).exec();
 			if (chat) {
 				const updateData: Partial<Chat> = {};
 

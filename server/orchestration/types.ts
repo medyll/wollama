@@ -96,6 +96,7 @@ export interface ProviderTurn {
 
 /** Provider-agnostic chat request. Adapters translate it to their own wire format. */
 export interface ProviderChatRequest {
+	signal?: AbortSignal;
 	model: string;
 	messages: unknown[];
 	tools?: ToolDescriptor[];

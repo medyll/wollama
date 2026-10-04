@@ -1,6 +1,15 @@
 export default {
 	de: {
 		settings: {
+			provider: 'KI-Anbieter',
+			provider_primary: 'Primär',
+			provider_unavailable: 'Nicht verfügbar',
+			providers_help:
+				'Ollama führt lokale Modelle aus. Codex, Claude und Kimi verwenden die angemeldete CLI auf dem Server und benötigen möglicherweise Internet. Verfügbarkeit bestätigt die Installation, nicht die Anmeldung.',
+			providers_refresh: 'Anbieter aktualisieren',
+			providers_error: 'Anbieter konnten nicht geladen werden.',
+			provider_model: 'CLI-Modell',
+			provider_model_help: 'default verwendet das Standardmodell der CLI. Alternativ ein Modell Ihres Kontos eingeben.',
 			groups: {
 				personal: 'Persönlich',
 				assistant: 'Assistent',

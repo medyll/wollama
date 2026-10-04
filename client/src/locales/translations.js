@@ -14,6 +14,15 @@ export const translations = {
 			systemPrompt: 'system prompt'
 		},
 		settings: {
+			provider: 'LLM provider',
+			provider_primary: 'Primary',
+			provider_unavailable: 'Unavailable',
+			providers_help:
+				'Ollama runs local models. Codex, Claude and Kimi use the CLI installed and signed in on the server; their models may require internet access. Available means the executable is installed, not that authentication has been verified.',
+			providers_refresh: 'Refresh providers',
+			providers_error: 'Could not load providers.',
+			provider_model: 'CLI model',
+			provider_model_help: 'Use default for the CLI default model, or enter a model supported by your account.',
 			groups: {
 				personal: 'Personal',
 				assistant: 'Assistant',

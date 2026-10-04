@@ -1,6 +1,16 @@
 export default {
 	it: {
 		settings: {
+			provider: 'Fornitore IA',
+			provider_primary: 'Principale',
+			provider_unavailable: 'Non disponibile',
+			providers_help:
+				'Ollama esegue modelli locali. Codex, Claude e Kimi usano la CLI installata e autenticata sul server e possono richiedere Internet. La disponibilità conferma l’installazione, non l’autenticazione.',
+			providers_refresh: 'Aggiorna fornitori',
+			providers_error: 'Impossibile caricare i fornitori.',
+			provider_model: 'Modello CLI',
+			provider_model_help:
+				'Usa default per il modello predefinito della CLI o indica un modello disponibile per il tuo account.',
 			groups: {
 				personal: 'Personale',
 				assistant: 'Assistente',

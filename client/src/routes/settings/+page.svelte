@@ -15,6 +15,8 @@
 	import DataUpdate from '$components/ui_data/DataUpdate.svelte';
 	import { ragService, type RagDocument } from '$lib/services/rag.service';
 	import { APP_THEMES } from '$lib/theme';
+	import { providerModelKey, providerModelLabel, resolveProviderModel } from '$lib/provider-model';
+	import type { ProviderSummary } from '$lib/provider-model';
 
 	import { onDestroy, onMount } from 'svelte';
 
@@ -35,6 +37,9 @@
 	let localServerUrl = $state(userState.preferences.serverUrl);
 	let isVerifying = $state(false);
 	let installedModels = $state<any[]>([]);
+	let providers = $state<ProviderSummary[]>([]);
+	let providerError = $state('');
+	let selectedProvider = $derived(resolveProviderModel(userState.preferences.defaultModel).providerId);
 	let companions = $state<Companion[]>([]);
 	let isLoadingModels = $state(false);
 	let newModelName = $state('');
@@ -256,18 +261,20 @@
 	}
 
 	async function loadModels() {
+		const providerId = selectedProvider;
+		installedModels = [];
 		isLoadingModels = true;
 		try {
 			const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
-			const res = await fetch(`${serverUrl}/api/models`);
+			const res = await fetch(`${serverUrl}/api/models?provider=${encodeURIComponent(providerId)}`);
 			if (res.ok) {
 				const data = await res.json();
-				installedModels = data.models || [];
+				if (selectedProvider === providerId) installedModels = data.models || [];
 			}
 		} catch (e) {
 			console.error('Failed to load models', e);
 		} finally {
-			isLoadingModels = false;
+			if (selectedProvider === providerId) isLoadingModels = false;
 		}
 	}
 
@@ -279,9 +286,31 @@
 	}
 
 	function selectModel(modelName: string) {
-		userState.preferences.defaultModel = modelName;
+		userState.preferences.defaultModel = providerModelKey(selectedProvider, modelName);
 		userState.save();
 	}
+
+	async function loadProviders() {
+		try {
+			providerError = '';
+			const response = await fetch(`${userState.preferences.serverUrl.replace(/\/$/, '')}/api/providers`);
+			if (!response.ok) throw new Error(t('settings.providers_error'));
+			providers = (await response.json()).providers;
+		} catch {
+			providerError = t('settings.providers_error');
+		}
+	}
+
+	async function selectProvider(id: string) {
+		userState.preferences.defaultModel = providerModelKey(id, id === 'ollama' ? 'mistral:latest' : 'default');
+		userState.save();
+		await loadModels();
+		if (selectedProvider === id && installedModels.length) selectModel(installedModels[0].name);
+	}
+
+	onMount(() => {
+		void loadProviders();
+	});
 
 	$effect(() => {
 		// Auto-save when these properties change
@@ -526,11 +555,39 @@
 			<div class="grid grid-cols-1 gap-4 pt-4">
 				<!-- Modèle sélectionné actuel -->
 				<div class="form-control">
+					<label class="label" for="llm-provider">{t('settings.provider')}</label>
+					<select
+						id="llm-provider"
+						class="select select-bordered"
+						value={selectedProvider}
+						onchange={(e) => void selectProvider(e.currentTarget.value)}
+					>
+						{#each providers as provider}
+							<option value={provider.id} disabled={!provider.available}>
+								{provider.label}{provider.id === 'ollama' ? ` · ${t('settings.provider_primary')}` : ''}
+								{!provider.available ? ` · ${t('settings.provider_unavailable')}` : ''}
+							</option>
+						{/each}
+						{#if !providers.some((p) => p.id === selectedProvider)}
+							<option value={selectedProvider}>{selectedProvider}</option>
+						{/if}
+					</select>
+					<p>{t('settings.providers_help')}</p>
+					{#if providerError}<p role="alert">{providerError}</p>{/if}
+					<button
+						class="btn btn-ghost"
+						onclick={() => {
+							void loadProviders();
+							void loadModels();
+						}}>{t('settings.providers_refresh')}</button
+					>
+				</div>
+				<div class="form-control">
 					<div class="label">
 						<span class="label-text font-medium">{t('settings.default_model')}</span>
 					</div>
 					<div class="badge badge-primary badge-lg p-4">
-						{userState.preferences.defaultModel || 'None selected'}
+						{providerModelLabel(userState.preferences.defaultModel) || 'None selected'}
 					</div>
 					<div class="label pb-0">
 						<span class="label-text-alt">{t('settings.model_help')}</span>
@@ -566,7 +623,9 @@
 									</thead>
 									<tbody>
 										{#each installedModels as model}
-											{@const isSelected = model.name === userState.preferences.defaultModel}
+											{@const isSelected =
+												providerModelKey(selectedProvider, model.name) ===
+												userState.preferences.defaultModel}
 											<tr
 												class="hover cursor-pointer {isSelected ? 'bg-primary/10' : ''}"
 												onclick={() => selectModel(model.name)}
@@ -658,50 +717,63 @@
 				</div>
 			</div>
 
-			<!-- Model Management -->
-			<div class="divider">Model Management</div>
-			<div class="form-control">
-				<label class="label" for="new-model">
-					<span class="label-text">Download New Model (Ollama)</span>
-				</label>
-				<div class="join w-full">
-					<input
-						type="text"
-						id="new-model"
-						placeholder="e.g. llama3, mistral, gemma"
-						class="input input-bordered join-item w-full"
-						bind:value={newModelName}
-						disabled={downloadState.isPulling}
-					/>
-					<button
-						class="btn btn-primary join-item"
-						onclick={pullModel}
-						disabled={downloadState.isPulling || !newModelName}
-						aria-label="Download Model"
-					>
-						{#if downloadState.isPulling}
-							<span class="loading loading-spinner loading-sm"></span>
-						{:else}
-							<Icon icon="lucide:download" class="h-4 w-4" />
-						{/if}
-						Download
-					</button>
-				</div>
-				{#if downloadState.isPulling}
-					<div class="mt-4 space-y-2">
-						<div class="flex justify-between text-xs">
-							<span>{downloadState.status}</span>
-							<span>{downloadState.progress}%</span>
-						</div>
-						<progress
-							class="progress progress-primary w-full"
-							value={downloadState.progress}
-							max="100"
-							aria-label="Download progress"
-						></progress>
+			{#if selectedProvider === 'ollama'}
+				<!-- Model Management -->
+				<div class="divider">Model Management</div>
+				<div class="form-control">
+					<label class="label" for="new-model">
+						<span class="label-text">Download New Model (Ollama)</span>
+					</label>
+					<div class="join w-full">
+						<input
+							type="text"
+							id="new-model"
+							placeholder="e.g. llama3, mistral, gemma"
+							class="input input-bordered join-item w-full"
+							bind:value={newModelName}
+							disabled={downloadState.isPulling}
+						/>
+						<button
+							class="btn btn-primary join-item"
+							onclick={pullModel}
+							disabled={downloadState.isPulling || !newModelName}
+							aria-label="Download Model"
+						>
+							{#if downloadState.isPulling}
+								<span class="loading loading-spinner loading-sm"></span>
+							{:else}
+								<Icon icon="lucide:download" class="h-4 w-4" />
+							{/if}
+							Download
+						</button>
 					</div>
-				{/if}
-			</div>
+					{#if downloadState.isPulling}
+						<div class="mt-4 space-y-2">
+							<div class="flex justify-between text-xs">
+								<span>{downloadState.status}</span>
+								<span>{downloadState.progress}%</span>
+							</div>
+							<progress
+								class="progress progress-primary w-full"
+								value={downloadState.progress}
+								max="100"
+								aria-label="Download progress"
+							></progress>
+						</div>
+					{/if}
+				</div>
+			{:else}
+				<div class="form-control">
+					<label class="label" for="provider-model">{t('settings.provider_model')}</label>
+					<input
+						id="provider-model"
+						class="input input-bordered"
+						value={resolveProviderModel(userState.preferences.defaultModel).model}
+						onchange={(e) => selectModel(e.currentTarget.value.trim() || 'default')}
+					/>
+					<p>{t('settings.provider_model_help')}</p>
+				</div>
+			{/if}
 		</div>
 	</section>
 {/snippet}

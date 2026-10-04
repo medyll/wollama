@@ -18,6 +18,7 @@
 	import Icon from '@iconify/svelte';
 	import type { Companion, UserCompanion } from '$types/data';
 	import { goto } from '$app/navigation';
+	import { providerModelKey } from '$lib/provider-model';
 
 	type ActiveCompanion = Companion | UserCompanion;
 
@@ -63,15 +64,21 @@
 	async function loadAvailableModels() {
 		try {
 			const serverUrl = userState.preferences.serverUrl.replace(/\/$/, '');
-			const response = await fetch(`${serverUrl}/api/models`);
+			const response = await fetch(`${serverUrl}/api/models?provider=all`);
 			if (!response.ok) return;
 
-			const data = (await response.json()) as { models?: Array<string | { name?: string }> };
+			const data = (await response.json()) as { models?: Array<string | { name?: string; providerId?: string }> };
 			availableModels = (data.models || [])
-				.map((model) => (typeof model === 'string' ? model : model.name || ''))
+				.map((model) =>
+					typeof model === 'string'
+						? model
+						: model.name
+							? providerModelKey(model.providerId || 'ollama', model.name)
+							: ''
+				)
 				.filter(Boolean);
 		} catch (error) {
-			console.warn('Could not load Ollama models:', error);
+			console.warn('Could not load provider models:', error);
 		}
 	}
 
@@ -124,6 +131,7 @@
 			const chat = await chatService.getChat(chatId);
 			if (chat) {
 				uiState.setTitle(chat.title);
+				if (chat.model) currentCompagnon = { ...currentCompagnon, model: chat.model };
 				if (chat.companion_id) {
 					const comp = await getCompanionById(chat.companion_id);
 					if (comp) {

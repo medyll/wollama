@@ -134,6 +134,19 @@ describe('ChatWindow', () => {
 	}
 
 	describe('Rendering', () => {
+		it('shouldRestoreTheSavedProviderModelWithoutACompanion', async () => {
+			const chatService = await loadChatService();
+			const model = 'wollama:provider:codex/default';
+			vi.mocked(chatService.getChat).mockResolvedValueOnce({ title: 'CLI chat', model } as never);
+			vi.mocked(chatService.getMessages).mockReturnValue(messageStream([]) as never);
+			const { container } = render(ChatWindow, { props: { chatId: 'cli-chat' } });
+			await waitFor(() => {
+				expect(container.querySelector<HTMLSelectElement>('select[title="Model"]')?.value).toBe(model);
+			});
+			expect(screen.getByRole('option', { name: 'Codex · default' })).toBeTruthy();
+			expect(screen.queryByRole('button', { name: 'ui.add_attachment' })).toBeNull();
+		});
+
 		it('should render the empty state and a composer when no chatId is provided', () => {
 			const { container } = render(ChatWindow, { props: {} });
 

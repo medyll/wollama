@@ -237,6 +237,10 @@ app.post('/api/audio/speak', async (req, res) => {
 });
 
 app.post('/api/chat/generate', async (req, res) => {
+	const abort = new AbortController();
+	res.once('close', () => {
+		if (!res.writableEnded) abort.abort();
+	});
 	try {
 		const { model, messages, stream, context, chat_id, user_id, companion_id, provider_id } = req.body;
 
@@ -310,7 +314,7 @@ app.post('/api/chat/generate', async (req, res) => {
 			// If OllamaService.chat throws, we can still send a JSON error if we haven't written data.
 
 			try {
-				const ctx = { chat_id, user_id, companion_id, origin: 'chat' as const };
+				const ctx = { chat_id, user_id, companion_id, origin: 'chat' as const, signal: abort.signal };
 
 				// Headers are set lazily on the first chunk, same as the original
 				// behavior of only sending NDJSON headers once a response stream was
@@ -351,7 +355,7 @@ app.post('/api/chat/generate', async (req, res) => {
 				}
 			}
 		} else {
-			const ctx = { chat_id, user_id, companion_id, origin: 'chat' as const };
+			const ctx = { chat_id, user_id, companion_id, origin: 'chat' as const, signal: abort.signal };
 			const result = await conversationOrchestrator.runChat({
 				model,
 				messages,
@@ -393,7 +397,7 @@ app.get('/api/providers', async (req, res) => {
 app.get('/api/models', async (req, res) => {
 	try {
 		const providerId = typeof req.query.provider === 'string' ? req.query.provider : undefined;
-		const models = await providerRegistry.listModels(providerId);
+		const models = await providerRegistry.listModels(providerId === 'all' ? undefined : providerId || 'ollama');
 		// `models[].raw` keeps ollama's own record shape (name, size, digest, details)
 		// so existing consumers of this endpoint are unaffected; providerId/id/label are
 		// additive, and providers without a raw record synthesize an equivalent entry.

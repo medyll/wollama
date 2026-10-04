@@ -4,6 +4,16 @@ export default {
 			promptCenter: 'centro del prompt'
 		},
 		settings: {
+			provider: 'Proveedor de IA',
+			provider_primary: 'Principal',
+			provider_unavailable: 'No disponible',
+			providers_help:
+				'Ollama ejecuta modelos locales. Codex, Claude y Kimi usan la CLI instalada y autenticada en el servidor y pueden necesitar Internet. La disponibilidad confirma la instalación, no la autenticación.',
+			providers_refresh: 'Actualizar proveedores',
+			providers_error: 'No se pudieron cargar los proveedores.',
+			provider_model: 'Modelo de la CLI',
+			provider_model_help:
+				'Use default para el modelo predeterminado de la CLI o indique un modelo disponible en su cuenta.',
 			groups: {
 				personal: 'Personal',
 				assistant: 'Asistente',

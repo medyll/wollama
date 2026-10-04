@@ -4,6 +4,16 @@ export default {
 			systemPrompt: 'invite de système'
 		},
 		settings: {
+			provider: 'Fournisseur IA',
+			provider_primary: 'Principal',
+			provider_unavailable: 'Indisponible',
+			providers_help:
+				'Ollama exécute les modèles locaux. Codex, Claude et Kimi utilisent leur CLI installé et connecté sur le serveur ; leurs modèles peuvent nécessiter Internet. Disponible signifie que le programme est installé, pas que la connexion au compte est vérifiée.',
+			providers_refresh: 'Actualiser les fournisseurs',
+			providers_error: 'Impossible de charger les fournisseurs.',
+			provider_model: 'Modèle du CLI',
+			provider_model_help:
+				'Utilisez default pour le modèle par défaut du CLI, ou indiquez un modèle accessible à votre compte.',
 			groups: {
 				personal: 'Personnel',
 				assistant: 'Assistant',

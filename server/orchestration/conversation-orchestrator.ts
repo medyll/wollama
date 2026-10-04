@@ -76,12 +76,16 @@ export function createConversationOrchestrator(injected?: ProviderAdapter) {
 			let lastNonToolChunkRaw: unknown;
 
 			for (let turn = 1; turn <= maxIterations; turn++) {
-				const descriptors = await toolCatalog.list(req.ctx);
+				const descriptors =
+					'capabilities' in provider && !(provider as { capabilities: { tools: boolean } }).capabilities.tools
+						? []
+						: await toolCatalog.list(req.ctx);
 				const providerTurn = await provider.chat({
 					model: req.model,
 					messages,
 					tools: descriptors.length > 0 ? descriptors : undefined,
-					stream: req.stream
+					stream: req.stream,
+					signal: req.ctx.signal
 				});
 
 				const pending: ToolCallRequest[] = [];

@@ -30,6 +30,7 @@ export const appSchema: DatabaseSchema = {
 			locale: { type: 'string', ui: { type: 'select', options: ['en', 'fr', 'es', 'de'] } },
 			auto_play_audio: { type: 'boolean', ui: { type: 'toggle' } },
 			server_url: { type: 'string', ui: { type: 'url' } },
+			// Provider-qualified selections use the existing string field; no data migration is needed.
 			default_model: { type: 'string' },
 			default_temperature: { type: 'number', ui: { type: 'slider', min: 0, max: 1, step: 0.1 } },
 			onboarding_completed: { type: 'boolean', ui: { type: 'toggle' }, default: false },
