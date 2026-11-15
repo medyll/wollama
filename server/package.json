@@ -44,11 +44,11 @@
 		"@types/pouchdb": "^6.4.2",
 		"@types/pouchdb-find": "^7.3.3",
 		"adm-zip": "^0.5.18",
-		"concurrently": "^10.0.6",
+		"concurrently": "^10.0.7",
 		"cross-env": "^10.1.0",
 		"ts-node": "^10.9.2",
 		"tsx": "^4.23.15",
 		"typescript": "^5.9.3",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	}
 }
