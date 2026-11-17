@@ -94,7 +94,7 @@
 		"@tailwindcss/vite": "^4.3.5",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/svelte": "^5.4.2",
-		"@testing-library/user-event": "^14.6.10",
+		"@testing-library/user-event": "^14.6.12",
 		"@types/marked": "^6.0.0",
 		"@types/pouchdb": "^6.4.2",
 		"@vitest/coverage-v8": "^5.1.0",
