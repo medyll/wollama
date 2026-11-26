@@ -1,0 +1,43 @@
+name: Dependabot auto-merge
+
+# Merges a Dependabot pull request once every check on its head commit has
+# passed. Deterministic: no LLM, no third-party service, no repository setting.
+# Runs from main with the default token, which does not start push workflows:
+# a dependency bump is released with the next regular push.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: dependabot-automerge-${{ github.event.workflow_run.head_branch }}
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge when every check is green
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          pr=$(gh pr list -R "$REPO" --head "$BRANCH" --state open --json number,headRefOid,author \
+            -q ".[] | select(.headRefOid == \"$SHA\" and (.author.login | test(\"dependabot\"))) | .number")
+          if [ -z "$pr" ]; then echo "No open Dependabot pull request at $SHA."; exit 0; fi
+          pending=$(gh pr view "$pr" -R "$REPO" --json statusCheckRollup \
+            -q '[.statusCheckRollup[] | select((.status // "COMPLETED") != "COMPLETED")] | length')
+          failed=$(gh pr view "$pr" -R "$REPO" --json statusCheckRollup \
+            -q '[.statusCheckRollup[] | (.conclusion // .state) | select(. != "SUCCESS" and . != "NEUTRAL" and . != "SKIPPED")] | length')
+          if [ "$pending" != "0" ]; then echo "$pending check(s) still running; the last one to finish merges."; exit 0; fi
+          if [ "$failed" != "0" ]; then echo "$failed check(s) not green: leaving #$pr open."; exit 0; fi
+          gh pr merge "$pr" -R "$REPO" --squash --delete-branch --match-head-commit "$SHA"
