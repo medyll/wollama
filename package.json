@@ -38,7 +38,7 @@
 		"globals": "^17.14.0",
 		"prettier": "^3.10.1",
 		"prettier-plugin-svelte": "^4.2.0",
-		"prettier-plugin-tailwindcss": "^0.7.4",
+		"prettier-plugin-tailwindcss": "^0.8.1",
 		"standard-version": "^9.5.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.74.0"
