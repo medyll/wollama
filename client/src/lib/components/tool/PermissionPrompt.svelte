@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { permissionState } from '$lib/state/permissions.svelte.js';
+	import { permissionState, type PermissionRequest } from '$lib/state/permissions.svelte.js';
 
-	let { request } = $props<{ request: import('$lib/state/permissions.svelte.js').PermissionRequest }>();
+	let { request }: { request: PermissionRequest } = $props();
 
 	let scope = $state<'once' | 'session' | 'persistent'>('once');
 	let authorization = $state('');

@@ -20,7 +20,7 @@
 		onrecord,
 		oncompanionclick,
 		onmodelchange
-	} = $props<{
+	}: {
 		value: string;
 		files: string[];
 		isRecording: boolean;
@@ -32,7 +32,7 @@
 		onrecord: () => void;
 		oncompanionclick: () => void;
 		onmodelchange: (model: string) => void;
-	}>();
+	} = $props();
 
 	let modelOptions = $derived(
 		Array.from(new Set([currentCompagnon.model, ...models].filter((model): model is string => Boolean(model))))

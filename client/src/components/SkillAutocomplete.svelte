@@ -7,10 +7,13 @@
 		description: string;
 	}
 
-	let { query = '', onSelect = () => {} } = $props<{
+	let {
+		query = '',
+		onSelect = () => {}
+	}: {
 		query?: string;
 		onSelect?: (skill: SkillSuggestion) => void;
-	}>();
+	} = $props();
 	let items = $state<SkillSuggestion[]>([]);
 
 	const fetchSkills = async (q: string) => {

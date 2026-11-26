@@ -22,7 +22,7 @@ export interface SyncQueueItem {
 export class SyncService {
 	private syncQueue: Map<string, SyncQueueItem> = new Map();
 	private isSyncing = false;
-	private syncInterval: NodeJS.Timeout | null = null;
+	private syncInterval: ReturnType<typeof setInterval> | null = null;
 	private networkListener: ((online: boolean) => void) | null = null;
 
 	constructor() {
